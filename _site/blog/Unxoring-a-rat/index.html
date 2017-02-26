@@ -21,7 +21,7 @@
 <meta name="twitter:creator" content="@GlassDFIR">
 
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://glassdfir.github.io/images/site-logo.png">
+<meta name="twitter:image" content="http://jon.glass/images/site-logo.png">
 
 <!-- Open Graph -->
 <meta property="og:locale" content="en_US">
@@ -30,15 +30,15 @@
 <meta property="og:description" content="I was looking at a sample of malware and I wanted to highlight a very simple technique I used to remove a layer of encryption without knowing the key. This post is not going to impress the seasoned veterans but since I think it will probably help someone in the community; I will bang out a post on it.
 
 ">
-<meta property="og:url" content="https://glassdfir.github.io/blog/Unxoring-a-rat/">
+<meta property="og:url" content="http://jon.glass/blog/Unxoring-a-rat/">
 <meta property="og:site_name" content="Half Full of Security">
 
 
 
 
 
-<link rel="canonical" href="https://glassdfir.github.io/blog/Unxoring-a-rat/">
-<link href="https://glassdfir.github.io/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
+<link rel="canonical" href="http://jon.glass/blog/Unxoring-a-rat/">
+<link href="http://jon.glass/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
 
 <!-- https://t.co/dKP3o1e -->
 <meta name="HandheldFriendly" content="True">
@@ -46,7 +46,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- For all browsers -->
-<link rel="stylesheet" href="https://glassdfir.github.io/assets/css/main.css">
+<link rel="stylesheet" href="http://jon.glass/assets/css/main.css">
 <!-- Webfonts -->
 <script src="https://use.edgefonts.net/source-sans-pro:n2,i2,n3,i3,n4,i4,n6,i6,n7,i7,n9,i9;source-code-pro:n4,n7;volkhov.js"></script>
 
@@ -54,12 +54,12 @@
 
 <!-- HTML5 Shiv and Media Query Support -->
 <!--[if lt IE 9]>
-  <script src="https://glassdfir.github.io/assets/js/vendor/html5shiv.min.js"></script>
-  <script src="https://glassdfir.github.io/assets/js/vendor/respond.min.js"></script>
+  <script src="http://jon.glass/assets/js/vendor/html5shiv.min.js"></script>
+  <script src="http://jon.glass/assets/js/vendor/respond.min.js"></script>
 <![endif]-->
 
 <!-- Modernizr -->
-<script src="https://glassdfir.github.io/assets/js/vendor/modernizr-2.7.1.custom.min.js"></script>
+<script src="http://jon.glass/assets/js/vendor/modernizr-2.7.1.custom.min.js"></script>
 
 
 <!-- MathJax -->
@@ -68,17 +68,17 @@
 
 <!-- Icons -->
 <!-- 16x16 -->
-<link rel="shortcut icon" href="https://glassdfir.github.io/favicon.ico">
+<link rel="shortcut icon" href="http://jon.glass/favicon.ico">
 <!-- 32x32 -->
-<link rel="shortcut icon" href="https://glassdfir.github.io/favicon.png">
+<link rel="shortcut icon" href="http://jon.glass/favicon.png">
 <!-- 57x57 (precomposed) for iPhone 3GS, pre-2011 iPod Touch and older Android devices -->
-<link rel="apple-touch-icon-precomposed" href="https://glassdfir.github.io/images/apple-touch-icon-precomposed.png">
+<link rel="apple-touch-icon-precomposed" href="http://jon.glass/images/apple-touch-icon-precomposed.png">
 <!-- 72x72 (precomposed) for 1st generation iPad, iPad 2 and iPad mini -->
-<link rel="apple-touch-icon-precomposed" sizes="72x72" href="https://glassdfir.github.io/images/apple-touch-icon-72x72-precomposed.png">
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://jon.glass/images/apple-touch-icon-72x72-precomposed.png">
 <!-- 114x114 (precomposed) for iPhone 4, 4S, 5 and post-2011 iPod Touch -->
-<link rel="apple-touch-icon-precomposed" sizes="114x114" href="https://glassdfir.github.io/images/apple-touch-icon-114x114-precomposed.png">
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://jon.glass/images/apple-touch-icon-114x114-precomposed.png">
 <!-- 144x144 (precomposed) for iPad 3rd and 4th generation -->
-<link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://glassdfir.github.io/images/apple-touch-icon-144x144-precomposed.png">
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://jon.glass/images/apple-touch-icon-144x144-precomposed.png">
 
 </head>
 
@@ -89,13 +89,13 @@
 	    <ul>
       
 		    
-		    <li><a href="https://glassdfir.github.io/blog/" >Blog</a></li>
+		    <li><a href="http://jon.glass/blog/" >Blog</a></li>
 		  
 		    
-		    <li><a href="https://glassdfir.github.io/about/" >About</a></li>
+		    <li><a href="http://jon.glass/about/" >About</a></li>
 		  
 		    
-		    <li><a href="https://glassdfir.github.io/search/" >Search</a></li>
+		    <li><a href="http://jon.glass/search/" >Search</a></li>
 		  
 	    </ul>
 	</nav>
@@ -106,9 +106,9 @@
 <header class="masthead">
 	<div class="wrap">
       
-  		<a href="https://glassdfir.github.io/" class="site-logo" rel="home" title="Half Full of Security"><img src="https://glassdfir.github.io/images/site-logo.png" width="200" height="200" alt="Half Full of Security logo" class="animated fadeInDown"></a>
+  		<a href="http://jon.glass/" class="site-logo" rel="home" title="Half Full of Security"><img src="http://jon.glass/images/site-logo.png" width="200" height="200" alt="Half Full of Security logo" class="animated fadeInDown"></a>
       
-      <h1 class="site-title animated fadeIn"><a href="https://glassdfir.github.io/">Half Full of Security</a></h1>
+      <h1 class="site-title animated fadeIn"><a href="http://jon.glass/">Half Full of Security</a></h1>
 		<h2 class="site-description animated fadeIn" itemprop="description">Sharpening the ACKs since 2013</h2>
 	</div>
 </header><!-- /.masthead -->
@@ -136,7 +136,7 @@
 <p>I was in the middle of reverse engineering a sample of AdWind RAT. McAfee has a great post on it here. As I read their article, my sample seemed to be in line with Variant 2, which among numerous other layers of obfuscation, has an XORed config.ini file in that contains, another Malicious payload.</p>
 
 <p>Looks like this:
-<img src="https://glassdfir.github.io/images/Screen-Shot-2016-02-05-at-10.26.16-PM.png" alt="image-title-here" class="img-responsive" />
+<img src="http://jon.glass/images/Screen-Shot-2016-02-05-at-10.26.16-PM.png" alt="image-title-here" class="img-responsive" />
 Since McAfee article mentions this file is an XML document, I saw an opportunity for a cheap win. The article shows the first line of the file as:</p>
 
 <figure class="highlight"><pre><code class="language-xml" data-lang="xml"><span class="cp">&lt;?xml version="1.0" encoding="UTF-8" standalone="no"?&gt;</span></code></pre></figure>
@@ -159,7 +159,7 @@ Since McAfee article mentions this file is an XML document, I saw an opportunity
         <span class="n">outfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">xor</span><span class="p">(</span><span class="n">inputfile</span><span class="o">.</span><span class="n">read</span><span class="p">(),</span><span class="n">key</span><span class="p">))</span></code></pre></figure>
 
 <p>Here is what we get:
-<img src="https://glassdfir.github.io/images/Screen-Shot-2016-02-05-at-10.32.38-PM.png" alt="image-title-here" class="img-responsive" />
+<img src="http://jon.glass/images/Screen-Shot-2016-02-05-at-10.32.38-PM.png" alt="image-title-here" class="img-responsive" />
 With this cleartext document in hand I could continue with my analysis. Again, this isn’t breathtaking but it is worth sharing.</p>
 
         
@@ -167,10 +167,10 @@ With this cleartext document in hand I could continue with my analysis. Again, t
     </div><!-- /.entry-wrapper -->
     <nav class="pagination" role="navigation">
       
-        <a href="https://glassdfir.github.io/blog/reviews_mastering_python_forensics/" class="btn" title="Review Of Mastering Python Forensics">Previous</a>
+        <a href="http://jon.glass/blog/reviews_mastering_python_forensics/" class="btn" title="Review Of Mastering Python Forensics">Previous</a>
       
       
-        <a href="https://glassdfir.github.io/blog/RogueUsers/" class="btn" title="Dealing with users gone bad…">Next</a>
+        <a href="http://jon.glass/blog/RogueUsers/" class="btn" title="Dealing with users gone bad…">Next</a>
       
     </nav><!-- /.pagination -->
   </article>
@@ -193,19 +193,19 @@ With this cleartext document in hand I could continue with my analysis. Again, t
 	
   
 	
-  <a href="https://glassdfir.github.io/feed.xml" title="Atom/RSS feed"><i class="fa fa-rss-square fa-2x"></i></a>
+  <a href="http://jon.glass/feed.xml" title="Atom/RSS feed"><i class="fa fa-rss-square fa-2x"></i></a>
 </div><!-- /.social-icons -->
 
   </footer>
 </div><!-- /.footer-wrapper -->
 
 <script type="text/javascript">
-  var BASE_URL = 'https://glassdfir.github.io';
+  var BASE_URL = 'http://jon.glass';
 </script>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="https://glassdfir.github.io/assets/js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
-<script src="https://glassdfir.github.io/assets/js/scripts.min.js"></script>
+<script>window.jQuery || document.write('<script src="http://jon.glass/assets/js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script src="http://jon.glass/assets/js/scripts.min.js"></script>
 
 
 
