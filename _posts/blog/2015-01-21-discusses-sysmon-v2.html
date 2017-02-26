@@ -1,0 +1,159 @@
+---
+layout: post
+title: How to Use Sysmon 2.0 (Part 1)
+date: 2015-01-21 11:09:07.000000000 -05:00
+categories: blog
+---
+<p>On <a href="http://blogs.technet.com/b/sysinternals/archive/2015/01/20/updates-sysmon-v2-0-accesschk-v5-21-ru-v1-1.aspx" target="_blank">January 19, 2015</a>, the SysInternals team released <a href="https://technet.microsoft.com/en-us/sysinternals/dn798348" target="_blank">Sysmon 2.0</a>. "This major update to Sysmon, a service that records process activity to the Windows event log for use by incident detection and forensic analysis, includes driver load and image load events with signature information, configurable hashing algorithm reporting, flexible filters for including and excluding events, and support for supplying configuration via a configuration file instead of the command line."</p>
+<p>One interesting update in 2.0 is the addition of Import Hashes (imphash).If you are not familiar, imports are the functions that a piece of software calls from other files. Most of the time, imports are used to augment a program with a function from a Windows DLL. Imphashes are calculated by based on library/API names and their specific order within the executable. Imphashes are useful for tracking flavors of malware that use the same functionality but have different binaries. This addition separates Sysmon from being an augmentation of Windows event logging to a utility that is designed to analyze malware. Awesome.</p>
+<h3>2.0 also comes with 5 new events:</h3>
+<p><strong>Event ID 4: Sysmon service state changed</strong><br />
+The service state change event reports the state of the Sysmon service (started or stopped).<br />
+<!-- HTML generated using hilite.me -->
+<pre style="margin: 0; line-height: 125%"><span style="color: #007700">&lt;Event</span> <span style="color: #0000CC">xmlns=</span><span style="background-color: #fff0f0">&quot;http://schemas.microsoft.com/win/2004/08/events/event&quot;</span><span style="color: #007700">&gt;</span>
+  <span style="color: #007700">&lt;System&gt;</span>
+    <span style="color: #007700">&lt;Provider</span> <span style="color: #0000CC">Name=</span><span style="background-color: #fff0f0">&quot;Microsoft-Windows-Sysmon&quot;</span> <span style="color: #0000CC">Guid=</span><span style="background-color: #fff0f0">&quot;{5770385F-C22A-43E0-BF4C-06F5698FFBD9}&quot;</span> <span style="color: #007700">/&gt;</span>
+    <span style="color: #007700">&lt;EventID&gt;</span>4<span style="color: #007700">&lt;/EventID&gt;</span>
+    <span style="color: #007700">&lt;Version&gt;</span>1<span style="color: #007700">&lt;/Version&gt;</span>
+    <span style="color: #007700">&lt;Level&gt;</span>4<span style="color: #007700">&lt;/Level&gt;</span>
+    <span style="color: #007700">&lt;Task&gt;</span>4<span style="color: #007700">&lt;/Task&gt;</span>
+    <span style="color: #007700">&lt;Opcode&gt;</span>0<span style="color: #007700">&lt;/Opcode&gt;</span>
+    <span style="color: #007700">&lt;Keywords&gt;</span>0x8000000000000000<span style="color: #007700">&lt;/Keywords&gt;</span>
+    <span style="color: #007700">&lt;TimeCreated</span> <span style="color: #0000CC">SystemTime=</span><span style="background-color: #fff0f0">&quot;2015-01-21T16:54:43.336928400Z&quot;</span> <span style="color: #007700">/&gt;</span>
+    <span style="color: #007700">&lt;EventRecordID&gt;</span>216242<span style="color: #007700">&lt;/EventRecordID&gt;</span>
+    <span style="color: #007700">&lt;Correlation</span> <span style="color: #007700">/&gt;</span>
+    <span style="color: #007700">&lt;Execution</span> <span style="color: #0000CC">ProcessID=</span><span style="background-color: #fff0f0">&quot;1112&quot;</span> <span style="color: #0000CC">ThreadID=</span><span style="background-color: #fff0f0">&quot;1168&quot;</span> <span style="color: #007700">/&gt;</span>
+    <span style="color: #007700">&lt;Channel&gt;</span>Microsoft-Windows-Sysmon/Operational<span style="color: #007700">&lt;/Channel&gt;</span>
+    <span style="color: #007700">&lt;Computer&gt;</span>WIN-RKSC06DQ86F<span style="color: #007700">&lt;/Computer&gt;</span>
+    <span style="color: #007700">&lt;Security</span> <span style="color: #0000CC">UserID=</span><span style="background-color: #fff0f0">&quot;S-1-5-18&quot;</span> <span style="color: #007700">/&gt;</span>
+  <span style="color: #007700">&lt;/System&gt;</span>
+  <span style="color: #007700">&lt;EventData&gt;</span>
+    <span style="color: #007700">&lt;Data</span> <span style="color: #0000CC">Name=</span><span style="background-color: #fff0f0">&quot;State&quot;</span><span style="color: #007700">&gt;</span>Started<span style="color: #007700">&lt;/Data&gt;</span>
+  <span style="color: #007700">&lt;/EventData&gt;</span>
+<span style="color: #007700">&lt;/Event&gt;</span>
+</pre>
+<p><strong>Event ID 5: Process terminated</strong><br />
+The process terminate event reports when a process terminates. It provides the UtcTime, ProcessGuid and ProcessId of the process.<br />
+<!-- HTML generated using hilite.me -->
+<pre style="margin: 0; line-height: 125%"><span style="color: #007700">&lt;Event</span> <span style="color: #0000CC">xmlns=</span><span style="background-color: #fff0f0">&quot;http://schemas.microsoft.com/win/2004/08/events/event&quot;</span><span style="color: #007700">&gt;</span>
+  <span style="color: #007700">&lt;System&gt;</span>
+    <span style="color: #007700">&lt;Provider</span> <span style="color: #0000CC">Name=</span><span style="background-color: #fff0f0">&quot;Microsoft-Windows-Sysmon&quot;</span> <span style="color: #0000CC">Guid=</span><span style="background-color: #fff0f0">&quot;{5770385F-C22A-43E0-BF4C-06F5698FFBD9}&quot;</span> <span style="color: #007700">/&gt;</span>
+    <span style="color: #007700">&lt;EventID&gt;</span>5<span style="color: #007700">&lt;/EventID&gt;</span>
+    <span style="color: #007700">&lt;Version&gt;</span>1<span style="color: #007700">&lt;/Version&gt;</span>
+    <span style="color: #007700">&lt;Level&gt;</span>4<span style="color: #007700">&lt;/Level&gt;</span>
+    <span style="color: #007700">&lt;Task&gt;</span>5<span style="color: #007700">&lt;/Task&gt;</span>
+    <span style="color: #007700">&lt;Opcode&gt;</span>0<span style="color: #007700">&lt;/Opcode&gt;</span>
+    <span style="color: #007700">&lt;Keywords&gt;</span>0x8000000000000000<span style="color: #007700">&lt;/Keywords&gt;</span>
+    <span style="color: #007700">&lt;TimeCreated</span> <span style="color: #0000CC">SystemTime=</span><span style="background-color: #fff0f0">&quot;2015-01-21T17:00:43.600396700Z&quot;</span> <span style="color: #007700">/&gt;</span>
+    <span style="color: #007700">&lt;EventRecordID&gt;</span>277158<span style="color: #007700">&lt;/EventRecordID&gt;</span>
+    <span style="color: #007700">&lt;Correlation</span> <span style="color: #007700">/&gt;</span>
+    <span style="color: #007700">&lt;Execution</span> <span style="color: #0000CC">ProcessID=</span><span style="background-color: #fff0f0">&quot;1112&quot;</span> <span style="color: #0000CC">ThreadID=</span><span style="background-color: #fff0f0">&quot;1332&quot;</span> <span style="color: #007700">/&gt;</span>
+    <span style="color: #007700">&lt;Channel&gt;</span>Microsoft-Windows-Sysmon/Operational<span style="color: #007700">&lt;/Channel&gt;</span>
+    <span style="color: #007700">&lt;Computer&gt;</span>WIN-RKSC06DQ86F<span style="color: #007700">&lt;/Computer&gt;</span>
+    <span style="color: #007700">&lt;Security</span> <span style="color: #0000CC">UserID=</span><span style="background-color: #fff0f0">&quot;S-1-5-18&quot;</span> <span style="color: #007700">/&gt;</span>
+  <span style="color: #007700">&lt;/System&gt;</span>
+  <span style="color: #007700">&lt;EventData&gt;</span>
+    <span style="color: #007700">&lt;Data</span> <span style="color: #0000CC">Name=</span><span style="background-color: #fff0f0">&quot;UtcTime&quot;</span><span style="color: #007700">&gt;</span>1/21/2015 05:00:43.481 PM<span style="color: #007700">&lt;/Data&gt;</span>
+    <span style="color: #007700">&lt;Data</span> <span style="color: #0000CC">Name=</span><span style="background-color: #fff0f0">&quot;ProcessGuid&quot;</span><span style="color: #007700">&gt;</span>{FF1717CF-DB0B-54BF-0000-001015761600}<span style="color: #007700">&lt;/Data&gt;</span>
+    <span style="color: #007700">&lt;Data</span> <span style="color: #0000CC">Name=</span><span style="background-color: #fff0f0">&quot;ProcessId&quot;</span><span style="color: #007700">&gt;</span>10096<span style="color: #007700">&lt;/Data&gt;</span>
+  <span style="color: #007700">&lt;/EventData&gt;</span>
+<span style="color: #007700">&lt;/Event&gt;</span>
+</pre>
+<p><strong>Event ID 6: Driver loaded</strong><br />
+The driver loaded events provides information about a driver being loaded on the system. The configured hashes are provided as well as signature information. The signature is done asynchronously for performance reasons and indicates if the file was removed after loading.<br />
+<!-- HTML generated using hilite.me -->
+<pre style="margin: 0; line-height: 125%"><span style="color: #007700">&lt;Event</span> <span style="color: #0000CC">xmlns=</span><span style="background-color: #fff0f0">&quot;http://schemas.microsoft.com/win/2004/08/events/event&quot;</span><span style="color: #007700">&gt;</span>
+  <span style="color: #007700">&lt;System&gt;</span>
+    <span style="color: #007700">&lt;Provider</span> <span style="color: #0000CC">Name=</span><span style="background-color: #fff0f0">&quot;Microsoft-Windows-Sysmon&quot;</span> <span style="color: #0000CC">Guid=</span><span style="background-color: #fff0f0">&quot;{5770385F-C22A-43E0-BF4C-06F5698FFBD9}&quot;</span> <span style="color: #007700">/&gt;</span>
+    <span style="color: #007700">&lt;EventID&gt;</span>6<span style="color: #007700">&lt;/EventID&gt;</span>
+    <span style="color: #007700">&lt;Version&gt;</span>1<span style="color: #007700">&lt;/Version&gt;</span>
+    <span style="color: #007700">&lt;Level&gt;</span>4<span style="color: #007700">&lt;/Level&gt;</span>
+    <span style="color: #007700">&lt;Task&gt;</span>6<span style="color: #007700">&lt;/Task&gt;</span>
+    <span style="color: #007700">&lt;Opcode&gt;</span>0<span style="color: #007700">&lt;/Opcode&gt;</span>
+    <span style="color: #007700">&lt;Keywords&gt;</span>0x8000000000000000<span style="color: #007700">&lt;/Keywords&gt;</span>
+    <span style="color: #007700">&lt;TimeCreated</span> <span style="color: #0000CC">SystemTime=</span><span style="background-color: #fff0f0">&quot;2015-01-21T16:54:54.924095100Z&quot;</span> <span style="color: #007700">/&gt;</span>
+    <span style="color: #007700">&lt;EventRecordID&gt;</span>218132<span style="color: #007700">&lt;/EventRecordID&gt;</span>
+    <span style="color: #007700">&lt;Correlation</span> <span style="color: #007700">/&gt;</span>
+    <span style="color: #007700">&lt;Execution</span> <span style="color: #0000CC">ProcessID=</span><span style="background-color: #fff0f0">&quot;1112&quot;</span> <span style="color: #0000CC">ThreadID=</span><span style="background-color: #fff0f0">&quot;1336&quot;</span> <span style="color: #007700">/&gt;</span>
+    <span style="color: #007700">&lt;Channel&gt;</span>Microsoft-Windows-Sysmon/Operational<span style="color: #007700">&lt;/Channel&gt;</span>
+    <span style="color: #007700">&lt;Computer&gt;</span>WIN-RKSC06DQ86F<span style="color: #007700">&lt;/Computer&gt;</span>
+    <span style="color: #007700">&lt;Security</span> <span style="color: #0000CC">UserID=</span><span style="background-color: #fff0f0">&quot;S-1-5-18&quot;</span> <span style="color: #007700">/&gt;</span>
+  <span style="color: #007700">&lt;/System&gt;</span>
+  <span style="color: #007700">&lt;EventData&gt;</span>
+    <span style="color: #007700">&lt;Data</span> <span style="color: #0000CC">Name=</span><span style="background-color: #fff0f0">&quot;UtcTime&quot;</span><span style="color: #007700">&gt;</span>1/21/2015 04:54:47.299 PM<span style="color: #007700">&lt;/Data&gt;</span>
+    <span style="color: #007700">&lt;Data</span> <span style="color: #0000CC">Name=</span><span style="background-color: #fff0f0">&quot;ImageLoaded&quot;</span><span style="color: #007700">&gt;</span>C:\Windows\System32\drivers\WdNisDrv.sys<span style="color: #007700">&lt;/Data&gt;</span>
+    <span style="color: #007700">&lt;Data</span> <span style="color: #0000CC">Name=</span><span style="background-color: #fff0f0">&quot;HashType&quot;</span><span style="color: #007700">&gt;</span>SHA1,MD5,SHA256,IMPHASH<span style="color: #007700">&lt;/Data&gt;</span>
+    <span style="color: #007700">&lt;Data</span> <span style="color: #0000CC">Name=</span><span style="background-color: #fff0f0">&quot;Hash&quot;</span><span style="color: #007700">&gt;</span>9F469B3BA78F83D1F8B73B4F6EFD365F92A89786,282E7D46310338FF4A6B7680440EB0DA,04242798DD82F583154AEA3D775C9BFD574FC471D01CDEB9D070872425094D82,FEC15D772A16260D523B3D2E2797F735<span style="color: #007700">&lt;/Data&gt;</span>
+    <span style="color: #007700">&lt;Data</span> <span style="color: #0000CC">Name=</span><span style="background-color: #fff0f0">&quot;Signed&quot;</span><span style="color: #007700">&gt;</span>true<span style="color: #007700">&lt;/Data&gt;</span>
+    <span style="color: #007700">&lt;Data</span> <span style="color: #0000CC">Name=</span><span style="background-color: #fff0f0">&quot;Signature&quot;</span><span style="color: #007700">&gt;</span>Microsoft Windows<span style="color: #007700">&lt;/Data&gt;</span>
+  <span style="color: #007700">&lt;/EventData&gt;</span>
+<span style="color: #007700">&lt;/Event&gt;</span>
+</pre>
+<p><strong>Event ID 7: Image loaded</strong><br />
+The image loaded event logs when a module is loaded in a specific process. This event is disabled by default and needs to be configured with the –l option. It indicates the process in which the module is loaded, hashes and signature information.  The signature is done asynchronously for performance reasons and indicates if the file was removed after loading. This event should be configured carefully, as monitoring all image load events will generate a large number of events.<br />
+<!-- HTML generated using hilite.me -->
+<pre style="margin: 0; line-height: 125%"><span style="color: #007700">&lt;Event</span> <span style="color: #0000CC">xmlns=</span><span style="background-color: #fff0f0">&quot;http://schemas.microsoft.com/win/2004/08/events/event&quot;</span><span style="color: #007700">&gt;</span>
+  <span style="color: #007700">&lt;System&gt;</span>
+    <span style="color: #007700">&lt;Provider</span> <span style="color: #0000CC">Name=</span><span style="background-color: #fff0f0">&quot;Microsoft-Windows-Sysmon&quot;</span> <span style="color: #0000CC">Guid=</span><span style="background-color: #fff0f0">&quot;{5770385F-C22A-43E0-BF4C-06F5698FFBD9}&quot;</span> <span style="color: #007700">/&gt;</span>
+    <span style="color: #007700">&lt;EventID&gt;</span>7<span style="color: #007700">&lt;/EventID&gt;</span>
+    <span style="color: #007700">&lt;Version&gt;</span>1<span style="color: #007700">&lt;/Version&gt;</span>
+    <span style="color: #007700">&lt;Level&gt;</span>4<span style="color: #007700">&lt;/Level&gt;</span>
+    <span style="color: #007700">&lt;Task&gt;</span>7<span style="color: #007700">&lt;/Task&gt;</span>
+    <span style="color: #007700">&lt;Opcode&gt;</span>0<span style="color: #007700">&lt;/Opcode&gt;</span>
+    <span style="color: #007700">&lt;Keywords&gt;</span>0x8000000000000000<span style="color: #007700">&lt;/Keywords&gt;</span>
+    <span style="color: #007700">&lt;TimeCreated</span> <span style="color: #0000CC">SystemTime=</span><span style="background-color: #fff0f0">&quot;2015-01-21T17:00:43.977452900Z&quot;</span> <span style="color: #007700">/&gt;</span>
+    <span style="color: #007700">&lt;EventRecordID&gt;</span>277336<span style="color: #007700">&lt;/EventRecordID&gt;</span>
+    <span style="color: #007700">&lt;Correlation</span> <span style="color: #007700">/&gt;</span>
+    <span style="color: #007700">&lt;Execution</span> <span style="color: #0000CC">ProcessID=</span><span style="background-color: #fff0f0">&quot;1112&quot;</span> <span style="color: #0000CC">ThreadID=</span><span style="background-color: #fff0f0">&quot;1332&quot;</span> <span style="color: #007700">/&gt;</span>
+    <span style="color: #007700">&lt;Channel&gt;</span>Microsoft-Windows-Sysmon/Operational<span style="color: #007700">&lt;/Channel&gt;</span>
+    <span style="color: #007700">&lt;Computer&gt;</span>WIN-RKSC06DQ86F<span style="color: #007700">&lt;/Computer&gt;</span>
+    <span style="color: #007700">&lt;Security</span> <span style="color: #0000CC">UserID=</span><span style="background-color: #fff0f0">&quot;S-1-5-18&quot;</span> <span style="color: #007700">/&gt;</span>
+  <span style="color: #007700">&lt;/System&gt;</span>
+  <span style="color: #007700">&lt;EventData&gt;</span>
+    <span style="color: #007700">&lt;Data</span> <span style="color: #0000CC">Name=</span><span style="background-color: #fff0f0">&quot;UtcTime&quot;</span><span style="color: #007700">&gt;</span>1/21/2015 05:00:43.789 PM<span style="color: #007700">&lt;/Data&gt;</span>
+    <span style="color: #007700">&lt;Data</span> <span style="color: #0000CC">Name=</span><span style="background-color: #fff0f0">&quot;ProcessGuid&quot;</span><span style="color: #007700">&gt;</span>{FF1717CF-DB37-54BF-0000-001008982000}<span style="color: #007700">&lt;/Data&gt;</span>
+    <span style="color: #007700">&lt;Data</span> <span style="color: #0000CC">Name=</span><span style="background-color: #fff0f0">&quot;ProcessId&quot;</span><span style="color: #007700">&gt;</span>41744<span style="color: #007700">&lt;/Data&gt;</span>
+    <span style="color: #007700">&lt;Data</span> <span style="color: #0000CC">Name=</span><span style="background-color: #fff0f0">&quot;Image&quot;</span><span style="color: #007700">&gt;</span>C:\Windows\System32\cmd.exe<span style="color: #007700">&lt;/Data&gt;</span>
+    <span style="color: #007700">&lt;Data</span> <span style="color: #0000CC">Name=</span><span style="background-color: #fff0f0">&quot;ImageLoaded&quot;</span><span style="color: #007700">&gt;</span>C:\Windows\System32\advapi32.dll<span style="color: #007700">&lt;/Data&gt;</span>
+    <span style="color: #007700">&lt;Data</span> <span style="color: #0000CC">Name=</span><span style="background-color: #fff0f0">&quot;HashType&quot;</span><span style="color: #007700">&gt;</span>SHA1,MD5,SHA256,IMPHASH<span style="color: #007700">&lt;/Data&gt;</span>
+    <span style="color: #007700">&lt;Data</span> <span style="color: #0000CC">Name=</span><span style="background-color: #fff0f0">&quot;Hash&quot;</span><span style="color: #007700">&gt;</span>C446DE5692D5CA9B7DAEE0F0A48FC6A575F8FE3A,561F1AB95F4F01C691BDABA5FD5C67FC,4C6184C1A72B2F84BB1CA5A72F89CC44F9F37FF225D834EBCEFF26F820635BED,973A8CDB39A3DB10C284AFB640B793B3<span style="color: #007700">&lt;/Data&gt;</span>
+    <span style="color: #007700">&lt;Data</span> <span style="color: #0000CC">Name=</span><span style="background-color: #fff0f0">&quot;Signed&quot;</span><span style="color: #007700">&gt;</span>true<span style="color: #007700">&lt;/Data&gt;</span>
+    <span style="color: #007700">&lt;Data</span> <span style="color: #0000CC">Name=</span><span style="background-color: #fff0f0">&quot;Signature&quot;</span><span style="color: #007700">&gt;</span>Microsoft Windows<span style="color: #007700">&lt;/Data&gt;</span>
+  <span style="color: #007700">&lt;/EventData&gt;</span>
+<span style="color: #007700">&lt;/Event&gt;</span>
+</pre>
+<p><strong>Event ID 255: Error</strong><br />
+This event is generated when an error occurred within Sysmon. They can happen if the system is under heavy load and certain tasked could not be performed or a bug exists in the Sysmon service.<br />
+<!-- HTML generated using hilite.me -->
+<pre style="margin: 0; line-height: 125%"><span style="color: #007700">&lt;Event</span> <span style="color: #0000CC">xmlns=</span><span style="background-color: #fff0f0">&quot;http://schemas.microsoft.com/win/2004/08/events/event&quot;</span><span style="color: #007700">&gt;</span>
+  <span style="color: #007700">&lt;System&gt;</span>
+    <span style="color: #007700">&lt;Provider</span> <span style="color: #0000CC">Name=</span><span style="background-color: #fff0f0">&quot;Microsoft-Windows-Sysmon&quot;</span> <span style="color: #0000CC">Guid=</span><span style="background-color: #fff0f0">&quot;{5770385F-C22A-43E0-BF4C-06F5698FFBD9}&quot;</span> <span style="color: #007700">/&gt;</span>
+    <span style="color: #007700">&lt;EventID&gt;</span>255<span style="color: #007700">&lt;/EventID&gt;</span>
+    <span style="color: #007700">&lt;Version&gt;</span>1<span style="color: #007700">&lt;/Version&gt;</span>
+    <span style="color: #007700">&lt;Level&gt;</span>2<span style="color: #007700">&lt;/Level&gt;</span>
+    <span style="color: #007700">&lt;Task&gt;</span>255<span style="color: #007700">&lt;/Task&gt;</span>
+    <span style="color: #007700">&lt;Opcode&gt;</span>0<span style="color: #007700">&lt;/Opcode&gt;</span>
+    <span style="color: #007700">&lt;Keywords&gt;</span>0x8000000000000000<span style="color: #007700">&lt;/Keywords&gt;</span>
+    <span style="color: #007700">&lt;TimeCreated</span> <span style="color: #0000CC">SystemTime=</span><span style="background-color: #fff0f0">&quot;2015-01-21T17:00:44.001453300Z&quot;</span> <span style="color: #007700">/&gt;</span>
+    <span style="color: #007700">&lt;EventRecordID&gt;</span>278772<span style="color: #007700">&lt;/EventRecordID&gt;</span>
+    <span style="color: #007700">&lt;Correlation</span> <span style="color: #007700">/&gt;</span>
+    <span style="color: #007700">&lt;Execution</span> <span style="color: #0000CC">ProcessID=</span><span style="background-color: #fff0f0">&quot;1112&quot;</span> <span style="color: #0000CC">ThreadID=</span><span style="background-color: #fff0f0">&quot;1332&quot;</span> <span style="color: #007700">/&gt;</span>
+    <span style="color: #007700">&lt;Channel&gt;</span>Microsoft-Windows-Sysmon/Operational<span style="color: #007700">&lt;/Channel&gt;</span>
+    <span style="color: #007700">&lt;Computer&gt;</span>WIN-RKSC06DQ86F<span style="color: #007700">&lt;/Computer&gt;</span>
+    <span style="color: #007700">&lt;Security</span> <span style="color: #0000CC">UserID=</span><span style="background-color: #fff0f0">&quot;S-1-5-18&quot;</span> <span style="color: #007700">/&gt;</span>
+  <span style="color: #007700">&lt;/System&gt;</span>
+  <span style="color: #007700">&lt;EventData&gt;</span>
+    <span style="color: #007700">&lt;Data</span> <span style="color: #0000CC">Name=</span><span style="background-color: #fff0f0">&quot;ID&quot;</span><span style="color: #007700">&gt;</span>DriverCommunication<span style="color: #007700">&lt;/Data&gt;</span>
+    <span style="color: #007700">&lt;Data</span> <span style="color: #0000CC">Name=</span><span style="background-color: #fff0f0">&quot;Description&quot;</span><span style="color: #007700">&gt;</span>Failed to retrieve events (Last error: Insufficient system resources exist to complete the requested service.).<span style="color: #007700">&lt;/Data&gt;</span>
+  <span style="color: #007700">&lt;/EventData&gt;</span>
+<span style="color: #007700">&lt;/Event&gt;</span>
+</pre>
+<p>Took me a second to get Sysmon to throw an error like this. It is worthy to note that, from my observations, Sysmon is not prone to error under normal use. In case anyone is wondering how to make Sysmon barf (along with the rest of the computer) I used an old school fork logic bomb batch script as a means to an end. Drop this into a batch file and run it. <em><strong>THIS WILL LOCK UP YOUR ENTIRE SYSTEM QUICK.</strong></em> You have been told.<br />
+<!-- HTML generated using hilite.me -->
+<pre style="margin: 0; line-height: 125%"><span style="color: #997700; font-weight: bold">:START</span>
+start <span style="color: #996633">%~dp0%</span>~n<span style="color: #6600EE; font-weight: bold">0</span><span style="color: #996633">%~x0</span>
+<span style="color: #996633">%~dp0%</span>~n<span style="color: #6600EE; font-weight: bold">0</span><span style="color: #996633">%~x0</span>|<span style="color: #996633">%~dp0%</span>~n<span style="color: #6600EE; font-weight: bold">0</span><span style="color: #996633">%~x0</span>
+<span style="color: #008800; font-weight: bold">GOTO</span> <span style="color: #997700; font-weight: bold">START</span>
+</pre>
+<p>I am sure there are more elegant ways but this was the first idea that came to mind that worked.</p>
+<p>Sysmon 2.0 also has a filtering feature that I will cover in the next post.</p>

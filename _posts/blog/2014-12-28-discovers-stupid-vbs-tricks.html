@@ -1,0 +1,50 @@
+---
+layout: post
+title: Stupid VBS tricks I discovered...
+date: 2014-12-28 15:19:03.000000000 -05:00
+type: post
+published: true
+status: publish
+categories: []
+tags: []
+meta:
+  _edit_last: '1'
+author:
+  login: GlassAdmin
+  email: thechosenoneandahalf@gmail.com
+  display_name: Jon
+  first_name: ''
+  last_name: ''
+---
+<p>This is dumb but I was trolling malwr.com and noticed there was a keyword for "VBS".<br />
+Uncompiled malware in a text file? Sign me up. Here are a few of the tidbits I picked up:<br />
+Here is an example of how to retrieve files from the interwebs with VBScript:</p>
+<pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Dim</span> oFSO: <span style="color: #0000ff">Set</span> oFSO = CreateObject(<span style="color: #a31515">&quot;Scripting.FileSystemObject&quot;</span>)
+a = GetRequest(<span style="color: #a31515">&quot;https://jon.glass&quot;</span>)
+<span style="color: #0000ff">With</span> oFSO.createTextFile(<span style="color: #a31515">&quot;index.htm&quot;</span>)
+    .Write(a)
+    .Close
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">With</span>
+<span style="color: #0000ff">Function</span> GetRequest(URL)
+    GetRequest=<span style="color: #a31515">&quot;&quot;</span>
+    <span style="color: #0000ff">Dim</span> o
+    <span style="color: #0000ff">Set</span> o = CreateObject(<span style="color: #a31515">&quot;MSXML2.XMLHTTP&quot;</span>)
+    o.open <span style="color: #a31515">&quot;GET&quot;</span>,URL, <span style="color: #0000ff">false</span>
+    o.send
+    GetRequest=o.responseText
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+</pre>
+<p>Here is an example of how to use VBScript to make a post :</p>
+<pre style="margin: 0; line-height: 125%">post <span style="color: #a31515">&quot;jon.glass&quot;</span>,<span style="color: #a31515">&quot;test&quot;</span>
+<span style="color: #0000ff">function</span> post(cmd ,da)
+    post=<span style="color: #a31515">&quot;&quot;</span>
+    UAString = <span style="color: #a31515">&quot;whatever the hell you want&quot;</span>
+    <span style="color: #0000ff">Dim</span> o
+    <span style="color: #0000ff">Set</span> o = CreateObject(<span style="color: #a31515">&quot;MSXML2.XMLHTTP&quot;</span>)
+    o.open <span style="color: #a31515">&quot;POST&quot;</span>,<span style="color: #a31515">&quot;http://&quot;</span> &amp; cmd, <span style="color: #0000ff">false</span>
+    o.setRequestHeader <span style="color: #a31515">&quot;User-Agent:&quot;</span>, UAString
+    o.send da
+    post=o.responseText
+<span style="color: #0000ff">end</span> <span style="color: #0000ff">function</span>
+</pre>
+<p>This is probably something well documented but since I was unfamiliar with it and it looks vaguely useful...I posted it here for future reference. </p>

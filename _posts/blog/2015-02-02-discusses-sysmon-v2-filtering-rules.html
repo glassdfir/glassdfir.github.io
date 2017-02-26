@@ -1,0 +1,67 @@
+---
+layout: post
+title: How to Use Sysmon 2.0 (Part 2)
+date: 2015-02-02 22:33:48.000000000 -05:00
+type: post
+published: true
+status: publish
+categories: blog
+tags: []
+meta:
+  _edit_last: '1'
+  _wp_old_slug: shows-how-to-use-sysmon-2-0-part-2
+author:
+  login: GlassAdmin
+  email: thechosenoneandahalf@gmail.com
+  display_name: Jon
+  first_name: ''
+  last_name: ''
+---
+<p>Sysmon 2.0 Rule filtering</p>
+<p>If you have used Sysmon for any extended length of time, you already know that the logs fill up quick. This is the nature of Windows. There is a lot going on under the hood. If you configure Sysmon to log when processes create network connections (Event ID 3) and load modules (Event ID 7), you are going to record more logs than you want to read.</p>
+<p>To help add granularity, 2.0 comes with the ability to filter events based off a flexible ruleset. This is implemented through an XML configuration file that can be applied during installation and changed any time. The configuration commands can be found on the SysInternals' Sysmon page. Here is an example of a basic configuration file w/some notes:</p>
+<p><script src="https://gist.github.com/glassdfir/4f15cf0856a7896297bd.js"></script></p>
+<p>The XML file is broken into to two sections Configuration and Rules.<br />
+The Configuration section provides for the same options config options from the command line.<br />
+-h Configuration entry: Hashing<br />
+-l Configuration entry: ImageLoading<br />
+-n Configuration entry: Network</p>
+<p>The Rules section allows you to configure which events you want to include/exclude.<br />
+Making rules are pretty easy:</p>
+<ol>
+<b />
+<li>Pick a Sysmon Event you want to include/exclude in the logs.</li>
+<pre>
+ID	Tag	           Event
+1	ProcessCreate	   Process Create
+2	FileCreateTime	   File creation time
+3	NetworkConnect	   Network connection detected
+5	ProcessTerminate   Process terminated
+6	DriverLoad	   Driver Loaded
+7	ImageLoad	   Image loaded
+</pre>
+<p>Lets say I want to focus on Event ID 2 events so I will use the "NetworkConnect" tag.<br />
+<b />
+<li>Determine if you are want to use this rule to include or exclude something.</li>
+<p><i>This might be the most confusing part but fear not, I will lead you through.</i><br />
+A Sysmon rule asks for a default action to apply to all events of that type. To Log (include) or not to Log (exclude), that is the question. Once you have established the default action, you include conditional statements that act as exceptions to the default action. So if the default action is to INCLUDE, all of the conditions in the rule will be used to EXCLUDE events from the log. The opposite is also true, if the default action is to EXCLUDE, all of the conditions in the rule will be used to INCLUDE events in the log.<br />
+<script src="https://gist.github.com/glassdfir/45804710ded41255353c.js"></script><br />
+<b />
+<li>Cast an appropriate net.</li>
+<p>This is where Sysmon shines. If you are configuring Sysmon monitor something specific, these new rules afford that level of granularity. Inversely, you can increase the Signal-to-Noise ratio and not log noisy known good processes (antivirus, binaries with specific hashes, etc).<br />
+This is an example of a configuration file to observe the specific actions of a particular malware:<a href="https://malwr.com/analysis/ZjljMjQ0NDZlM2Q1NDVkNmIzMzNiOTBhYzdkMjhiZjM/" target="_blank"><br />
+Here</a> is a random example I pulled from the good people at <a href="https://malwr.com" target="_blank">malwr.com.</a><br />
+Here is a Sysmon configuration file that could be used to monitor most of the behavior. (This is not exhaustive, just an example of potential use.)<br />
+<script src="https://gist.github.com/glassdfir/32c6d982dc4c3bfed779.js"></script><br />
+Using Sysmon for something this specific is great but when you are staring at trees, you are going to miss the forest. Here is an example of how to use Sysmon as an everyday background service that monitors everything EXCEPT for processes that you would rather not see cluttering up your logs.<br />
+<script src="https://gist.github.com/glassdfir/684f7664c468e275cba8.js"></script>
+</ol>
+<p>The seriously useful part about the configuration file is that you can load a new one at anytime.</p>
+<pre>
+C:\Windows\System32>sysmon.exe -c OnlyLookAtOneThing.xml
+C:\Windows\System32>sysmon.exe -c DontLogPornHubTraffic.xml
+</pre>
+<p>This makes Sysmon very deployable and scalable. Personally, on most of my machines, I typically run Sysmon wide open, without any restriction on what to log unless I want to document something specific. I also increase the log size to something ridiculous like 200 MB.</p>
+<pre>
+wevtutil sl Microsoft-Windows-Sysmon/Operational /ms:209715200
+</pre>

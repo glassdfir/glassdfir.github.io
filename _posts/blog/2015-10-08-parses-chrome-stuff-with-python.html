@@ -1,0 +1,211 @@
+---
+layout: post
+title: Parsing Chrome Artifacts with Python! Part 1
+date: 2015-10-08 23:03:41.000000000 -04:00
+categories: blog
+---
+<p>I recently googled myself and saw that I had a blog. After several failed guesses at my e-mail address and password, I was able to stumble back in here. For what it is worth, I have been very busy doing some cool stuff at work. Along those lines, I wanted to highlight some tips on Chrome forensics.
+
+As usual with my blog posts, you are going to have to do your homework for them to make complete sense.<br />
+
+I recommend reading these:<br />
+<a href="http://forensicswiki.org/wiki/Google_Chrome" target="_blank">http://forensicswiki.org/wiki/Google_Chrome</a><br />
+<a href="https://digital-forensics.sans.org/blog/2010/01/21/google-chrome-forensics/" target="_blank">https://digital-forensics.sans.org/blog/2010/01/21/google-chrome-forensics/</a></p>
+<p>In fact the more I look at these posts...I am not even certain if any of the following is new or original but I am posting examples of how to use SQLite and Python to parse Chrome files. In fact, if you want one comprehensive Python script for parsing all of the Chrome artifacts from the various versions of Chrome, grab a copy of <a href="https://github.com/obsidianforensics/hindsight" target="_blank">hindsight</a> by <a href="https://twitter.com/_RyanBenson" target="_blank">Ryan Benson</a> from <a href="http://www.obsidianforensics.com/" target="_blank">Obsidian Forensics</a>. Looks like he used the source from Chromium to interpret the values in each of the tables. Top Notch. </p>
+<p>First things first, which of Chromes files can you parse with SQLite?<br />
+Here is a quick and dirty way to find all of the Chrome SQLite files on Windows:<br />
+All of the sqlite files have an associated rollback journal with them. A rollback journal is a temporary file used to implement atomic commit and rollback capabilities in SQLite. Rollback journals have the same filename as the database file except there is a "-journal" appended to the end.<br />
+Example:<br />
+C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\History is the sqlite database that stores Chrome's web history.<br />
+C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\History-journal is it's rollback journal. With that in mind...<br />
+{% highlight raw %}
+C:\>dir Users\*-journal /s /b
+C:\Users\User\AppData\Local\Google\Chrome\User Data\Safe Browsing Cookies-journal
+C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\Cookies-journal
+C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\Extension Cookies-journal
+C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\Favicons-journal
+C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\History-journal
+C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\Login Data-journal
+C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\Network Action Predictor-journal
+C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\Origin Bound Certs-journal
+C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\QuotaManager-journal
+C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\Shortcuts-journal
+C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\Top Sites-journal
+C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\Web Data-journal
+C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\Application Cache\Index-journal
+C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\databases\Databases.db-journal
+C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\Local Storage\https_www.youtube.com_0.localstorage-journal
+C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\Local Storage\http_a.rfihub.com_0.localstorage-journal
+C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\Local Storage\http_ad.doubleclick.net_0.localstorage-journal
+C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\Local Storage\http_arduino.cc_0.localstorage-journal
+C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\Local Storage\http_blogs.technet.com_0.localstorage-journal
+C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\Local Storage\http_d3l3lkinz3f56t.cloudfront.net_0.localstorage-journal
+C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\Local Storage\http_en.wikipedia.org_0.localstorage-journal
+C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\Storage\ext\chrome-signin\def\Cookies-journal
+C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\Storage\ext\chrome-signin\def\QuotaManager-journal
+C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\Storage\ext\chrome-signin\def\databases\Databases.db-journal
+{% endhighlight %}
+Or if you are into Apple's:
+{% highlight raw %}
+MacDaddy:Users glass$sudo find /Users -name *-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Application Cache/Index-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Cookies-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/databases/Databases.db-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Extension Cookies-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Favicons-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/History-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Local Storage/__0.localstorage-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Local Storage/chrome-devtools_devtools_0.localstorage-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Local Storage/chrome-extension_djflhoibgkdhkhhcedjiklpkjnoahfmg_0.localstorage-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Local Storage/chrome-extension_pafkbggdmjlpgkdkcbjmhmfcdpncadgh_0.localstorage-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Local Storage/http_blog.cassidiancybersecurity.com_0.localstorage-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Local Storage/http_computers.woot.com_0.localstorage-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Local Storage/http_gizmodo.com_0.localstorage-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Local Storage/http_googleads.g.doubleclick.net_0.localstorage-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Local Storage/http_jon.glass_0.localstorage-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Local Storage/http_marvel.com_0.localstorage-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Local Storage/http_pythoncentral.io_0.localstorage-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Local Storage/http_raspberrypi.stackexchange.com_0.localstorage-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Local Storage/http_reverseengineering.stackexchange.com_0.localstorage-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Local Storage/http_shop.oreilly.com_0.localstorage-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Local Storage/http_shop.theoatmeal.com_0.localstorage-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Local Storage/http_williballenthin.com_0.localstorage-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Local Storage/http_www.amazon.com_0.localstorage-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Local Storage/http_www.imdb.com_0.localstorage-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Local Storage/http_www.instructables.com_0.localstorage-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Local Storage/http_www.netflix.com_0.localstorage-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Local Storage/http_www.pendrivelinux.com_0.localstorage-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Local Storage/http_www.rifftrax.com_0.localstorage-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Local Storage/https_docs.google.com_0.localstorage-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Local Storage/https_drive.google.com_0.localstorage-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Local Storage/https_gist.github.com_0.localstorage-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Local Storage/https_github.com_0.localstorage-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Login Data-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Network Action Predictor-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Origin Bound Certs-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/QuotaManager-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Shortcuts-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Sync Data/SyncData.sqlite3-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Sync Data Backup/SyncData.sqlite3-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Top Sites-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/Web Data-journal
+/Users/glass/Library/Application Support/Google/Chrome/Default/WebRTCIdentityStore-journal
+/Users/glass/Library/Application Support/Google/Chrome/Safe Browsing Cookies-journal
+{% endhighlight %}
+Or if you use Linux like a real forensicator...<br />
+{% highlight raw %}
+root@LinuxLaptop:/# find /home -name *-journal
+/home/glass/.config/google-chrome/Default/Origin Bound Certs-journal
+/home/glass/.config/google-chrome/Default/Storage/ext/chrome-signin/def/QuotaManager-journal
+/home/glass/.config/google-chrome/Default/Storage/ext/chrome-signin/def/databases/Databases.db-journal
+/home/glass/.config/google-chrome/Default/Storage/ext/chrome-signin/def/Cookies-journal
+/home/glass/.config/google-chrome/Default/QuotaManager-journal
+/home/glass/.config/google-chrome/Default/Shortcuts-journal
+/home/glass/.config/google-chrome/Default/databases/Databases.db-journal
+/home/glass/.config/google-chrome/Default/Favicons-journal
+/home/glass/.config/google-chrome/Default/History-journal
+/home/glass/.config/google-chrome/Default/Network Action Predictor-journal
+/home/glass/.config/google-chrome/Default/Application Cache/Index-journal
+/home/glass/.config/google-chrome/Default/Web Data-journal
+/home/glass/.config/google-chrome/Default/Login Data-journal
+/home/glass/.config/google-chrome/Default/Cookies-journal
+/home/glass/.config/google-chrome/Default/Top Sites-journal
+/home/glass/.config/google-chrome/Default/Extension Cookies-journal
+/home/glass/.config/google-chrome/Default/Local Storage/http_en.wikipedia.org_0.localstorage-journal
+/home/glass/.config/google-chrome/Default/Local Storage/https_www.google.com_0.localstorage-journal
+/home/glass/.config/google-chrome/Default/Local Storage/http_serverfault.com_0.localstorage-journal
+/home/glass/.config/google-chrome/Default/Local Storage/https_github.com_0.localstorage-journal
+/home/glass/.config/google-chrome/Default/Local Storage/http_c.betrad.com_0.localstorage-journal
+/home/glass/.config/google-chrome/Default/Local Storage/http_jon.glass_0.localstorage-journal
+/home/glass/.config/google-chrome/Default/Local Storage/http_www.howtogeek.com_0.localstorage-journal
+/home/glass/.config/google-chrome/Default/Local Storage/https_bitbucket.org_0.localstorage-journal
+/home/glass/.config/google-chrome/Default/Local Storage/https_www.youtube.com_0.localstorage-journal
+/home/glass/.config/google-chrome/Default/Local Storage/http_security.stackexchange.com_0.localstorage-journal
+/home/glass/.config/google-chrome/Default/Local Storage/http_stackoverflow.com_0.localstorage-journal
+/home/glass/.config/google-chrome/Default/Local Storage/http_superuser.com_0.localstorage-journal
+/home/glass/.config/google-chrome/Default/Local Storage/http_unix.stackexchange.com_0.localstorage-journal
+/home/glass/.config/google-chrome/Safe Browsing Cookies-journal
+{% endhighlight %}
+
+By reviewing just these dir listings we can see that all three versions have the following files:<br />
+<strong>Origin Bound Certs</strong> - DB of Origin-Bound Certificates (OBC). OBCs are a self-signed certificates that the browser uses to perform TLS Client Authentication.<br />
+<strong>QuotaManager</strong> - Handles offline content quotas for AppCache, IndexedDB, WebSQL and File System API.<br />
+<strong>Shortcuts</strong> - Contains info about the "omnibox" shortcuts that come up when you open a new tab or window.<br />
+<strong>databases/Databases.db</strong> - Not 100% on these but I found an <a href="http://Evercookie - Samy Kamkar" target="_blank">evercookie</a> in one.<br />
+<strong>Favicons</strong> - Keeps track of icons associated with web sites.<br />
+<strong>History</strong> - The file that gets you in trouble with your boss/wife/priest.<br />
+<strong>Network Action Predictor</strong> - When you start typing in stuff in the navigation bar, Google makes a guess at what you want a based on previous stuff you have looked and straight up voodoo. This file keeps track of what you type, what Google guessed, and how accurate the guess was based on whether or not you clicked on the guess they presented you with a list of options from the drop down that appears. This is a great artifact of attribute because it is generated by hands on keyboards.<br />
+<strong>Application Cache/Index</strong> - Cache for Chrome Apps.<br />
+<strong>Web Data</strong>  - Contains mostly autofill data. Some useful timestamps.<br />
+<strong>Login Data</strong> - Contains any username and password you have asked Chrome to store for you. This is in plaintext.<br />
+<strong>Cookies</strong> - This is where Chrome stores all of the bits of crap that web sites use to remember you.<br />
+<strong>Top Sites</strong> - Name says it all really.<br />
+<strong>Extension Cookies</strong> - Cookies for Chrome Extensions<br />
+<strong>Safe Browsing Cookies</strong> - Google use this for determining how well their server-side components are functioning.<br />
+Additionally, all 3 versions have local storage for extensions and websites that have been visited.<br />
+The format looks like this:<code>Local Storage/PROTOCAL_DOMAINNAME_0.localstorage</code><br />
+We are already profiling user activity without even trying! Thanks Chrome!</p>
+<p>This is all well and good but I promised you Python and Python you shall have but before you get too deep into code, <a href="http://sqlitebrowser.org/" target="_blank">download SQLite Browser</a>.<br />
+It's cross platform and painless to use. This will make the road ahead a lot easier.</p>
+<blockquote><p>Note about using SQLite Browser to look at Chrome files: SQLite Browser is, by default, always looking for .sqlite files, and while these files are sqlite, they do not have the nifty extension. So you will need to select All files (*) from the drop down menu to see them.</p></blockquote>
+<p>Since I know most of you can manage a GUI, I am not going to bore you with explaining everything...<br />
+Open up any of the SQLite files we found earlier...let's say...History<br />
+<a href="https://jon.glass/wp-content/uploads/2015/10/OpenHistory.png"><img src="{{ site.baseurl }}/images/OpenHistory.png" /></a><br />
+And here is what that looks like...
+<a href="https://jon.glass/wp-content/uploads/2015/10/history.png"><img src="{{ site.baseurl }}/images/history.png" /></a><br />
+This is everything you need to start cranking out some sweet SQLite parsin' Python scripts!<br />
+So lets say we wanted to get a list of all of the downloads from the History database.<br />
+Specifically, I want to know where it was saved to, where did it come from, the time it started downloading, when it finished, and how big it was when it was downloaded. The select statement would look a like this:<br />
+{% highlight SQL %}
+SELECT target_path,referrer,start_time,end_time,received_bytes FROM downloads;
+{% endhighlight %}
+Let's wrap some python around it and bring this post to a close:<br />
+{% highlight python %}
+mport sqlite3, datetime
+def fixDate(timestamp):
+    #Chrome stores timestamps in the number of microseconds since Jan 1 1601.
+    #To convert, we create a datetime object for Jan 1 1601...
+    epoch_start = datetime.datetime(1601,1,1)
+    #create an object for the number of microseconds in the timestamp
+    delta = datetime.timedelta(microseconds=int(timestamp))
+    #and return the sum of the two.
+    return epoch_start + delta
+
+selectStatement = 'SELECT target_path, referrer, start_time, end_time, received_bytes FROM downloads;'
+historyFile = 'C:\\Users\\User\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\History'
+c = sqlite3.connect(historyFile)
+for row in c.execute(selectStatement):
+    print "Download:",row[0].encode('utf-8')
+    print "\tFrom:",str(row[1])
+    print "\tStarted:",str(fixDate(row[2]))
+    print "\tFinished:",str(fixDate(row[3]))
+    print "\tSize:",str(row[4])
+{% endhighlight %}
+
+
+The output looks like this:<br />
+{% highlight raw %}
+c:\Demo> ChromeDownloads.py
+Download: C:\Users\User\Downloads\SysinternalsSuite.zip
+        From: http://technet.microsoft.com/en-us/sysinternals/bb842062.aspx
+        Started: 2014-12-27 02:44:33.643417
+        Finished: 2014-12-27 02:45:01.690324
+        Size: 13708848
+Download: C:\Users\User\Downloads\7z936.msi
+        From: http://sourceforge.net/projects/sevenzip/files/7-Zip/9.36/7z936.msi/download
+        Started: 2014-12-27 02:46:00.532712
+        Finished: 2014-12-27 02:46:04.400309
+        Size: 1196032
+Download: C:\Users\User\Downloads\Wireshark-win32-1.12.2.exe
+        From: https://www.wireshark.org/download.html
+        Started: 2014-12-27 03:36:24.090374
+        Finished: 2014-12-27 03:36:33.952502
+        Size: 23571488
+Download: C:\Users\User\Downloads\0xED.tar.bz2
+        From: http://www.suavetech.com/0xed/
+        Started: 2014-12-27 03:48:12.519877
+        Finished: 2014-12-27 03:48:13.893038
+        Size: 896330
+{% endhighlight %}
+
+<p>That is all for this post but I plan on digging a bit deeper on the next few.</p>

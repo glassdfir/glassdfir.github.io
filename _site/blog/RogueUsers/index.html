@@ -1,0 +1,224 @@
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8" lang="en"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9" lang="en"><![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<title>Dealing with users gone bad… &#8211; Half Full of Security</title>
+<meta name="description" content="We have all been there when someone that gets paid more than you do runs in and says “We need to remove User X from the network and lock them out of their PC to preserve evidence!!!”. If not, you will be.
+
+">
+<meta name="keywords" content="">
+
+
+<!-- Twitter Cards -->
+<meta name="twitter:title" content="Dealing with users gone bad…">
+<meta name="twitter:description" content="We have all been there when someone that gets paid more than you do runs in and says “We need to remove User X from the network and lock them out of their PC to preserve evidence!!!”. If not, you will be.
+
+">
+<meta name="twitter:site" content="@GlassDFIR">
+<meta name="twitter:creator" content="@GlassDFIR">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://localhost:4000/images/site-logo.png">
+
+<!-- Open Graph -->
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dealing with users gone bad…">
+<meta property="og:description" content="We have all been there when someone that gets paid more than you do runs in and says “We need to remove User X from the network and lock them out of their PC to preserve evidence!!!”. If not, you will be.
+
+">
+<meta property="og:url" content="http://localhost:4000/blog/RogueUsers/">
+<meta property="og:site_name" content="Half Full of Security">
+
+
+
+
+
+<link rel="canonical" href="http://localhost:4000/blog/RogueUsers/">
+<link href="http://localhost:4000/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="http://localhost:4000/assets/css/main.css">
+<!-- Webfonts -->
+<script src="https://use.edgefonts.net/source-sans-pro:n2,i2,n3,i3,n4,i4,n6,i6,n7,i7,n9,i9;source-code-pro:n4,n7;volkhov.js"></script>
+
+<meta http-equiv="cleartype" content="on">
+
+<!-- HTML5 Shiv and Media Query Support -->
+<!--[if lt IE 9]>
+  <script src="http://localhost:4000/assets/js/vendor/html5shiv.min.js"></script>
+  <script src="http://localhost:4000/assets/js/vendor/respond.min.js"></script>
+<![endif]-->
+
+<!-- Modernizr -->
+<script src="http://localhost:4000/assets/js/vendor/modernizr-2.7.1.custom.min.js"></script>
+
+
+<!-- MathJax -->
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+<!-- Icons -->
+<!-- 16x16 -->
+<link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+<!-- 32x32 -->
+<link rel="shortcut icon" href="http://localhost:4000/favicon.png">
+<!-- 57x57 (precomposed) for iPhone 3GS, pre-2011 iPod Touch and older Android devices -->
+<link rel="apple-touch-icon-precomposed" href="http://localhost:4000/images/apple-touch-icon-precomposed.png">
+<!-- 72x72 (precomposed) for 1st generation iPad, iPad 2 and iPad mini -->
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://localhost:4000/images/apple-touch-icon-72x72-precomposed.png">
+<!-- 114x114 (precomposed) for iPhone 4, 4S, 5 and post-2011 iPod Touch -->
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://localhost:4000/images/apple-touch-icon-114x114-precomposed.png">
+<!-- 144x144 (precomposed) for iPad 3rd and 4th generation -->
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://localhost:4000/images/apple-touch-icon-144x144-precomposed.png">
+
+</head>
+
+<body id="post">
+
+<div class="navigation-wrapper">
+	<nav role="navigation" id="site-nav" class="animated drop">
+	    <ul>
+      
+		    
+		    <li><a href="http://localhost:4000/blog/" >Blog</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/about/" >About</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/search/" >Search</a></li>
+		  
+	    </ul>
+	</nav>
+</div><!-- /.navigation-wrapper -->
+
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+
+<header class="masthead">
+	<div class="wrap">
+      
+  		<a href="http://localhost:4000/" class="site-logo" rel="home" title="Half Full of Security"><img src="http://localhost:4000/images/site-logo.png" width="200" height="200" alt="Half Full of Security logo" class="animated fadeInDown"></a>
+      
+      <h1 class="site-title animated fadeIn"><a href="http://localhost:4000/">Half Full of Security</a></h1>
+		<h2 class="site-description animated fadeIn" itemprop="description">Sharpening the ACKs since 2013</h2>
+	</div>
+</header><!-- /.masthead -->
+
+<div class="js-menu-screen menu-screen"></div>
+
+
+<div id="main" role="main">
+  <article class="hentry">
+    
+    <div class="entry-wrapper">
+      <header class="entry-header">
+        <ul class="entry-tags">
+          
+        </ul>
+        
+          <h1 class="entry-title">Dealing with users gone bad…</h1>
+        
+      </header>
+    
+      <div class="entry-content">
+        <time datetime="2017-02-03T14:52:28-05:00"><i class="fa fa-calendar-o"></i> February 03, 2017</time>
+        <p>We have all been there when someone that gets paid more than you do runs in and says “We need to remove User X from the network and lock them out of their PC to preserve evidence!!!”. If not, you will be.</p>
+
+<p>So…aside from any 3rd party endpoint software you might have in that environment…what do you do? I have a list of steps, native Windows functions, that I have found helps eliminate avenues for User X’s continued use of ComputerX.</p>
+
+<h3 id="disable-user-xs-active-directory-account">1. Disable User X’s Active Directory Account</h3>
+<p>This can be done in a number of ways but this post has a PowerShell tag so I recommend downloading Remote Server Administration Tools for your flavor of Windows if you don’t have it already. Then it is a simple matter of …</p>
+
+<figure class="highlight"><pre><code class="language-powershell" data-lang="powershell"> Disable-ADAccount -Identity <span class="s2">"UserX"</span> </code></pre></figure>
+
+<h3 id="delete-all-cached-credentials">2. Delete All Cached Credentials</h3>
+
+<figure class="highlight"><pre><code class="language-powershell" data-lang="powershell"><span class="nv">$credential</span> <span class="o">=</span> <span class="nb">Get-Credential</span> -Credential <span class="s2">"DOMAIN</span><span class="se">\a</span><span class="s2">dminacct"</span>
+Enter-PSSession -ComputerName ComputerX -Credential <span class="nv">$credential</span>
+<span class="nb">Set-ItemProperty</span> -Path <span class="s2">"HKLM:</span><span class="se">\S</span><span class="s2">oftware</span><span class="se">\M</span><span class="s2">icrosoft</span><span class="se">\W</span><span class="s2">indows NT</span><span class="se">\C</span><span class="s2">urrentVersion</span><span class="se">\W</span><span class="s2">inlogon"</span> -Name CachedLogonsCount -Value 0</code></pre></figure>
+
+<p>This will set the number of cached creds Windows is storing to 0 and erase the previous creds.</p>
+<h3 id="change-their-bitlocker-key-remotely">3. Change their BitLocker Key Remotely</h3>
+
+<figure class="highlight"><pre><code class="language-powershell" data-lang="powershell"><span class="nv">$BitLocker</span> <span class="o">=</span> <span class="nb">Get-WmiObject</span> -ComputerName ComputerX -Namespace <span class="s2">"Root</span><span class="se">\c</span><span class="s2">imv2</span><span class="se">\S</span><span class="s2">ecurity</span><span class="se">\M</span><span class="s2">icrosoftVolumeEncryption"</span> -Class <span class="s2">"Win32_EncryptableVolume"</span> -Filter <span class="s2">"DriveLetter = 'C:'"</span>
+<span class="nv">$VolumeKeyProtectorIDs</span> <span class="o">=</span> <span class="nv">$BitLocker</span>.GetKeyProtectors<span class="o">()</span>|Select-Object VolumeKeyProtectorID
+<span class="c1">#Let's loop through all of the VolumeKeyProtectorIDs for the C Volume and delete them.</span>
+<span class="k">ForEach</span><span class="o">(</span><span class="nv">$ID</span> <span class="k">in</span> <span class="nv">$VolumeKeyProtectorIDs</span><span class="o">){</span><span class="nv">$BitLocker</span>.DeleteKeyProtector<span class="o">(</span><span class="nv">$ID</span><span class="o">)}</span>
+<span class="c1">#Now that all of the previous Protectors are gone, let's add our own.</span>
+<span class="c1">#Let's add a new password that only the security team will need to know.</span>
+<span class="nv">$BitLocker</span>.ProtectKeyWithTPMAndPin<span class="o">(</span><span class="s2">""</span>,<span class="s2">""</span>,<span class="s2">"BrandNewPassword123"</span><span class="o">)</span>
+<span class="c1">#As a backup, let's also add a couple of recovery keys just in case noone can find the sticky note with the password.</span>
+<span class="nv">$BitLocker</span>.ProtectKeyWithNumericalPassword<span class="o">(</span><span class="s2">"Primary"</span>,<span class="s2">"555555-555555-555555-555555-555555-555555-555555-555555"</span><span class="o">)</span>
+<span class="c1">#Adding an additional optional recovery key might be helpful if you have more than one team that might need to gain access.</span>
+<span class="nv">$BitLocker</span>.ProtectKeyWithNumericalPassword<span class="o">(</span><span class="s2">"Secondary"</span>,<span class="s2">"050505-050505-050505-050505-050505-050505-050505-050505"</span><span class="o">)</span>
+<span class="nv">$BitLocker</span>.EnableKeyProtectors<span class="o">()</span></code></pre></figure>
+
+<p>This is a fun one. This will delete the user’s BitLocker key and save a new one that the user doesn’t know so they can’t unlock the drive after a reboot.</p>
+<h3 id="shut-down-the-remote-system-using-any-number-of-methods">4. Shut down the remote system using any number of methods.</h3>
+
+<figure class="highlight"><pre><code class="language-powershell" data-lang="powershell"><span class="c1">#The nice way</span>
+Stop-Computer -computerName ComputerX -force
+<span class="c1">#Old school</span>
+shutdown -s -f -t 0 -m ComputerX
+<span class="c1">#The BSOD way</span>
+<span class="nb">get-process</span> -computername ComputerX| <span class="nb">stop-process</span> -force</code></pre></figure>
+
+<p>This is not meant to be an exhaustive list but rather a collection of practical considerations. Lemme know if this helps or you have other suggestions.</p>
+
+        
+      </div><!-- /.entry-content -->
+    </div><!-- /.entry-wrapper -->
+    <nav class="pagination" role="navigation">
+      
+        <a href="http://localhost:4000/blog/Unxoring-a-rat/" class="btn" title="UnXORing a RAT">Previous</a>
+      
+      
+    </nav><!-- /.pagination -->
+  </article>
+</div><!-- /#main -->
+
+<div class="footer-wrapper">
+  <footer role="contentinfo" class="entry-wrapper">
+    
+
+<span>&copy; 2017 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
+<div class="social-icons">
+	<a href="https://twitter.com/GlassDFIR" title="Jon Glass on Twitter" target="_blank"><i class="fa fa-twitter-square fa-2x"></i></a>
+	
+	
+	
+	
+	
+	
+	<a href="https://github.com/GlassDFIR" title="Jon Glass on Github" target="_blank"><i class="fa fa-github-square fa-2x"></i></a>
+	
+  
+	
+  <a href="http://localhost:4000/feed.xml" title="Atom/RSS feed"><i class="fa fa-rss-square fa-2x"></i></a>
+</div><!-- /.social-icons -->
+
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+<script type="text/javascript">
+  var BASE_URL = 'http://localhost:4000';
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="http://localhost:4000/assets/js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script src="http://localhost:4000/assets/js/scripts.min.js"></script>
+
+
+
+
+</body>
+</html>

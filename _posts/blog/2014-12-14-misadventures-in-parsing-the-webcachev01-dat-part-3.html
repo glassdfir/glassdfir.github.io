@@ -1,0 +1,38 @@
+---
+layout: post
+title: Misadventures in Parsing the WebCacheV01.dat (Part 3)
+date: 2014-12-14 23:04:53.000000000 -05:00
+type: post
+published: true
+status: publish
+categories:
+- DFIR
+tags: []
+meta:
+  _edit_last: '1'
+  _thumbnail_id: '241'
+author:
+  login: GlassAdmin
+  email: thechosenoneandahalf@gmail.com
+  display_name: Jon
+  first_name: ''
+  last_name: ''
+---
+<p>I have always found the best way to understand something is to try to build it. With that in mind I discovered an <a href="http://ironpython.net/">IronPython</a> <a href="https://managedesent.codeplex.com/releases">library</a> for working with ESENT Databases.<br />
+Turns out it's fairly simply to use. In this example I create an ESE database and add two Test values, one LargeText Value, and another text value.<br />
+<script src="https://gist.github.com/glassdfir/cbb523a4ed93a9b1139a.js"></script></p>
+<p>Which looks like this in EseDatabaseView:<br />
+<a href="http://jon.glass/wp-content/uploads/2014/12/testesedb1.png"><img class="alignnone size-medium wp-image-238" src="{{ site.baseurl }}/assets/testesedb1-300x161.png" alt="testesedb" width="300" height="161" /></a><br />
+And here is what the esedb_data table looks like in a Hex Editor:<br />
+<a href="http://jon.glass/wp-content/uploads/2014/12/LongValue.png"><img class="alignnone size-medium wp-image-239" src="{{ site.baseurl }}/assets/LongValue-300x190.png" alt="LongValue" width="300" height="190" /></a><br />
+I have highlighted the section of the table associated with the LongText value. Just like in the last post, we don't see that LongText value but we do see a pointer to it. This can be a little hard to see in this format so if we display the hex of each record as a line in a text file it becomes more noticeable.<br />
+<a href="http://jon.glass/wp-content/uploads/2014/12/LID.png"><img class="alignnone size-medium wp-image-240" src="{{ site.baseurl }}/assets/LID-300x58.png" alt="LID" width="300" height="58" /></a><br />
+The 05 type code for LongValues is the same as the WebCacheV01.dat. The next four bytes are the LID.<br />
+Let's take a look at what the LongText value looks like in a Hex Editor:<br />
+Header:<br />
+<a href="http://jon.glass/wp-content/uploads/2014/12/LID-headers.png"><img class="alignnone size-medium wp-image-246" src="{{ site.baseurl }}/assets/LID-headers-300x190.png" alt="LID-headers" width="300" height="190" /></a><br />
+Footer:<br />
+<a href="http://jon.glass/wp-content/uploads/2014/12/LID-footers.png"><img class="alignnone size-medium wp-image-241" src="{{ site.baseurl }}/assets/LID-footers-300x190.png" alt="LID-footers" width="300" height="190" /></a><br />
+The 4 bytes after the LID, as shown in purple, appear to involve sequencing. The header has 00 00 00 00 and the footer has 01 00 00 00.<br />
+I am not sure I am any closer to finding and parsing this value from a python script but this is interesting to look at if nothing else. I think the real nail in this project's coffin is that I discovered a tool that does this already. :( I don't know why I didn't see it earlier but, <a href="http://www.nirsoft.net/utils/browsing_history_view.html">BrowsingHistoryView</a> works like a champ from the command line. I will put it through some paces and put up a review.<br />
+I am still going to keep an eye on the python libraries longvalue support because I want a open-source tool that I can tweak if I need to.</p>

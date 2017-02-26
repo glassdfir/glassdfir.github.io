@@ -1,0 +1,20 @@
+---
+layout: post
+title: Because I consistently forget how to install Kismet from source...
+date: 2013-07-29 00:29:30.000000000 -04:00
+---
+<p>apt-get install build-essential git subversion libncurses-dev libpcap-dev libnl-dev libpcre3-dev<br />
+mkdir /usr/src/compiled<br />
+cd /usr/src/compiled<br />
+git clone https://www.kismetwireless.net/kismet.git<br />
+cd kismet<br />
+./configure<br />
+make dep<br />
+make plugins<br />
+make<br />
+make install<br />
+make plugins-install<br />
+cdÂ restricted-plugin-autowep<br />
+KIS_SRC_DIR=/usr/src/compiled/kismet make<br />
+KIS_SRC_DIR=/usr/src/compiled/kismet make userinstall</p>
+<p>Then making all of configurations....</p>

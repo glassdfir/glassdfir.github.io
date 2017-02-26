@@ -1,0 +1,53 @@
+---
+layout: post
+title: Misadventures in Parsing the WebCacheV01.dat (Part 2)
+date: 2014-12-10 17:02:37.000000000 -05:00
+type: post
+published: true
+status: publish
+categories: []
+tags: []
+meta:
+  _edit_last: '1'
+  _thumbnail_id: '218'
+author:
+  login: GlassAdmin
+  email: thechosenoneandahalf@gmail.com
+  display_name: Jon
+  first_name: ''
+  last_name: ''
+---
+<p>This post is meant as an exploration of things you can do when you have no clue what you're doing. :)<br />
+I am not saying these steps are correct. I am just documenting this work in progress. Currently, this story does not have a happy ending.<br />
+So in my previous post, I mentioned that I was getting weird output when parsing the URLs from WebCacheV01.dat.<br />
+<a href="http://jon.glass/wp-content/uploads/2014/12/LongURLS.png"><img src="{{ site.baseurl }}/assets/LongURLS-300x197.png" alt="LongURLS" width="300" height="197" class="alignnone size-medium wp-image-204" /></a><br />
+My first step in isolating the problem was to figure out which records were affected and which were not.<br />
+So I altered the code of the Python scripts to print the EntryID field in addition to the Url Field.<br />
+<script src="https://gist.github.com/glassdfir/325d1c86aab71f31aac0.js"></script><br />
+This gives me an output that looks like this:<br />
+<a href="http://jon.glass/wp-content/uploads/2014/12/WeirdSequencialUnicode.png"><img src="{{ site.baseurl }}/assets/WeirdSequencialUnicode-300x196.png" alt="WeirdSequencialUnicode" width="300" height="196" class="alignnone size-medium wp-image-218" /></a><br />
+The first thing that jumped out at me was the unicode characters that were displayed instead of URLs. 0018, 0019, 001A, 001B...some kind of... pattern...forming. To highlight the missing values, I simply grepped out the all of URLS and added a dash of command-line kungfu...and voilÃ !<br />
+<a href="http://jon.glass/wp-content/uploads/2014/12/JustWeirdSequencialUnicode2.png"><img src="{{ site.baseurl }}/assets/JustWeirdSequencialUnicode2-300x164.png" alt="JustWeirdSequencialUnicode2" width="300" height="164" class="alignnone size-medium wp-image-222" /></a><br />
+So instead of a URL, these records have a value that is iterating. Neat. So I am assuming that this is the long value record number but if the URL isn't here, where is it? This is where ESEDatabaseView comes in handy. To find where the URLs are in the WebCacheV01.dat, I picked the record that didn't parse, opened it up in ESEDatabaseView and took a look at the URL.<br />
+<a href="http://jon.glass/wp-content/uploads/2014/12/486.png"><img src="{{ site.baseurl }}/assets/486-300x300.png" alt="486" width="300" height="300" class="alignnone size-medium wp-image-225" /></a><br />
+The URL for this record was: Visited: jon@http://ads-cast.com/rlast?dt=1bd723dc&uri=recipehangouts.com%2frc%3fdt%3d2cf909a8%7curi%3dservedbyads.net%253ftt%253dsb%2526query%253dnFub3jwxWFDQAkHii1IcyjylSlTz3.eULDVRy2DUvcRI1aFXhHquAODUNsn8DnzelULy2xk9Q0WMDEqxRrUUMVRhR*yKrAJLUqt.E7wVmAkOOKyXWBJLelRNBlDYRLeAqoVPx4YoJRkTP.usCKwnrs3qp4YikjZn.NCHt.x3tlTifLODFVH*j9MkXIAikwXVO6Lr0RMbdnqNluEgvMD5tT*SjGTLqQ5EO8nlP*.3UDnOBm2i2vwLOdU8VxFkgSFP%7cunq%3dtrue%7ctd%3dFpWk.DD16pc73UdTJiml.6I97dIkGVvGjK4beBwj8EiJNMFEr3Xzvn7HkVbwd9nV2T3Y4tif4lIq7GcE9A5FYLlQy.Qx4SuirFbyhYJDH3YzHXLYsqofJSW.rBj2qtXbfaX1FTmbA77Dckr90mDMYgkoDgJyl6YEoZyNccn23Xj1CN2Uiw*CwhAc1EKGseHbdkC0K*jewTzXcNUFh*M0rMYrbpx9Pou8rjoz17aNKcvNk0tn16gwjImOL4omR1ecwYThp2KhLQiz*m4F9RObSLD97kG1Sg05dRzGeLRqP*GbL0Sq0sHJG.1En6aL6zuu7tXrdkL0GIr8LE5wfafmYnhTAoatCrSybnG7.B73OSziL0kydVwg3ETljyHYCzWL.78GVyR6M4Lw55i2l0F9OzlVVYxdYd3mxs9rEibH*eZZW0eAa7Z5Wiy0m2Pzp45.kB6sAH5bSdLpXJTxt0BQxIaHGkqB4h9EOW*bRJ*ABLA-%7cfss%3dec54b83b-306a-40a6-8120-ef664583323f. Cracking open a hex editor and searching for that unicode string shows it is located from 1869838 to 1871761. Here are some of my notes on the Long Text value header and footer (rough guesses):</p>
+<pre>
+Offset: 1869828-1869837: 08 20 00 00 00 19 00 00 00 00 - Start Record Header
+	08 20 Header sig?
+	00 00 00 19 Long Value Identifier
+	00 00 00 00 Array address within LongValue? Start marker?
+Offset: 1869838-1871761:
+	Unicode URL ****same as above****
+
+Offset: 1871762-1871775: 04 20 00 00 00 19 01 00 00 00 84 07 00 00 End of Record Footer
+	04 20  Footer Sig?
+	00 00 00 19 Long Value Identifier
+	01 00 00 00 End Marker???
+	84 07 00 00 LENGTH  of the Long Value 784h > 1924d (1871761 - 1869838 = 1924)
+</pre>
+<p>Here is what I found on the <a href="http://technet.microsoft.com/en-us/library/aa998171%28v=exchg.65%29.aspx">Microsoft Exchange</a> website:</p>
+<blockquote><p>Long-Values<br />
+A column or a record in ESE cannot span pages in the data B-tree. There are values (such as PR_BODY, which is the message body of a message) that break the 4KB boundary of a page. These are referred to as long-values (LV). A table's long-value B-tree is used to store these large values. If a piece of data is entered in an ESE table, and it is too large to go into the data B-tree, it is divided into four KB sized pages and stored in the table's separate long-value B-tree. The record in the data B-tree contains a pointer to the long-value. This pointer is called the long-value ID (LID) and means that the record has a pointer to LID 256.</p></blockquote>
+<p>I also found this nugget in Tony Redmond's Microsoft Exchange Server 2003: with SP1:</p>
+<blockquote><p>Each table can have a long value tree, which is created on an as-needed basis. If a piece of data is too big to fit into a data tree, it is broken up into a series of 4KB chunks stored in the long value tree. Each chunk is assigned a table wide identifier within the long value tree. When required, data can be located very efficiently in the long value tree through a combination of the identifier and the offset within the tree.</p></blockquote>
+<p>This is consistent with what I am seeing. So the question is how do I reference the table's separate long-value B-tree? The saga continues...</p>

@@ -1,0 +1,9 @@
+---
+layout: post
+title: TShark Commands
+date: 2013-07-10 02:55:14.000000000 -04:00
+---
+<p>Here are some of the more useful commands I am using to sort through tons of pcaps I gathered:<br />
+This one recursively looks for kismet pcap files and runs tshark against them. This example is looking for a count of the SSID and the privacy bit for each of the beacon frames.</p>
+<p>find . -iname '*pcapdump' -exec sh -c 'tshark -r "{}" -T fields -e wlan_mgt.ssid -e wlan_mgt.fixed.capabilities.privacy -R "wlan.fc.type_subtype == 0x08"' ;| sort | uniq -c</p>
+<p>&nbsp;</p>

@@ -1,0 +1,36 @@
+---
+layout: post
+title: SysMon!
+date: 2014-08-29 03:24:59.000000000 -04:00
+---
+<p>The Microsoft Sysinternals team recently released System Monitor (<a href="http://technet.microsoft.com/en-us/sysinternals/dn798348.aspx">Sysmon</a>), a Windows system service and device driver that, once installed on a system, remains resident across system reboots to monitor and log system activity to the Windows event log. It provides detailed information about process creations, network connections, and changes to file creation time.</p>
+<p>The timing of this release could not have worked out better for me because I had just spent two weeks reviewing Bit9's <a href="https://www.bit9.com/solutions/carbon-black/">CarbonBlack</a> product. I am not going to provide an in depth review of CarbonBlack here but I found with, a little bit of PowerShell, I could get some similar results out of Sysmon.</p>
+<p>****Disclaimer****  This is my first PowerShell project and the coding is rough. You have been warned.</p>
+<p>I started with something pretty simple:<br />
+<script src="https://gist.github.com/glassdfir/2846607c05079e9bc66a.js"></script><br />
+This little script allowed me to search through the Sysmon Event Logs, define a start and stop time, and if the event data matched a keyword, it would return the event to screen.</p>
+<p>Example:</p>
+<p><strong>PS C:\Users\user\Desktop> .Sysmon.ps1 -StartDate "08/28/2014 21:40" -StopDate "08/28/2014 21:50" -keyword "cmd"</strong></p>
+<p><script src="https://gist.github.com/glassdfir/5c13c0eed0c0fe83cea6.js"></script><br />
+This was great. From this I can see:</p>
+<ol>
+<li><script><br />
+var a = "c m d.exe";<br />
+document.write(a.split(' ').join(''));<br />
+</script> being launched from explorer.exe</li>
+<li><script><br />
+var a = "c m d.exe";<br />
+document.write(a.split(' ').join(''));<br />
+</script> launching conhost.exe</li>
+<li>Ping.exe getting launched from <script><br />
+var a = "c m d.exe";<br />
+document.write(a.split(' ').join(''));<br />
+</script> with the command line of  "Ping google.com"</li>
+</ol>
+<p>One of the coolest features of CarbonBlack was the ability to visualize/map the process creation over time. So I set out to make something that gave me this functionality using the Sysmon logs. I experimented with a few different graphing technologies and I have currently landed on using <a href="https://developers.google.com/chart/interactive/docs/gallery/orgchart">Google's Org Chart API</a> to do the mapping. I know there are other and probably better ways to do this but I was looking for something high speed/low drag that didn't require installing something.</p>
+<p>With this goal in mind, I threw together <a href="https://github.com/glassdfir/SysmonMapper" target="_blank">SysmonMapper</a>. Again, this is some pretty rough PowerShell but it gets the job done.</p>
+<p><strong>PS C:Users\user\Desktop&gt; .SysmonMapper.ps1 -StartDate "08/28/2014 21:40" -StopDate "08/28/2014 21:50" -P 4332</strong></p>
+<p><a href="https://Jon.Glass/wp-content/uploads/2014/08/sysmonmap.png"><img class="alignnone size-medium wp-image-44" src="{{ site.baseurl }}/assets/sysmonmap-300x236.png" alt="sysmonmap" width="300" height="236" /></a></p>
+<p>Here is another example of sysmonmapper in action: <a href="http://Jon.Glass/wp-content/uploads/2014/08/sysmonmap.html" target="_blank">example</a>.</p>
+<p>In the next few weeks I am going throw together some post that will highlight the functionality of this script and show some use cases that demonstrate the  power of visualizing sysmon logs.</p>
+<p>&nbsp;</p>

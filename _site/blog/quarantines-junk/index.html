@@ -1,0 +1,330 @@
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8" lang="en"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9" lang="en"><![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<title>What happens when Windows Defender Quarantines Stuff... &#8211; Half Full of Security</title>
+<meta name="description" content="Recently a colleague of mine asked me what happens in the file system when a malicious file is "quarantined".
+
+">
+<meta name="keywords" content="">
+
+
+<!-- Twitter Cards -->
+<meta name="twitter:title" content="What happens when Windows Defender Quarantines Stuff...">
+<meta name="twitter:description" content="Recently a colleague of mine asked me what happens in the file system when a malicious file is "quarantined".
+
+">
+<meta name="twitter:site" content="@GlassDFIR">
+<meta name="twitter:creator" content="@GlassDFIR">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://localhost:4000/images/site-logo.png">
+
+<!-- Open Graph -->
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:title" content="What happens when Windows Defender Quarantines Stuff...">
+<meta property="og:description" content="Recently a colleague of mine asked me what happens in the file system when a malicious file is "quarantined".
+
+">
+<meta property="og:url" content="http://localhost:4000/blog/quarantines-junk/">
+<meta property="og:site_name" content="Half Full of Security">
+
+
+
+
+
+<link rel="canonical" href="http://localhost:4000/blog/quarantines-junk/">
+<link href="http://localhost:4000/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="http://localhost:4000/assets/css/main.css">
+<!-- Webfonts -->
+<script src="https://use.edgefonts.net/source-sans-pro:n2,i2,n3,i3,n4,i4,n6,i6,n7,i7,n9,i9;source-code-pro:n4,n7;volkhov.js"></script>
+
+<meta http-equiv="cleartype" content="on">
+
+<!-- HTML5 Shiv and Media Query Support -->
+<!--[if lt IE 9]>
+  <script src="http://localhost:4000/assets/js/vendor/html5shiv.min.js"></script>
+  <script src="http://localhost:4000/assets/js/vendor/respond.min.js"></script>
+<![endif]-->
+
+<!-- Modernizr -->
+<script src="http://localhost:4000/assets/js/vendor/modernizr-2.7.1.custom.min.js"></script>
+
+
+<!-- MathJax -->
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+<!-- Icons -->
+<!-- 16x16 -->
+<link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+<!-- 32x32 -->
+<link rel="shortcut icon" href="http://localhost:4000/favicon.png">
+<!-- 57x57 (precomposed) for iPhone 3GS, pre-2011 iPod Touch and older Android devices -->
+<link rel="apple-touch-icon-precomposed" href="http://localhost:4000/images/apple-touch-icon-precomposed.png">
+<!-- 72x72 (precomposed) for 1st generation iPad, iPad 2 and iPad mini -->
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://localhost:4000/images/apple-touch-icon-72x72-precomposed.png">
+<!-- 114x114 (precomposed) for iPhone 4, 4S, 5 and post-2011 iPod Touch -->
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://localhost:4000/images/apple-touch-icon-114x114-precomposed.png">
+<!-- 144x144 (precomposed) for iPad 3rd and 4th generation -->
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://localhost:4000/images/apple-touch-icon-144x144-precomposed.png">
+
+</head>
+
+<body id="post">
+
+<div class="navigation-wrapper">
+	<nav role="navigation" id="site-nav" class="animated drop">
+	    <ul>
+      
+		    
+		    <li><a href="http://localhost:4000/blog/" >Blog</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/about/" >About</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/search/" >Search</a></li>
+		  
+	    </ul>
+	</nav>
+</div><!-- /.navigation-wrapper -->
+
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+
+<header class="masthead">
+	<div class="wrap">
+      
+  		<a href="http://localhost:4000/" class="site-logo" rel="home" title="Half Full of Security"><img src="http://localhost:4000/images/site-logo.png" width="200" height="200" alt="Half Full of Security logo" class="animated fadeInDown"></a>
+      
+      <h1 class="site-title animated fadeIn"><a href="http://localhost:4000/">Half Full of Security</a></h1>
+		<h2 class="site-description animated fadeIn" itemprop="description">Sharpening the ACKs since 2013</h2>
+	</div>
+</header><!-- /.masthead -->
+
+<div class="js-menu-screen menu-screen"></div>
+
+
+<div id="main" role="main">
+  <article class="hentry">
+    
+    <div class="entry-wrapper">
+      <header class="entry-header">
+        <ul class="entry-tags">
+          
+        </ul>
+        
+          <h1 class="entry-title">What happens when Windows Defender Quarantines Stuff...</h1>
+        
+      </header>
+    
+      <div class="entry-content">
+        <time datetime="2015-11-02T23:34:30-05:00"><i class="fa fa-calendar-o"></i> November 02, 2015</time>
+        <p>Recently a colleague of mine asked me what happens in the file system when a malicious file is "quarantined".
+
+  The answer varies widely and as this is the "secret sauce" for many antivirus vendors, most of the time it is not overly documented how they do the voodoo they do. Seems like something that might make for a good blog or two so I sat down and did a few tests.</p>
+
+<p>This post is going to cover what happened on my Windows 8 VM when I turned Windows Defender against a vicious EICAR.TXT file!</p>
+<blockquote><p>Windows Defender is a software product that attempts to detect and remove malware. Initially released as an antispyware program, it was first released as a free download for Windows XP, shipped with Windows Vista by default, and currently ships with antivirus capabilities as part of Windows 10. <a href="https://en.wikipedia.org/wiki/Windows_Defender" target="_blank">--Wikipedia </a></p></blockquote>
+<p>I chose to beat up on Windows Defender mostly because it is free and has a huge market share. Nothing personal.</p>
+<p>So first things first: I grabbed the <a href="http://www.eicar.org/86-0-Intended-use.html">EICAR file</a> and saved it to C:\temp.<br />
+Then I grabbed a copy of the $MFT to take a look at the this file's record. Looks like this:<br />
+<a href="/images/2015-11-02-23_26_38-Document-WordPad1.png" rel="lightbox[wp-image-766]"><img src="/images/2015-11-02-23_26_38-Document-WordPad1.png" alt="2015-11-02 23_26_38-Document - WordPad" width="90%" class="aligncenter size-large wp-image-766" /></a><br />
+There is a lot going on in there but I just wanted to focus on a few things. <a href="http://www.writeblocked.org/resources/NTFS_CHEAT_SHEETS.pdf" target="_blank">If you are lost, read this.</a></p>
+<p>NEXT, I turned on Windows Defender real-time protection. It was recommended.<br />
+<a href="/images/2015_11_02_23_46_14_Windows_Defender.png"><img src="/images/2015_11_02_23_46_14_Windows_Defender.png" alt="2015_11_02_23_46_14_Windows_Defender" width="90%" class="aligncenter size-large wp-image-767" /></a></p>
+<p>Then a whole bunch of stuff happened.</p>
+<p>Let's start with $MFT record number 27152. So I quickly dumped the $MFT again and here's what I got:</p>
+<p><a href="/images/2015-11-03-00_52_57-Document.rtf-WordPad.png"><img src="/images/2015-11-03-00_52_57-Document.rtf-WordPad.png" alt="2015-11-03 00_52_57-Document.rtf - WordPad" width="75%" class="aligncenter size-large wp-image-775" /></a></p>
+<p>So what changed? Pretty much everything accept the $MFT record number.</p>
+<p>The sequence number is increment by 4, indicating that there were numerous changes to the file. Specifically the rename and move to a new parent folder.<br />
+Lets take a closer look at the USNJrnl-$J to get an idea what happened:<br />
+
+<figure class="highlight"><pre><code class="language-raw" data-lang="raw">###When I created the EICAR File and Added the EICAR string to it.###
+2015-11-03 03:03:23.186	ref_num = 27152-96	eicar.txt	File_Create,Close
+2015-11-03 03:03:23.231	ref_num = 27152-97	eicar.txt	File_Create,Data_Extend,Close
+2015-11-03 03:06:48.274	ref_num = 27152-97	eicar.txt	Data_Extend,Data_Truncation,Close
+
+### This is Windows Defender Deleting the File. ###
+2015-11-03 03:07:20.379	ref_num = 27152-97	eicar.txt	Object_ID_Change,Close
+2015-11-03 03:09:43.529	ref_num = 27152-97	eicar.txt	Basic_Info_Change,Data_Overwrite,File_Delete,Close
+
+###Since this Record Number is up for grabs, it is reused for a different file ###
+2015-11-03 03:09:43.534	ref_num = 27152-98	5A7D7B64F11FF203E09434276A974A97	File_Create,Data_Extend,Close</code></pre></figure>
+
+<p>So in short Windows Defender deleted the original file. The MFT record number was up for grabs so it was picked up by a newly created file C:\ProgramData\Microsoft\Windows Defender\Scans\History\RemCheck\5A7D7B64F11FF203E09434276A974A97</p>
+<p>So where did my EICAR file go? Windows Defender puts quarantined files C:\ProgramData\Microsoft\Windows Defender\Quarantine\ResourceData\. Mine was saved C:\ProgramData\Microsoft\Windows Defender\Quarantine\ResourceData\50\50761523FA79FDF68E04707959836D1F6DBA9969.<br />
+Let's take a look at that:<br />
+<a href="/images/2015-11-05-19_55_39-Document.rtf-WordPad.png"><img src="/images/2015-11-05-19_55_39-Document.rtf-WordPad.png" alt="2015-11-05 19_55_39-Document.rtf - WordPad" width="75%" class="aligncenter size-large wp-image-792" /></a><br />
+For those that don't know, Windows Defender and Microsoft Security Essentials Quarantine files have a magic number of 0B AD 00. Clever.</p>
+<p>Looking at the histogram of the data, it is pretty obvious that it was stored using some kind of encryption.<br />
+<a href="/images/Screen-Shot-2015-11-04-at-10.40.52-AM-1024x396.png"><img src="/images/Screen-Shot-2015-11-04-at-10.40.52-AM-1024x396.png" alt="Screen Shot 2015-11-04 at 10.40.52 AM" width="75%" class="aligncenter size-large wp-image-787" /></a><br />
+After doing a bit more digging, it turns out that Windows Defender uses a hard coded RC4 key to encrypt quarantine files.<br />
+A colleague of my pointed me at the <a href="https://raw.githubusercontent.com/brad-accuvant/cuckoo-modified/00ad13c94cc7453c40ed6152d16009ca1c8ed6f2/lib/cuckoo/common/quarantine.py" target="_blank"> this cool script from Cuckoo </a><br />
+Here is the relevant chuck of their code that I bastardized for this blog post:<br />
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c"># Copyright (C) 2015 KillerInstinct, Optiv, Inc. (brad.spengler@optiv.com)</span>
+<span class="c"># This file is part of Cuckoo Sandbox - http://www.cuckoosandbox.org</span>
+<span class="c"># See the file 'docs/LICENSE' for copying permission.</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+<span class="kn">from</span> <span class="nn">binascii</span> <span class="kn">import</span> <span class="n">crc32</span>
+
+<span class="k">def</span> <span class="nf">mse_ksa</span><span class="p">():</span>
+    <span class="c"># hardcoded key obtained from mpengine.dll</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x1E</span><span class="p">,</span> <span class="mh">0x87</span><span class="p">,</span> <span class="mh">0x78</span><span class="p">,</span> <span class="mh">0x1B</span><span class="p">,</span> <span class="mh">0x8D</span><span class="p">,</span> <span class="mh">0xBA</span><span class="p">,</span> <span class="mh">0xA8</span><span class="p">,</span> <span class="mh">0x44</span><span class="p">,</span> <span class="mh">0xCE</span><span class="p">,</span> <span class="mh">0x69</span><span class="p">,</span>
+           <span class="mh">0x70</span><span class="p">,</span> <span class="mh">0x2C</span><span class="p">,</span> <span class="mh">0x0C</span><span class="p">,</span> <span class="mh">0x78</span><span class="p">,</span> <span class="mh">0xB7</span><span class="p">,</span> <span class="mh">0x86</span><span class="p">,</span> <span class="mh">0xA3</span><span class="p">,</span> <span class="mh">0xF6</span><span class="p">,</span> <span class="mh">0x23</span><span class="p">,</span> <span class="mh">0xB7</span><span class="p">,</span>
+           <span class="mh">0x38</span><span class="p">,</span> <span class="mh">0xF5</span><span class="p">,</span> <span class="mh">0xED</span><span class="p">,</span> <span class="mh">0xF9</span><span class="p">,</span> <span class="mh">0xAF</span><span class="p">,</span> <span class="mh">0x83</span><span class="p">,</span> <span class="mh">0x53</span><span class="p">,</span> <span class="mh">0x0F</span><span class="p">,</span> <span class="mh">0xB3</span><span class="p">,</span> <span class="mh">0xFC</span><span class="p">,</span>
+           <span class="mh">0x54</span><span class="p">,</span> <span class="mh">0xFA</span><span class="p">,</span> <span class="mh">0xA2</span><span class="p">,</span> <span class="mh">0x1E</span><span class="p">,</span> <span class="mh">0xB9</span><span class="p">,</span> <span class="mh">0xCF</span><span class="p">,</span> <span class="mh">0x13</span><span class="p">,</span> <span class="mh">0x31</span><span class="p">,</span> <span class="mh">0xFD</span><span class="p">,</span> <span class="mh">0x0F</span><span class="p">,</span>
+           <span class="mh">0x0D</span><span class="p">,</span> <span class="mh">0xA9</span><span class="p">,</span> <span class="mh">0x54</span><span class="p">,</span> <span class="mh">0xF6</span><span class="p">,</span> <span class="mh">0x87</span><span class="p">,</span> <span class="mh">0xCB</span><span class="p">,</span> <span class="mh">0x9E</span><span class="p">,</span> <span class="mh">0x18</span><span class="p">,</span> <span class="mh">0x27</span><span class="p">,</span> <span class="mh">0x96</span><span class="p">,</span>
+           <span class="mh">0x97</span><span class="p">,</span> <span class="mh">0x90</span><span class="p">,</span> <span class="mh">0x0E</span><span class="p">,</span> <span class="mh">0x53</span><span class="p">,</span> <span class="mh">0xFB</span><span class="p">,</span> <span class="mh">0x31</span><span class="p">,</span> <span class="mh">0x7C</span><span class="p">,</span> <span class="mh">0x9C</span><span class="p">,</span> <span class="mh">0xBC</span><span class="p">,</span> <span class="mh">0xE4</span><span class="p">,</span>
+           <span class="mh">0x8E</span><span class="p">,</span> <span class="mh">0x23</span><span class="p">,</span> <span class="mh">0xD0</span><span class="p">,</span> <span class="mh">0x53</span><span class="p">,</span> <span class="mh">0x71</span><span class="p">,</span> <span class="mh">0xEC</span><span class="p">,</span> <span class="mh">0xC1</span><span class="p">,</span> <span class="mh">0x59</span><span class="p">,</span> <span class="mh">0x51</span><span class="p">,</span> <span class="mh">0xB8</span><span class="p">,</span>
+           <span class="mh">0xF3</span><span class="p">,</span> <span class="mh">0x64</span><span class="p">,</span> <span class="mh">0x9D</span><span class="p">,</span> <span class="mh">0x7C</span><span class="p">,</span> <span class="mh">0xA3</span><span class="p">,</span> <span class="mh">0x3E</span><span class="p">,</span> <span class="mh">0xD6</span><span class="p">,</span> <span class="mh">0x8D</span><span class="p">,</span> <span class="mh">0xC9</span><span class="p">,</span> <span class="mh">0x04</span><span class="p">,</span>
+           <span class="mh">0x7E</span><span class="p">,</span> <span class="mh">0x82</span><span class="p">,</span> <span class="mh">0xC9</span><span class="p">,</span> <span class="mh">0xBA</span><span class="p">,</span> <span class="mh">0xAD</span><span class="p">,</span> <span class="mh">0x97</span><span class="p">,</span> <span class="mh">0x99</span><span class="p">,</span> <span class="mh">0xD0</span><span class="p">,</span> <span class="mh">0xD4</span><span class="p">,</span> <span class="mh">0x58</span><span class="p">,</span>
+           <span class="mh">0xCB</span><span class="p">,</span> <span class="mh">0x84</span><span class="p">,</span> <span class="mh">0x7C</span><span class="p">,</span> <span class="mh">0xA9</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xBE</span><span class="p">,</span> <span class="mh">0x3C</span><span class="p">,</span> <span class="mh">0x8A</span><span class="p">,</span> <span class="mh">0x77</span><span class="p">,</span> <span class="mh">0x52</span><span class="p">,</span>
+           <span class="mh">0x33</span><span class="p">,</span> <span class="mh">0x55</span><span class="p">,</span> <span class="mh">0x7D</span><span class="p">,</span> <span class="mh">0xDE</span><span class="p">,</span> <span class="mh">0x13</span><span class="p">,</span> <span class="mh">0xA8</span><span class="p">,</span> <span class="mh">0xB1</span><span class="p">,</span> <span class="mh">0x40</span><span class="p">,</span> <span class="mh">0x87</span><span class="p">,</span> <span class="mh">0xCC</span><span class="p">,</span>
+           <span class="mh">0x1B</span><span class="p">,</span> <span class="mh">0xC8</span><span class="p">,</span> <span class="mh">0xF1</span><span class="p">,</span> <span class="mh">0x0F</span><span class="p">,</span> <span class="mh">0x6E</span><span class="p">,</span> <span class="mh">0xCD</span><span class="p">,</span> <span class="mh">0xD0</span><span class="p">,</span> <span class="mh">0x83</span><span class="p">,</span> <span class="mh">0xA9</span><span class="p">,</span> <span class="mh">0x59</span><span class="p">,</span>
+           <span class="mh">0xCF</span><span class="p">,</span> <span class="mh">0xF8</span><span class="p">,</span> <span class="mh">0x4A</span><span class="p">,</span> <span class="mh">0x9D</span><span class="p">,</span> <span class="mh">0x1D</span><span class="p">,</span> <span class="mh">0x50</span><span class="p">,</span> <span class="mh">0x75</span><span class="p">,</span> <span class="mh">0x5E</span><span class="p">,</span> <span class="mh">0x3E</span><span class="p">,</span> <span class="mh">0x19</span><span class="p">,</span>
+           <span class="mh">0x18</span><span class="p">,</span> <span class="mh">0x18</span><span class="p">,</span> <span class="mh">0xAF</span><span class="p">,</span> <span class="mh">0x23</span><span class="p">,</span> <span class="mh">0xE2</span><span class="p">,</span> <span class="mh">0x29</span><span class="p">,</span> <span class="mh">0x35</span><span class="p">,</span> <span class="mh">0x58</span><span class="p">,</span> <span class="mh">0x76</span><span class="p">,</span> <span class="mh">0x6D</span><span class="p">,</span>
+           <span class="mh">0x2C</span><span class="p">,</span> <span class="mh">0x07</span><span class="p">,</span> <span class="mh">0xE2</span><span class="p">,</span> <span class="mh">0x57</span><span class="p">,</span> <span class="mh">0x12</span><span class="p">,</span> <span class="mh">0xB2</span><span class="p">,</span> <span class="mh">0xCA</span><span class="p">,</span> <span class="mh">0x0B</span><span class="p">,</span> <span class="mh">0x53</span><span class="p">,</span> <span class="mh">0x5E</span><span class="p">,</span>
+           <span class="mh">0xD8</span><span class="p">,</span> <span class="mh">0xF6</span><span class="p">,</span> <span class="mh">0xC5</span><span class="p">,</span> <span class="mh">0x6C</span><span class="p">,</span> <span class="mh">0xE7</span><span class="p">,</span> <span class="mh">0x3D</span><span class="p">,</span> <span class="mh">0x24</span><span class="p">,</span> <span class="mh">0xBD</span><span class="p">,</span> <span class="mh">0xD0</span><span class="p">,</span> <span class="mh">0x29</span><span class="p">,</span>
+           <span class="mh">0x17</span><span class="p">,</span> <span class="mh">0x71</span><span class="p">,</span> <span class="mh">0x86</span><span class="p">,</span> <span class="mh">0x1A</span><span class="p">,</span> <span class="mh">0x54</span><span class="p">,</span> <span class="mh">0xB4</span><span class="p">,</span> <span class="mh">0xC2</span><span class="p">,</span> <span class="mh">0x85</span><span class="p">,</span> <span class="mh">0xA9</span><span class="p">,</span> <span class="mh">0xA3</span><span class="p">,</span>
+           <span class="mh">0xDB</span><span class="p">,</span> <span class="mh">0x7A</span><span class="p">,</span> <span class="mh">0xCA</span><span class="p">,</span> <span class="mh">0x6D</span><span class="p">,</span> <span class="mh">0x22</span><span class="p">,</span> <span class="mh">0x4A</span><span class="p">,</span> <span class="mh">0xEA</span><span class="p">,</span> <span class="mh">0xCD</span><span class="p">,</span> <span class="mh">0x62</span><span class="p">,</span> <span class="mh">0x1D</span><span class="p">,</span>
+           <span class="mh">0xB9</span><span class="p">,</span> <span class="mh">0xF2</span><span class="p">,</span> <span class="mh">0xA2</span><span class="p">,</span> <span class="mh">0x2E</span><span class="p">,</span> <span class="mh">0xD1</span><span class="p">,</span> <span class="mh">0xE9</span><span class="p">,</span> <span class="mh">0xE1</span><span class="p">,</span> <span class="mh">0x1D</span><span class="p">,</span> <span class="mh">0x75</span><span class="p">,</span> <span class="mh">0xBE</span><span class="p">,</span>
+           <span class="mh">0xD7</span><span class="p">,</span> <span class="mh">0xDC</span><span class="p">,</span> <span class="mh">0x0E</span><span class="p">,</span> <span class="mh">0xCB</span><span class="p">,</span> <span class="mh">0x0A</span><span class="p">,</span> <span class="mh">0x8E</span><span class="p">,</span> <span class="mh">0x68</span><span class="p">,</span> <span class="mh">0xA2</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0x12</span><span class="p">,</span>
+           <span class="mh">0x63</span><span class="p">,</span> <span class="mh">0x40</span><span class="p">,</span> <span class="mh">0x8D</span><span class="p">,</span> <span class="mh">0xC8</span><span class="p">,</span> <span class="mh">0x08</span><span class="p">,</span> <span class="mh">0xDF</span><span class="p">,</span> <span class="mh">0xFD</span><span class="p">,</span> <span class="mh">0x16</span><span class="p">,</span> <span class="mh">0x4B</span><span class="p">,</span> <span class="mh">0x11</span><span class="p">,</span>
+           <span class="mh">0x67</span><span class="p">,</span> <span class="mh">0x74</span><span class="p">,</span> <span class="mh">0xCD</span><span class="p">,</span> <span class="mh">0x0B</span><span class="p">,</span> <span class="mh">0x9B</span><span class="p">,</span> <span class="mh">0x8D</span><span class="p">,</span> <span class="mh">0x05</span><span class="p">,</span> <span class="mh">0x41</span><span class="p">,</span> <span class="mh">0x1E</span><span class="p">,</span> <span class="mh">0xD6</span><span class="p">,</span>
+           <span class="mh">0x26</span><span class="p">,</span> <span class="mh">0x2E</span><span class="p">,</span> <span class="mh">0x42</span><span class="p">,</span> <span class="mh">0x9B</span><span class="p">,</span> <span class="mh">0xA4</span><span class="p">,</span> <span class="mh">0x95</span><span class="p">,</span> <span class="mh">0x67</span><span class="p">,</span> <span class="mh">0x6B</span><span class="p">,</span> <span class="mh">0x83</span><span class="p">,</span> <span class="mh">0x98</span><span class="p">,</span>
+           <span class="mh">0xDB</span><span class="p">,</span> <span class="mh">0x2F</span><span class="p">,</span> <span class="mh">0x35</span><span class="p">,</span> <span class="mh">0xD3</span><span class="p">,</span> <span class="mh">0xC1</span><span class="p">,</span> <span class="mh">0xB9</span><span class="p">,</span> <span class="mh">0xCE</span><span class="p">,</span> <span class="mh">0xD5</span><span class="p">,</span> <span class="mh">0x26</span><span class="p">,</span> <span class="mh">0x36</span><span class="p">,</span>
+           <span class="mh">0xF2</span><span class="p">,</span> <span class="mh">0x76</span><span class="p">,</span> <span class="mh">0x5E</span><span class="p">,</span> <span class="mh">0x1A</span><span class="p">,</span> <span class="mh">0x95</span><span class="p">,</span> <span class="mh">0xCB</span><span class="p">,</span> <span class="mh">0x7C</span><span class="p">,</span> <span class="mh">0xA4</span><span class="p">,</span> <span class="mh">0xC3</span><span class="p">,</span> <span class="mh">0xDD</span><span class="p">,</span>
+           <span class="mh">0xAB</span><span class="p">,</span> <span class="mh">0xDD</span><span class="p">,</span> <span class="mh">0xBF</span><span class="p">,</span> <span class="mh">0xF3</span><span class="p">,</span> <span class="mh">0x82</span><span class="p">,</span> <span class="mh">0x53</span>
+    <span class="p">]</span>
+    <span class="n">sbox</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">256</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">256</span><span class="p">):</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="n">sbox</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">key</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">%</span> <span class="mi">256</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">sbox</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">sbox</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">sbox</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+        <span class="n">sbox</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
+    <span class="k">return</span> <span class="n">sbox</span>
+
+<span class="k">def</span> <span class="nf">rc4_decrypt</span><span class="p">(</span><span class="n">sbox</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)):</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">256</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="n">sbox</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">%</span> <span class="mi">256</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">sbox</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">sbox</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">sbox</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+        <span class="n">sbox</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">sbox</span><span class="p">[(</span><span class="n">sbox</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">sbox</span><span class="p">[</span><span class="n">j</span><span class="p">])</span> <span class="o">%</span> <span class="mi">256</span><span class="p">]</span>
+        <span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span> <span class="o">^</span> <span class="n">data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">out</span>
+
+<span class="k">def</span> <span class="nf">mse_unquarantine</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">quarfile</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="nb">bytearray</span><span class="p">(</span><span class="n">quarfile</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+    <span class="n">fsize</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">fsize</span> <span class="o">&lt;</span> <span class="mi">12</span> <span class="ow">or</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mh">0x0B</span> <span class="ow">or</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mh">0xad</span> <span class="ow">or</span> <span class="n">data</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">!=</span> <span class="mh">0x00</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="n">sbox</span> <span class="o">=</span> <span class="n">mse_ksa</span><span class="p">()</span>
+    <span class="n">outdata</span> <span class="o">=</span> <span class="n">rc4_decrypt</span><span class="p">(</span><span class="n">sbox</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+    <span class="c">#prints</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">"unquar-with-meta.bin"</span><span class="p">,</span> <span class="s">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">outdata</span><span class="p">)</span>
+
+    <span class="c"># MSE stores metadata like the original filename in a separate file,</span>
+    <span class="c"># so due to our existing interface, we can't restore the original name</span>
+    <span class="c"># from just the ResourceData file.  Later we may allow uploading pairs</span>
+    <span class="c"># of files, match them up by name, and then associate that data here</span>
+    <span class="c"># for the final submission</span>
+
+    <span class="n">headerlen</span> <span class="o">=</span> <span class="mh">0x28</span> <span class="o">+</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s">"&lt;I"</span><span class="p">,</span> <span class="n">outdata</span><span class="p">[</span><span class="mi">8</span><span class="p">:</span><span class="mi">12</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">origlen</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s">"&lt;I"</span><span class="p">,</span> <span class="n">outdata</span><span class="p">[</span><span class="n">headerlen</span><span class="o">-</span><span class="mi">12</span><span class="p">:</span><span class="n">headerlen</span><span class="o">-</span><span class="mi">8</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">origlen</span> <span class="o">+</span> <span class="n">headerlen</span> <span class="o">=</span> <span class="n">fsize</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">"unquar.bin"</span><span class="p">,</span> <span class="s">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">outdata</span><span class="p">[</span><span class="n">headerlen</span><span class="p">:])</span>
+
+<span class="n">mse_unquarantine</span><span class="p">(</span><span class="s">"50761523FA79FDF68E04707959836D1F6DBA9969"</span><span class="p">)</span></code></pre></figure>
+
+The RC4 cipher can be found twice in each of these files:<br />
+<figure class="highlight"><pre><code class="language-raw" data-lang="raw">c:\ProgramData\Microsoft\Windows Defender\Definition Updates\Backup\mpengine.dll
+c:\ProgramData\Microsoft\Windows Defender\Definition Updates\Default\MpEngine.dll
+c:\ProgramData\Microsoft\Windows Defender\Definition Updates\{D45C13C3-59B3-4726-B82F-03461072F006}\mpengine.dll
+c:\Users\All Users\Microsoft\Windows Defender\Definition Updates\Backup\mpengine.dll
+c:\Users\All Users\Microsoft\Windows Defender\Definition Updates\Default\MpEngine.dll
+c:\Users\All Users\Microsoft\Windows Defender\Definition Updates\{D45C13C3-59B3-4726-B82F-03461072F006}\mpengine.dll
+c:\Windows\WinSxS\amd64_windows-defender-am-engine_31bf3856ad364e35_6.3.9600.16384_none_efe9bba68a38095a\MpEngine.dll&lt;/p&gt;</code></pre></figure>
+
+<p>Looks like this:<br />
+<a href="/images/mpengine.dll_.rc4_.png"><img src="/images/mpengine.dll_.rc4_.png" alt="mpengine.dll.rc4" width="75%" class="aligncenter size-large wp-image-797" /></a><br />
+I might dig a little deeper on this but this is all for now. Hope this helps.</p>
+
+        
+      </div><!-- /.entry-content -->
+    </div><!-- /.entry-wrapper -->
+    <nav class="pagination" role="navigation">
+      
+        <a href="http://localhost:4000/blog/parsing-chrome-artifacts-with-python-part-3/" class="btn" title="Parsing Chrome Artifacts with Python! Part 3">Previous</a>
+      
+      
+        <a href="http://localhost:4000/blog/reviews_mastering_python_forensics/" class="btn" title="Review Of Mastering Python Forensics">Next</a>
+      
+    </nav><!-- /.pagination -->
+  </article>
+</div><!-- /#main -->
+
+<div class="footer-wrapper">
+  <footer role="contentinfo" class="entry-wrapper">
+    
+
+<span>&copy; 2017 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
+<div class="social-icons">
+	<a href="https://twitter.com/GlassDFIR" title="Jon Glass on Twitter" target="_blank"><i class="fa fa-twitter-square fa-2x"></i></a>
+	
+	
+	
+	
+	
+	
+	<a href="https://github.com/GlassDFIR" title="Jon Glass on Github" target="_blank"><i class="fa fa-github-square fa-2x"></i></a>
+	
+  
+	
+  <a href="http://localhost:4000/feed.xml" title="Atom/RSS feed"><i class="fa fa-rss-square fa-2x"></i></a>
+</div><!-- /.social-icons -->
+
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+<script type="text/javascript">
+  var BASE_URL = 'http://localhost:4000';
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="http://localhost:4000/assets/js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script src="http://localhost:4000/assets/js/scripts.min.js"></script>
+
+
+
+
+</body>
+</html>

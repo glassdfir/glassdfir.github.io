@@ -1,0 +1,114 @@
+---
+layout: post
+title: Parsing Chrome Artifacts with Python! Part 3
+date: 2015-10-25 19:55:08.000000000 -04:00
+categories: blog
+---
+<p>Continuing on my mission to bore the crap out of my readers, I took a look at the html local storage databases I discovered in Part One.</p>
+
+<h1>What is HTML Local Storage?</h1>
+<blockquote><p>With local storage, web applications can store data locally within the user's browser.<br />
+Before HTML5, application data had to be stored in cookies, included in every server request. Local storage is more secure, and large amounts of data can be stored locally, without affecting website performance. Unlike cookies, the storage limit is far larger (at least 5MB) and information is never transferred to the server. Local storage is per origin (per domain and protocol). All pages, from one origin, can store and access the same data.<br />
+--http://www.w3schools.com/html/html5_webstorage.asp</p></blockquote>
+<p>If this is a foreign concept to you, try it out:<br />
+{% highlight html %}
+<!DOCTYPE html>
+<html>
+<body>
+<div id="result"></div>
+<script>
+// Check browser support
+if (typeof(Storage) !== "undefined") {
+    // Store
+    localStorage.setItem("secret message", "Congratulations! This sentence is now stored in your local storage.");
+    // Retrieve
+    document.getElementById("result").style.color = "Green"
+    document.getElementById("result").innerHTML = localStorage.getItem("secret message");
+} else {
+    document.getElementById("result").style.color = "Red"
+    document.getElementById("result").innerHTML = "Sorry, your browser does not support HTML5 Web Storage...";
+}
+</script>
+</body>
+</html>
+{% endhighlight %}
+
+Pretty simple stuff. If you browsed this from Chrome you should now have a <code class="highlighter-rouge">https_jon.glass_0.localstorage</code> in your local storage directory.<br />
+On my Windows 7 VM the Chrome Local Storage files are located here:<br />
+<code>C:\Users\UserName\AppData\Local\Google\Chrome\User Data\Default\Local Storage</code><br />
+Here is a look at a few of mine:<br />
+{% highlight raw%}
+C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\Local Storage>dir *e /o:s
+ Volume in drive C has no label.
+ Volume Serial Number is D6AE-9F0B
+
+ Directory of C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\Local Storage
+
+07/07/2015  10:24 AM             3,072 https_www.mandiant.com_0.localstorage
+10/09/2015  09:49 PM             3,072 chrome-extension_pafkbggdmjlpgkdkcbjmhmfcdpncadgh_0.localstorage
+10/09/2015  09:52 PM             3,072 chrome-extension_pbjikboenpfhbbejgkoklgkhjpfogcam_0.localstorage
+03/19/2015  11:41 AM             3,072 http_www.nirsoft.net_0.localstorage
+07/22/2015  11:46 AM             3,072 https_bitbucket.org_0.localstorage
+03/12/2015  12:20 PM             3,072 http_www.arduino.cc_0.localstorage
+12/27/2014  08:22 PM             3,072 https_support.google.com_0.localstorage
+01/26/2015  11:06 AM             3,072 https_technet.microsoft.com_0.localstorage
+03/09/2015  02:45 PM             3,072 http_samy.pl_0.localstorage
+07/27/2015  04:33 PM             3,072 https_www.mozilla.org_0.localstorage
+03/12/2015  02:32 PM             3,072 https_www.youtube.com_0.localstorage
+05/17/2015  02:16 PM             3,072 http_ad.doubleclick.net_0.localstorage
+07/15/2015  11:48 AM             3,072 http_ib.adnxs.com_0.localstorage
+03/12/2015  12:29 PM             3,072 http_arduino.cc_0.localstorage
+01/26/2015  11:06 AM             3,072 http_blogs.technet.com_0.localstorage
+07/27/2015  12:49 PM             3,072 http_googleads.g.doubleclick.net_0.localstorage
+10/25/2015  10:19 PM             3,072 https_jon.glass_0.localstorage
+09/15/2015  09:41 AM             4,096 https_github.com_0.localstorage
+07/27/2015  12:40 PM             4,096 https_www.facebook.com_0.localstorage
+10/10/2015  09:58 PM             8,192 https_www.google.com_0.localstorage
+05/14/2015  11:27 AM            35,840 chrome-devtools_devtools_0.localstorage
+10/09/2015  09:52 PM            45,056 https_analytics.app.amazonbrowserapp.com_0.localstorage
+06/08/2015  01:50 PM            52,224 http_sourceforge.net_0.localstorage
+05/15/2015  09:02 AM           150,528 https_c.betrad.com_0.localstorage
+10/09/2015  10:46 PM           225,280 http_c.betrad.com_0.localstorage
+10/10/2015  09:59 PM           732,160 https_en.wikipedia.org_0.localstorage
+03/12/2015  02:36 PM         1,492,992 http_en.wikipedia.org_0.localstorage
+{% endhighlight %}
+It is worthy to mention there are a few investigative points you can glean from just this directory listing:</p>
+<ul>
+<li>The protocol of the site (http/https).</li>
+<li>The domain.</li>
+<li>The last modified date and time of the local storage file</li>
+</ul>
+<p>Let's look at my local storage entry from a few angles.<br />
+First lets checkout Chrome's developer tools > Resources > Local Storage:<br />
+<a href="{{ site.baseurl }}/images/devtool2.png"><img src="{{ site.baseurl }}/images/devtool2.png" /></a><br />
+Here is a shot of what it looks like in the ol' SQLITE Browser:<br />
+<a href="{{ site.baseurl }}/images/devtool3.png"><img src="{{ site.baseurl }}/images/devtool3.png" /></a><br />
+Here is some Python that will read it too:<br />
+{% highlight python %}
+import sqlite3, datetime
+selectStatement = 'SELECT * FROM ItemTable'
+LocalStorageFile = 'C:\\Users\\User\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Local Storage\\https_jon.glass_0.localstorage'
+c = sqlite3.connect(LocalStorageFile)
+for row in c.execute(selectStatement):
+    print row[0]
+    print str(row[1]).decode("utf-16")
+{% endhighlight %}
+<a href="{{ site.baseurl }}/images/devtool5.png"><img src="{{ site.baseurl }}/images/devtool5.png" /></a><br />
+I have looked at a bunch of these and the format is mostly developers choice. It is interesting to see how they are leveraged. For example, Wikipedia's local storage is so big, comparatively, because they are storing Base64 encoded images in the SQLite database.<br />
+{% highlight raw %}
+...
+background-image:url(//bits.wikimedia.org/static-1.25wmf20/skins/Vector/skinStyles/jquery.ui/
+images/ui-icons_666666_256x240.png?2015-03-04T20:18:20Z)!ie}.ui-state-highlight .ui-icon{back
+ground-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAADwCAMAAADYSUr5AAABDlBMVE
+Uug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8
+ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8u
+g/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug
+/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8bvOpvAAAAWX
+RSTlMAGRAzBAhQv4KZLyJVcUBmYBoTMswNITwWQkhLIB5aIycxUyyFNIeAw2rIz8Y4RRy8uL58q7WljKqorR+yKf0BnlE
+k7woGAgOPomKUSqCvbd+cR2M/b3+RaPlAXvEAAAABYktHRACIBR1IAAAACXBIWXMAAABIAAAASABGyWs+AAAPZElEQVR4
+2u1dC2PbthEGyUiq6ZiSXblLE6ex1mTO5iXZq+u6ro3abG26pOkSd13v//+RAXzhcIeHWMoUbeOTLesIEMB9PIB3ACgLE
+...
+{% endhighlight %}
+
+Kinda makes you wonder about what is hiding in YOUR local storage.<br />
+Well that is all for now... </p>

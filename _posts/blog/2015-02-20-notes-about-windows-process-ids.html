@@ -1,0 +1,19 @@
+---
+layout: post
+title: Useless Trivia about Windows Process IDs
+date: 2015-02-20 11:05:14.000000000 -05:00
+categories: blog
+---
+<p>Here are somethings I discovered about Windows Process IDs that I did not previously know...</p>
+
+ProcessIDs are stored as DWORDs.<br />
+A DWORD is a 32-bit unsigned integer (range: 0 through 4294967295 decimal).<br />
+ProcessIDs are divisible by 4 so the highest possible pid is 4,294,967,292.<br />
+Since they are divisible by 4, there are only 1,073,741,823 possible PIDs.<br />
+I wrote a script to keep launching and closing "calc.exe" until it gave me the PID I wanted.<br />
+<script src="https://gist.github.com/glassdfir/28f4311cceaf1fa7f069.js"></script><br />
+On average, it took around 103 tries to get the pid I wanted.<br />
+I knew PIDs get reused all the time but its weird that it happens so often.<br />
+The whole problem with the sysmonmap from <a href="https://jon.glass/looks-at-the-win10-boot-process/" target="_blank">here</a><br />
+is that there was a PID reused in under a second. That has got to cause other problems than just logging.</p>
+<p>I am not investing any actual research time on this but I am documenting the trivia nonetheless.</p>

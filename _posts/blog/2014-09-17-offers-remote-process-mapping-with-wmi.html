@@ -1,0 +1,17 @@
+---
+layout: post
+title: Live Process Mapping with WMI
+date: 2014-09-17 04:54:29.000000000 -04:00
+---
+<p>In previous posts I have discussed how you can parse a Windows event log and, through the magic of Powershell and javascript, create a visual map of process creation. But what if you are more IR than DF?<br />
+Here is an example of how you can leverage the Win32_Process WMI object to pull back the necessary information for a rudimentary process map on a <strong>live machine</strong>:<br />
+<a href="http://jon.glass/wp-content/uploads/2014/09/liveprocessmap.html">liveprocessmap</a></p>
+<p>Its the same principle as before except this time we are pulling the data for the current running processes. The tooltip is programmed to display the command line of the process. Google Chrome has a very noisy command line syntax. This is great because you don't have to install anything or reconfigure your event log auditing.</p>
+<p>Here is the code:<br />
+<script src="https://gist.github.com/glassdfir/24000caf48726ed84a5a.js"></script><br />
+I will throw this script up on the ol' GitHub as well just for kicks.</p>
+<p>Can this script be run on a remote machine? Of course it can! (provided you have the right access)</p>
+<p>LiveProcessMap.ps1 -ComputerName REMOTECOMPUTER</p>
+<p>The other scripts can too now that I think about it...I will be adding that feature soon.</p>
+<p>*************DISCLAIMER*************<br />
+These mapping scripts are not an exact science. The script can only map the information it has to work with. There are gaps in process creation for numerous reasons. I have found that visually mapping them highlights those very quickly.</p>

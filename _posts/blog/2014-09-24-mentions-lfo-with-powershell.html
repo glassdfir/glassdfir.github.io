@@ -1,0 +1,45 @@
+---
+layout: post
+title: LFO with Powershell
+date: 2014-09-24 02:06:35.000000000 -04:00
+---
+<p>In the DFIR world, it can be important to understand the principle of Least Frequency of Occurrence (LFO). The first place I read about this was on <a href="http://windowsir.blogspot.com/2010/01/thoughts-on-apt.html" target="_blank">Harlan Carvey's Blog</a> a few years ago. The general concept is that your system processes and favorite applications should be the most abundant items in your process logs. Inversely, malware should be the least abundant by comparison as most are designed to not draw a lot of attention. Sometimes you find yourself without much of a pivot point and you are asked to "find evil".</p>
+<p>With that in mind, here is an example of how you can use Sysmon to list all the processes, sorted by frequency count:<br />
+<script src="https://gist.github.com/glassdfir/210ff631af02e47b14cc.js"></script></p>
+<pre>
+PS C:Temp> C:TempLFO.ps1
+Count Name
+----- ----
+    1 C:\cygwin64\bin\cat.exe
+    1 C:\cygwin64\bin\cygpath.exe
+    1 C:\cygwin64\bin\find.exe
+    1 C:\cygwin64\bin\grep.exe
+    1 C:\cygwin64\bin\mkgroup.exe
+    1 C:\cygwin64binmkpasswd.exe
+    1 C:\cygwin64binrebase.exe
+    1 C:\cygwin64binsort.exe
+    1 C:\Program Files (x86)\Common Files\Java\Java Update\jaureg.exe
+    1 C:\Program Files (x86)\Common FilesVMwareUSBvnetlib64.exe
+    1 C:\Program Files (x86)\FileZilla FTP Client\filezilla.exe
+    1 C:\Program Files (x86)\FileZilla FTP Client\fzsftp.exe
+    1 C:\Program Files (x86)\Inkscape\inkscape.exe
+    1 C:\Program Files (x86)\Java\jre7bin\javaws.exe
+    1 C:\Program Files (x86)\Mozilla Firefox\maintenanceservice_installer.exe
+    1 C:\Program Files (x86)\Mozilla Maintenance Service\maintenanceservice_tmp.exe
+    1 C:\Program Files (x86)\Notepad++\updatergup.exe
+    1 C:\Program Files (x86)\Optimizer Pro\OptProStart.exe
+    1 C:\Program Files (x86)\Optimizer Pro\OptProUninstaller.exe
+    1 C:\Program Files (x86)\Optimizer Pro\unins000.exe
+    1 C:\Program Files (x86)\VMware\VMware Workstation\vmware.exe
+    1 C:\Program Files (x86)\VMware\VMware Workstation\vmware-unity-helper.exe
+    1 C:\Program Files (x86)\VMware\VMware Workstation\vprintproxy.exe
+    1 C:\Program Files (x86)\VMware\VMware Workstation\x64vmware-vmx.exe
+...
+
+</pre>
+<p>Just at a quick glance, I see a few things in there that might be cause for concern. For example:<br />
+C:Users<strong>Guest</strong>Downloadsinstall_flashplayer15x32_mssa_aaa_aih.exe<br />
+I could crack open the Sysmon log and find out more about this if I wanted to dive deeper.</p>
+<p>Here is an example using just the 4688 event from the security logs:<br />
+<script src="https://gist.github.com/glassdfir/80117cbcbe5e6e145c8a.js"></script><br />
+I realize that this is not ground breaking work but it seemed like something that others could use. </p>

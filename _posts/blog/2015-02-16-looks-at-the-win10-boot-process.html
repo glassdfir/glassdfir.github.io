@@ -1,0 +1,70 @@
+---
+layout: post
+title: The magic trick I discovered in the Windows 10 boot process...
+date: 2015-02-16 22:03:50.000000000 -05:00
+categories: blog
+---
+<p>So there I was, at the tail end of a RaDFIRe presentation that I barely had time to make much less review, trying to demonstrate how similar the Windows 7, 8, and 10 Tech Preview boot operations were when I brought up the SysmonMap for Windows 10. It was different from the rest and it threw me for a loop in front of a crowd. I will explain the difference I noticed.</p>
+<p>Long before time began, there was Windows 3.1. Windows 3.1 introduced the <strong>S</strong>ession <strong>M</strong>anager <strong>S</strong>ub<strong>s</strong>ystem (SMSS.EXE). SMSS.EXE is responsible for a few things: creating page files and environment variables, creating DOS device mappings like LPT1, and most importantly it creates the Kernel mode (WIN32K.SYS) and User mode (CSRSS.EXE) of the Win32 subsystem. The important difference between the two is that Kernel mode processes were allowed to talk, through device drivers, directly to hardware devices whereas User mode processes have to use Windows API calls to indirectly talk to hardware. Many of the security problems with early versions of Windows stemmed from allowing services and user applications to run in the same session.</p>
+<p>To establish a greater rift between user and system mode processes, starting in Windows Vista, SMSS creates two copies of itself on boot.<br />
+<a href="https://jon.glass/wp-content/uploads/2015/02/Screen-Shot-2015-02-16-at-11.03.25-AM.png"><img src="{{ site.baseurl }}/assets/Screen-Shot-2015-02-16-at-11.03.25-AM-300x225.png" alt="Screen Shot 2015-02-16 at 11.03.25 AM" width="300" height="225" class="alignleft size-medium wp-image-456" /></a> The first instance of SMSS is used to run <strong>Session 0</strong> and is reserved exclusively for services and other non-interactive user applications. Session 0 is used to launch operating system and background processes like Local Session Manager Service (LSM), Local Security Authority (LSA), and Services Controller Manager (SCM) to name a few. Most importantly, this is the session that all services are run in.</p>
+<p>
+<a href="../images/Screen-Shot-2015-02-16-at-11.24.41-AM.png"><img src="{{ site.baseurl }}/images/Screen-Shot-2015-02-16-at-11.24.41-AM-300x186.png" alt="Win 8 Session 0 SMSS SysmonMap" width="300" height="186" class="alignleft size-medium wp-image-462" /></a> This second screenshot is what a Windows 8 Session 0 SMSS.EXE looks like on a SysmonMap. This is something to look for in "Know normal, Find Evil" category. Like the Highlander, there can (should) be only ONE SMSS.EXE running. For sessions higher than 0, a SMSS.EXE is launched but it terminates once WINLOGON.EXE is running. If you have more than one SMSS.EXE running on your system...you have a problem.<br />
+<br />
+Users who are logged on to Windows and their user applications must run in Session 1 or higher. Session 0 no longer support User interfaces. In fact, processes running in Session 0 have no access to the graphics hardware thus user interfaces cannot be directly displayed on the monitor.<br />
+Don't believe me? Try this:<br />
+Download PsExec from Microsoft SysInternals site.<br />
+Run psexec.exe -s -d calc.exe to run calc.exe in Session 0.<br />
+You won't see the calculator window pop up but it is running.<br />
+You can check with WMIC to see what sessionid it is running under as well.<br />
+Looks like this:<br />
+<a href="https://jon.glass/wp-content/uploads/2015/02/session01.png"><img src="{{ site.baseurl }}/images/session01-1024x711.png" alt="session0" width="620" height="430" class="aligncenter size-large wp-image-454" /></a></p>
+<p>The second instance of SMSS establishes <strong>Session 1</strong> and supports interactive User processes. Every additional concurrent user gets their own Session. So if I logon into a server over RDP after someone else is already logged on, my Session ID will be higher than 1. This is an interesting artifact to review when establishing attribution of running processes. While sessions are designed to partition the processes of concurrent users, it is pretty easy to run a process in another session.<br />
+If I logged in after someone else and wanted an interactive process to appear in their session, all I would need to do is:</p>
+<pre>
+psexec.exe -i 1 ProcessForLoggedOnUserToSee.exe
+ -i         Run the program so that it interacts with the desktop of the
+            specified session on the remote system. If no session is
+            specified the process runs in the console session.
+</pre>
+<p>Once you stare at enough event logs, behavior like that would stick out if you know what to look for. While this information might seem off topic, I will bring it all full circle.</p>
+<p>Back to the Windows 10... Here is the<br />
+<a href="https://jon.glass/wp-content/uploads/2015/02/Win10-Sysmonmap.html">Win10 Tech Preview SysmonMap</a> I was displaying to the crowd. It is a bit busy to look at but here is the condensed version.<br />
+<a href="https://jon.glass/wp-content/uploads/2015/02/Screen-Shot-2015-02-16-at-9.02.53-PM.png"><img src="{{ site.baseurl }}/images/Screen-Shot-2015-02-16-at-9.02.53-PM-300x282.png" alt="Screen Shot 2015-02-16 at 9.02.53 PM" width="300" height="282" class="alignleft size-medium wp-image-489" /></a> So just as with Vista/7/8, SMSS launched two instances of itself to create Session 0 and Session 1 but, in Windows 10 the client session SMSS.EXE apparently doesn't directly start any processes. Instead, an Session 0 SVCHOST.EXE is used to launch WINLOGON.EXE? This can't be right. Let's dig a little deeper...<br />
+<br />
+Here is the XML for the SMSS.EXE process creation as logged by Sysmon:<br />
+<script src="https://gist.github.com/glassdfir/9caa4e96d836770d0287.js"></script><br />
+Notice the PID of 660, image of "C:\Windows\System32\smss.exe" and the GUID of 66AE7ABA-04DC-54DD-0000-001055930000<br />
+Now lets look at the XML for the WINLOGON.EXE process creation:<br />
+<script src="https://gist.github.com/glassdfir/b948a357879037e54b6b.js"></script><br />
+Take a look at the ParentProcess.<br />
+The PID is the 660<br />
+The GUID is the 66AE7ABA-04DD-54DD-0000-0010CC300100?!<br />
+The image is... SVCHOST.EXE?!<br />
+MIND. BLOWN.<br />
+That is some David Copperfield shit there.</p>
+<p>I am not sure what happened here but questions abound:<br />
+1. Is this magic trick something that is new with Windows 10? I can't imagine a purpose for a change like this.<br />
+2. Is this an artifact of the Windows Boot sequence that I don't fully understand? Maybe.<br />
+3. Is this a Sysmon logging error? If this is an error on Sysmon's side, it is the first major SNAFU I have encountered.<br />
+4. Is this an quirk of a half-baked Tech Preview? Could be.<br />
+My money is riding on some combination of 3 and 4.</p>
+<p>I would not have found whatever this is if I had not recently made a change in my SysmonMapper script.<br />
+I was binding parent processes to child processes using processids BUT that leads to erroneous results across reboots because everything maps back to pid 4 every time. Instead I chose GUIDs because it allows the script to handle start ups and shut downs throughout the time frame of the query. Once I get the new code presentable I will put it up here. Currently it is functional but looks like a toddler wrote it.<br />
+Since I have run out of things to say about this subject, this is where I leave you. If an answer comes forth to explain this prestidigitation, I will put all of your minds at ease and post it as an update here. If you can shed some light on this, hit me up in the comments section or on Twitter.</p>
+<p>*******UPDATE***********<br />
+Reading further into the logs I found the event for SVCHOST.EXE launching:<br />
+<script src="https://gist.github.com/glassdfir/80325777f5e9151332ec.js"></script><br />
+Things are starting to become a bit clearer. So far I can tell that<br />
+At 19:54:14.351173000Z, SMSS.EXE starts with PID 660.<br />
+At 19:54:14.366799500Z, WINLOGON.EXE starts.<br />
+At 19:54:14.569924800Z, SVCHOST.EXE starts with 660 starts.<br />
+At 19:54:15.335550000Z, SYSMON.EXE starts up.</p>
+<p>The Sysmon logs show that SVCHOST.EXE as the parent process for WINLOGON.EXE but since SVCHOST.EXE hadn't started yet this is clearly an error.<br />
+What happened was a PID collision. Here is how it actually went down:<br />
+1. SMSS.EXE starts up with PID 660<br />
+2. SMSS.EXE launches WINLOGON.EXE just like Windows Vista/7/8<br />
+3. Once WINLOGON.EXE is running, the Session 1 SMSS.EXE terminates and releases PID 660 back into the pool of available pid numbers.<br />
+4. SVCHOST.EXE starts up and grabs PID 660.<br />
+5. Sysmon starts up and sees the Parent PID for WINLOGON.EXE is 660 and the current PID for SVCHOST is 660 and makes a reasonable guess.</p>
+<p>This is explains EVERYTHING. It also highlights how Sysmon documents things that occur before it is running to see them. Good stuff. So no magic here, just Sysmon erroneously logging based off of a PID collision. </p>

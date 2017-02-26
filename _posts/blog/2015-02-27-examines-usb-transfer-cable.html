@@ -1,0 +1,204 @@
+---
+layout: post
+title: Evidence of USB Transfer Cable
+date: 2015-02-27 22:07:21.000000000 -05:00
+categories: blog
+---
+<p>Recently my local RadioShack had a huge "Going Out of Business" sale. So I grabbed a few things I that looked interesting. Among those items was a <a href="https://jon.glass/wp-content/uploads/2015/02/2604052_PM_EN.pdf">RadioShack USB Transfer Cable for Windows and Mac</a>.
+
+   <a href="https://jon.glass/wp-content/uploads/2015/02/02604052_00-e1425167642232.jpg"><img src="{{ site.baseurl }}/images/02604052_00-e1425167642232-300x194.jpg" alt="02604052_00" width="300" height="194" class="alignleft size-medium wp-image-526" /></a>I had heard of these but never really had a need for one one. The 80% discount convinced me that I now had a "need". It occurred to me that this would be an interesting method of exfiltration. So after a quick Google search turned up nothing about anyone else documenting what these do from a forensic standpoint, I figured I would type something up. Admittedly, I didn't look too hard so if someone else has blazed this trail already someone let me know. Much of this information also applies to forensic evidence of any USB device being inserted for the first time and used.</p>
+<p>For those unfamiliar with USB transfer cables, there are <a href="http://www.amazon.com/Tripp-Lite-Hi-Speed-Transfer-U233-006-MP-R/dp/B0030F2U9G">a</a> <a href="http://www.amazon.com/Macally-Transcable-File-Transfer-Cable/dp/B002PAQY7G" target="_blank">few</a> <a href="http://www.amazon.com/C2G-39941-Windows-Driverless-Transfer/dp/B00AM8FVOK" target="_blank">out</a> <a href="http://www.amazon.com/IOGEAR-Smartlink-Transfer-Cable-GUN262WE/dp/B00C97ZYOO" target="_blank">there</a>. Unlike <a href="http://en.wikipedia.org/wiki/Windows_Easy_Transfer" target="_blank">Windows Easy Transfer</a> cables which use native Windows functionality to move profiles, this cable uses the Go!EasySuite software to transfer files.<a href="https://jon.glass/wp-content/uploads/2015/02/Screen-Shot-2015-02-28-at-7.41.59-AM-e1425170715449.png"><img src="{{ site.baseurl }}/images/Screen-Shot-2015-02-28-at-7.41.59-AM-e1425170715449.png" alt="Screen Shot 2015-02-28 at 7.41.59 AM" width="250" height="213" class="alignleft size-full wp-image-538" /></a> The setup is pretty simple.<br />
+1. Plug usb cable into Computer A and Computer B. It doesn't matter which side.<br />
+2. Run the Go!Suite Software on both computers.<br />
+3. Use the GUI to copy files back and forth.<br />
+Pretty easy peasy stuff but let's dig a little deeper...</p>
+<p>When a user plugs in this USB cable into a Windows machine for the first time:<br />
+If you have never loaded a USB device to the machine, one of the first things you will see is the USB driver being added in the following location:</p>
+<pre>
+HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Setup\PnpLockdownFiles\%SystemPath%\system32\drivers\USBSTOR.SYS: 0x00000001
+</pre>
+<p>You are also going to see the device class get updated on the <a href="https://msdn.microsoft.com/en-us/library/windows/hardware/ff546165%28v=vs.85%29.aspx">Control Set</a> that booted the system (typically ControlSet001).</p>
+<pre>
+HKLM\SYSTEM\ControlSet001\Control\Class\{36FC9E60-C465-11CF-8056-444553540000}<pre wp-pre-tag-1></pre>007\DriverFlags: 0x00000001
+HKLM\SYSTEM\ControlSet001\Control\Class\{36FC9E60-C465-11CF-8056-444553540000}<pre wp-pre-tag-1></pre>007\InfPath: "usbstor.inf"
+HKLM\SYSTEM\ControlSet001\Control\Class\{36FC9E60-C465-11CF-8056-444553540000}<pre wp-pre-tag-1></pre>007\InfSection: "USBSTOR_BULK"
+HKLM\SYSTEM\ControlSet001\Control\Class\{36FC9E60-C465-11CF-8056-444553540000}<pre wp-pre-tag-1></pre>007\InfSectionExt: ".NT"
+HKLM\SYSTEM\ControlSet001\Control\Class\{36FC9E60-C465-11CF-8056-444553540000}<pre wp-pre-tag-1></pre>007\ProviderName: "Microsoft"
+HKLM\SYSTEM\ControlSet001\Control\Class\{36FC9E60-C465-11CF-8056-444553540000}<pre wp-pre-tag-1></pre>007\DriverDateData:  00 80 8C A3 C5 94 C6 01
+HKLM\SYSTEM\ControlSet001\Control\Class\{36FC9E60-C465-11CF-8056-444553540000}<pre wp-pre-tag-1></pre>007\DriverDate: "6-21-2006"
+HKLM\SYSTEM\ControlSet001\Control\Class\{36FC9E60-C465-11CF-8056-444553540000}<pre wp-pre-tag-1></pre>007\DriverVersion: "6.1.7601.17514"
+HKLM\SYSTEM\ControlSet001\Control\Class\{36FC9E60-C465-11CF-8056-444553540000}<pre wp-pre-tag-1></pre>007\MatchingDeviceId: "usb\class_08&subclass_06&prot_50"
+HKLM\SYSTEM\ControlSet001\Control\Class\{36FC9E60-C465-11CF-8056-444553540000}<pre wp-pre-tag-1></pre>007\DriverDesc: "USB Mass Storage Device"
+</pre>
+<p>Next, if you have never installed a CD-ROM device you are going to see something like this. </p>
+<pre>
+HKLM\SYSTEM\ControlSet001\Control\Class\{4D36E965-E325-11CE-BFC1-08002BE10318}<pre wp-pre-tag-2></pre>001\InfPath: "cdrom.inf"
+HKLM\SYSTEM\ControlSet001\Control\Class\{4D36E965-E325-11CE-BFC1-08002BE10318}<pre wp-pre-tag-2></pre>001\InfSection: "cdrom_install"
+HKLM\SYSTEM\ControlSet001\Control\Class\{4D36E965-E325-11CE-BFC1-08002BE10318}<pre wp-pre-tag-2></pre>001\ProviderName: "Microsoft"
+HKLM\SYSTEM\ControlSet001\Control\Class\{4D36E965-E325-11CE-BFC1-08002BE10318}<pre wp-pre-tag-2></pre>001\DriverDateData:  00 80 8C A3 C5 94 C6 01
+HKLM\SYSTEM\ControlSet001\Control\Class\{4D36E965-E325-11CE-BFC1-08002BE10318}<pre wp-pre-tag-2></pre>001\DriverDate: "6-21-2006"
+HKLM\SYSTEM\ControlSet001\Control\Class\{4D36E965-E325-11CE-BFC1-08002BE10318}<pre wp-pre-tag-2></pre>001\DriverVersion: "6.1.7601.17514"
+HKLM\SYSTEM\ControlSet001\Control\Class\{4D36E965-E325-11CE-BFC1-08002BE10318}<pre wp-pre-tag-2></pre>001\MatchingDeviceId: "gencdrom"
+HKLM\SYSTEM\ControlSet001\Control\Class\{4D36E965-E325-11CE-BFC1-08002BE10318}<pre wp-pre-tag-2></pre>001\DriverDesc: "CD-ROM Drive"
+</pre>
+<p>Now that Windows knows about generic CD-ROM devices, let's install a "Easy Suite" CD-ROM device:</p>
+<pre>
+HKLM\SYSTEM\ControlSet001\Control\DeviceClasses\{53f56308-b6bf-11d0-94f2-00a0c91efb8b}\##?#USBSTOR#CdRom&Ven_&Prod_Easy_Suite&Rev_2.00#7&1ca94d81&0&94F85364742E0061&0#{53f56308-b6bf-11d0-94f2-00a0c91efb8b}\DeviceInstance: "USBSTOR\CdRom&Ven_&Prod_Easy_Suite&Rev_2.00&1ca94d81&0&94F85364742E0061&0"
+HKLM\SYSTEM\ControlSet001\Control\DeviceClasses\{53f56308-b6bf-11d0-94f2-00a0c91efb8b}\##?#USBSTOR#CdRom&Ven_&Prod_Easy_Suite&Rev_2.00#7&1ca94d81&0&94F85364742E0061&0#{53f56308-b6bf-11d0-94f2-00a0c91efb8b}\#\SymbolicLink: "\?\USBSTOR#CdRom&Ven_&Prod_Easy_Suite&Rev_2.00#7&1ca94d81&0&94F85364742E0061&0#{53f56308-b6bf-11d0-94f2-00a0c91efb8b}"
+HKLM\SYSTEM\ControlSet001\Control\DeviceClasses\{53f56308-b6bf-11d0-94f2-00a0c91efb8b}\##?#USBSTOR#CdRom&Ven_&Prod_Easy_Suite&Rev_2.00#7&1ca94d81&0&94F85364742E0061&0#{53f56308-b6bf-11d0-94f2-00a0c91efb8b}\#\Control\Linked: 0x00000001
+HKLM\SYSTEM\ControlSet001\Control\DeviceClasses\{53f56308-b6bf-11d0-94f2-00a0c91efb8b}\##?#USBSTOR#CdRom&Ven_&Prod_Easy_Suite&Rev_2.00#7&1ca94d81&0&94F85364742E0061&0#{53f56308-b6bf-11d0-94f2-00a0c91efb8b}\Control\ReferenceCount: 0x00000001
+HKLM\SYSTEM\ControlSet001\Control\DeviceClasses\{53f5630d-b6bf-11d0-94f2-00a0c91efb8b}\##?#USBSTOR#CdRom&Ven_&Prod_Easy_Suite&Rev_2.00#7&1ca94d81&0&94F85364742E0061&0#{53f5630d-b6bf-11d0-94f2-00a0c91efb8b}\DeviceInstance: "USBSTOR\CdRom&Ven_&Prod_Easy_Suite&Rev_2.00&1ca94d81&0&94F85364742E0061&0"
+HKLM\SYSTEM\ControlSet001\Control\DeviceClasses\{53f5630d-b6bf-11d0-94f2-00a0c91efb8b}\##?#USBSTOR#CdRom&Ven_&Prod_Easy_Suite&Rev_2.00#7&1ca94d81&0&94F85364742E0061&0#{53f5630d-b6bf-11d0-94f2-00a0c91efb8b}\#\SymbolicLink: "\?\USBSTOR#CdRom&Ven_&Prod_Easy_Suite&Rev_2.00#7&1ca94d81&0&94F85364742E0061&0#{53f5630d-b6bf-11d0-94f2-00a0c91efb8b}"
+HKLM\SYSTEM\ControlSet001\Control\DeviceClasses\{53f5630d-b6bf-11d0-94f2-00a0c91efb8b}\##?#USBSTOR#CdRom&Ven_&Prod_Easy_Suite&Rev_2.00#7&1ca94d81&0&94F85364742E0061&0#{53f5630d-b6bf-11d0-94f2-00a0c91efb8b}\#\Control\Linked: 0x00000001
+HKLM\SYSTEM\ControlSet001\Control\DeviceClasses\{53f5630d-b6bf-11d0-94f2-00a0c91efb8b}\##?#USBSTOR#CdRom&Ven_&Prod_Easy_Suite&Rev_2.00#7&1ca94d81&0&94F85364742E0061&0#{53f5630d-b6bf-11d0-94f2-00a0c91efb8b}\Control\ReferenceCount: 0x00000001
+</pre>
+<p>For me, this is one of the most interesting parts about this cable. When you plug it in, Windows detects that you have installed a CD-ROM drive with a CD in it. Emulating a CD-ROM is not an uncommon practice. <a href="http://www.allarghiamoci.it/usbcdrom/" target="_blank">Hell, it's not even all that hard to do.</a> Companies like <a href="http://www.ironkey.com/">IronKey</a> make secure USB drives with emulated CD-ROMs. The emulated CD contains the software used to unlock the encrypted USB drive. With this particular device, the emulated CD contains the software used to transfer files to and fro.</p>
+<p>Now that we have explained to Windows what a a "Easy Suite" CD-ROM device looks like, we are going to document this specific instance of device.</p>
+<pre>
+HKLM\SYSTEM\ControlSet001\Control\DeviceClasses\{a5dcbf10-6530-11d2-901f-00c04fb951ed}\##?#USB#VID_0EA0&PID_2210#6&103465e1&0&2#{a5dcbf10-6530-11d2-901f-00c04fb951ed}\DeviceInstance: "USB\VID_0EA0&PID_2210&103465e1&0&2"
+HKLM\SYSTEM\ControlSet001\Control\DeviceClasses\{a5dcbf10-6530-11d2-901f-00c04fb951ed}\##?#USB#VID_0EA0&PID_2210#6&103465e1&0&2#{a5dcbf10-6530-11d2-901f-00c04fb951ed}\#\SymbolicLink: "\?\USB#VID_0EA0&PID_2210#6&103465e1&0&2#{a5dcbf10-6530-11d2-901f-00c04fb951ed}"
+HKLM\SYSTEM\ControlSet001\Control\DeviceClasses\{a5dcbf10-6530-11d2-901f-00c04fb951ed}\##?#USB#VID_0EA0&PID_2210#6&103465e1&0&2#{a5dcbf10-6530-11d2-901f-00c04fb951ed}\#\Control\Linked: 0x00000001
+HKLM\SYSTEM\ControlSet001\Control\DeviceClasses\{a5dcbf10-6530-11d2-901f-00c04fb951ed}\##?#USB#VID_0EA0&PID_2210#6&103465e1&0&2#{a5dcbf10-6530-11d2-901f-00c04fb951ed}\Control\ReferenceCount: 0x00000001
+</pre>
+<p>Make special note of USB\VID_0EA0&PID_2210\6&103465e1&0&2 because under <strong>HKLM\SYSTEM\ControlSet001\Enum\USB</strong> a key is made for it:</p>
+<pre>
+VID_0EA0&PID_2210&103465e1&0&2\LocationInformation: "Port_#0002.Hub_#0002"
+VID_0EA0&PID_2210&103465e1&0&2\Capabilities: 0x000000C4
+VID_0EA0&PID_2210&103465e1&0&2\HardwareID:  55 00 53 00 42 00 5C 00 56 00 49 ...
+VID_0EA0&PID_2210&103465e1&0&2\CompatibleIDs:  55 00 53 00 42 00 5C 00 43 00 6C 00 ...
+VID_0EA0&PID_2210&103465e1&0&2\ContainerID: "{5e1ad350-a56d-11e4-b416-3c15c2c04e57}"
+VID_0EA0&PID_2210&103465e1&0&2\ConfigFlags: 0x00000000
+VID_0EA0&PID_2210&103465e1&0&2\ClassGUID: "{36fc9e60-c465-11cf-8056-444553540000}"
+VID_0EA0&PID_2210&103465e1&0&2\Driver: "{36fc9e60-c465-11cf-8056-444553540000}<pre wp-pre-tag-5></pre>007"
+VID_0EA0&PID_2210&103465e1&0&2\Class: "USB"
+VID_0EA0&PID_2210&103465e1&0&2\Mfg: "@usbstor.inf,%generic.mfg%;Compatible USB storage device"
+VID_0EA0&PID_2210&103465e1&0&2\Service: "USBSTOR"
+VID_0EA0&PID_2210&103465e1&0&2\DeviceDesc: "@usbstor.inf,%genericbulkonly.devicedesc%;USB Mass Storage Device"
+VID_0EA0&PID_2210&103465e1&0&2\ParentIdPrefix: "7&1ca94d81&0"
+VID_0EA0&PID_2210&103465e1&0&2\Control\ActiveService: "USBSTOR"
+</pre>
+<p>Next up, <strong>HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\cdfs</strong> gets updated.<br />
+FUN FACT:<br />
+The name of each Services subkey is the name of the service, which is also the root of the name of the file from which the service is loaded.</p>
+<pre>
+HKLM\SYSTEM\ControlSet001\services\cdfs\Enum<pre wp-pre-tag-6></pre>: "Root\LEGACY_CDFS<pre wp-pre-tag-6></pre>000"
+HKLM\SYSTEM\ControlSet001\services\cdfs\Enum\Count: 0x00000001
+HKLM\SYSTEM\ControlSet001\services\cdfs\Enum\NextInstance: 0x00000001
+HKLM\SYSTEM\ControlSet001\services\cdrom\Enum: "USBSTOR\CdRom&Ven_&Prod_Easy_Suite&Rev_2.00&1ca94d81&0&94F85364742E0061&0"
+HKLM\SYSTEM\ControlSet001\services\USBSTOR\Enum<pre wp-pre-tag-6></pre>: "USB\VID_0EA0&PID_2210&103465e1&0&2"
+HKLM\SYSTEM\ControlSet001\services\USBSTOR\Enum\Count: 0x00000001
+HKLM\SYSTEM\ControlSet001\services\USBSTOR\Enum\NextInstance: 0x00000001
+</pre>
+<p>Reader, I know what you are thinking. "Jon, doesn't a mount point get established around this time?"<br />
+Of course it does!</p>
+<pre>
+HKLM\SYSTEM\MountedDevices\??\Volume{5e1ad351-a56d-11e4-b416-3c15c2c04e57}:  5C 00 3F 00 3F 00 ...
+HKLM\SYSTEM\MountedDevices\DosDevices\E::  5C 00 3F 00 3F 00 ...
+</pre>
+<p>Here we can see that this device was mounted to the E: drive.<br />
+Next, error logging is turned on for <a href="https://msdn.microsoft.com/en-us/library/windows/hardware/ff550808%28v=vs.85%29.aspx" target="_blank">setupapi.dev.log</a>:</p>
+<pre>
+HKLM\SYSTEM\Setup\SetupapiLogStatus\setupapi.dev.log: 0x00001000
+</pre>
+<p>After the HKLM\SYSTEM\ControlSet001 is fully populated with it's changes, you will see the keys get replicated to <a href="https://msdn.microsoft.com/en-us/library/windows/hardware/ff546165%28v=vs.85%29.aspx" target="_blank">HKLM\SYSTEM\CurrentControlSet</a>.<br />
+Enough about the System Registry hive. Let's talk NTUSER.DAT. So now that we have installed this "CD-ROM" device, of course it wanted to autorun. <a href="https://jon.glass/wp-content/uploads/2015/02/1-e1425182003585.png"><img src="{{ site.baseurl }}/images/1-e1425182003585-300x243.png" alt="1" width="300" height="243" class="alignleft size-medium wp-image-560" /></a> According to <a href="https://msdn.microsoft.com/en-us/library/windows/desktop/cc144202%28v=vs.85%29.aspx">Microsoft</a>: "AutoRun is a feature of the Windows operating system. It automates the procedures for installing and configuring products designed for Windows-based platforms that are distributed on CD-ROMs. When users insert an AutoRun-enabled compact disc into their CD-ROM drive, AutoRun automatically runs an application on the CD-ROM that installs, configures, or runs the selected product." Most environments have their system's configured to at least prompt before automatically running a CD. The autorun can be seen in the NTUSER.DAT file of the logged on user under <strong>Software\Microsoft\Windows\CurrentVersion\Explorer\</strong>:</p>
+<pre>
+AutoplayHandlers\EventHandlersDefaultSelection\AutorunINFLegacyArrival\: "MSAutoRun"
+AutoplayHandlers\UserChosenExecuteHandlers\AutorunINFLegacyArrival\: "MSPromptEachTime"
+CD Burning\Drives\Volume{5e1ad351-a56d-11e4-b416-3c15c2c04e57}\Drive Type: 0x00000007
+CD Burning\Drives\Volume{5e1ad351-a56d-11e4-b416-3c15c2c04e57}\IsImapiDataBurnSupported: 0x00000000
+CD Burning\StagingInfo\NextStagingPathIndex: 0x00000002
+CD Burning\StagingInfo\Volume{5e1ad351-a56d-11e4-b416-3c15c2c04e57}\StagingPath: "C:\Users\User\AppData\Local\Microsoft\Windows\Burn\Burn1"
+CD Burning\StagingInfo\Volume{5e1ad351-a56d-11e4-b416-3c15c2c04e57}\Active: 0x00000001
+CD Burning\StagingInfo\Volume{5e1ad351-a56d-11e4-b416-3c15c2c04e57}\DriveNumber: 0x00000004
+MountPoints2\CPC\Volume\{5e1ad351-a56d-11e4-b416-3c15c2c04e57}\Generation: 0x00000002
+MountPoints2\{5e1ad351-a56d-11e4-b416-3c15c2c04e57}\ISOVersion\SetWorkingDirectoryFromTarget: ""
+MountPoints2\{5e1ad351-a56d-11e4-b416-3c15c2c04e57}\ISOVersion\: "5.0.890.53"
+MountPoints2\{5e1ad351-a56d-11e4-b416-3c15c2c04e57}\shell\: "AutoRun"
+MountPoints2\{5e1ad351-a56d-11e4-b416-3c15c2c04e57}\shell\Autoplay\MUIVerb: "@shell32.dll,-8507"
+MountPoints2\{5e1ad351-a56d-11e4-b416-3c15c2c04e57}\shell\Autoplay\DropTarget\CLSID: "{F26A669A-BCBB-4E37-ABF9-7325DA15F931}"
+MountPoints2\{5e1ad351-a56d-11e4-b416-3c15c2c04e57}\shell\AutoRun\: "Install or run program from your media"
+MountPoints2\{5e1ad351-a56d-11e4-b416-3c15c2c04e57}\shell\AutoRun\SetWorkingDirectoryFromTarget: ""
+MountPoints2\{5e1ad351-a56d-11e4-b416-3c15c2c04e57}\shell\AutoRun\command\: "E:\EasySuite.exe"
+MountPoints2\{5e1ad351-a56d-11e4-b416-3c15c2c04e57}\_Autorun\DefaultIcon\: "E:\EasySuite.exe"
+</pre>
+<p>Most of this information comes from the autorun.inf file located at the root of the "CD".</p>
+<pre>
+[autorun]
+ISOVersion=5.0.890.53
+open=EasySuite.exe
+icon=EasySuite.exe
+</pre>
+<p>Ok. So up until now all of this happened automatically without the user doing anything except plugging the device in. Let's look at Evidence of Execution. Here is the <a href="http://www.4n6k.com/2013/05/userassist-forensics-timelines.html">UserAssist</a> related to the software: </p>
+<pre>
+UserAssist\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\Count\P:\Hfref\Hfre\NccQngn\Ybpny\Grzc\RPAK\RnflFhvgr.rkr:  00 00 00 00 00 00 00 00 00 00 00 00 82 1A 00 00 00 00 80 BF 00 00 80 BF 00 00 80 BF 00 00 80 BF 00 00 80 BF 00 00 80 BF 00 00 80 BF 00 00 80 BF 00 00 80 BF 00 00 80 BF FF FF FF FF 00 00 00 00 00 00 00 00 00 00 00 00
+</pre>
+<p>Busted out my ROT13 decoder ring...<br />
+P:\Hfref\Hfre\NccQngn\Ybpny\Grzc\RPAK\RnflFhvgr.rkr<br />
+C:\Users\User\AppData\Local\Temp\ECNX\EasySuite.exe<br />
+Wait a damn minute. I thought this software was located on an emulated cd located on the E:?<br />
+For some reason, EasySuite.exe wants to spread out when executed.<br />
+If you drag it from the "CD" on the E: to the desktop, when executed it drops the following files in the working dir:</p>
+<pre>
+ECN001.DLL
+ECN010.DLL
+ECN011.DLL
+ECN030.DLL
+ProdLic.DLL
+</pre>
+<p>Obviously, when you run it from the read-only "CD" the software can't drop these files in the same dir as the exe SO it drops all of the files in <strong>C:\Users\User\AppData\Local\Temp</strong> or <strong>%TEMP%</strong>.</p>
+<pre>
+C:\Users\User\AppData\Local\Temp\ECNX\EasySuite.exe
+C:\Users\User\AppData\Local\Temp\ECNX\ECN001.DLL
+C:\Users\User\AppData\Local\Temp\ECNX\ECN010.DLL
+C:\Users\User\AppData\Local\Temp\ECNX\ECN011.DLL
+C:\Users\User\AppData\Local\Temp\ECNX\ECN030.DLL
+C:\Users\User\AppData\Local\Temp\ECNX\ProdLic.DLL
+</pre>
+<p>Other files are dropped upon execution as well:</p>
+<pre>
+C:\Users\User\AppData\Local\Temp\ECNX\ProfileClone\ExcelOutlookProfile.dll
+C:\Users\User\AppData\Local\Temp\ECNX\ProfileClone\FileProfileClone.dll
+C:\Users\User\AppData\Local\Temp\ECNX\ProfileClone\IEOEMP_ProfileClone.dll
+C:\Users\User\AppData\Local\Temp\ECNX\ProfileClone\IMProfile.dll
+C:\Users\User\AppData\Local\Temp\ECNX\ProfileClone\SystemProfileInfo.dll
+C:\Users\User\AppData\Local\Temp\ECNX\ProfileClone\WordPointProfile.dll
+C:\Users\User\AppData\Roaming\EasyMover\EasyMoverSettings.xml
+C:\Users\User\AppData\Roaming\EasySuite.3.436.80\ECN010.DLL
+C:\Users\User\AppData\Roaming\EasySuite.3.101.22\ECN011.DLL
+C:\Users\User\AppData\Roaming\EasySuite.7.436.71\ECN030.DLL
+</pre>
+<p>We can also see evidence of EasySuite settings in the <strong>NTUSER.DAT</strong> SOFTWARE hive:</p>
+<pre>
+Software\OTi108\EasySuite\LastFolderAccessHex:"43003A005C00550073006500720073005C0055007300650072005C0044006F00630075006D0065006E0074007300"
+Software\OTi108\EasySuite\ReadOnlyFlag: 0x00000000
+Software\OTi108\EasySuite\AdvanceFunctionModules\ModulesPath010: "C:\Users\User\AppData\Roaming\EasySuite.3.436.80\ECN010.DLL"
+Software\OTi108\EasySuite\AdvanceFunctionModules\ModulesPath011: "C:\Users\User\AppData\Roaming\EasySuite.3.101.22\ECN011.DLL"
+Software\OTi108\EasySuite\AdvanceFunctionModules\ModulesPath030: "C:\Users\User\AppData\Roaming\EasySuite.7.436.71\ECN030.DLL"
+Software\OTi\OutlookSync\URTI\EnabelSynchronize: "Y"
+Software\OTi\ThunderBird\FolderSync\ExportSyncFunction: (NULL!)
+</pre>
+<p>OTi = Ours Technology inc. (The publisher)<br />
+2108 =<br />
+I discovered another curious artifact that gets created when you insert this cable:</p>
+<pre>
+C:\Users\User\AppData\Local\Microsoft\Windows\Burn\Burn1
+</pre>
+<p>This folder is designed to be a temp folder for files waiting to be burned to optical media. You can tell that it was created through a Windows Explorer API call because a desktop.ini file is created in the folder as well. Not 100% sure why this gets created at this time but I am 85% sure it doesn't really matter. :)  </p>
+<p>Let's look at the GUI of this beast:<br />
+One of the first things I noticed was this software was not using the standard Windows Explorer dialogs for displaying files and folders. As such it displays system files that a normally masked by Explorer. <a href="https://jon.glass/wp-content/uploads/2015/02/3.png"><img src="{{ site.baseurl }}/images/3-1024x439.png" alt="3" width="620" height="266" class="aligncenter size-large wp-image-573" /></a></p>
+<p>To put this through it's paces, I plugged the cable into both side of my Mac Book and associated one end with a Windows 7 VM and the other with a Windows 8 VM.<br />
+The first thing I checked was to see if just any user could run the software.<br />
+<a href="https://jon.glass/wp-content/uploads/2015/02/6.png"><img src="{{ site.baseurl }}/images/6.png" alt="6" width="487" height="181" class="aligncenter size-full wp-image-579" /></a><br />
+It internally checks the administrative rights of the account running the software. It does not prompt to elevate.<br />
+The second thing I looked for was whether or not it would copy locked files.<br />
+I tried to copy the NTUSER.DAT of the User that was logged in on the Win8 machine.<br />
+<a href="https://jon.glass/wp-content/uploads/2015/02/5.png"><img src="{{ site.baseurl }}/images/5-1024x889.png" alt="5" width="620" height="538" class="aligncenter size-large wp-image-577" /></a><br />
+So that didn't work. But what about non-locked files that I would need to UAC permission for?<br />
+In Windows Explorer, I attempted to copy the NTUSER.DAT from an inactive account and I got this prompt when I attempted to view the folder.<br />
+<a href="https://jon.glass/wp-content/uploads/2015/02/7.png"><img src="{{ site.baseurl }}/images/7-1024x862.png" alt="7" width="620" height="522" class="aligncenter size-large wp-image-580" /></a><br />
+But this software is not bound by such restrictions...<br />
+<a href="https://jon.glass/wp-content/uploads/2015/02/4.png"><img src="{{ site.baseurl }}/images/4-1024x889.png" alt="4" width="620" height="538" class="aligncenter size-large wp-image-581" /></a><br />
+This proves, once again, that UAC is more of an annoyance to users trying to work than an actual security feature. The remote host does not approve/confirm/see what files are being transferred to the other system. Plugging the cable in and running the software is implied consent access all files on the system.<br />
+Next I ran the software then right-clicked on the E: drive and ejected the CD just to see what would happen. As I suspected, turns out it is 100% functional without the "CD" being present. You don't even need a visible GUI. I used psexec to launch the software in session 0 and it still works. Since it will run as SYSTEM, a user doesn't need to be logged on for it to work. That got me thinking about possible applications for this type of device. What if we drop the software on a machine and let it autorun early in the boot process? We could bypass a lot of security restrictions. I could see applications for <font color="blue">good</font> and <font color="red">evil</font> for a persistent physical backdoor. Okay mostly evil.</p>
+<p>I am still interested in how the two sides of this cable communicate. I will probably take a deeper look at it in the near future.</p>

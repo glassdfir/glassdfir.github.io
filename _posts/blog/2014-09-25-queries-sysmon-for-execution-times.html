@@ -1,0 +1,38 @@
+---
+layout: post
+title: Sysmon Continues
+date: 2014-09-25 19:28:50.000000000 -04:00
+---
+<p>Q: Imaginary Reader writes "Sysmon is great and all but how can I quickly search for specific information from it?"</p>
+<p>A: To be honest, Imaginary Reader, I was wondering the same thing. So I threw this together to perform a very common function: return the dates and times that a process was executed.<br />
+<script src="https://gist.github.com/glassdfir/a12cbad63fad91ff90d5.js"></script><br />
+I ended up with two scripts that I jammed together; one for exact matches using -FilterXPath (which is very quick) and one for matching a partial string in the Image name (not so quick). As far as I can tell FilterXPath doesn't support partial matches.</p>
+<pre>
+PS C:demo> .ExecTimeQuery.ps1 -query "C:\Program Files (x86)\Mozilla Firefox\firefox.exe" -exact
+9/20/2014 5:33:16 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/20/2014 3:42:32 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/20/2014 3:38:58 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/20/2014 1:01:13 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/20/2014 1:01:12 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/19/2014 9:02:39 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/19/2014 9:02:18 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/19/2014 8:50:46 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/19/2014 3:26:02 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+
+PS C:demo> .ExecTimeQuery.ps1 -query "firefox"
+9/20/2014 5:33:16 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/20/2014 3:42:32 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/20/2014 3:38:58 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/20/2014 1:01:13 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/20/2014 1:01:13 PM	C:\Program Files (x86)Mozilla Firefox\uninstallhelper.exe
+9/20/2014 1:01:12 PM	C:\Program Files (x86)Mozilla Firefox\uninstallhelper.exe
+9/20/2014 1:01:12 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/19/2014 9:02:39 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/19/2014 9:02:18 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/19/2014 8:50:46 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/19/2014 3:26:18 PM	C:\Program Files (x86)\Mozilla Firefox\uninstallhelper.exe
+9/19/2014 3:26:13 PM	C:\Program Files (x86)\Mozilla Firefox\uninstallhelper.exe
+9/19/2014 3:26:02 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+</pre>
+<p>I am looking for ways to speed this up so if anyone has any suggestions, let me know.</p>
+<p>&nbsp;</p>

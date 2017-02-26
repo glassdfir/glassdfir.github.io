@@ -1,0 +1,42 @@
+---
+layout: post
+title: Misadventures in Parsing the WebCacheV01.dat (Part 1)
+date: 2014-12-10 09:48:36.000000000 -05:00
+type: post
+published: true
+status: publish
+categories: []
+tags:
+- DFIR
+- impacket
+- libesedb
+meta:
+  _edit_last: '1'
+  _thumbnail_id: '204'
+  _oembed_f0d24300e38e6915bba7d5e33a727c9a: '{{unknown}}'
+  _oembed_b8e88f7e50ba972f745068ad34f54dc6: '{{unknown}}'
+author:
+  login: GlassAdmin
+  email: thechosenoneandahalf@gmail.com
+  display_name: Jon
+  first_name: ''
+  last_name: ''
+---
+<p>Recently, I found myself with a bit of free time so I decided to attempt to create a python CLI tool for live parsing the WebCache from my Windows 8.1 machine. My goal is to make something that I can include in a live response script.<br />
+For those who may not be aware, since the introduction of Windows 8 and Internet Explorer 10, IE no longer logs internet history to the traditional index.dat file. Microsoft decided to store IE cache information in an Extensible Storage Engine (ESE) database (also known as Jet Blue). This makes sense to me. ESE is used in Microsoft Exchange Server's Mailbox Database.edb and Public Folder Database.edb to store mail data. ESE is used in the Active Directory database NTDS.DIT file for storing objects. ESE is also used in Windows Search Service cache, which can be found %Profiles%/All Users/Application Data/Microsoft/Search/Data/Applications/Windows/Windows.edb. (<em>Oddly enough I appear to a have another copy located C:ProgramDataMicrosoftSearchDataApplicationsWindows. I will figure that out later.)</em> For now, let's get back to the topic at hand: WebCacheV01.dat.</p>
+<p>If you are completely unfamiliar with forensics on ESE databases, I recommend reading <a href="http://articles.forensicfocus.com/2013/12/10/forensic-analysis-of-the-ese-database-in-internet-explorer-10/">this</a>, <a href="http://www.forensicfocus.com/windows-search-forensics">this</a>, and <a href="http://eprints.whiterose.ac.uk/75046/1/Forensic_Data_Recovery_From_The_Windows_Search_Database_preprint_DIIN328.pdf">this</a>. When I started researching how to parse ESE databases, I found that <a href="http://www.nirsoft.net/utils/ese_database_view.html">Nirsoft's ESEDatabaseView</a> mentioned more than any other tool. This utility is wonderful for displaying the contents of an ESE DB in a GUI but it does not have a CLI. Unfortunately, this doesn't work well for my scripting needs. Nevertheless, I highly recommend this tool for the forensic analysis of WebCacheV01.dat. I relied heavily upon this tool to help me understand the structure of the web cache and troubleshoot my scripts when they failed.</p>
+<p>Continuing on my journey, I discovered two python libraries dedicated to parsing ESE databases:<br />
+<a href="https://github.com/libyal/libesedb">libesedb</a> by <a href="https://code.google.com/u/joachim.metz@gmail.com/">Joachim Metz</a> at Google and <a href="http://corelabs.coresecurity.com/index.php?module=Wiki&amp;action=view&amp;type=tool&amp;name=Impacket">Impacket</a>'s <a href="https://code.google.com/p/impacket/source/browse/tags/impacket_0_9_12/impacket/ese.py">ese.py</a> by Alberto Solino at <a href="http://corelabs.coresecurity.com/">CoreLabs</a>. I was able to use both of these with equivalent success to parse the IE 11 Web Cache. I have included some examples of sophomoric but functional code below.</p>
+<p>Since WebcacheV01.dat contains a lot of information (Cookies, pointers to the location of cache files, etc...), I needed to narrow my focus to only the Web History. My methodology was to parse the Containers container looking for containers named "History" that have "History.IE5" in the Directory field and grab the ContainerId value.<br />
+<a href="http://jon.glass/wp-content/uploads/2014/12/esedbviewerhistfiles.png"><img class="alignnone wp-image-201 size-medium" src="{{ site.baseurl }}/assets/esedbviewerhistfiles-300x164.png" alt="esedbviewerhistfiles" width="300" height="164" /></a><br />
+In my analysis of WebCacheV01.dat, this appears to be the shortest distance to finding which tables contain IE web history logs. If there is a better way, I would love to hear it. This feels clunky.<br />
+Once I knew which container contains the web history, it was a simple matter of opening the table and looping through the records. As a proof of concept, I decided to grab just the URLs from the history containers.</p>
+<p>Here is how I parsed the WebCache using libesedb:<br />
+<script src="https://gist.github.com/glassdfir/a17999599abd4d24f3c1.js"></script><br />
+Here is how I parsed the WebCache using Impacket:<br />
+<script src="https://gist.github.com/glassdfir/393fa85e364c3660e448.js"></script><br />
+Both of these libraries worked great and returned most of the URLs from the two tables but there were a few records whose URLs did not parse.<br />
+<a href="http://jon.glass/wp-content/uploads/2014/12/LongURLS.png"><img class="alignnone wp-image-204 size-medium" src="{{ site.baseurl }}/assets/LongURLS-300x197.png" alt="LongURLS" width="300" height="197" /></a></p>
+<p>This took me a minute to figure out but ESE databases have a built-in functionality for handling <a href="http://en.wikipedia.org/wiki/Extensible_Storage_Engine#Long_values">Long Values</a>. Basically, values that will make the record exceed it's allotted size will be stored in a separate table. As far as I can tell, neither of the two libraries that I used supports recognizing Long Values and looking them up in their separate table. If they do, I don't know how to do it. The comments in the <a href="https://code.google.com/p/impacket/source/browse/tags/impacket_0_9_12/impacket/ese.py">Impacket library</a> indicate that Long Values are on the ToDo list. I will be keeping an eye on that.<br />
+If you guys know of a better way to accomplish this goal, please let me know.<br />
+I will explain how I defined the problem and the steps I took to reverse-engineer the WebcacheV01.dat in my next post.</p>

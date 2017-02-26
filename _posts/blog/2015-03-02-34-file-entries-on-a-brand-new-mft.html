@@ -1,0 +1,67 @@
+---
+layout: post
+title: 34 File Entries on a Brand New $MFT
+date: 2015-03-02 21:51:08.000000000 -05:00
+categories: blog
+---
+<p>So recently there was a request on a DFIR mailing list about recovering $MFT FILE records.<br />
+That got me thinking about the creation of the $MFT so I added a new virtual drive to a VM and formatted it.<br />
+
+
+Here are the entries I found on a brand new $MFT:<br />
+<strong>"0","File","/$MFT"</strong><br />
+The master file table (MFT) stores the information required to retrieve files from an NTFS partition.<br />
+<a href="https://msdn.microsoft.com/en-us/library/bb470206%28v=vs.85%29.aspx" target="_blank">https://msdn.microsoft.com/en-us/library/bb470206%28v=vs.85%29.aspx</a><br />
+<strong>"1","File","/$MFTMirr"</strong><br />
+This is a system file that duplicates at least the first four FILE records of the MFT for recovery purposes.<br />
+<a href="http://0cch.net/ntfsdoc/files/mftmirr.html" target="_blank">http://0cch.net/ntfsdoc/files/mftmirr.html</a><br />
+<strong>"2","File","/$LogFile"</strong><br />
+The NTFS log file is a circular log of all file operations, kept on disk so that unsuccessful operations can be rolled back safely.<br />
+<a href="http://ntfs.com/transaction.htm">http://ntfs.com/transaction.htm</a><br />
+<strong>"3","File","/$Volume"</strong><br />
+Contains information about the volume, such as the volume label and the volume version.<br />
+<a href="http://www.writeblocked.org/resources/ntfs_cheat_sheets.pdf">http://www.writeblocked.org/resources/ntfs_cheat_sheets.pdf</a><br />
+<strong>"4","File","/$AttrDef"</strong><br />
+Lists attribute names, numbers, and descriptions.<br />
+<a href="http://www.writeblocked.org/resources/ntfs_cheat_sheets.pdf">http://www.writeblocked.org/resources/ntfs_cheat_sheets.pdf</a><br />
+<strong>"5","Folder","/."</strong><br />
+Root folder.<br />
+<strong>"6","File","/$Bitmap"</strong><br />
+Keeps track of all of the used and unused clusters on an NTFS volume.<br />
+<a href="https://whereismydata.wordpress.com/2009/06/01/forensics-what-is-the-bitmap/">https://whereismydata.wordpress.com/2009/06/01/forensics-what-is-the-bitmap/</a><br />
+"7","File","/$Boot"<br />
+"Boot Sector" Bootable partition that stores information about the layout of the volume and the file system structures, as well as the boot code that loads Ntdlr.<br />
+<a href="https://technet.microsoft.com/en-us/library/cc781134(WS.10).aspx" target="_blank">https://technet.microsoft.com/en-us/library/cc781134(WS.10).aspx</a><br />
+"8","File","/$BadClus"<br />
+NTFS puts the address of the cluster containing the bad sector in the bad cluster file, $BadClus, in the MFT so that the bad sector is not reused.<br />
+<a href="https://technet.microsoft.com/en-us/library/cc781134(WS.10).aspx" target="_blank">https://technet.microsoft.com/en-us/library/cc781134(WS.10).aspx</a><br />
+"8","File","/$BadClus:$Bad"<br />
+Alternate Data Stream of $BadClus.<br />
+"9","File + Unknown2","/$Secure"<br />
+The Security Descriptor Stream ($SDS) contains a list of all the Security Descriptors on the volume.<br />
+<a href="http://0cch.net/ntfsdoc/files/secure.html" target="_blank">http://0cch.net/ntfsdoc/files/secure.html</a><br />
+"9","File + Unknown2","/$Secure:$SDS"<br />
+"10","File","/$UpCase"<br />
+This is a 128KB file full of capital letters. For each character in the Unicode alphabet, there is an entry in this file. It is used to compare and sort filenames.<br />
+<a href="http://0cch.net/ntfsdoc/files/upcase.html" target="_blank">http://0cch.net/ntfsdoc/files/upcase.html</a><br />
+"10","File","/$UpCase:$Info"<br />
+"11","Folder","/$Extend"<br />
+This is a directory containing the Metadata files: $ObjId, $Quota, $Reparse and $UsnJrnl<br />
+<a href="http://0cch.net/ntfsdoc/files/extend.html" target="_blank">http://0cch.net/ntfsdoc/files/extend.html</a><br />
+"12","File","NoFNRecord"<br />
+"13","File","NoFNRecord"<br />
+"14","File","NoFNRecord"<br />
+"15","File","NoFNRecord"<br />
+"24","File + Unknown1 + Unknown2","/$Extend/$Quota"<br />
+"25","File + Unknown1 + Unknown2","/$Extend/$ObjId"<br />
+"26","File + Unknown1 + Unknown2","/$Extend/$Reparse"<br />
+"27","Folder","/$Extend/$RmMetadata"<br />
+"28","File + Unknown1","/$Extend/$RmMetadata/$Repair"<br />
+"28","File + Unknown1","/$Extend/$RmMetadata/$Repair:$Config"<br />
+"29","Folder","/$Extend/$RmMetadata/$TxfLog"<br />
+"30","Folder","/$Extend/$RmMetadata/$Txf"<br />
+"31","File","/$Extend/$RmMetadata/$TxfLog/$Tops"<br />
+"31","File","/$Extend/$RmMetadata/$TxfLog/$Tops:$T"<br />
+"32","File","/$Extend/$RmMetadata/$TxfLog/$TxfLog.blf"<br />
+"33","File","/$Extend/$RmMetadata/$TxfLog/$TxfLogContainer00000000000000000001"<br />
+"34","File","/$Extend/$RmMetadata/$TxfLog/$TxfLogContainer00000000000000000002"</p>

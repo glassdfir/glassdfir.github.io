@@ -1,0 +1,159 @@
+---
+layout: post
+title: What happens when Windows Defender Quarantines Stuff...
+date: 2015-11-02 23:34:30.000000000 -05:00
+categories: blog
+---
+<p>Recently a colleague of mine asked me what happens in the file system when a malicious file is "quarantined".
+
+  The answer varies widely and as this is the "secret sauce" for many antivirus vendors, most of the time it is not overly documented how they do the voodoo they do. Seems like something that might make for a good blog or two so I sat down and did a few tests.</p>
+
+<p>This post is going to cover what happened on my Windows 8 VM when I turned Windows Defender against a vicious EICAR.TXT file!</p>
+<blockquote><p>Windows Defender is a software product that attempts to detect and remove malware. Initially released as an antispyware program, it was first released as a free download for Windows XP, shipped with Windows Vista by default, and currently ships with antivirus capabilities as part of Windows 10. <a href="https://en.wikipedia.org/wiki/Windows_Defender" target="_blank">--Wikipedia </a></p></blockquote>
+<p>I chose to beat up on Windows Defender mostly because it is free and has a huge market share. Nothing personal.</p>
+<p>So first things first: I grabbed the <a href="http://www.eicar.org/86-0-Intended-use.html">EICAR file</a> and saved it to C:\temp.<br />
+Then I grabbed a copy of the $MFT to take a look at the this file's record. Looks like this:<br />
+<a href="{{ site.baseurl }}/images/2015-11-02-23_26_38-Document-WordPad1.png" rel="lightbox[wp-image-766]"><img src="{{ site.baseurl }}/images/2015-11-02-23_26_38-Document-WordPad1.png" alt="2015-11-02 23_26_38-Document - WordPad" width="90%" class="aligncenter size-large wp-image-766" /></a><br />
+There is a lot going on in there but I just wanted to focus on a few things. <a href="http://www.writeblocked.org/resources/NTFS_CHEAT_SHEETS.pdf" target="_blank">If you are lost, read this.</a></p>
+<p>NEXT, I turned on Windows Defender real-time protection. It was recommended.<br />
+<a href="{{ site.baseurl }}/images/2015_11_02_23_46_14_Windows_Defender.png"><img src="{{ site.baseurl }}/images/2015_11_02_23_46_14_Windows_Defender.png" alt="2015_11_02_23_46_14_Windows_Defender" width="90%" class="aligncenter size-large wp-image-767" /></a></p>
+<p>Then a whole bunch of stuff happened.</p>
+<p>Let's start with $MFT record number 27152. So I quickly dumped the $MFT again and here's what I got:</p>
+<p><a href="{{ site.baseurl }}/images/2015-11-03-00_52_57-Document.rtf-WordPad.png"><img src="{{ site.baseurl }}/images/2015-11-03-00_52_57-Document.rtf-WordPad.png" alt="2015-11-03 00_52_57-Document.rtf - WordPad" width="75%" class="aligncenter size-large wp-image-775" /></a></p>
+<p>So what changed? Pretty much everything accept the $MFT record number.</p>
+<p>The sequence number is increment by 4, indicating that there were numerous changes to the file. Specifically the rename and move to a new parent folder.<br />
+Lets take a closer look at the USNJrnl-$J to get an idea what happened:<br />
+
+{% highlight raw %}
+###When I created the EICAR File and Added the EICAR string to it.###
+2015-11-03 03:03:23.186	ref_num = 27152-96	eicar.txt	File_Create,Close
+2015-11-03 03:03:23.231	ref_num = 27152-97	eicar.txt	File_Create,Data_Extend,Close
+2015-11-03 03:06:48.274	ref_num = 27152-97	eicar.txt	Data_Extend,Data_Truncation,Close
+
+### This is Windows Defender Deleting the File. ###
+2015-11-03 03:07:20.379	ref_num = 27152-97	eicar.txt	Object_ID_Change,Close
+2015-11-03 03:09:43.529	ref_num = 27152-97	eicar.txt	Basic_Info_Change,Data_Overwrite,File_Delete,Close
+
+###Since this Record Number is up for grabs, it is reused for a different file ###
+2015-11-03 03:09:43.534	ref_num = 27152-98	5A7D7B64F11FF203E09434276A974A97	File_Create,Data_Extend,Close
+{% endhighlight %}
+
+<p>So in short Windows Defender deleted the original file. The MFT record number was up for grabs so it was picked up by a newly created file C:\ProgramData\Microsoft\Windows Defender\Scans\History\RemCheck\5A7D7B64F11FF203E09434276A974A97</p>
+<p>So where did my EICAR file go? Windows Defender puts quarantined files C:\ProgramData\Microsoft\Windows Defender\Quarantine\ResourceData\. Mine was saved C:\ProgramData\Microsoft\Windows Defender\Quarantine\ResourceData\50\50761523FA79FDF68E04707959836D1F6DBA9969.<br />
+Let's take a look at that:<br />
+<a href="{{ site.baseurl }}/images/2015-11-05-19_55_39-Document.rtf-WordPad.png"><img src="{{ site.baseurl }}/images/2015-11-05-19_55_39-Document.rtf-WordPad.png" alt="2015-11-05 19_55_39-Document.rtf - WordPad" width="75%" class="aligncenter size-large wp-image-792" /></a><br />
+For those that don't know, Windows Defender and Microsoft Security Essentials Quarantine files have a magic number of 0B AD 00. Clever.</p>
+<p>Looking at the histogram of the data, it is pretty obvious that it was stored using some kind of encryption.<br />
+<a href="{{ site.baseurl }}/images/Screen-Shot-2015-11-04-at-10.40.52-AM-1024x396.png"><img src="{{ site.baseurl }}/images/Screen-Shot-2015-11-04-at-10.40.52-AM-1024x396.png" alt="Screen Shot 2015-11-04 at 10.40.52 AM" width="75%" class="aligncenter size-large wp-image-787" /></a><br />
+After doing a bit more digging, it turns out that Windows Defender uses a hard coded RC4 key to encrypt quarantine files.<br />
+A colleague of my pointed me at the <a href="https://raw.githubusercontent.com/brad-accuvant/cuckoo-modified/00ad13c94cc7453c40ed6152d16009ca1c8ed6f2/lib/cuckoo/common/quarantine.py" target="_blank"> this cool script from Cuckoo </a><br />
+Here is the relevant chuck of their code that I bastardized for this blog post:<br />
+
+{% highlight python %}
+# Copyright (C) 2015 KillerInstinct, Optiv, Inc. (brad.spengler@optiv.com)
+# This file is part of Cuckoo Sandbox - http://www.cuckoosandbox.org
+# See the file 'docs/LICENSE' for copying permission.
+
+import os
+import struct
+import hashlib
+from binascii import crc32
+
+def mse_ksa():
+    # hardcoded key obtained from mpengine.dll
+    key = [0x1E, 0x87, 0x78, 0x1B, 0x8D, 0xBA, 0xA8, 0x44, 0xCE, 0x69,
+           0x70, 0x2C, 0x0C, 0x78, 0xB7, 0x86, 0xA3, 0xF6, 0x23, 0xB7,
+           0x38, 0xF5, 0xED, 0xF9, 0xAF, 0x83, 0x53, 0x0F, 0xB3, 0xFC,
+           0x54, 0xFA, 0xA2, 0x1E, 0xB9, 0xCF, 0x13, 0x31, 0xFD, 0x0F,
+           0x0D, 0xA9, 0x54, 0xF6, 0x87, 0xCB, 0x9E, 0x18, 0x27, 0x96,
+           0x97, 0x90, 0x0E, 0x53, 0xFB, 0x31, 0x7C, 0x9C, 0xBC, 0xE4,
+           0x8E, 0x23, 0xD0, 0x53, 0x71, 0xEC, 0xC1, 0x59, 0x51, 0xB8,
+           0xF3, 0x64, 0x9D, 0x7C, 0xA3, 0x3E, 0xD6, 0x8D, 0xC9, 0x04,
+           0x7E, 0x82, 0xC9, 0xBA, 0xAD, 0x97, 0x99, 0xD0, 0xD4, 0x58,
+           0xCB, 0x84, 0x7C, 0xA9, 0xFF, 0xBE, 0x3C, 0x8A, 0x77, 0x52,
+           0x33, 0x55, 0x7D, 0xDE, 0x13, 0xA8, 0xB1, 0x40, 0x87, 0xCC,
+           0x1B, 0xC8, 0xF1, 0x0F, 0x6E, 0xCD, 0xD0, 0x83, 0xA9, 0x59,
+           0xCF, 0xF8, 0x4A, 0x9D, 0x1D, 0x50, 0x75, 0x5E, 0x3E, 0x19,
+           0x18, 0x18, 0xAF, 0x23, 0xE2, 0x29, 0x35, 0x58, 0x76, 0x6D,
+           0x2C, 0x07, 0xE2, 0x57, 0x12, 0xB2, 0xCA, 0x0B, 0x53, 0x5E,
+           0xD8, 0xF6, 0xC5, 0x6C, 0xE7, 0x3D, 0x24, 0xBD, 0xD0, 0x29,
+           0x17, 0x71, 0x86, 0x1A, 0x54, 0xB4, 0xC2, 0x85, 0xA9, 0xA3,
+           0xDB, 0x7A, 0xCA, 0x6D, 0x22, 0x4A, 0xEA, 0xCD, 0x62, 0x1D,
+           0xB9, 0xF2, 0xA2, 0x2E, 0xD1, 0xE9, 0xE1, 0x1D, 0x75, 0xBE,
+           0xD7, 0xDC, 0x0E, 0xCB, 0x0A, 0x8E, 0x68, 0xA2, 0xFF, 0x12,
+           0x63, 0x40, 0x8D, 0xC8, 0x08, 0xDF, 0xFD, 0x16, 0x4B, 0x11,
+           0x67, 0x74, 0xCD, 0x0B, 0x9B, 0x8D, 0x05, 0x41, 0x1E, 0xD6,
+           0x26, 0x2E, 0x42, 0x9B, 0xA4, 0x95, 0x67, 0x6B, 0x83, 0x98,
+           0xDB, 0x2F, 0x35, 0xD3, 0xC1, 0xB9, 0xCE, 0xD5, 0x26, 0x36,
+           0xF2, 0x76, 0x5E, 0x1A, 0x95, 0xCB, 0x7C, 0xA4, 0xC3, 0xDD,
+           0xAB, 0xDD, 0xBF, 0xF3, 0x82, 0x53
+    ]
+    sbox = range(256)
+    j = 0
+    for i in range(256):
+        j = (j + sbox[i] + key[i]) % 256
+        tmp = sbox[i]
+        sbox[i] = sbox[j]
+        sbox[j] = tmp
+    return sbox
+
+def rc4_decrypt(sbox, data):
+    out = bytearray(len(data))
+    i = 0
+    j = 0
+    for k in range(len(data)):
+        i = (i + 1) % 256
+        j = (j + sbox[i]) % 256
+        tmp = sbox[i]
+        sbox[i] = sbox[j]
+        sbox[j] = tmp
+        val = sbox[(sbox[i] + sbox[j]) % 256]
+        out[k] = val ^ data[k]
+
+    return out
+
+def mse_unquarantine(f):
+    with open(f, "rb") as quarfile:
+        data = bytearray(quarfile.read())
+
+    fsize = len(data)
+    if fsize < 12 or data[0] != 0x0B or data[1] != 0xad or data[2] != 0x00:
+        return None
+
+    sbox = mse_ksa()
+    outdata = rc4_decrypt(sbox, data)
+    #prints
+    with open("unquar-with-meta.bin", "wb") as f:
+        f.write(outdata)
+
+    # MSE stores metadata like the original filename in a separate file,
+    # so due to our existing interface, we can't restore the original name
+    # from just the ResourceData file.  Later we may allow uploading pairs
+    # of files, match them up by name, and then associate that data here
+    # for the final submission
+
+    headerlen = 0x28 + struct.unpack("<I", outdata[8:12])[0]
+    origlen = struct.unpack("<I", outdata[headerlen-12:headerlen-8])[0]
+
+    if origlen + headerlen = fsize:
+        with open("unquar.bin", "wb") as f:
+            f.write(outdata[headerlen:])
+
+mse_unquarantine("50761523FA79FDF68E04707959836D1F6DBA9969")
+{% endhighlight %}
+
+The RC4 cipher can be found twice in each of these files:<br />
+{% highlight raw %}
+
+c:\ProgramData\Microsoft\Windows Defender\Definition Updates\Backup\mpengine.dll
+c:\ProgramData\Microsoft\Windows Defender\Definition Updates\Default\MpEngine.dll
+c:\ProgramData\Microsoft\Windows Defender\Definition Updates\{D45C13C3-59B3-4726-B82F-03461072F006}\mpengine.dll
+c:\Users\All Users\Microsoft\Windows Defender\Definition Updates\Backup\mpengine.dll
+c:\Users\All Users\Microsoft\Windows Defender\Definition Updates\Default\MpEngine.dll
+c:\Users\All Users\Microsoft\Windows Defender\Definition Updates\{D45C13C3-59B3-4726-B82F-03461072F006}\mpengine.dll
+c:\Windows\WinSxS\amd64_windows-defender-am-engine_31bf3856ad364e35_6.3.9600.16384_none_efe9bba68a38095a\MpEngine.dll</p>
+{% endhighlight %}
+
+<p>Looks like this:<br />
+<a href="{{ site.baseurl }}/images/mpengine.dll_.rc4_.png"><img src="{{ site.baseurl }}/images/mpengine.dll_.rc4_.png" alt="mpengine.dll.rc4" width="75%" class="aligncenter size-large wp-image-797" /></a><br />
+I might dig a little deeper on this but this is all for now. Hope this helps.</p>

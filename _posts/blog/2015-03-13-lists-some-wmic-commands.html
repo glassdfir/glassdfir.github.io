@@ -1,0 +1,102 @@
+---
+layout: post
+title: These Aren't Yo Momma's WMIC Commands
+date: 2015-03-13 15:48:48.000000000 -04:00
+categories: blog
+---
+<p>I outright stole most of this off of <a href="https://twitter.com/nbaronian">@nbaronian</a> but I plan on updating this post with more as they come to me.</p>
+
+<p><strong>WMIC not working, rpc server unavailable, mof error corruption</strong><br />
+psexec \\x.x.x.x cmd.exe<br />
+net stop winmgmt /Y<br />
+net stop winmgmt<br />
+reg add "hkcu\Environment" /v PROCESSOR_ARCHITECTURE /t REG_SZ /d x86<br />
+rename or delete c:\windows\system32\wbem\repository<br />
+net start winmgmt</p>
+<p><strong>WinMGMT STOP using SC </strong><br />
+sc \\remotemachine stop winmgmt and it's needed deps<br />
+rename c:\windows\system32\wbem\repository<br />
+sc \\remotemachine start winmgmt<br />
+psexec \\remotemachine cmd.exe<br />
+reg add "hkcu\Environment" /v PROCESSOR_ARCHITECTURE /t REG_SZ /d x86<br />
+Test wmic<br />
+wmic process list brief<br />
+If SC fails use psexec like so to stop winmgmt<br />
+psexec \\remotebox -u rb\username cmd.exe<br />
+net stop winmgmt /Y<br />
+rename c:\windows\system32\wbem\repository<br />
+reg add "hkcu\Environment" /v PROCESSOR_ARCHITECTURE /t REG_SZ /d x86<br />
+net start winmgmt /Y</p>
+<p><strong>Determine user currently logged in remotely</strong><br />
+wmic /node:remotecomputer computersystem get username</p>
+<p><strong>For a text file of the manual run</strong><br />
+wmic /?:full > wmic_docs.txt</p>
+<p><strong>Remotely list startup apps</strong><br />
+wmic /node:machinename startup list full<br />
+wmic STARTUP GET Caption, Command, User</p>
+<p><strong>Reboot or Shutdown a box</strong><br />
+wmic os where buildnumber="7601" call reboot</p>
+<p><strong>Kill a process – use with care</strong><br />
+wmic process where name="cmd.exe" delete</p>
+<p><strong>Get OS Information and export to CSV, html, xsl, mof</strong><br />
+wmic /output:wmicbuild.csv os get /all /format:csv<br />
+wmic /output:wmicbuild.html os get /all /format:htable</p>
+<p><strong>List running processes and output to HTML/XSL form.</strong><br />
+wmic /output:wmic.html process list full /format:hform</p>
+<p><strong>Query Device Driver Status</strong><br />
+wmic /output:savrt.csv sysdriver where name="savrt" list status /format:csv</p>
+<p><strong>Query this status on all machines in the domain. You have all the machines in the domain in a text file </strong><br />
+wmic /node:"@targets.txt" /output:savrt.csv sysdriver where name="savrt" list status /format:csv</p>
+<p><strong>Get a list of NICs and IP’s in use</strong><br />
+netsh int ip show config<br />
+wmic nicconfig where IPEnabled='true'</p>
+<p><strong>Remotely change the IP to a static IP (Index is Interface#)</strong><br />
+wmic /node:machinename nicconfig where Index=1 call EnableStatic ("172.16.10.10"), ("255.255.0.0")</p>
+<p><strong>Remotely change IP to use DHCP</strong><br />
+wmic /node:machinename nicconfig where Index=1 call EnableDHCP</p>
+<p><strong>Remotely Display machine’s MAC Address</strong><br />
+wmic /node:machinename nic get macaddress</p>
+<p><strong>Get Process Owner or OwnerSID</strong><br />
+wmic process where name="cmd.exe" call getowner<br />
+wmic process where name="cmd.exe" call getownersid</p>
+<p><strong>Remotely list running processes every second</strong><br />
+wmic /node:machinename process list brief /every:1</p>
+<p><strong>Delete ARPCache</strong><br />
+netsh int ip delete arpcache</p>
+<p><strong>System Information - Remotely display System Info</strong><br />
+wmic /node:machinename computersystem list full</p>
+<p><strong>Full Drive Info</strong><br />
+wmic diskdrive list full<br />
+wmic partition list full</p>
+<p><strong>Bios Info</strong><br />
+wmic bios list full</p>
+<p><strong>List all Hotfixes and Services Packs</strong><br />
+wmic qfe</p>
+<p><strong>List HotfixID, description and Install date</strong><br />
+wmic qfe where "not description like " get description,hotfixid,installedon<br />
+example: wmic qfe where hotfixid="KB958644" list full
+<lists patch info for ms08-067>
+<p><strong>Remotely List Local Enabled Accounts</strong><br />
+wmic /node:computername USERACCOUNT WHERE "Disabled=0 AND LocalAccount=1" GET Name</p>
+<p><strong>Start a service</strong><br />
+wmic /node:computername service lanmanserver CALL Startservice</p>
+<p><strong>Change startup mode for a service</strong><br />
+wmic /node:machinename service where (name like "Fax" OR name like "Alerter") CALL ChangeStartMode Disabled</p>
+<p><strong>List Services with brief description</strong><br />
+wmic service list brief</p>
+<p><strong>List useraccounts</strong><br />
+wmic useraccount<br />
+wmic useraccount list brief</p>
+<p><strong>Enable RDP</strong><br />
+wmic /node:"computername" path Win32_TerminalServiceSetting where AllowTSConnections=“0” call SetAllowTSConnections “1”</p>
+<p><strong>List ShadowCopy Info</strong><br />
+wmic shadowcopy list brief</p>
+<p><strong>List Event Logs</strong><br />
+wmic ntevent list brief --- Brief takes a while, full takes even longer<br />
+wmic nteventlog where (description like "%secevent%") call cleareventlog</p>
+<p><strong>Remotely output Logon Events to a html file</strong><br />
+wmic /node:machinename /output:wmicevents.html ntevent where (message like "%logon%") list brief /format:htform</p>
+<p><strong>List number of times a user logged on</strong><br />
+wmic netlogin where (name like "%adm%") get numberoflogons</p>
+<p><strong>Display Shares</strong><br />
+wmic share list brief</lists>

@@ -1,0 +1,226 @@
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8" lang="en"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9" lang="en"><![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<title>Live Process Mapping with WMI &#8211; Half Full of Security</title>
+<meta name="description" content="In previous posts I have discussed how you can parse a Windows event log and, through the magic of Powershell and javascript, create a visual map of process creation. But what if you are more IR than DF?
+Here is an example of how you can leverage the Win32_Process WMI object to pull back the necessary information for a rudimentary process map on a live machine:
+liveprocessmap
+Its the same principle as before except this time we are pulling the data for the current running processes. The tooltip is programmed to display the command line of the process. Google Chrome has a very noisy command line syntax. This is great because you don't have to install anything or reconfigure your event log auditing.
+Here is the code:
+
+I will throw this script up on the ol' GitHub as well just for kicks.
+Can this script be run on a remote machine? Of course it can! (provided you have the right access)
+LiveProcessMap.ps1 -ComputerName REMOTECOMPUTER
+The other scripts can too now that I think about it...I will be adding that feature soon.
+*************DISCLAIMER*************
+These mapping scripts are not an exact science. The script can only map the information it has to work with. There are gaps in process creation for numerous reasons. I have found that visually mapping them highlights those very quickly.
+">
+<meta name="keywords" content="">
+
+
+<!-- Twitter Cards -->
+<meta name="twitter:title" content="Live Process Mapping with WMI">
+<meta name="twitter:description" content="In previous posts I have discussed how you can parse a Windows event log and, through the magic of Powershell and javascript, create a visual map of process creation. But what if you are more IR than DF?
+Here is an example of how you can leverage the Win32_Process WMI object to pull back the necessary information for a rudimentary process map on a live machine:
+liveprocessmap
+Its the same principle as before except this time we are pulling the data for the current running processes. The tooltip is programmed to display the command line of the process. Google Chrome has a very noisy command line syntax. This is great because you don't have to install anything or reconfigure your event log auditing.
+Here is the code:
+
+I will throw this script up on the ol' GitHub as well just for kicks.
+Can this script be run on a remote machine? Of course it can! (provided you have the right access)
+LiveProcessMap.ps1 -ComputerName REMOTECOMPUTER
+The other scripts can too now that I think about it...I will be adding that feature soon.
+*************DISCLAIMER*************
+These mapping scripts are not an exact science. The script can only map the information it has to work with. There are gaps in process creation for numerous reasons. I have found that visually mapping them highlights those very quickly.
+">
+<meta name="twitter:site" content="@GlassDFIR">
+<meta name="twitter:creator" content="@GlassDFIR">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://localhost:4000/images/site-logo.png">
+
+<!-- Open Graph -->
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Live Process Mapping with WMI">
+<meta property="og:description" content="In previous posts I have discussed how you can parse a Windows event log and, through the magic of Powershell and javascript, create a visual map of process creation. But what if you are more IR than DF?
+Here is an example of how you can leverage the Win32_Process WMI object to pull back the necessary information for a rudimentary process map on a live machine:
+liveprocessmap
+Its the same principle as before except this time we are pulling the data for the current running processes. The tooltip is programmed to display the command line of the process. Google Chrome has a very noisy command line syntax. This is great because you don't have to install anything or reconfigure your event log auditing.
+Here is the code:
+
+I will throw this script up on the ol' GitHub as well just for kicks.
+Can this script be run on a remote machine? Of course it can! (provided you have the right access)
+LiveProcessMap.ps1 -ComputerName REMOTECOMPUTER
+The other scripts can too now that I think about it...I will be adding that feature soon.
+*************DISCLAIMER*************
+These mapping scripts are not an exact science. The script can only map the information it has to work with. There are gaps in process creation for numerous reasons. I have found that visually mapping them highlights those very quickly.
+">
+<meta property="og:url" content="http://localhost:4000/offers-remote-process-mapping-with-wmi/">
+<meta property="og:site_name" content="Half Full of Security">
+
+
+
+
+
+<link rel="canonical" href="http://localhost:4000/offers-remote-process-mapping-with-wmi/">
+<link href="http://localhost:4000/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="http://localhost:4000/assets/css/main.css">
+<!-- Webfonts -->
+<script src="https://use.edgefonts.net/source-sans-pro:n2,i2,n3,i3,n4,i4,n6,i6,n7,i7,n9,i9;source-code-pro:n4,n7;volkhov.js"></script>
+
+<meta http-equiv="cleartype" content="on">
+
+<!-- HTML5 Shiv and Media Query Support -->
+<!--[if lt IE 9]>
+  <script src="http://localhost:4000/assets/js/vendor/html5shiv.min.js"></script>
+  <script src="http://localhost:4000/assets/js/vendor/respond.min.js"></script>
+<![endif]-->
+
+<!-- Modernizr -->
+<script src="http://localhost:4000/assets/js/vendor/modernizr-2.7.1.custom.min.js"></script>
+
+
+<!-- MathJax -->
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+<!-- Icons -->
+<!-- 16x16 -->
+<link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+<!-- 32x32 -->
+<link rel="shortcut icon" href="http://localhost:4000/favicon.png">
+<!-- 57x57 (precomposed) for iPhone 3GS, pre-2011 iPod Touch and older Android devices -->
+<link rel="apple-touch-icon-precomposed" href="http://localhost:4000/images/apple-touch-icon-precomposed.png">
+<!-- 72x72 (precomposed) for 1st generation iPad, iPad 2 and iPad mini -->
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://localhost:4000/images/apple-touch-icon-72x72-precomposed.png">
+<!-- 114x114 (precomposed) for iPhone 4, 4S, 5 and post-2011 iPod Touch -->
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://localhost:4000/images/apple-touch-icon-114x114-precomposed.png">
+<!-- 144x144 (precomposed) for iPad 3rd and 4th generation -->
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://localhost:4000/images/apple-touch-icon-144x144-precomposed.png">
+
+</head>
+
+<body id="post">
+
+<div class="navigation-wrapper">
+	<nav role="navigation" id="site-nav" class="animated drop">
+	    <ul>
+      
+		    
+		    <li><a href="http://localhost:4000/blog/" >Blog</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/about/" >About</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/search/" >Search</a></li>
+		  
+	    </ul>
+	</nav>
+</div><!-- /.navigation-wrapper -->
+
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+
+<header class="masthead">
+	<div class="wrap">
+      
+  		<a href="http://localhost:4000/" class="site-logo" rel="home" title="Half Full of Security"><img src="http://localhost:4000/images/site-logo.png" width="200" height="200" alt="Half Full of Security logo" class="animated fadeInDown"></a>
+      
+      <h1 class="site-title animated fadeIn"><a href="http://localhost:4000/">Half Full of Security</a></h1>
+		<h2 class="site-description animated fadeIn" itemprop="description">Sharpening the ACKs since 2013</h2>
+	</div>
+</header><!-- /.masthead -->
+
+<div class="js-menu-screen menu-screen"></div>
+
+
+<div id="main" role="main">
+  <article class="hentry">
+    
+    <div class="entry-wrapper">
+      <header class="entry-header">
+        <ul class="entry-tags">
+          
+        </ul>
+        
+          <h1 class="entry-title">Live Process Mapping with WMI</h1>
+        
+      </header>
+    
+      <div class="entry-content">
+        <time datetime="2014-09-17T04:54:29-04:00"><i class="fa fa-calendar-o"></i> September 17, 2014</time>
+        <p>In previous posts I have discussed how you can parse a Windows event log and, through the magic of Powershell and javascript, create a visual map of process creation. But what if you are more IR than DF?<br />
+Here is an example of how you can leverage the Win32_Process WMI object to pull back the necessary information for a rudimentary process map on a <strong>live machine</strong>:<br />
+<a href="http://jon.glass/wp-content/uploads/2014/09/liveprocessmap.html">liveprocessmap</a></p>
+<p>Its the same principle as before except this time we are pulling the data for the current running processes. The tooltip is programmed to display the command line of the process. Google Chrome has a very noisy command line syntax. This is great because you don't have to install anything or reconfigure your event log auditing.</p>
+<p>Here is the code:<br />
+<script src="https://gist.github.com/glassdfir/24000caf48726ed84a5a.js"></script><br />
+I will throw this script up on the ol' GitHub as well just for kicks.</p>
+<p>Can this script be run on a remote machine? Of course it can! (provided you have the right access)</p>
+<p>LiveProcessMap.ps1 -ComputerName REMOTECOMPUTER</p>
+<p>The other scripts can too now that I think about it...I will be adding that feature soon.</p>
+<p>*************DISCLAIMER*************<br />
+These mapping scripts are not an exact science. The script can only map the information it has to work with. There are gaps in process creation for numerous reasons. I have found that visually mapping them highlights those very quickly.</p>
+
+        
+      </div><!-- /.entry-content -->
+    </div><!-- /.entry-wrapper -->
+    <nav class="pagination" role="navigation">
+      
+        <a href="http://localhost:4000/uses_his_github/" class="btn" title="GitHub?!">Previous</a>
+      
+      
+        <a href="http://localhost:4000/mentions-lfo-with-powershell/" class="btn" title="LFO with Powershell">Next</a>
+      
+    </nav><!-- /.pagination -->
+  </article>
+</div><!-- /#main -->
+
+<div class="footer-wrapper">
+  <footer role="contentinfo" class="entry-wrapper">
+    
+
+<span>&copy; 2017 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
+<div class="social-icons">
+	<a href="https://twitter.com/GlassDFIR" title="Jon Glass on Twitter" target="_blank"><i class="fa fa-twitter-square fa-2x"></i></a>
+	
+	
+	
+	
+	
+	
+	<a href="https://github.com/GlassDFIR" title="Jon Glass on Github" target="_blank"><i class="fa fa-github-square fa-2x"></i></a>
+	
+  
+	
+  <a href="http://localhost:4000/feed.xml" title="Atom/RSS feed"><i class="fa fa-rss-square fa-2x"></i></a>
+</div><!-- /.social-icons -->
+
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+<script type="text/javascript">
+  var BASE_URL = 'http://localhost:4000';
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="http://localhost:4000/assets/js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script src="http://localhost:4000/assets/js/scripts.min.js"></script>
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,29 @@
+---
+layout: post
+title: More SysmonMaps and ProcessMapper!
+date: 2014-09-12 03:24:37.000000000 -04:00
+---
+<p>Here is a sample of the processes running on my Windows 8 machine for the past 2 hours:<br />
+<a title="Map of Time Period" href="http://jon.glass/wp-content/uploads/2014/09/sysmonmap.html" target="_blank">Sysmonmap of Time Period</a></p>
+<p>This shows tons of interesting information about the boot process. One thing I have noticed is that Google Chrome is noisy.</p>
+<p>Also just for kicks I coded an example of the same thing using the native Security log:</p>
+<p>To use this make sure Process Creation auditing is enabled. This has been turned on in every environment I have ever worked in but if you are following along at home, here are some fun articles to consider:<br />
+<a href="http://technet.microsoft.com/en-us/library/dd941613(v=ws.10).aspx" target="_blank">http://technet.microsoft.com/en-us/library/dd941613(v=ws.10).aspx</a><br />
+<a href="http://technet.microsoft.com/en-us/library/dn535776.aspx" target="_blank">http://technet.microsoft.com/en-us/library/dn535776.aspx</a></p>
+<p>Or go here and turn it on:<br />
+<a href="http://Jon.Glass/wp-content/uploads/2014/09/turnonprocessauditing.png"><img class="alignnone wp-image-58 size-medium" src="{{ site.baseurl }}/images/turnonprocessauditing-300x178.png" alt="turnonprocessauditing" width="300" height="178" /></a></p>
+<p>Then you can see logs like this:</p>
+<p><a href="http://jon.glass/wp-content/uploads/2014/09/4688.png"><img class="alignnone wp-image-59 size-medium" src="{{ site.baseurl }}/images/4688-300x205.png" alt="4688" width="300" height="205" /></a></p>
+<p>********Update Code can be found on the <a href="https://github.com/glassdfir/SysmonMapper">GitHub</a> *********</p>
+<p>Then use some PowerShell to whip up the same Google Org chart from the last post.<br />
+<script src="https://gist.github.com/glassdfir/a8077a890670e7a4eca0.js"></script><br />
+Then you can look at things like this:<a href="http://jon.glass/wp-content/uploads/2014/09/processmap.html" target="_blank">processmap</a></p>
+<p>Not as sexy as sysmon but this script can be used in most environments without the need to install anything.<br />
+Also this PowerShell Script could be pointed at a recovered security log, perhaps from a disk image, instead of a live system.<br />
+<a title="Offline log analysis with PowerShell" href="http://social.technet.microsoft.com/Forums/windowsserver/en-US/c8330f58-f2e5-4681-beb2-b2b6a185f818/how-to-geteventlog-for-offline-evtx-files?forum=winserverpowershell" target="_blank">http://social.technet.microsoft.com/Forums/windowsserver/en-US/c8330f58-f2e5-4681-beb2-b2b6a185f818/how-to-geteventlog-for-offline-evtx-files?forum=winserverpowershell</a></p>
+<p>Change:<br />
+$events = Get-WinEvent -FilterHashtable @{Logname='Security';Id=4688}|Where-Object { ( $_.TimeCreated -gt $StartDate -and $_.TimeCreated -le $StopDate)}|Sort-Object TimeCreated<br />
+To this:<br />
+$events = Get-WinEvent <strong>-path "c:\pathtosecurity.evtx"</strong> -FilterHashtable @{Logname='Security';Id=4688}|Where-Object { ( $_.TimeCreated -gt $StartDate -and $_.TimeCreated -le $StopDate)}|Sort-Object TimeCreated</p>
+<p>&nbsp;</p>
+<pre></pre>

@@ -1,0 +1,72 @@
+---
+layout: post
+title: Use Python to Encrypt Memory Files
+date: 2015-05-28 23:42:25.000000000 -04:00
+categories: blog
+---
+<p>I was looking for a way to quickly encrypt large files in python.
+
+After some digging, I ran across<a href="http://stackoverflow.com/questions/16761458/how-to-aes-encrypt-decrypt-files-using-python-pycrypto-in-an-openssl-compatible" target="_blank"> this post on stackoverflow.com.</a> The basic idea here is to use standard python libraries to take a plaintext file and make an AES encrypted copy in a manner that is compatible with OpenSSL tools.<br />
+The code provided in the post work like a charm when collecting memory, disk space is a big issue. Most systems these days are running at least 8GB. Making two full size copies of a memory dump on a host machine is not practical even under ideal conditions. Even if I compress first, we still need enough free space to cover of the original plus the compressed copy. Sometimes that is not available.<br />
+To help with this issue, I adapted the script to encrypt the file as it reads it.<br />
+{% highlight python %}
+from hashlib import md5
+from Crypto.Cipher import AES
+from Crypto import Random
+def derive_key_and_iv(password, salt, key_length, iv_length):
+    d = d_i = ''
+    while len(d) < key_length + iv_length:
+        d_i = md5(d_i + password + salt).digest()
+        d += d_i
+    return d[:key_length], d[key_length:key_length+iv_length]
+def encrypt(in_file, out_file, password, key_length=32):
+    bs = AES.block_size
+    salt = Random.new().read(bs - len('Salted__'))
+    key, iv = derive_key_and_iv(password, salt, key_length, bs)
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    out_file.write('Salted__' + salt)
+    finished = False
+    while not finished:
+        chunk = in_file.read(1024 * bs)
+        if len(chunk) == 0 or len(chunk) % bs != 0:
+            padding_length = (bs - len(chunk) % bs) or bs
+            chunk += padding_length * chr(padding_length)
+            finished = True
+        out_file.write(cipher.encrypt(chunk))
+def decrypt(in_file, out_file, password, key_length=32):
+    bs = AES.block_size
+    salt = in_file.read(bs)[len('Salted__'):]
+    key, iv = derive_key_and_iv(password, salt, key_length, bs)
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    next_chunk = ''
+    finished = False
+    while not finished:
+        chunk, next_chunk = next_chunk, cipher.decrypt(in_file.read(1024 * bs))
+        if len(next_chunk) == 0:
+            padding_length = ord(chunk[-1])
+            chunk = chunk[:-padding_length]
+            finished = True
+        out_file.write(chunk)
+zipfilename = "RapidFire_Collection.zip"
+with open(zipfilename, 'rb+') as in_file, open(zipfilename, 'rb+') as out_file:
+    encrypt(in_file, out_file, password)
+{% endhighlight %}
+Here is the important tweak that I made:<br />
+{% highlight python %}
+#This is the important snippet from Thijs van Dien's code on stackoverflow:
+with open(in_filename, 'rb') as in_file, open(out_filename, 'wb') as out_file:
+    encrypt(in_file, out_file, password)
+#Opens the in_filename with read binary permissions as "in_file" and
+#Opens the out_filename with write binary permissions as outfile
+#With a slight adjustment we can overwrite the original file as we go
+with open(in_filename, 'rb+') as in_file, open(in_filename, 'rb+') as out_file:
+    encrypt(in_file, out_file, password)
+#Opens two copies of the in_filename BOTH with read/write binary permissions
+#This will allow use to read a chunk of the file, encrypt, and write to the top of the file, repeat
+{% endhighlight %}
+So we are reading chunk of the file, encrypting it, then overwriting the chunk with encrypted data until we get to the end of the file.<br />
+Does this really work you ask? Of course it does.<br />
+<a href="{{ site.baseurl }}/images/openssl.png"><img src="{{ site.baseurl }}/images/openssl.png" alt="openssl" width="780" height="491" class="aligncenter size-large wp-image-690" /></a><br />
+Don't know why this feels like a magic trick but TA DA!<br />
+This doesn't fix all of my issues with moving huge files around but this does encrypt it locally before it is sent over the network without needing double the space.<br />
+Big thanks to <a href="http://stackoverflow.com/users/1163893/thijs-van-dien" target="_blank">Thjis van Dien</a> for putting this solution out there.</p>

@@ -1,0 +1,14 @@
+---
+layout: post
+title: Get Internet headers from MailItem in PowerShell
+date: 2014-10-08 03:44:41.000000000 -04:00
+---
+<pre lang="powershell">
+# Get Internet headers from MailItem in PowerShell
+Add-type -assembly "Microsoft.Office.Interop.Outlook" | out-null
+$OutlookApp = new-object -comobject outlook.application
+$MAPI = $OutlookApp.GetNamespace("MAPI")
+$Message = $MAPI.GetDefaultFolder([Microsoft.Office.Interop.Outlook.OlDefaultFolders]::olFolderInbox).Items.GetLast()
+$Message.PropertyAccessor.GetProperty("http://schemas.microsoft.com/mapi/proptag/0x007D001E")
+$OutlookApp.Quit()
+</pre>

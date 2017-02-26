@@ -1,0 +1,129 @@
+---
+layout: post
+title: Parsing Chrome Artifacts with Python! Part 2
+date: 2015-10-11 09:28:03.000000000 -04:00
+categories: blog
+---
+<p>Continuing on with my riveting series on how to parse the Chrome SQLite files with Python, let's dig a little deeper into SQL portion by taking a look the History database.</p>
+
+<h2>History Database</h2>
+<p>Here are the tables and associated fields:</p>
+<ul>
+<li><strong>downloads: </strong>id,current_path,target_path, start_time, received_bytes, total_bytes, state, danger_type, interrupt_reason, end_time, opened, referrer, by_ext_id, by_ext_name, etag, last_modified, mime_type, original_mime_type</li>
+<li><strong>downloads_url_chains: </strong>id, chain_index, url</li>
+<li><strong>keyword_search_terms:</strong> keyword_id, url_id, lower_term, term</li>
+<li><strong>meta: </strong>key,value</li>
+<li><strong>segment_usage:</strong> <strong> </strong>id, segment_id, time_slot, visit_count</li>
+<li><strong>segments: </strong>id, name, url_id<strong><br />
+</strong></li>
+<li><strong>urls: </strong>id, url, title, visit_count, typed_count, last_visit_time, hidden, favicon_id</li>
+<li><strong>visits: </strong>id, url, visit_time, from_visit, transition, segment_id, visit_duration</li>
+<li><strong>visit_source: </strong>id, source</li>
+<p> ses
+</ul>
+<p>Some of these tables are useful on there own but much more information can be derived from querying more than one at a time. For example, the visits table stores information about the when and how often you visit a URL. To reduce redundant information in the database, instead of storing the URL again in the visits table, the visits table contains a pointer to the index of the URL in the url table.<br />
+
+{% highlight python %}
+import sqlite3, datetime
+def fixDate(timestamp):
+    #Chrome stores timestamps in the number of microseconds since Jan 1 1601.
+    #To convert, we create a datetime object for Jan 1 1601...
+    epoch_start = datetime.datetime(1601,1,1)
+    #create an object for the number of microseconds in the timestamp
+    delta = datetime.timedelta(microseconds=int(timestamp))
+    #and return the sum of the two.
+    return epoch_start + delta
+#Here is a simple example of how to query two tables and produce one meaningful output
+selectStatement = 'SELECT visits.visit_time, urls.url, urls.title FROM visits, urls WHERE visits.url=urls.id;'
+
+#These can be a bit tricky so lets break it down...
+#FROM visits, urls : From the "visits" and "urls" tables
+#WHERE visits.url=urls.id : If the value in the visits.url field matches an id value in the url table...
+#SELECT visits.visit_time, urls.url, urls.title : Return the visit_time from the visits table, the URL and Title from the url table
+
+historyFile = 'C:\\Users\\User\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\History'
+c = sqlite3.connect(historyFile)
+for row in c.execute(selectStatement):
+    print str(fixDate(row[0])),"\n\tURL: ", str(row[1]), "\n\tTITLE: ", row[2].encode("utf-8")
+'''
+#########Sample Output#########
+2015-07-22 15:46:47.718275
+        URL:  http://www.decalage.info/python/olefileio
+        TITLE:  olefile - a Python module to read/write MS OLE2 files | Decalage
+2015-07-22 15:46:53.788847
+        URL:  https://bitbucket.org/decalage/olefileio_pl/wiki/Install
+        TITLE:  decalage / OleFileIO_PL / wiki / Install ΓÇö Bitbucket
+2015-07-22 15:49:52.388096
+        URL:  http://www.decalage.info/python/olefileio
+        TITLE:  olefile - a Python module to read/write MS OLE2 files | Decalage
+2015-07-22 15:50:15.158813
+        URL:  http://blog.didierstevens.com/programs/oledump-py/
+        TITLE:  oledump.py | Didier Stevens
+2015-07-22 15:50:42.258023
+        URL:  http://www.kahusecurity.com/2013/dissecting-a-malicious-word-document/
+        TITLE:  Dissecting a Malicious Word Document | Kahu Security
+'''
+{% endhighlight %}
+
+Here are some more examples of SQL statements you could run against the History file if you are interested in the exercise.<br />
+{% highlight sql %}
+/* Look for all search terms and the site they went searched from */
+SELECT keyword_search_terms.term, urls.url
+FROM urls, keyword_search_terms
+WHERE keyword_search_terms.url_id=urls.id;
+/* Look for search term matching a string. Here we are looking for "install" */
+SELECT keyword_search_terms.term, urls.url
+FROM urls, keyword_search_terms
+WHERE keyword_search_terms.url_id=urls.id AND keyword_search_terms.term LIKE "%install%";
+{% endhighlight %}
+I can hear the groaning already...<br />
+<blockquote>"Jon, I am a seasoned Information Security professional and I am taking the time to read your silly blog. Don't bore me." </blockquote> Imaginary Reader, I respect your candor and thirst for knowledge. Fine! Challenge accepted.<br />
+Here is a query that will query the visits table and the urls table for the URLS for the visits and their referring visits URL, assuming both are available.<br />
+{% highlight sql %}
+SELECT  urls.url AS "NAVIGATED_FROM",  VISITSESSIONS.URL AS "NAVIGATED_TO"
+FROM (
+    SELECT visits.id AS ID,visits.from_visit AS CHILDSESSION, visits.url AS URLID, urls.url AS URL
+    FROM visits, urls
+    WHERE visits.url = urls.id) AS VISITSESSIONS, visits, urls
+WHERE visits.id = VISITSESSIONS.Parent AND visits.url = urls.id
+/*
+####SAMPLE OUTPUT#####
+http://www.mozilla.org/	https://www.mozilla.org/
+https://www.mozilla.org/	https://www.mozilla.org/en-US/
+https://www.mozilla.org/en-US/	https://www.mozilla.org/firefox/new/?scene=2#download-fx
+https://www.mozilla.org/firefox/new/?scene=2#download-fx	https://www.mozilla.org/en-US/firefox/new/?scene=2#download-fx
+https://github.com/williballenthin	https://github.com/williballenthin/python-registry
+*/
+{% endhighlight %}
+
+From the output of this query we can see the referring URL that sponsored the records in the visits table. Note about this particular artifact is that it doesn't look like this visits.from_visit field is propagated on new sessions or tabs. This more or less illustrates the URL changes in one tab. Looking though the sample output, I see a lot of http redirects to https, so these transitions are not dependent upon user interaction. Not saying this is particularly useful but more or less just an example of how you can build tools to leverage SQL differently. You could see the same thing, arguably better, from:<br />
+{% highlight sql %}
+SELECT visits.visit_time, urls.url
+FROM visits, urls
+WHERE visits.url = urls.id
+ORDER BY visits.visit_time
+
+/*
+########SAMPLE########
+13082502632412243,https://www.google.com/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8
+13082502636950357,https://www.google.com/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=install+firefox
+13082502642336239,http://www.mozilla.org/
+13082502642336239,https://www.mozilla.org/
+13082502642336239,https://www.mozilla.org/en-US/
+13082502855571719,https://www.mozilla.org/en-US/
+13082502869473924,https://www.mozilla.org/firefox/new/?scene=2#download-fx
+13082502869473924,https://www.mozilla.org/en-US/firefox/new/?scene=2#download-fx
+13082503576546744,https://www.google.com/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8
+13082503584223125,https://www.google.com/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=wireshark%20filter%20flash
+13082503593833681,https://ask.wireshark.org/questions/8650/capturing-http-requests-of-a-flash-application
+13082567906034617,https://ask.wireshark.org/questions/8650/capturing-http-requests-of-a-flash-application
+13084943745780659,https://www.google.com/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8
+13084943750422298,https://www.google.com/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=analyzeMFT
+13084943753991890,https://github.com/dkovar/analyzeMFT
+13084944413570153,https://www.google.com/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8
+13084944422840343,https://www.google.com/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=parse%20windows%20registry%20python
+*/
+{% endhighlight %}
+
+
+So these kind of techniques I will use in the next few posts to show various nifty artifacts from Chrome. Thanks for reading. More to come soon.</p>
