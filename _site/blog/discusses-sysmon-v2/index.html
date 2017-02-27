@@ -122,8 +122,8 @@
           <h1 class="entry-title">How to Use Sysmon 2.0 (Part 1)</h1>
         
       </header>
-    
-      <div class="entry-content">
+
+
         <time datetime="2015-01-21T11:09:07-05:00"><i class="fa fa-calendar-o"></i> January 21, 2015</time>
         <p>On <a href="http://blogs.technet.com/b/sysinternals/archive/2015/01/20/updates-sysmon-v2-0-accesschk-v5-21-ru-v1-1.aspx" target="_blank">January 19, 2015</a>, the SysInternals team released <a href="https://technet.microsoft.com/en-us/sysinternals/dn798348" target="_blank">Sysmon 2.0</a>. "This major update to Sysmon, a service that records process activity to the Windows event log for use by incident detection and forensic analysis, includes driver load and image load events with signature information, configurable hashing algorithm reporting, flexible filters for including and excluding events, and support for supplying configuration via a configuration file instead of the command line."</p>
 <p>One interesting update in 2.0 is the addition of Import Hashes (imphash).If you are not familiar, imports are the functions that a piece of software calls from other files. Most of the time, imports are used to augment a program with a function from a Windows DLL. Imphashes are calculated by based on library/API names and their specific order within the executable. Imphashes are useful for tracking flavors of malware that use the same functionality but have different binaries. This addition separates Sysmon from being an augmentation of Windows event logging to a utility that is designed to analyze malware. Awesome.</p>
@@ -280,7 +280,7 @@ start <span style="color: #996633">%~dp0%</span>~n<span style="color: #6600EE; f
 <p>Sysmon 2.0 also has a filtering feature that I will cover in the next post.</p>
 
         
-      </div><!-- /.entry-content -->
+
     </div><!-- /.entry-wrapper -->
     <nav class="pagination" role="navigation">
       

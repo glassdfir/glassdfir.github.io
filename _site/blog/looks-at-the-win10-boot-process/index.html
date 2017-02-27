@@ -122,8 +122,8 @@
           <h1 class="entry-title">The magic trick I discovered in the Windows 10 boot process...</h1>
         
       </header>
-    
-      <div class="entry-content">
+
+
         <time datetime="2015-02-16T22:03:50-05:00"><i class="fa fa-calendar-o"></i> February 16, 2015</time>
         <p>So there I was, at the tail end of a RaDFIRe presentation that I barely had time to make much less review, trying to demonstrate how similar the Windows 7, 8, and 10 Tech Preview boot operations were when I brought up the SysmonMap for Windows 10. It was different from the rest and it threw me for a loop in front of a crowd. I will explain the difference I noticed.</p>
 <p>Long before time began, there was Windows 3.1. Windows 3.1 introduced the <strong>S</strong>ession <strong>M</strong>anager <strong>S</strong>ub<strong>s</strong>ystem (SMSS.EXE). SMSS.EXE is responsible for a few things: creating page files and environment variables, creating DOS device mappings like LPT1, and most importantly it creates the Kernel mode (WIN32K.SYS) and User mode (CSRSS.EXE) of the Win32 subsystem. The important difference between the two is that Kernel mode processes were allowed to talk, through device drivers, directly to hardware devices whereas User mode processes have to use Windows API calls to indirectly talk to hardware. Many of the security problems with early versions of Windows stemmed from allowing services and user applications to run in the same session.</p>
@@ -191,7 +191,7 @@ What happened was a PID collision. Here is how it actually went down:<br />
 <p>This is explains EVERYTHING. It also highlights how Sysmon documents things that occur before it is running to see them. Good stuff. So no magic here, just Sysmon erroneously logging based off of a PID collision. </p>
 
         
-      </div><!-- /.entry-content -->
+
     </div><!-- /.entry-wrapper -->
     <nav class="pagination" role="navigation">
       

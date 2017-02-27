@@ -122,8 +122,8 @@
           <h1 class="entry-title">Zip Seeking Missile</h1>
         
       </header>
-    
-      <div class="entry-content">
+
+
         <time datetime="2014-11-22T00:03:37-05:00"><i class="fa fa-calendar-o"></i> November 22, 2014</time>
         <p>In the spirit of "don't give a presentation without offering a script/tool", here is something I am currently dubbing the "Zip Seeking Missile€ (not married to that name, suggestions are welcome). This script reads in a file and looks for the Local File Headers, Central Directory File Headers, and Central Directory End Records. If found it will attempt to parse the various fields. It is still pretty rough but it is good enough now that someone might find it useful. I intend on adding analysis of the compressed file data and automating the carving process as well. I realize there are probably dozens of software that already do this but I enjoy the insight that comes with building tools from the ground up.</p>
 <p><a href="https://github.com/glassdfir/ZipFileJunk/blob/master/zsm.py">https://github.com/glassdfir/ZipFileJunk/blob/master/zsm.py</a></p>
@@ -242,7 +242,7 @@ Found 1 hits for Central Dir. End Record at byte offsets [354] .
 <p>Taking this experiment to a logical extreme, I threw a 12GB memory dump into the script and <a href="http://jon.glass/wp-content/uploads/2014/11/output.txt">here are the results.</a> I was amazed by all of the Java that was floating around in memory. I also noticed the tool can generate some false positives on the file name. Occasionally those magic numbers just occur in memory and this script will attempt to parse whatever it sees. I did put a limit of 260 on the file name in an effort to knock down some of the false positives. Windows Shell API limits a single path to around 260 characters depending upon your flavor of Windows. Seems like as good of a number as any.</p>
 
         
-      </div><!-- /.entry-content -->
+
     </div><!-- /.entry-wrapper -->
     <nav class="pagination" role="navigation">
       
