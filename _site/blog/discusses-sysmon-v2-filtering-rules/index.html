@@ -6,109 +6,13 @@
 <head>
 <meta charset="utf-8">
 <title>How to Use Sysmon 2.0 (Part 2) &#8211; Half Full of Security</title>
-<meta name="description" content="Sysmon 2.0 Rule filtering
-If you have used Sysmon for any extended length of time, you already know that the logs fill up quick. This is the nature of Windows. There is a lot going on under the hood. If you configure Sysmon to log when processes create network connections (Event ID 3) and load modules (Event ID 7), you are going to record more logs than you want to read.
-To help add granularity, 2.0 comes with the ability to filter events based off a flexible ruleset. This is implemented through an XML configuration file that can be applied during installation and changed any time. The configuration commands can be found on the SysInternals' Sysmon page. Here is an example of a basic configuration file w/some notes:
-
-The XML file is broken into to two sections Configuration and Rules.
-The Configuration section provides for the same options config options from the command line.
--h Configuration entry: Hashing
--l Configuration entry: ImageLoading
--n Configuration entry: Network
-The Rules section allows you to configure which events you want to include/exclude.
-Making rules are pretty easy:
-
-
-Pick a Sysmon Event you want to include/exclude in the logs.
-
-ID	Tag	           Event
-1	ProcessCreate	   Process Create
-2	FileCreateTime	   File creation time
-3	NetworkConnect	   Network connection detected
-5	ProcessTerminate   Process terminated
-6	DriverLoad	   Driver Loaded
-7	ImageLoad	   Image loaded
-
-Lets say I want to focus on Event ID 2 events so I will use the "NetworkConnect" tag.
-
-Determine if you are want to use this rule to include or exclude something.
-This might be the most confusing part but fear not, I will lead you through.
-A Sysmon rule asks for a default action to apply to all events of that type. To Log (include) or not to Log (exclude), that is the question. Once you have established the default action, you include conditional statements that act as exceptions to the default action. So if the default action is to INCLUDE, all of the conditions in the rule will be used to EXCLUDE events from the log. The opposite is also true, if the default action is to EXCLUDE, all of the conditions in the rule will be used to INCLUDE events in the log.
-
-
-Cast an appropriate net.
-This is where Sysmon shines. If you are configuring Sysmon monitor something specific, these new rules afford that level of granularity. Inversely, you can increase the Signal-to-Noise ratio and not log noisy known good processes (antivirus, binaries with specific hashes, etc).
-This is an example of a configuration file to observe the specific actions of a particular malware:
-Here is a random example I pulled from the good people at malwr.com.
-Here is a Sysmon configuration file that could be used to monitor most of the behavior. (This is not exhaustive, just an example of potential use.)
-
-Using Sysmon for something this specific is great but when you are staring at trees, you are going to miss the forest. Here is an example of how to use Sysmon as an everyday background service that monitors everything EXCEPT for processes that you would rather not see cluttering up your logs.
-
-
-The seriously useful part about the configuration file is that you can load a new one at anytime.
-
-C:\Windows\System32>sysmon.exe -c OnlyLookAtOneThing.xml
-C:\Windows\System32>sysmon.exe -c DontLogPornHubTraffic.xml
-
-This makes Sysmon very deployable and scalable. Personally, on most of my machines, I typically run Sysmon wide open, without any restriction on what to log unless I want to document something specific. I also increase the log size to something ridiculous like 200 MB.
-
-wevtutil sl Microsoft-Windows-Sysmon/Operational /ms:209715200
-
-">
+<meta name="description" content="">
 <meta name="keywords" content="">
 
 
 <!-- Twitter Cards -->
 <meta name="twitter:title" content="How to Use Sysmon 2.0 (Part 2)">
-<meta name="twitter:description" content="Sysmon 2.0 Rule filtering
-If you have used Sysmon for any extended length of time, you already know that the logs fill up quick. This is the nature of Windows. There is a lot going on under the hood. If you configure Sysmon to log when processes create network connections (Event ID 3) and load modules (Event ID 7), you are going to record more logs than you want to read.
-To help add granularity, 2.0 comes with the ability to filter events based off a flexible ruleset. This is implemented through an XML configuration file that can be applied during installation and changed any time. The configuration commands can be found on the SysInternals' Sysmon page. Here is an example of a basic configuration file w/some notes:
-
-The XML file is broken into to two sections Configuration and Rules.
-The Configuration section provides for the same options config options from the command line.
--h Configuration entry: Hashing
--l Configuration entry: ImageLoading
--n Configuration entry: Network
-The Rules section allows you to configure which events you want to include/exclude.
-Making rules are pretty easy:
-
-
-Pick a Sysmon Event you want to include/exclude in the logs.
-
-ID	Tag	           Event
-1	ProcessCreate	   Process Create
-2	FileCreateTime	   File creation time
-3	NetworkConnect	   Network connection detected
-5	ProcessTerminate   Process terminated
-6	DriverLoad	   Driver Loaded
-7	ImageLoad	   Image loaded
-
-Lets say I want to focus on Event ID 2 events so I will use the "NetworkConnect" tag.
-
-Determine if you are want to use this rule to include or exclude something.
-This might be the most confusing part but fear not, I will lead you through.
-A Sysmon rule asks for a default action to apply to all events of that type. To Log (include) or not to Log (exclude), that is the question. Once you have established the default action, you include conditional statements that act as exceptions to the default action. So if the default action is to INCLUDE, all of the conditions in the rule will be used to EXCLUDE events from the log. The opposite is also true, if the default action is to EXCLUDE, all of the conditions in the rule will be used to INCLUDE events in the log.
-
-
-Cast an appropriate net.
-This is where Sysmon shines. If you are configuring Sysmon monitor something specific, these new rules afford that level of granularity. Inversely, you can increase the Signal-to-Noise ratio and not log noisy known good processes (antivirus, binaries with specific hashes, etc).
-This is an example of a configuration file to observe the specific actions of a particular malware:
-Here is a random example I pulled from the good people at malwr.com.
-Here is a Sysmon configuration file that could be used to monitor most of the behavior. (This is not exhaustive, just an example of potential use.)
-
-Using Sysmon for something this specific is great but when you are staring at trees, you are going to miss the forest. Here is an example of how to use Sysmon as an everyday background service that monitors everything EXCEPT for processes that you would rather not see cluttering up your logs.
-
-
-The seriously useful part about the configuration file is that you can load a new one at anytime.
-
-C:\Windows\System32>sysmon.exe -c OnlyLookAtOneThing.xml
-C:\Windows\System32>sysmon.exe -c DontLogPornHubTraffic.xml
-
-This makes Sysmon very deployable and scalable. Personally, on most of my machines, I typically run Sysmon wide open, without any restriction on what to log unless I want to document something specific. I also increase the log size to something ridiculous like 200 MB.
-
-wevtutil sl Microsoft-Windows-Sysmon/Operational /ms:209715200
-
-">
+<meta name="twitter:description" content="">
 <meta name="twitter:site" content="@GlassDFIR">
 
 
@@ -119,55 +23,7 @@ wevtutil sl Microsoft-Windows-Sysmon/Operational /ms:209715200
 <meta property="og:locale" content="en_US">
 <meta property="og:type" content="article">
 <meta property="og:title" content="How to Use Sysmon 2.0 (Part 2)">
-<meta property="og:description" content="Sysmon 2.0 Rule filtering
-If you have used Sysmon for any extended length of time, you already know that the logs fill up quick. This is the nature of Windows. There is a lot going on under the hood. If you configure Sysmon to log when processes create network connections (Event ID 3) and load modules (Event ID 7), you are going to record more logs than you want to read.
-To help add granularity, 2.0 comes with the ability to filter events based off a flexible ruleset. This is implemented through an XML configuration file that can be applied during installation and changed any time. The configuration commands can be found on the SysInternals' Sysmon page. Here is an example of a basic configuration file w/some notes:
-
-The XML file is broken into to two sections Configuration and Rules.
-The Configuration section provides for the same options config options from the command line.
--h Configuration entry: Hashing
--l Configuration entry: ImageLoading
--n Configuration entry: Network
-The Rules section allows you to configure which events you want to include/exclude.
-Making rules are pretty easy:
-
-
-Pick a Sysmon Event you want to include/exclude in the logs.
-
-ID	Tag	           Event
-1	ProcessCreate	   Process Create
-2	FileCreateTime	   File creation time
-3	NetworkConnect	   Network connection detected
-5	ProcessTerminate   Process terminated
-6	DriverLoad	   Driver Loaded
-7	ImageLoad	   Image loaded
-
-Lets say I want to focus on Event ID 2 events so I will use the "NetworkConnect" tag.
-
-Determine if you are want to use this rule to include or exclude something.
-This might be the most confusing part but fear not, I will lead you through.
-A Sysmon rule asks for a default action to apply to all events of that type. To Log (include) or not to Log (exclude), that is the question. Once you have established the default action, you include conditional statements that act as exceptions to the default action. So if the default action is to INCLUDE, all of the conditions in the rule will be used to EXCLUDE events from the log. The opposite is also true, if the default action is to EXCLUDE, all of the conditions in the rule will be used to INCLUDE events in the log.
-
-
-Cast an appropriate net.
-This is where Sysmon shines. If you are configuring Sysmon monitor something specific, these new rules afford that level of granularity. Inversely, you can increase the Signal-to-Noise ratio and not log noisy known good processes (antivirus, binaries with specific hashes, etc).
-This is an example of a configuration file to observe the specific actions of a particular malware:
-Here is a random example I pulled from the good people at malwr.com.
-Here is a Sysmon configuration file that could be used to monitor most of the behavior. (This is not exhaustive, just an example of potential use.)
-
-Using Sysmon for something this specific is great but when you are staring at trees, you are going to miss the forest. Here is an example of how to use Sysmon as an everyday background service that monitors everything EXCEPT for processes that you would rather not see cluttering up your logs.
-
-
-The seriously useful part about the configuration file is that you can load a new one at anytime.
-
-C:\Windows\System32>sysmon.exe -c OnlyLookAtOneThing.xml
-C:\Windows\System32>sysmon.exe -c DontLogPornHubTraffic.xml
-
-This makes Sysmon very deployable and scalable. Personally, on most of my machines, I typically run Sysmon wide open, without any restriction on what to log unless I want to document something specific. I also increase the log size to something ridiculous like 200 MB.
-
-wevtutil sl Microsoft-Windows-Sysmon/Operational /ms:209715200
-
-">
+<meta property="og:description" content="">
 <meta property="og:url" content="http://jon.glass/blog/discusses-sysmon-v2-filtering-rules/">
 <meta property="og:site_name" content="Half Full of Security">
 

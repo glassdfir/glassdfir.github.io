@@ -6,77 +6,13 @@
 <head>
 <meta charset="utf-8">
 <title>Stupid VBS tricks I discovered... &#8211; Half Full of Security</title>
-<meta name="description" content="This is dumb but I was trolling malwr.com and noticed there was a keyword for "VBS".
-Uncompiled malware in a text file? Sign me up. Here are a few of the tidbits I picked up:
-Here is an example of how to retrieve files from the interwebs with VBScript:
-Dim oFSO: Set oFSO = CreateObject(&quot;Scripting.FileSystemObject&quot;)
-a = GetRequest(&quot;https://jon.glass&quot;)
-With oFSO.createTextFile(&quot;index.htm&quot;)
-    .Write(a)
-    .Close
-End With
-Function GetRequest(URL)
-    GetRequest=&quot;&quot;
-    Dim o
-    Set o = CreateObject(&quot;MSXML2.XMLHTTP&quot;)
-    o.open &quot;GET&quot;,URL, false
-    o.send
-    GetRequest=o.responseText
-End Function
-
-Here is an example of how to use VBScript to make a post :
-post &quot;jon.glass&quot;,&quot;test&quot;
-function post(cmd ,da)
-    post=&quot;&quot;
-    UAString = &quot;whatever the hell you want&quot;
-    Dim o
-    Set o = CreateObject(&quot;MSXML2.XMLHTTP&quot;)
-    o.open &quot;POST&quot;,&quot;http://&quot; &amp; cmd, false
-    o.setRequestHeader &quot;User-Agent:&quot;, UAString
-    o.send da
-    post=o.responseText
-end function
-
-This is probably something well documented but since I was unfamiliar with it and it looks vaguely useful...I posted it here for future reference. 
-">
+<meta name="description" content="">
 <meta name="keywords" content="">
 
 
 <!-- Twitter Cards -->
 <meta name="twitter:title" content="Stupid VBS tricks I discovered...">
-<meta name="twitter:description" content="This is dumb but I was trolling malwr.com and noticed there was a keyword for "VBS".
-Uncompiled malware in a text file? Sign me up. Here are a few of the tidbits I picked up:
-Here is an example of how to retrieve files from the interwebs with VBScript:
-Dim oFSO: Set oFSO = CreateObject(&quot;Scripting.FileSystemObject&quot;)
-a = GetRequest(&quot;https://jon.glass&quot;)
-With oFSO.createTextFile(&quot;index.htm&quot;)
-    .Write(a)
-    .Close
-End With
-Function GetRequest(URL)
-    GetRequest=&quot;&quot;
-    Dim o
-    Set o = CreateObject(&quot;MSXML2.XMLHTTP&quot;)
-    o.open &quot;GET&quot;,URL, false
-    o.send
-    GetRequest=o.responseText
-End Function
-
-Here is an example of how to use VBScript to make a post :
-post &quot;jon.glass&quot;,&quot;test&quot;
-function post(cmd ,da)
-    post=&quot;&quot;
-    UAString = &quot;whatever the hell you want&quot;
-    Dim o
-    Set o = CreateObject(&quot;MSXML2.XMLHTTP&quot;)
-    o.open &quot;POST&quot;,&quot;http://&quot; &amp; cmd, false
-    o.setRequestHeader &quot;User-Agent:&quot;, UAString
-    o.send da
-    post=o.responseText
-end function
-
-This is probably something well documented but since I was unfamiliar with it and it looks vaguely useful...I posted it here for future reference. 
-">
+<meta name="twitter:description" content="">
 <meta name="twitter:site" content="@GlassDFIR">
 
 
@@ -87,39 +23,7 @@ This is probably something well documented but since I was unfamiliar with it an
 <meta property="og:locale" content="en_US">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Stupid VBS tricks I discovered...">
-<meta property="og:description" content="This is dumb but I was trolling malwr.com and noticed there was a keyword for "VBS".
-Uncompiled malware in a text file? Sign me up. Here are a few of the tidbits I picked up:
-Here is an example of how to retrieve files from the interwebs with VBScript:
-Dim oFSO: Set oFSO = CreateObject(&quot;Scripting.FileSystemObject&quot;)
-a = GetRequest(&quot;https://jon.glass&quot;)
-With oFSO.createTextFile(&quot;index.htm&quot;)
-    .Write(a)
-    .Close
-End With
-Function GetRequest(URL)
-    GetRequest=&quot;&quot;
-    Dim o
-    Set o = CreateObject(&quot;MSXML2.XMLHTTP&quot;)
-    o.open &quot;GET&quot;,URL, false
-    o.send
-    GetRequest=o.responseText
-End Function
-
-Here is an example of how to use VBScript to make a post :
-post &quot;jon.glass&quot;,&quot;test&quot;
-function post(cmd ,da)
-    post=&quot;&quot;
-    UAString = &quot;whatever the hell you want&quot;
-    Dim o
-    Set o = CreateObject(&quot;MSXML2.XMLHTTP&quot;)
-    o.open &quot;POST&quot;,&quot;http://&quot; &amp; cmd, false
-    o.setRequestHeader &quot;User-Agent:&quot;, UAString
-    o.send da
-    post=o.responseText
-end function
-
-This is probably something well documented but since I was unfamiliar with it and it looks vaguely useful...I posted it here for future reference. 
-">
+<meta property="og:description" content="">
 <meta property="og:url" content="http://jon.glass/discovers-stupid-vbs-tricks/">
 <meta property="og:site_name" content="Half Full of Security">
 

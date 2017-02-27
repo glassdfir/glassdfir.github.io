@@ -6,61 +6,13 @@
 <head>
 <meta charset="utf-8">
 <title>More SysmonMaps and ProcessMapper! &#8211; Half Full of Security</title>
-<meta name="description" content="Here is a sample of the processes running on my Windows 8 machine for the past 2 hours:
-Sysmonmap of Time Period
-This shows tons of interesting information about the boot process. One thing I have noticed is that Google Chrome is noisy.
-Also just for kicks I coded an example of the same thing using the native Security log:
-To use this make sure Process Creation auditing is enabled. This has been turned on in every environment I have ever worked in but if you are following along at home, here are some fun articles to consider:
-http://technet.microsoft.com/en-us/library/dd941613(v=ws.10).aspx
-http://technet.microsoft.com/en-us/library/dn535776.aspx
-Or go here and turn it on:
-
-Then you can see logs like this:
-
-********Update Code can be found on the GitHub *********
-Then use some PowerShell to whip up the same Google Org chart from the last post.
-
-Then you can look at things like this:processmap
-Not as sexy as sysmon but this script can be used in most environments without the need to install anything.
-Also this PowerShell Script could be pointed at a recovered security log, perhaps from a disk image, instead of a live system.
-http://social.technet.microsoft.com/Forums/windowsserver/en-US/c8330f58-f2e5-4681-beb2-b2b6a185f818/how-to-geteventlog-for-offline-evtx-files?forum=winserverpowershell
-Change:
-$events = Get-WinEvent -FilterHashtable @{Logname='Security';Id=4688}|Where-Object { ( $_.TimeCreated -gt $StartDate -and $_.TimeCreated -le $StopDate)}|Sort-Object TimeCreated
-To this:
-$events = Get-WinEvent -path "c:\pathtosecurity.evtx" -FilterHashtable @{Logname='Security';Id=4688}|Where-Object { ( $_.TimeCreated -gt $StartDate -and $_.TimeCreated -le $StopDate)}|Sort-Object TimeCreated
-&nbsp;
-
-">
+<meta name="description" content="">
 <meta name="keywords" content="">
 
 
 <!-- Twitter Cards -->
 <meta name="twitter:title" content="More SysmonMaps and ProcessMapper!">
-<meta name="twitter:description" content="Here is a sample of the processes running on my Windows 8 machine for the past 2 hours:
-Sysmonmap of Time Period
-This shows tons of interesting information about the boot process. One thing I have noticed is that Google Chrome is noisy.
-Also just for kicks I coded an example of the same thing using the native Security log:
-To use this make sure Process Creation auditing is enabled. This has been turned on in every environment I have ever worked in but if you are following along at home, here are some fun articles to consider:
-http://technet.microsoft.com/en-us/library/dd941613(v=ws.10).aspx
-http://technet.microsoft.com/en-us/library/dn535776.aspx
-Or go here and turn it on:
-
-Then you can see logs like this:
-
-********Update Code can be found on the GitHub *********
-Then use some PowerShell to whip up the same Google Org chart from the last post.
-
-Then you can look at things like this:processmap
-Not as sexy as sysmon but this script can be used in most environments without the need to install anything.
-Also this PowerShell Script could be pointed at a recovered security log, perhaps from a disk image, instead of a live system.
-http://social.technet.microsoft.com/Forums/windowsserver/en-US/c8330f58-f2e5-4681-beb2-b2b6a185f818/how-to-geteventlog-for-offline-evtx-files?forum=winserverpowershell
-Change:
-$events = Get-WinEvent -FilterHashtable @{Logname='Security';Id=4688}|Where-Object { ( $_.TimeCreated -gt $StartDate -and $_.TimeCreated -le $StopDate)}|Sort-Object TimeCreated
-To this:
-$events = Get-WinEvent -path "c:\pathtosecurity.evtx" -FilterHashtable @{Logname='Security';Id=4688}|Where-Object { ( $_.TimeCreated -gt $StartDate -and $_.TimeCreated -le $StopDate)}|Sort-Object TimeCreated
-&nbsp;
-
-">
+<meta name="twitter:description" content="">
 <meta name="twitter:site" content="@GlassDFIR">
 <meta name="twitter:creator" content="@GlassDFIR">
 
@@ -71,31 +23,7 @@ $events = Get-WinEvent -path "c:\pathtosecurity.evtx" -FilterHashtable @{Logname
 <meta property="og:locale" content="en_US">
 <meta property="og:type" content="article">
 <meta property="og:title" content="More SysmonMaps and ProcessMapper!">
-<meta property="og:description" content="Here is a sample of the processes running on my Windows 8 machine for the past 2 hours:
-Sysmonmap of Time Period
-This shows tons of interesting information about the boot process. One thing I have noticed is that Google Chrome is noisy.
-Also just for kicks I coded an example of the same thing using the native Security log:
-To use this make sure Process Creation auditing is enabled. This has been turned on in every environment I have ever worked in but if you are following along at home, here are some fun articles to consider:
-http://technet.microsoft.com/en-us/library/dd941613(v=ws.10).aspx
-http://technet.microsoft.com/en-us/library/dn535776.aspx
-Or go here and turn it on:
-
-Then you can see logs like this:
-
-********Update Code can be found on the GitHub *********
-Then use some PowerShell to whip up the same Google Org chart from the last post.
-
-Then you can look at things like this:processmap
-Not as sexy as sysmon but this script can be used in most environments without the need to install anything.
-Also this PowerShell Script could be pointed at a recovered security log, perhaps from a disk image, instead of a live system.
-http://social.technet.microsoft.com/Forums/windowsserver/en-US/c8330f58-f2e5-4681-beb2-b2b6a185f818/how-to-geteventlog-for-offline-evtx-files?forum=winserverpowershell
-Change:
-$events = Get-WinEvent -FilterHashtable @{Logname='Security';Id=4688}|Where-Object { ( $_.TimeCreated -gt $StartDate -and $_.TimeCreated -le $StopDate)}|Sort-Object TimeCreated
-To this:
-$events = Get-WinEvent -path "c:\pathtosecurity.evtx" -FilterHashtable @{Logname='Security';Id=4688}|Where-Object { ( $_.TimeCreated -gt $StartDate -and $_.TimeCreated -le $StopDate)}|Sort-Object TimeCreated
-&nbsp;
-
-">
+<meta property="og:description" content="">
 <meta property="og:url" content="http://jon.glass/shows-more-process-mapping-crap/">
 <meta property="og:site_name" content="Half Full of Security">
 

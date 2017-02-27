@@ -6,79 +6,13 @@
 <head>
 <meta charset="utf-8">
 <title>Sysmon Continues &#8211; Half Full of Security</title>
-<meta name="description" content="Q: Imaginary Reader writes "Sysmon is great and all but how can I quickly search for specific information from it?"
-A: To be honest, Imaginary Reader, I was wondering the same thing. So I threw this together to perform a very common function: return the dates and times that a process was executed.
-
-I ended up with two scripts that I jammed together; one for exact matches using -FilterXPath (which is very quick) and one for matching a partial string in the Image name (not so quick). As far as I can tell FilterXPath doesn't support partial matches.
-
-PS C:demo> .ExecTimeQuery.ps1 -query "C:\Program Files (x86)\Mozilla Firefox\firefox.exe" -exact
-9/20/2014 5:33:16 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/20/2014 3:42:32 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/20/2014 3:38:58 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/20/2014 1:01:13 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/20/2014 1:01:12 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/19/2014 9:02:39 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/19/2014 9:02:18 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/19/2014 8:50:46 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/19/2014 3:26:02 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-
-PS C:demo> .ExecTimeQuery.ps1 -query "firefox"
-9/20/2014 5:33:16 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/20/2014 3:42:32 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/20/2014 3:38:58 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/20/2014 1:01:13 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/20/2014 1:01:13 PM	C:\Program Files (x86)Mozilla Firefox\uninstallhelper.exe
-9/20/2014 1:01:12 PM	C:\Program Files (x86)Mozilla Firefox\uninstallhelper.exe
-9/20/2014 1:01:12 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/19/2014 9:02:39 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/19/2014 9:02:18 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/19/2014 8:50:46 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/19/2014 3:26:18 PM	C:\Program Files (x86)\Mozilla Firefox\uninstallhelper.exe
-9/19/2014 3:26:13 PM	C:\Program Files (x86)\Mozilla Firefox\uninstallhelper.exe
-9/19/2014 3:26:02 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-
-I am looking for ways to speed this up so if anyone has any suggestions, let me know.
-&nbsp;
-">
+<meta name="description" content="">
 <meta name="keywords" content="">
 
 
 <!-- Twitter Cards -->
 <meta name="twitter:title" content="Sysmon Continues">
-<meta name="twitter:description" content="Q: Imaginary Reader writes "Sysmon is great and all but how can I quickly search for specific information from it?"
-A: To be honest, Imaginary Reader, I was wondering the same thing. So I threw this together to perform a very common function: return the dates and times that a process was executed.
-
-I ended up with two scripts that I jammed together; one for exact matches using -FilterXPath (which is very quick) and one for matching a partial string in the Image name (not so quick). As far as I can tell FilterXPath doesn't support partial matches.
-
-PS C:demo> .ExecTimeQuery.ps1 -query "C:\Program Files (x86)\Mozilla Firefox\firefox.exe" -exact
-9/20/2014 5:33:16 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/20/2014 3:42:32 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/20/2014 3:38:58 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/20/2014 1:01:13 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/20/2014 1:01:12 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/19/2014 9:02:39 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/19/2014 9:02:18 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/19/2014 8:50:46 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/19/2014 3:26:02 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-
-PS C:demo> .ExecTimeQuery.ps1 -query "firefox"
-9/20/2014 5:33:16 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/20/2014 3:42:32 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/20/2014 3:38:58 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/20/2014 1:01:13 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/20/2014 1:01:13 PM	C:\Program Files (x86)Mozilla Firefox\uninstallhelper.exe
-9/20/2014 1:01:12 PM	C:\Program Files (x86)Mozilla Firefox\uninstallhelper.exe
-9/20/2014 1:01:12 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/19/2014 9:02:39 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/19/2014 9:02:18 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/19/2014 8:50:46 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/19/2014 3:26:18 PM	C:\Program Files (x86)\Mozilla Firefox\uninstallhelper.exe
-9/19/2014 3:26:13 PM	C:\Program Files (x86)\Mozilla Firefox\uninstallhelper.exe
-9/19/2014 3:26:02 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-
-I am looking for ways to speed this up so if anyone has any suggestions, let me know.
-&nbsp;
-">
+<meta name="twitter:description" content="">
 <meta name="twitter:site" content="@GlassDFIR">
 <meta name="twitter:creator" content="@GlassDFIR">
 
@@ -89,40 +23,7 @@ I am looking for ways to speed this up so if anyone has any suggestions, let me 
 <meta property="og:locale" content="en_US">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Sysmon Continues">
-<meta property="og:description" content="Q: Imaginary Reader writes "Sysmon is great and all but how can I quickly search for specific information from it?"
-A: To be honest, Imaginary Reader, I was wondering the same thing. So I threw this together to perform a very common function: return the dates and times that a process was executed.
-
-I ended up with two scripts that I jammed together; one for exact matches using -FilterXPath (which is very quick) and one for matching a partial string in the Image name (not so quick). As far as I can tell FilterXPath doesn't support partial matches.
-
-PS C:demo> .ExecTimeQuery.ps1 -query "C:\Program Files (x86)\Mozilla Firefox\firefox.exe" -exact
-9/20/2014 5:33:16 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/20/2014 3:42:32 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/20/2014 3:38:58 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/20/2014 1:01:13 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/20/2014 1:01:12 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/19/2014 9:02:39 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/19/2014 9:02:18 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/19/2014 8:50:46 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/19/2014 3:26:02 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-
-PS C:demo> .ExecTimeQuery.ps1 -query "firefox"
-9/20/2014 5:33:16 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/20/2014 3:42:32 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/20/2014 3:38:58 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/20/2014 1:01:13 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/20/2014 1:01:13 PM	C:\Program Files (x86)Mozilla Firefox\uninstallhelper.exe
-9/20/2014 1:01:12 PM	C:\Program Files (x86)Mozilla Firefox\uninstallhelper.exe
-9/20/2014 1:01:12 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/19/2014 9:02:39 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/19/2014 9:02:18 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/19/2014 8:50:46 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-9/19/2014 3:26:18 PM	C:\Program Files (x86)\Mozilla Firefox\uninstallhelper.exe
-9/19/2014 3:26:13 PM	C:\Program Files (x86)\Mozilla Firefox\uninstallhelper.exe
-9/19/2014 3:26:02 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
-
-I am looking for ways to speed this up so if anyone has any suggestions, let me know.
-&nbsp;
-">
+<meta property="og:description" content="">
 <meta property="og:url" content="http://jon.glass/queries-sysmon-for-execution-times/">
 <meta property="og:site_name" content="Half Full of Security">
 

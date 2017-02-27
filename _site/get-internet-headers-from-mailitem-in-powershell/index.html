@@ -6,31 +6,13 @@
 <head>
 <meta charset="utf-8">
 <title>Get Internet headers from MailItem in PowerShell &#8211; Half Full of Security</title>
-<meta name="description" content="
-# Get Internet headers from MailItem in PowerShell
-Add-type -assembly "Microsoft.Office.Interop.Outlook" | out-null
-$OutlookApp = new-object -comobject outlook.application
-$MAPI = $OutlookApp.GetNamespace("MAPI")
-$Message = $MAPI.GetDefaultFolder([Microsoft.Office.Interop.Outlook.OlDefaultFolders]::olFolderInbox).Items.GetLast()
-$Message.PropertyAccessor.GetProperty("http://schemas.microsoft.com/mapi/proptag/0x007D001E")
-$OutlookApp.Quit()
-
-">
+<meta name="description" content="">
 <meta name="keywords" content="">
 
 
 <!-- Twitter Cards -->
 <meta name="twitter:title" content="Get Internet headers from MailItem in PowerShell">
-<meta name="twitter:description" content="
-# Get Internet headers from MailItem in PowerShell
-Add-type -assembly "Microsoft.Office.Interop.Outlook" | out-null
-$OutlookApp = new-object -comobject outlook.application
-$MAPI = $OutlookApp.GetNamespace("MAPI")
-$Message = $MAPI.GetDefaultFolder([Microsoft.Office.Interop.Outlook.OlDefaultFolders]::olFolderInbox).Items.GetLast()
-$Message.PropertyAccessor.GetProperty("http://schemas.microsoft.com/mapi/proptag/0x007D001E")
-$OutlookApp.Quit()
-
-">
+<meta name="twitter:description" content="">
 <meta name="twitter:site" content="@GlassDFIR">
 <meta name="twitter:creator" content="@GlassDFIR">
 
@@ -41,16 +23,7 @@ $OutlookApp.Quit()
 <meta property="og:locale" content="en_US">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Get Internet headers from MailItem in PowerShell">
-<meta property="og:description" content="
-# Get Internet headers from MailItem in PowerShell
-Add-type -assembly "Microsoft.Office.Interop.Outlook" | out-null
-$OutlookApp = new-object -comobject outlook.application
-$MAPI = $OutlookApp.GetNamespace("MAPI")
-$Message = $MAPI.GetDefaultFolder([Microsoft.Office.Interop.Outlook.OlDefaultFolders]::olFolderInbox).Items.GetLast()
-$Message.PropertyAccessor.GetProperty("http://schemas.microsoft.com/mapi/proptag/0x007D001E")
-$OutlookApp.Quit()
-
-">
+<meta property="og:description" content="">
 <meta property="og:url" content="http://jon.glass/get-internet-headers-from-mailitem-in-powershell/">
 <meta property="og:site_name" content="Half Full of Security">
 

@@ -6,57 +6,13 @@
 <head>
 <meta charset="utf-8">
 <title>SysMon! &#8211; Half Full of Security</title>
-<meta name="description" content="The Microsoft Sysinternals team recently released System Monitor (Sysmon), a Windows system service and device driver that, once installed on a system, remains resident across system reboots to monitor and log system activity to the Windows event log. It provides detailed information about process creations, network connections, and changes to file creation time.
-The timing of this release could not have worked out better for me because I had just spent two weeks reviewing Bit9's CarbonBlack product. I am not going to provide an in depth review of CarbonBlack here but I found with, a little bit of PowerShell, I could get some similar results out of Sysmon.
-****Disclaimer****  This is my first PowerShell project and the coding is rough. You have been warned.
-I started with something pretty simple:
-
-This little script allowed me to search through the Sysmon Event Logs, define a start and stop time, and if the event data matched a keyword, it would return the event to screen.
-Example:
-PS C:\Users\user\Desktop> .Sysmon.ps1 -StartDate "08/28/2014 21:40" -StopDate "08/28/2014 21:50" -keyword "cmd"
-
-This was great. From this I can see:
-
- being launched from explorer.exe
- launching conhost.exe
-Ping.exe getting launched from  with the command line of  "Ping google.com"
-
-One of the coolest features of CarbonBlack was the ability to visualize/map the process creation over time. So I set out to make something that gave me this functionality using the Sysmon logs. I experimented with a few different graphing technologies and I have currently landed on using Google's Org Chart API to do the mapping. I know there are other and probably better ways to do this but I was looking for something high speed/low drag that didn't require installing something.
-With this goal in mind, I threw together SysmonMapper. Again, this is some pretty rough PowerShell but it gets the job done.
-PS C:Users\user\Desktop&gt; .SysmonMapper.ps1 -StartDate "08/28/2014 21:40" -StopDate "08/28/2014 21:50" -P 4332
-
-Here is another example of sysmonmapper in action: example.
-In the next few weeks I am going throw together some post that will highlight the functionality of this script and show some use cases that demonstrate the  power of visualizing sysmon logs.
-&nbsp;
-">
+<meta name="description" content="">
 <meta name="keywords" content="">
 
 
 <!-- Twitter Cards -->
 <meta name="twitter:title" content="SysMon!">
-<meta name="twitter:description" content="The Microsoft Sysinternals team recently released System Monitor (Sysmon), a Windows system service and device driver that, once installed on a system, remains resident across system reboots to monitor and log system activity to the Windows event log. It provides detailed information about process creations, network connections, and changes to file creation time.
-The timing of this release could not have worked out better for me because I had just spent two weeks reviewing Bit9's CarbonBlack product. I am not going to provide an in depth review of CarbonBlack here but I found with, a little bit of PowerShell, I could get some similar results out of Sysmon.
-****Disclaimer****  This is my first PowerShell project and the coding is rough. You have been warned.
-I started with something pretty simple:
-
-This little script allowed me to search through the Sysmon Event Logs, define a start and stop time, and if the event data matched a keyword, it would return the event to screen.
-Example:
-PS C:\Users\user\Desktop> .Sysmon.ps1 -StartDate "08/28/2014 21:40" -StopDate "08/28/2014 21:50" -keyword "cmd"
-
-This was great. From this I can see:
-
- being launched from explorer.exe
- launching conhost.exe
-Ping.exe getting launched from  with the command line of  "Ping google.com"
-
-One of the coolest features of CarbonBlack was the ability to visualize/map the process creation over time. So I set out to make something that gave me this functionality using the Sysmon logs. I experimented with a few different graphing technologies and I have currently landed on using Google's Org Chart API to do the mapping. I know there are other and probably better ways to do this but I was looking for something high speed/low drag that didn't require installing something.
-With this goal in mind, I threw together SysmonMapper. Again, this is some pretty rough PowerShell but it gets the job done.
-PS C:Users\user\Desktop&gt; .SysmonMapper.ps1 -StartDate "08/28/2014 21:40" -StopDate "08/28/2014 21:50" -P 4332
-
-Here is another example of sysmonmapper in action: example.
-In the next few weeks I am going throw together some post that will highlight the functionality of this script and show some use cases that demonstrate the  power of visualizing sysmon logs.
-&nbsp;
-">
+<meta name="twitter:description" content="">
 <meta name="twitter:site" content="@GlassDFIR">
 <meta name="twitter:creator" content="@GlassDFIR">
 
@@ -67,29 +23,7 @@ In the next few weeks I am going throw together some post that will highlight t
 <meta property="og:locale" content="en_US">
 <meta property="og:type" content="article">
 <meta property="og:title" content="SysMon!">
-<meta property="og:description" content="The Microsoft Sysinternals team recently released System Monitor (Sysmon), a Windows system service and device driver that, once installed on a system, remains resident across system reboots to monitor and log system activity to the Windows event log. It provides detailed information about process creations, network connections, and changes to file creation time.
-The timing of this release could not have worked out better for me because I had just spent two weeks reviewing Bit9's CarbonBlack product. I am not going to provide an in depth review of CarbonBlack here but I found with, a little bit of PowerShell, I could get some similar results out of Sysmon.
-****Disclaimer****  This is my first PowerShell project and the coding is rough. You have been warned.
-I started with something pretty simple:
-
-This little script allowed me to search through the Sysmon Event Logs, define a start and stop time, and if the event data matched a keyword, it would return the event to screen.
-Example:
-PS C:\Users\user\Desktop> .Sysmon.ps1 -StartDate "08/28/2014 21:40" -StopDate "08/28/2014 21:50" -keyword "cmd"
-
-This was great. From this I can see:
-
- being launched from explorer.exe
- launching conhost.exe
-Ping.exe getting launched from  with the command line of  "Ping google.com"
-
-One of the coolest features of CarbonBlack was the ability to visualize/map the process creation over time. So I set out to make something that gave me this functionality using the Sysmon logs. I experimented with a few different graphing technologies and I have currently landed on using Google's Org Chart API to do the mapping. I know there are other and probably better ways to do this but I was looking for something high speed/low drag that didn't require installing something.
-With this goal in mind, I threw together SysmonMapper. Again, this is some pretty rough PowerShell but it gets the job done.
-PS C:Users\user\Desktop&gt; .SysmonMapper.ps1 -StartDate "08/28/2014 21:40" -StopDate "08/28/2014 21:50" -P 4332
-
-Here is another example of sysmonmapper in action: example.
-In the next few weeks I am going throw together some post that will highlight the functionality of this script and show some use cases that demonstrate the  power of visualizing sysmon logs.
-&nbsp;
-">
+<meta property="og:description" content="">
 <meta property="og:url" content="http://jon.glass/talks_about_sysmon/">
 <meta property="og:site_name" content="Half Full of Security">
 

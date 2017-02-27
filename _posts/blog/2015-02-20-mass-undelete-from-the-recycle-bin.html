@@ -7,7 +7,8 @@ categories: blog
 <p>This is more "e-discovery" than forensics but I recently had a case where I needed to 1,300 files that were in a user's Recycle Bin.
 </p>
 It was not overly important to the user's management when they were originally created or when it was deleted. They just wanted to review the documents. So I took an hour and hammered out this beast.<br />
-{% highlight python %}
+{%highlight python%}
+
 #Purpose: 	Copy all of the contents of the Recycle Bin to a destination folder
 #		perserving the dir structure and filename.
 #		Not meant as a forensically sound aquistion tool. Just a means to an end.
@@ -69,4 +70,5 @@ for root, dirs, files in os.walk("c:\\$recycle.bin", topdown=False):
     for name in files:
 		if name.lower().startswith('$i'):
 			check4rfile(root, name)
-{% endhighlight %}
+
+{%endhighlight%}

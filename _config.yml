@@ -6,6 +6,7 @@ description: Sharpening the ACKs since 2013
 logo: site-logo.png
 search: true
 url: http://jon.glass
+excerpt_separator: ""
 
 # Jekyll configuration
 

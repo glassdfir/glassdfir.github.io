@@ -6,21 +6,13 @@
 <head>
 <meta charset="utf-8">
 <title>TShark Commands &#8211; Half Full of Security</title>
-<meta name="description" content="Here are some of the more useful commands I am using to sort through tons of pcaps I gathered:
-This one recursively looks for kismet pcap files and runs tshark against them. This example is looking for a count of the SSID and the privacy bit for each of the beacon frames.
-find . -iname '*pcapdump' -exec sh -c 'tshark -r "{}" -T fields -e wlan_mgt.ssid -e wlan_mgt.fixed.capabilities.privacy -R "wlan.fc.type_subtype == 0x08"' ;| sort | uniq -c
-&nbsp;
-">
+<meta name="description" content="">
 <meta name="keywords" content="">
 
 
 <!-- Twitter Cards -->
 <meta name="twitter:title" content="TShark Commands">
-<meta name="twitter:description" content="Here are some of the more useful commands I am using to sort through tons of pcaps I gathered:
-This one recursively looks for kismet pcap files and runs tshark against them. This example is looking for a count of the SSID and the privacy bit for each of the beacon frames.
-find . -iname '*pcapdump' -exec sh -c 'tshark -r "{}" -T fields -e wlan_mgt.ssid -e wlan_mgt.fixed.capabilities.privacy -R "wlan.fc.type_subtype == 0x08"' ;| sort | uniq -c
-&nbsp;
-">
+<meta name="twitter:description" content="">
 <meta name="twitter:site" content="@GlassDFIR">
 <meta name="twitter:creator" content="@GlassDFIR">
 
@@ -31,11 +23,7 @@ find . -iname '*pcapdump' -exec sh -c 'tshark -r "{}" -T fields -e wlan_mgt.ssid
 <meta property="og:locale" content="en_US">
 <meta property="og:type" content="article">
 <meta property="og:title" content="TShark Commands">
-<meta property="og:description" content="Here are some of the more useful commands I am using to sort through tons of pcaps I gathered:
-This one recursively looks for kismet pcap files and runs tshark against them. This example is looking for a count of the SSID and the privacy bit for each of the beacon frames.
-find . -iname '*pcapdump' -exec sh -c 'tshark -r "{}" -T fields -e wlan_mgt.ssid -e wlan_mgt.fixed.capabilities.privacy -R "wlan.fc.type_subtype == 0x08"' ;| sort | uniq -c
-&nbsp;
-">
+<meta property="og:description" content="">
 <meta property="og:url" content="http://jon.glass/lists-tshark-commands/">
 <meta property="og:site_name" content="Half Full of Security">
 

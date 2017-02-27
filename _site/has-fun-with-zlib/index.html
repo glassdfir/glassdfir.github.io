@@ -6,47 +6,13 @@
 <head>
 <meta charset="utf-8">
 <title>Use Python zlib to recover Zip Files &#8211; Half Full of Security</title>
-<meta name="description" content="So continuing on with my series of borderline obsessive blog posts about zip files, I would like to highlight another technique that can be used to recover compressed data. Python comes with library called zlib that is designed to handle the compression and decompression of data.
-Lets just jump into the code:
-
-Here I am creating two simple functions, deflate and inflate. Deflate is passing data to the zlib.compress function and then it removes the first two bytes(the zlib compression header (0x78 0x9C)) and the last four bytes which contain the checksum. After removing that metadata we are left raw deflated data, exactly like you would find inside of a zip file. The inflate function is fairly simple as well. It passes compressed data to the zlib decompress function with a windowbits size of -15. From the zlib manual "windowBits can also be –8..–15 for raw deflate. In this case, -windowBits determines the window size. deflate() will then generate raw deflate data with no zlib header or trailer, and will not compute an adler32 check value" This is great for our purposes.
-Now that we have our functions, let's try them out.
-
-To verify that zlib created the same deflated content as the Windows standard compression, I zipped the uncompressed.txt through the Explorer.
-
-Then I compared the compressed.bin file with the uncompressed.zip in a hex editor.
-
-
-The File Data in the zip is the same as the data created by zlib. Now that we have raw deflated data that is exactly like what we would find in a broken zip file, lets inflate the it and recover the contents.
-Here is the entire script:
-
-And Voila!
-
-You can see the inflated file is the same as the original file. What does this mean? This means we can still recover Zip file contents even if the headers and footers are corrupt or missing.
-">
+<meta name="description" content="">
 <meta name="keywords" content="">
 
 
 <!-- Twitter Cards -->
 <meta name="twitter:title" content="Use Python zlib to recover Zip Files">
-<meta name="twitter:description" content="So continuing on with my series of borderline obsessive blog posts about zip files, I would like to highlight another technique that can be used to recover compressed data. Python comes with library called zlib that is designed to handle the compression and decompression of data.
-Lets just jump into the code:
-
-Here I am creating two simple functions, deflate and inflate. Deflate is passing data to the zlib.compress function and then it removes the first two bytes(the zlib compression header (0x78 0x9C)) and the last four bytes which contain the checksum. After removing that metadata we are left raw deflated data, exactly like you would find inside of a zip file. The inflate function is fairly simple as well. It passes compressed data to the zlib decompress function with a windowbits size of -15. From the zlib manual "windowBits can also be –8..–15 for raw deflate. In this case, -windowBits determines the window size. deflate() will then generate raw deflate data with no zlib header or trailer, and will not compute an adler32 check value" This is great for our purposes.
-Now that we have our functions, let's try them out.
-
-To verify that zlib created the same deflated content as the Windows standard compression, I zipped the uncompressed.txt through the Explorer.
-
-Then I compared the compressed.bin file with the uncompressed.zip in a hex editor.
-
-
-The File Data in the zip is the same as the data created by zlib. Now that we have raw deflated data that is exactly like what we would find in a broken zip file, lets inflate the it and recover the contents.
-Here is the entire script:
-
-And Voila!
-
-You can see the inflated file is the same as the original file. What does this mean? This means we can still recover Zip file contents even if the headers and footers are corrupt or missing.
-">
+<meta name="twitter:description" content="">
 <meta name="twitter:site" content="@GlassDFIR">
 <meta name="twitter:creator" content="@GlassDFIR">
 
@@ -57,24 +23,7 @@ You can see the inflated file is the same as the original file. What does this m
 <meta property="og:locale" content="en_US">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Use Python zlib to recover Zip Files">
-<meta property="og:description" content="So continuing on with my series of borderline obsessive blog posts about zip files, I would like to highlight another technique that can be used to recover compressed data. Python comes with library called zlib that is designed to handle the compression and decompression of data.
-Lets just jump into the code:
-
-Here I am creating two simple functions, deflate and inflate. Deflate is passing data to the zlib.compress function and then it removes the first two bytes(the zlib compression header (0x78 0x9C)) and the last four bytes which contain the checksum. After removing that metadata we are left raw deflated data, exactly like you would find inside of a zip file. The inflate function is fairly simple as well. It passes compressed data to the zlib decompress function with a windowbits size of -15. From the zlib manual "windowBits can also be –8..–15 for raw deflate. In this case, -windowBits determines the window size. deflate() will then generate raw deflate data with no zlib header or trailer, and will not compute an adler32 check value" This is great for our purposes.
-Now that we have our functions, let's try them out.
-
-To verify that zlib created the same deflated content as the Windows standard compression, I zipped the uncompressed.txt through the Explorer.
-
-Then I compared the compressed.bin file with the uncompressed.zip in a hex editor.
-
-
-The File Data in the zip is the same as the data created by zlib. Now that we have raw deflated data that is exactly like what we would find in a broken zip file, lets inflate the it and recover the contents.
-Here is the entire script:
-
-And Voila!
-
-You can see the inflated file is the same as the original file. What does this mean? This means we can still recover Zip file contents even if the headers and footers are corrupt or missing.
-">
+<meta property="og:description" content="">
 <meta property="og:url" content="http://jon.glass/has-fun-with-zlib/">
 <meta property="og:site_name" content="Half Full of Security">
 

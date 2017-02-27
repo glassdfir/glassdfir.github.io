@@ -6,125 +6,13 @@
 <head>
 <meta charset="utf-8">
 <title>Reading e-mail with Powershell &#8211; Half Full of Security</title>
-<meta name="description" content="Occasionally in the DFIR world, you may be called upon to review e-mail files. Sometimes a lot of them. At the same time. (Before, we dive into this subject it is worth mentioning that reviewing a user's e-mail is a sensitive element of our work. Ensure reviewing e-mail falls within the scope of your investigation and you have all of the appropriate permissions before you travel down these paths...)
-To get comfortable with interacting with the Outlook API, I recommend working on your own machine first. I recently installed Outlook on my home machine and pointed it at one of my gmail accounts so I could share my thoughts with you good people. On a live system, here is a quick way to grab some quick info from the logged on user's inbox:
-Find the properties you want to read from the e-mail object
-
-These are the properties available for reference from each e-mail object. Most are easily parsed to strings. It is easy to see how this information could be useful to a forensic investigation.
-Grab the specific properties from the messages in the Inbox:
-
-Displaying this information to the screen is often not the best option considering most of us keep hundreds (if not thousands) of e-mails in our inboxes.
-To export to CSV:
-This script only works locally as the user that is currently logged on.  This is not terribly practical from an investigative standpoint.
-Most often you will get email files in the form of a .pst(Personal Storage Table file) or .ost(Offline Storage Table) file, perhaps recovered from a disk image. References:
-http://www.forensicswiki.org/wiki/Personal_Folder_File_(PAB,_PST,_OST)
-http://office.microsoft.com/en-us/outlook-help/introduction-to-outlook-data-files-pst-and-ost-HA010354876.aspx
-This is not a big problem. You will need to open the .pst/.ost file to an instance of Outlook and then proceed as before.
-To read through a OST/PST:
-[string]$pstPath = "C:\demobackup.pst"
-#if outlook is not running, launch a hidden instance.
-$oProc = ( Get-Process | where { $_.Name -eq "OUTLOOK" } )
-if ( $oProc -eq $null ) { Start-Process outlook -WindowStyle Hidden; Start-Sleep -Seconds 5 }
-$outlook = New-Object -ComObject Outlook.Application
-$namespace = $outlook.GetNamespace("MAPI")
-$namespace.AddStoreEx($pstPath, "olStoreDefault")
-$pstStore = ( $nameSpace.Stores | where { $_.FilePath -eq $pstPath } )
-$pstRootFolder = $pstStore.GetRootFolder()
-$inboxFolder = $pstRootFolder.Folders|? { $_.Name -eq 'Inbox' }
-$inboxFolder.Items|Select SenderEmailAddress,to,subject|Export-Csv C:demoinbox.csv -NoTypeInformation
-
-Sometimes you are not lucky enough to get all of the emails in one outlook object. You may find yourself in a situation where you need to read a bunch of .eml or .msg files. Fear not. I have you covered.
-To loop through a directory of .eml files:
-#A lot of the meta is stripped from the eml text format so you can really only display what you have to work with
-Get-ChildItem "C:\demo" -Filter *.eml|ForEach-Object{
-$adoDbStream = New-Object -ComObject ADODB.Stream
-$adoDbStream.Open()
-$adoDbStream.LoadFromFile($_.FullName)
-$cdoMessage = New-Object -ComObject CDO.Message
-$cdoMessage.DataSource.OpenObject($adoDbStream, "_Stream")
-$cdoMessage.Fields.Item("urn:schemas:mailheader:to").Value
-$cdoMessage.Fields.Item("urn:schemas:mailheader:from").Value
-$cdoMessage.Fields.Item("urn:schemas:mailheader:subject").Value
-$cdoMessage.Fields.Item("urn:schemas:mailheader:sent").Value
-}
-
-This could use a little more polish to make it export to a csv but I am sure you guys can figure out the rest.
-To loop through a directory of .msg files:
-Get-ChildItem "c:demo" -Filter *.msg|`
-ForEach-Object{
-    $outlook = New-Object -comobject outlook.application
-    $msg = $outlook.CreateItemFromTemplate($_.FullName)
-    $msg | Select senderemailaddress,to,subject,Senton,body|ft -AutoSize
-    }
-
-SenderEmailAddress To                     Subject                            SentOn               Body
------------------- --                     -------                            ------               ----
-email@jon.glass    jonathanglass@live.com This is the subject of the e-mail. 9/28/2014 9:47:47 PM This is the body of the e-mail....
-
-I have found the Outlook API to be extremely useful on numerous occasions for this type of work. If anyone has a better/different way to grab this data, I would love to hear it.
-">
+<meta name="description" content="">
 <meta name="keywords" content="">
 
 
 <!-- Twitter Cards -->
 <meta name="twitter:title" content="Reading e-mail with Powershell">
-<meta name="twitter:description" content="Occasionally in the DFIR world, you may be called upon to review e-mail files. Sometimes a lot of them. At the same time. (Before, we dive into this subject it is worth mentioning that reviewing a user's e-mail is a sensitive element of our work. Ensure reviewing e-mail falls within the scope of your investigation and you have all of the appropriate permissions before you travel down these paths...)
-To get comfortable with interacting with the Outlook API, I recommend working on your own machine first. I recently installed Outlook on my home machine and pointed it at one of my gmail accounts so I could share my thoughts with you good people. On a live system, here is a quick way to grab some quick info from the logged on user's inbox:
-Find the properties you want to read from the e-mail object
-
-These are the properties available for reference from each e-mail object. Most are easily parsed to strings. It is easy to see how this information could be useful to a forensic investigation.
-Grab the specific properties from the messages in the Inbox:
-
-Displaying this information to the screen is often not the best option considering most of us keep hundreds (if not thousands) of e-mails in our inboxes.
-To export to CSV:
-This script only works locally as the user that is currently logged on.  This is not terribly practical from an investigative standpoint.
-Most often you will get email files in the form of a .pst(Personal Storage Table file) or .ost(Offline Storage Table) file, perhaps recovered from a disk image. References:
-http://www.forensicswiki.org/wiki/Personal_Folder_File_(PAB,_PST,_OST)
-http://office.microsoft.com/en-us/outlook-help/introduction-to-outlook-data-files-pst-and-ost-HA010354876.aspx
-This is not a big problem. You will need to open the .pst/.ost file to an instance of Outlook and then proceed as before.
-To read through a OST/PST:
-[string]$pstPath = "C:\demobackup.pst"
-#if outlook is not running, launch a hidden instance.
-$oProc = ( Get-Process | where { $_.Name -eq "OUTLOOK" } )
-if ( $oProc -eq $null ) { Start-Process outlook -WindowStyle Hidden; Start-Sleep -Seconds 5 }
-$outlook = New-Object -ComObject Outlook.Application
-$namespace = $outlook.GetNamespace("MAPI")
-$namespace.AddStoreEx($pstPath, "olStoreDefault")
-$pstStore = ( $nameSpace.Stores | where { $_.FilePath -eq $pstPath } )
-$pstRootFolder = $pstStore.GetRootFolder()
-$inboxFolder = $pstRootFolder.Folders|? { $_.Name -eq 'Inbox' }
-$inboxFolder.Items|Select SenderEmailAddress,to,subject|Export-Csv C:demoinbox.csv -NoTypeInformation
-
-Sometimes you are not lucky enough to get all of the emails in one outlook object. You may find yourself in a situation where you need to read a bunch of .eml or .msg files. Fear not. I have you covered.
-To loop through a directory of .eml files:
-#A lot of the meta is stripped from the eml text format so you can really only display what you have to work with
-Get-ChildItem "C:\demo" -Filter *.eml|ForEach-Object{
-$adoDbStream = New-Object -ComObject ADODB.Stream
-$adoDbStream.Open()
-$adoDbStream.LoadFromFile($_.FullName)
-$cdoMessage = New-Object -ComObject CDO.Message
-$cdoMessage.DataSource.OpenObject($adoDbStream, "_Stream")
-$cdoMessage.Fields.Item("urn:schemas:mailheader:to").Value
-$cdoMessage.Fields.Item("urn:schemas:mailheader:from").Value
-$cdoMessage.Fields.Item("urn:schemas:mailheader:subject").Value
-$cdoMessage.Fields.Item("urn:schemas:mailheader:sent").Value
-}
-
-This could use a little more polish to make it export to a csv but I am sure you guys can figure out the rest.
-To loop through a directory of .msg files:
-Get-ChildItem "c:demo" -Filter *.msg|`
-ForEach-Object{
-    $outlook = New-Object -comobject outlook.application
-    $msg = $outlook.CreateItemFromTemplate($_.FullName)
-    $msg | Select senderemailaddress,to,subject,Senton,body|ft -AutoSize
-    }
-
-SenderEmailAddress To                     Subject                            SentOn               Body
------------------- --                     -------                            ------               ----
-email@jon.glass    jonathanglass@live.com This is the subject of the e-mail. 9/28/2014 9:47:47 PM This is the body of the e-mail....
-
-I have found the Outlook API to be extremely useful on numerous occasions for this type of work. If anyone has a better/different way to grab this data, I would love to hear it.
-">
+<meta name="twitter:description" content="">
 <meta name="twitter:site" content="@GlassDFIR">
 <meta name="twitter:creator" content="@GlassDFIR">
 
@@ -135,63 +23,7 @@ I have found the Outlook API to be extremely useful on numerous occasions for th
 <meta property="og:locale" content="en_US">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Reading e-mail with Powershell">
-<meta property="og:description" content="Occasionally in the DFIR world, you may be called upon to review e-mail files. Sometimes a lot of them. At the same time. (Before, we dive into this subject it is worth mentioning that reviewing a user's e-mail is a sensitive element of our work. Ensure reviewing e-mail falls within the scope of your investigation and you have all of the appropriate permissions before you travel down these paths...)
-To get comfortable with interacting with the Outlook API, I recommend working on your own machine first. I recently installed Outlook on my home machine and pointed it at one of my gmail accounts so I could share my thoughts with you good people. On a live system, here is a quick way to grab some quick info from the logged on user's inbox:
-Find the properties you want to read from the e-mail object
-
-These are the properties available for reference from each e-mail object. Most are easily parsed to strings. It is easy to see how this information could be useful to a forensic investigation.
-Grab the specific properties from the messages in the Inbox:
-
-Displaying this information to the screen is often not the best option considering most of us keep hundreds (if not thousands) of e-mails in our inboxes.
-To export to CSV:
-This script only works locally as the user that is currently logged on.  This is not terribly practical from an investigative standpoint.
-Most often you will get email files in the form of a .pst(Personal Storage Table file) or .ost(Offline Storage Table) file, perhaps recovered from a disk image. References:
-http://www.forensicswiki.org/wiki/Personal_Folder_File_(PAB,_PST,_OST)
-http://office.microsoft.com/en-us/outlook-help/introduction-to-outlook-data-files-pst-and-ost-HA010354876.aspx
-This is not a big problem. You will need to open the .pst/.ost file to an instance of Outlook and then proceed as before.
-To read through a OST/PST:
-[string]$pstPath = "C:\demobackup.pst"
-#if outlook is not running, launch a hidden instance.
-$oProc = ( Get-Process | where { $_.Name -eq "OUTLOOK" } )
-if ( $oProc -eq $null ) { Start-Process outlook -WindowStyle Hidden; Start-Sleep -Seconds 5 }
-$outlook = New-Object -ComObject Outlook.Application
-$namespace = $outlook.GetNamespace("MAPI")
-$namespace.AddStoreEx($pstPath, "olStoreDefault")
-$pstStore = ( $nameSpace.Stores | where { $_.FilePath -eq $pstPath } )
-$pstRootFolder = $pstStore.GetRootFolder()
-$inboxFolder = $pstRootFolder.Folders|? { $_.Name -eq 'Inbox' }
-$inboxFolder.Items|Select SenderEmailAddress,to,subject|Export-Csv C:demoinbox.csv -NoTypeInformation
-
-Sometimes you are not lucky enough to get all of the emails in one outlook object. You may find yourself in a situation where you need to read a bunch of .eml or .msg files. Fear not. I have you covered.
-To loop through a directory of .eml files:
-#A lot of the meta is stripped from the eml text format so you can really only display what you have to work with
-Get-ChildItem "C:\demo" -Filter *.eml|ForEach-Object{
-$adoDbStream = New-Object -ComObject ADODB.Stream
-$adoDbStream.Open()
-$adoDbStream.LoadFromFile($_.FullName)
-$cdoMessage = New-Object -ComObject CDO.Message
-$cdoMessage.DataSource.OpenObject($adoDbStream, "_Stream")
-$cdoMessage.Fields.Item("urn:schemas:mailheader:to").Value
-$cdoMessage.Fields.Item("urn:schemas:mailheader:from").Value
-$cdoMessage.Fields.Item("urn:schemas:mailheader:subject").Value
-$cdoMessage.Fields.Item("urn:schemas:mailheader:sent").Value
-}
-
-This could use a little more polish to make it export to a csv but I am sure you guys can figure out the rest.
-To loop through a directory of .msg files:
-Get-ChildItem "c:demo" -Filter *.msg|`
-ForEach-Object{
-    $outlook = New-Object -comobject outlook.application
-    $msg = $outlook.CreateItemFromTemplate($_.FullName)
-    $msg | Select senderemailaddress,to,subject,Senton,body|ft -AutoSize
-    }
-
-SenderEmailAddress To                     Subject                            SentOn               Body
------------------- --                     -------                            ------               ----
-email@jon.glass    jonathanglass@live.com This is the subject of the e-mail. 9/28/2014 9:47:47 PM This is the body of the e-mail....
-
-I have found the Outlook API to be extremely useful on numerous occasions for this type of work. If anyone has a better/different way to grab this data, I would love to hear it.
-">
+<meta property="og:description" content="">
 <meta property="og:url" content="http://jon.glass/reads-e-mail-with-powershell/">
 <meta property="og:site_name" content="Half Full of Security">
 

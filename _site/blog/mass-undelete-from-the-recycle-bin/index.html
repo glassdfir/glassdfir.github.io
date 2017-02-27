@@ -6,21 +6,13 @@
 <head>
 <meta charset="utf-8">
 <title>Mass Undelete from the Recycle Bin &#8211; Half Full of Security</title>
-<meta name="description" content="This is more "e-discovery" than forensics but I recently had a case where I needed to 1,300 files that were in a user's Recycle Bin.
-
-It was not overly important to the user's management when they were originally created or when it was deleted. They just wanted to review the documents. So I took an hour and hammered out this beast.
-
-">
+<meta name="description" content="">
 <meta name="keywords" content="">
 
 
 <!-- Twitter Cards -->
 <meta name="twitter:title" content="Mass Undelete from the Recycle Bin">
-<meta name="twitter:description" content="This is more "e-discovery" than forensics but I recently had a case where I needed to 1,300 files that were in a user's Recycle Bin.
-
-It was not overly important to the user's management when they were originally created or when it was deleted. They just wanted to review the documents. So I took an hour and hammered out this beast.
-
-">
+<meta name="twitter:description" content="">
 <meta name="twitter:site" content="@GlassDFIR">
 <meta name="twitter:creator" content="@GlassDFIR">
 
@@ -31,11 +23,7 @@ It was not overly important to the user's management when they were originally c
 <meta property="og:locale" content="en_US">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Mass Undelete from the Recycle Bin">
-<meta property="og:description" content="This is more "e-discovery" than forensics but I recently had a case where I needed to 1,300 files that were in a user's Recycle Bin.
-
-It was not overly important to the user's management when they were originally created or when it was deleted. They just wanted to review the documents. So I took an hour and hammered out this beast.
-
-">
+<meta property="og:description" content="">
 <meta property="og:url" content="http://jon.glass/blog/mass-undelete-from-the-recycle-bin/">
 <meta property="og:site_name" content="Half Full of Security">
 
@@ -140,7 +128,67 @@ It was not overly important to the user's management when they were originally c
         <p>This is more "e-discovery" than forensics but I recently had a case where I needed to 1,300 files that were in a user's Recycle Bin.
 </p>
 It was not overly important to the user's management when they were originally created or when it was deleted. They just wanted to review the documents. So I took an hour and hammered out this beast.<br />
-<script src="https://gist.github.com/glassdfir/a094415b0d23fa58f0b4.js"></script></p>
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="c">#Purpose: 	Copy all of the contents of the Recycle Bin to a destination folder</span>
+<span class="c">#		perserving the dir structure and filename.</span>
+<span class="c">#		Not meant as a forensically sound aquistion tool. Just a means to an end.</span>
+<span class="c">#This hack job of a python script does:</span>
+<span class="c">#1. Looks for $I files</span>
+<span class="c">#2. Checks to see if the corresponding $R file exists</span>
+<span class="c">#3. Parses $I files to get the original filename and path</span>
+<span class="c">#4. Copies the $R file to the output folder recreating the original dir structure</span>
+<span class="c"># Example:</span>
+<span class="c"># c:\test\subdir\uselessfile.txt gets deleted.</span>
+<span class="c"># This script will copy the file out of the Recycle Bin to c:\Temp\Root\Test\subdir\uselessfile.txt.</span>
+<span class="c"># If one already exists there, it will keep trying make a unique name ex: uselessfile12345.txt</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">exists</span>
+<span class="n">RecBin</span> <span class="o">=</span> <span class="s">'C:</span><span class="se">\\</span><span class="s">$Recycle.Bin'</span>
+<span class="n">DestFolder</span> <span class="o">=</span> <span class="s">'c:</span><span class="se">\\</span><span class="s">Temp</span><span class="se">\\</span><span class="s">test'</span>
+
+<span class="k">def</span> <span class="nf">look4ifiles</span><span class="p">(</span><span class="n">ext</span><span class="p">,</span> <span class="n">dirname</span><span class="p">,</span> <span class="n">names</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span><span class="p">:</span>
+		<span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">'$i'</span><span class="p">):</span>
+			<span class="n">check4rfile</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">check4rfile</span><span class="p">(</span><span class="n">ifiledirname</span><span class="p">,</span> <span class="n">ifilename</span><span class="p">):</span>
+	<span class="n">rfilename</span> <span class="o">=</span> <span class="n">ifilename</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">'$i'</span><span class="p">,</span><span class="s">'$r'</span><span class="p">)</span>
+	<span class="k">if</span> <span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ifiledirname</span><span class="p">,</span> <span class="n">rfilename</span><span class="p">)):</span>
+		<span class="n">parseifile</span><span class="p">(</span><span class="n">ifiledirname</span><span class="p">,</span> <span class="n">ifilename</span><span class="p">,</span> <span class="n">rfilename</span><span class="p">)</span>
+	<span class="k">else</span><span class="p">:</span>
+		<span class="k">print</span><span class="p">(</span><span class="s">"Can not find "</span> <span class="o">+</span> <span class="n">rfilename</span> <span class="o">+</span> <span class="s">" for "</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ifiledirname</span><span class="p">,</span> <span class="n">rfilename</span><span class="p">))</span>
+
+<span class="k">def</span> <span class="nf">parseifile</span><span class="p">(</span><span class="n">ifiledirname</span><span class="p">,</span> <span class="n">ifilename</span><span class="p">,</span><span class="n">rfilename</span><span class="p">):</span>
+	<span class="n">dest_path</span> <span class="o">=</span> <span class="s">""</span>
+	<span class="n">ifile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ifiledirname</span><span class="p">,</span> <span class="n">ifilename</span><span class="p">)</span>
+	<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">ifile</span><span class="p">,</span><span class="s">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+		<span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">28</span><span class="p">)</span>
+		<span class="n">file_path</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+		<span class="k">while</span> <span class="n">file_path</span> <span class="o">!=</span> <span class="s">""</span><span class="p">:</span>
+			<span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">file_path</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s">"hex"</span><span class="p">),</span><span class="mi">16</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+				<span class="n">dest_path</span> <span class="o">+=</span> <span class="n">file_path</span>
+			<span class="n">file_path</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+	<span class="n">extractfromrecbin</span><span class="p">(</span><span class="n">ifiledirname</span><span class="p">,</span> <span class="n">rfilename</span><span class="p">,</span> <span class="n">dest_path</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">finduseabledestinationfilepath</span><span class="p">(</span><span class="n">final_dest_path</span><span class="p">):</span>
+	<span class="k">if</span> <span class="n">exists</span><span class="p">(</span><span class="n">final_dest_path</span><span class="p">):</span>
+		<span class="n">fileName</span><span class="p">,</span> <span class="n">fileExtension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">final_dest_path</span><span class="p">)</span>
+		<span class="n">trythisone</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">fileName</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1000000</span><span class="p">))</span> <span class="o">+</span> <span class="n">fileExtension</span><span class="p">)</span>
+		<span class="k">print</span> <span class="n">trythisone</span>
+		<span class="k">return</span> <span class="n">finduseabledestinationfilepath</span><span class="p">(</span><span class="n">trythisone</span><span class="p">)</span>
+	<span class="k">else</span><span class="p">:</span>
+		<span class="k">return</span> <span class="n">final_dest_path</span>
+<span class="k">def</span> <span class="nf">extractfromrecbin</span><span class="p">(</span><span class="n">ifiledirname</span><span class="p">,</span> <span class="n">rfilename</span><span class="p">,</span> <span class="n">dest_path</span><span class="p">):</span>
+	<span class="n">rfile</span> <span class="o">=</span> <span class="n">ifiledirname</span> <span class="o">+</span> <span class="s">'</span><span class="se">\\</span><span class="s">'</span> <span class="o">+</span> <span class="n">rfilename</span>
+	<span class="n">outputlocation</span> <span class="o">=</span> <span class="n">finduseabledestinationfilepath</span><span class="p">(</span><span class="n">DestFolder</span> <span class="o">+</span> <span class="n">dest_path</span><span class="p">)</span>
+	<span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s">'echo f |xcopy /Y </span><span class="se">\"</span><span class="s">'</span> <span class="o">+</span> <span class="n">rfile</span> <span class="o">+</span> <span class="s">'</span><span class="se">\"</span><span class="s"> </span><span class="se">\"</span><span class="s">'</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">outputlocation</span><span class="p">)</span> <span class="o">+</span> <span class="s">'</span><span class="se">\"</span><span class="s">'</span><span class="p">)</span>
+
+<span class="c">#os.path.walk(RecBin, look4ifiles, exten)</span>
+<span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">files</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="s">"c:</span><span class="se">\\</span><span class="s">$recycle.bin"</span><span class="p">,</span> <span class="n">topdown</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+		<span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">'$i'</span><span class="p">):</span>
+			<span class="n">check4rfile</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></code></pre></figure>
 
         
       </div><!-- /.entry-content -->
