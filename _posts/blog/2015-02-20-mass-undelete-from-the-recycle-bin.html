@@ -7,4 +7,66 @@ categories: blog
 <p>This is more "e-discovery" than forensics but I recently had a case where I needed to 1,300 files that were in a user's Recycle Bin.
 </p>
 It was not overly important to the user's management when they were originally created or when it was deleted. They just wanted to review the documents. So I took an hour and hammered out this beast.<br />
-<script src="https://gist.github.com/glassdfir/a094415b0d23fa58f0b4.js"></script></p>
+{% hightlight python %}
+#Purpose: 	Copy all of the contents of the Recycle Bin to a destination folder
+#		perserving the dir structure and filename.
+#		Not meant as a forensically sound aquistion tool. Just a means to an end.
+#This hack job of a python script does:
+#1. Looks for $I files
+#2. Checks to see if the corresponding $R file exists
+#3. Parses $I files to get the original filename and path
+#4. Copies the $R file to the output folder recreating the original dir structure
+# Example:
+# c:\test\subdir\uselessfile.txt gets deleted.
+# This script will copy the file out of the Recycle Bin to c:\Temp\Root\Test\subdir\uselessfile.txt.
+# If one already exists there, it will keep trying make a unique name ex: uselessfile12345.txt
+
+import os
+import random
+from os.path import exists
+RecBin = 'C:\\$Recycle.Bin'
+DestFolder = 'c:\\Temp\\test'
+
+def look4ifiles(ext, dirname, names):
+    for name in names:
+		if name.lower().startswith('$i'):
+			check4rfile(dirname, name)
+
+def check4rfile(ifiledirname, ifilename):
+	rfilename = ifilename.lower().replace('$i','$r')
+	if exists(os.path.join(ifiledirname, rfilename)):
+		parseifile(ifiledirname, ifilename, rfilename)
+	else:
+		print("Can not find " + rfilename + " for " + os.path.join(ifiledirname, rfilename))
+
+def parseifile(ifiledirname, ifilename,rfilename):
+	dest_path = ""
+	ifile = os.path.join(ifiledirname, ifilename)
+	with open(ifile,"rb") as f:
+		f.seek(28)
+		file_path = f.read(1)
+		while file_path != "":
+			if int(file_path.encode("hex"),16) != 0:
+				dest_path += file_path
+			file_path = f.read(1)
+	extractfromrecbin(ifiledirname, rfilename, dest_path)
+
+def finduseabledestinationfilepath(final_dest_path):
+	if exists(final_dest_path):
+		fileName, fileExtension = os.path.splitext(final_dest_path)
+		trythisone = str(fileName + str(random.randint(0,1000000)) + fileExtension)
+		print trythisone
+		return finduseabledestinationfilepath(trythisone)
+	else:
+		return final_dest_path
+def extractfromrecbin(ifiledirname, rfilename, dest_path):
+	rfile = ifiledirname + '\\' + rfilename
+	outputlocation = finduseabledestinationfilepath(DestFolder + dest_path)
+	os.system('echo f |xcopy /Y \"' + rfile + '\" \"' + str(outputlocation) + '\"')
+
+#os.path.walk(RecBin, look4ifiles, exten)
+for root, dirs, files in os.walk("c:\\$recycle.bin", topdown=False):
+    for name in files:
+		if name.lower().startswith('$i'):
+			check4rfile(root, name)
+{% endhighlight %}
