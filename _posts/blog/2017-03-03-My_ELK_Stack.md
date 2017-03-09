@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Setting up ELK on my MacBook"
+title:  "Setting up ELK on my MacBook (Part 1)"
 date:   2017-03-06 19:52:28 -0500
 categories: blog
 ---
