@@ -76,7 +76,9 @@ path.logs: /Users/glass/ELK/Logs
 {% highlight raw %}
 ./elasticsearch-5.2.2/bin/elasticsearch
 Once that is running, in a separate tab, curl the service to make sure you are good to go.
-{% highlight raw %}curl -XGET http://localhost:9200/{% endhighlight %}
+{% highlight raw %}
+curl -XGET http://localhost:9200/
+{% endhighlight %}
 and you should see something like this:
 {% highlight json %}
 {
