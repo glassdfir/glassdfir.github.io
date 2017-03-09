@@ -1,4 +1,107 @@
-<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://jon.glass/feed.xml" rel="self" type="application/atom+xml" /><link href="http://jon.glass/" rel="alternate" type="text/html" /><updated>2017-02-26T20:40:43-05:00</updated><id>http://jon.glass/</id><title type="html">Half Full of Security</title><subtitle>Sharpening the ACKs since 2013</subtitle><entry><title type="html">Dealing with users gone bad…</title><link href="http://jon.glass/blog/RogueUsers/" rel="alternate" type="text/html" title="Dealing with users gone bad…" /><published>2017-02-03T14:52:28-05:00</published><updated>2017-02-03T14:52:28-05:00</updated><id>http://jon.glass/blog/RogueUsers</id><content type="html" xml:base="http://jon.glass/blog/RogueUsers/">&lt;p&gt;We have all been there when someone that gets paid more than you do runs in and says “We need to remove User X from the network and lock them out of their PC to preserve evidence!!!”. If not, you will be.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://jon.glass/feed.xml" rel="self" type="application/atom+xml" /><link href="http://jon.glass/" rel="alternate" type="text/html" /><updated>2017-03-09T09:21:06-05:00</updated><id>http://jon.glass/</id><title type="html">Half Full of Security</title><subtitle>Sharpening the ACKs since 2013</subtitle><entry><title type="html">Setting up ELK on my MacBook</title><link href="http://jon.glass/blog/My_ELK_Stack/" rel="alternate" type="text/html" title="Setting up ELK on my MacBook" /><published>2017-03-06T19:52:28-05:00</published><updated>2017-03-06T19:52:28-05:00</updated><id>http://jon.glass/blog/My_ELK_Stack</id><content type="html" xml:base="http://jon.glass/blog/My_ELK_Stack/">&lt;p&gt;I am starting up a new run of blog posts to document some malware analysis work I have been doing lately. Since I got my new MacBook, I have used the new hardware to as an opportunity to rebuild my setup from scratch. I am using Elasticsearch, Logstash, and Kibana on my MacBook and WinLogBeat and PacketBeat on my Windows 10 VM. This is post is meant to help me rebuild my ELK stack on MacBook the next time I dork it up. I tried running installing the stack in a few different ways but these are the steps I took that were ultimately successful.&lt;/p&gt;
+
+&lt;h3 id=&quot;create-some-folders&quot;&gt;1. Create some folders:&lt;/h3&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-raw&quot; data-lang=&quot;raw&quot;&gt;mkdir ~/Applications/ELK
+cd ~/Applications/ELK
+mkdir Data Logs&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;I put this off of my profile because as soon as I start burying it off in some directory off of root like a proper admin I can’t remember where I put it.&lt;/p&gt;
+
+&lt;h3 id=&quot;download-elasticsearch&quot;&gt;2. Download Elasticsearch:&lt;/h3&gt;
+&lt;p&gt;Elasticsearch is a highly scalable open-source full-text search and analytics engine. It allows you to store, search, and analyze big volumes of data quickly and in near real time.
+Download your copy from here: &lt;a href=&quot;https://www.elastic.co/downloads/elasticsearch&quot;&gt;https://www.elastic.co/downloads/elasticsearch&lt;/a&gt;
+Specifically I downloaded the &lt;a href=&quot;https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.2.2.tar.gz&quot;&gt;https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.2.2.tar.gz&lt;/a&gt;
+and extracted it to the ELK folder.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-raw&quot; data-lang=&quot;raw&quot;&gt;tar -xvzf elasticsearch-5.2.2.tar.gz&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h3 id=&quot;configure-elasticsearch&quot;&gt;3. Configure Elasticsearch:&lt;/h3&gt;
+&lt;p&gt;One of the things I ended up doing in my setup was changing the configuration from localhost to 0.0.0.0. I did this because, in addition to Malware Analysis VMs on my MacBook, I also have other boxes around my lab that I wanted logs from as well.&lt;/p&gt;
+
+&lt;p&gt;To do this crack open ~/ELK/elasticsearch-5.2.2/config/elasticsearch.yml in your favorite text editor and change:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-yml&quot; data-lang=&quot;yml&quot;&gt;&lt;span class=&quot;c1&quot;&gt;# ---------------------------------- Network -----------------------------------&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;#&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# Set the bind address to a specific IP (IPv4 or IPv6):&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;#&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;#network.host: 192.168.0.1&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;to:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-yml&quot; data-lang=&quot;yml&quot;&gt;&lt;span class=&quot;c1&quot;&gt;# ---------------------------------- Network -----------------------------------&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;#&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# Set the bind address to a specific IP (IPv4 or IPv6):&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;#&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;network.host&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;0.0.0.0&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;If you are just doing this for local logging, the default configuration is fine.&lt;/p&gt;
+
+&lt;p&gt;Next I changed the default Log and Data directories because this allows me to be more resilient when I screw something up and need to reinstall.
+Also in ~/ELK/elasticsearch-5.2.2/config/elasticsearch.yml, change:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-yml&quot; data-lang=&quot;yml&quot;&gt;&lt;span class=&quot;c1&quot;&gt;# ----------------------------------- Paths ------------------------------------&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;#&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# Path to directory where to store the data (separate multiple locations by comma):&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;#&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;#path.data: /path/to/data&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;#&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# Path to log files:&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;#&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;#path.logs: /path/to/logs&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;to…&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-yml&quot; data-lang=&quot;yml&quot;&gt;&lt;span class=&quot;c1&quot;&gt;# ----------------------------------- Paths ------------------------------------&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;#&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# Path to directory where to store the data (separate multiple locations by comma):&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;#&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;path.data&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;/Users/glass/ELK/Data&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;#&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;# Path to log files:&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;#&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;path.logs&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;/Users/glass/ELK/Logs&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h3 id=&quot;run-elasticsearch-to-make-sure-it-works&quot;&gt;4. Run Elasticsearch to make sure it works:&lt;/h3&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-raw&quot; data-lang=&quot;raw&quot;&gt;./elasticsearch-5.2.2/bin/elasticsearch&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Once that is running, in a separate tab, curl the service to make sure you are good to go.
+curl -XGET http://localhost:9200/ and you should see something like this:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-json&quot; data-lang=&quot;json&quot;&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;name&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;D4i86Xk&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;cluster_name&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;elasticsearch&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;cluster_uuid&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;YNTg9_EpQ46-TDcfKqdgRw&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;version&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;number&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;5.2.2&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;build_hash&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;f9d9b74&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;build_date&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;2017-02-24T17:26:45.835Z&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;build_snapshot&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;kc&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;lucene_version&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;6.4.1&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;},&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+  &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&quot;tagline&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;You Know, for Search&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h3 id=&quot;download-kibana&quot;&gt;3. Download Kibana:&lt;/h3&gt;
+&lt;p&gt;Kibana is an open source (Apache Licensed), browser based analytics and search dashboard for Elasticsearch.
+I grabbed [kibana-5.2.2-linux-x86_64.tar.gz]https://artifacts.elastic.co/downloads/kibana/kibana-5.2.2-linux-x86_64.tar.gz)
+and unzipped it in my ~/ELK directory.&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-raw&quot; data-lang=&quot;raw&quot;&gt;tar -xvzf kibana-5.2.2-linux-x86_64.tar.gz&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;I left the default configuration alone because I didn’t need to change anything.&lt;/p&gt;
+
+&lt;h3 id=&quot;run-kibana&quot;&gt;4. Run Kibana:&lt;/h3&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-raw&quot; data-lang=&quot;raw&quot;&gt;~/ELK/kibana-5.2.2-darwin-x86_64/bin/kibana&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;For me, it looks like this:
+&lt;img src=&quot;/images/kibanarunning.png&quot; alt=&quot;Kibana Running&quot; /&gt;
+So, for those ELK stack nerds out there: “You’re right. My first time running Kibana did not look exactly like this because I have installed some plugins.” You caught me not taking screenshots in a timely manner. Feel free to file a complaint and I will refund your subscription fee to this blog. The point is there at the bottom: green means good.
+ Fire up a browser (I like chrome) and navigate to http://localhost:5601 and should look like this:
+ &lt;img src=&quot;/images/kibanainchrome.png&quot; alt=&quot;Kibana Running&quot; /&gt;
+ You will notice that it is immediately complaining about not having an index pattern. That is normal. So far we are good. In my next post, I will cover how I am sending logs into Elasticsearch from my VMs using WinLogBeat and PacketBeat.&lt;/p&gt;</content></entry><entry><title type="html">Dealing with users gone bad…</title><link href="http://jon.glass/blog/RogueUsers/" rel="alternate" type="text/html" title="Dealing with users gone bad…" /><published>2017-02-03T14:52:28-05:00</published><updated>2017-02-03T14:52:28-05:00</updated><id>http://jon.glass/blog/RogueUsers</id><content type="html" xml:base="http://jon.glass/blog/RogueUsers/">&lt;p&gt;We have all been there when someone that gets paid more than you do runs in and says “We need to remove User X from the network and lock them out of their PC to preserve evidence!!!”. If not, you will be.&lt;/p&gt;
 
 &lt;p&gt;So…aside from any 3rd party endpoint software you might have in that environment…what do you do? I have a list of steps, native Windows functions, that I have found helps eliminate avenues for User X’s continued use of ComputerX.&lt;/p&gt;
 
@@ -10,7 +113,7 @@
 &lt;h3 id=&quot;delete-all-cached-credentials&quot;&gt;2. Delete All Cached Credentials&lt;/h3&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-powershell&quot; data-lang=&quot;powershell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$credential&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Get-Credential&lt;/span&gt; -Credential &lt;span class=&quot;s2&quot;&gt;&quot;DOMAIN&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\a&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;dminacct&quot;&lt;/span&gt;
-Enter-PSSession -ComputerName ComputerX -Credential &lt;span class=&quot;nv&quot;&gt;$credential&lt;/span&gt;
+Enter-PSSessio n -ComputerName ComputerX -Credential &lt;span class=&quot;nv&quot;&gt;$credential&lt;/span&gt;
 &lt;span class=&quot;nb&quot;&gt;Set-ItemProperty&lt;/span&gt; -Path &lt;span class=&quot;s2&quot;&gt;&quot;HKLM:&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\S&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;oftware&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\M&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;icrosoft&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\W&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;indows NT&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\C&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;urrentVersion&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\W&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;inlogon&quot;&lt;/span&gt; -Name CachedLogonsCount -Value 0&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;This will set the number of cached creds Windows is storing to 0 and erase the previous creds.&lt;/p&gt;
@@ -786,56 +889,4 @@ Does this really work you ask? Of course it does.&lt;br /&gt;
 &lt;a href=&quot;/images/openssl.png&quot;&gt;&lt;img src=&quot;/images/openssl.png&quot; alt=&quot;openssl&quot; width=&quot;780&quot; height=&quot;491&quot; class=&quot;aligncenter size-large wp-image-690&quot; /&gt;&lt;/a&gt;&lt;br /&gt;
 Don't know why this feels like a magic trick but TA DA!&lt;br /&gt;
 This doesn't fix all of my issues with moving huge files around but this does encrypt it locally before it is sent over the network without needing double the space.&lt;br /&gt;
-Big thanks to &lt;a href=&quot;http://stackoverflow.com/users/1163893/thijs-van-dien&quot; target=&quot;_blank&quot;&gt;Thjis van Dien&lt;/a&gt; for putting this solution out there.&lt;/p&gt;</content></entry><entry><title type="html">My analysis of Dridex malware (Part Two)</title><link href="http://jon.glass/blog/analyzes-dridex-malware-p2/" rel="alternate" type="text/html" title="My analysis of Dridex malware (Part Two)" /><published>2015-03-23T19:01:16-04:00</published><updated>2015-03-23T19:01:16-04:00</updated><id>http://jon.glass/blog/analyzes-dridex-malware-p2</id><content type="html" xml:base="http://jon.glass/blog/analyzes-dridex-malware-p2/">&lt;p&gt;In the last post, I analyzed a dropper associated with Dridex. This post will focus on analyzing the assa.exe that was dropped.&lt;/p&gt;
-
-&lt;p&gt;File name: assa.exe&lt;br /&gt;
-MD5: 8a996e195337c68d3c4b0a82a285f70b&lt;br /&gt;
-SHA1: 5bf78a6cd73e20393960a4187833028bee179dd6&lt;br /&gt;
-SHA256:21f596cae35b2cb7e61c1a93bfa60ebf590d60b9b9f936f820aec96932ca11c7&lt;br /&gt;
-(I am throwing the hashes in these posts to help my fellow Googlers.)&lt;/p&gt;
-&lt;p&gt;To analyze assa.exe, I used a handful of tried and true tools:&lt;br /&gt;
-&lt;a href=&quot;https://technet.microsoft.com/en-us/sysinternals/bb842062.aspx&quot;&gt;Sysinternals&lt;/a&gt; tools (&lt;a href=&quot;https://technet.microsoft.com/en-us/sysinternals/bb896645&quot;&gt;procmon&lt;/a&gt;, &lt;a href=&quot;https://technet.microsoft.com/en-us/sysinternals/bb897441.aspx&quot;&gt;sigcheck&lt;/a&gt;, etc...)&lt;br /&gt;
-&lt;a href=&quot;https://www.wireshark.org/&quot;&gt;Wireshark&lt;/a&gt;&lt;br /&gt;
-ResEdit&lt;br /&gt;
-Some batch scripting&lt;br /&gt;
-VMware Workstation&lt;/p&gt;
-&lt;p&gt;So here is how I did the behavioral analysis of the assa.exe.&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;I opened a Windows 7 32-bit SP1 VM I had laying around that has Sysmon installed on it.&lt;/li&gt;
-&lt;li&gt;I fired up procmon and wireshark.&lt;/li&gt;
-&lt;li&gt;Took a snapshot in VMware so I could revert back to clean state as needed.&lt;/li&gt;
-&lt;li&gt;Copied the assa.exe to C:\Users\User\Desktop and ran it.&lt;/li&gt;
-&lt;li&gt;Waited about...3 mins.&lt;/li&gt;
-&lt;li&gt;Saved the Procmon output, Wireshark pcap, sysmon log, and a memory dump to a share.&lt;/li&gt;
-&lt;li&gt;Reverted to snapshot.&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;First thing I did was read the Process Monitor log. I opened the file up from the network share and setup a filter to only look at assa.exe for now.&lt;br /&gt;
-&lt;a href=&quot;https://jon.glass/wp-content/uploads/2015/03/Screen-Shot-2015-03-23-at-9.00.44-AM.jpg&quot;&gt;&lt;img src=&quot;/images/Screen-Shot-2015-03-23-at-9.00.44-AM-300x172.jpg&quot; alt=&quot;Screen Shot 2015-03-23 at 9.00.44 AM&quot; width=&quot;300&quot; height=&quot;172&quot; class=&quot;aligncenter size-medium wp-image-630&quot; /&gt;&lt;/a&gt;&lt;br /&gt;
-If you are new to ProcMon, the signal to noise ratio can make it difficult to read but here are the highlights:&lt;br /&gt;
-&lt;script src=&quot;https://gist.github.com/glassdfir/5c37128a7be49d56f7ea.js&quot;&gt;&lt;/script&gt;&lt;br /&gt;
-Assa.exe then generates the following network traffic:&lt;br /&gt;
-&lt;script src=&quot;https://gist.github.com/glassdfir/a694add3275f0c617577.js&quot;&gt;&lt;/script&gt;&lt;br /&gt;
-I will take a crack at decoding that blob of nonsense later but for now, I will keep going.&lt;br /&gt;
-&lt;script src=&quot;https://gist.github.com/glassdfir/abe43cd9e06d72e34d01.js&quot;&gt;&lt;/script&gt;&lt;br /&gt;
-This looks to be the a third stage payload. For those who aren't familiar with the IRP_MJ_CREATE Operation, &lt;a href=&quot;https://msdn.microsoft.com/en-us/library/windows/hardware/ff548630%28v=vs.85%29.aspx&quot;&gt;Microsoft&lt;/a&gt; says &lt;/p&gt;
-&lt;blockquote&gt;&lt;p&gt;The I/O Manager sends the IRP_MJ_CREATE request when a new file or directory is being created, or when an existing file, device, directory, or volume is being opened. &lt;/p&gt;&lt;/blockquote&gt;
-&lt;p&gt;When hashed, the tmp file gave me nothing to work with. No matter. I'll come back to that later as well.&lt;br /&gt;
-&lt;script src=&quot;https://gist.github.com/glassdfir/1adbeb8d2c7cf1384569.js&quot;&gt;&lt;/script&gt;&lt;br /&gt;
-0928AC45920A48C1E11D207E55797CF0 appears to be a 32 bit tracking signature for the infected computer. The idea is you need a way to uniquely identify 100,000 computers that could have very similar characteristics. Computer Names, User names, IP/MAC addresses by themselves could cause collisions in a botnet. The likelihood that another machine is going have the same ComputerName, Username, InstallDate and MachineGuid starts to become very slim.&lt;br /&gt;
-A little later in the Procmon output we see this:&lt;br /&gt;
-&lt;script src=&quot;https://gist.github.com/glassdfir/e643cd82cc7c86edff84.js&quot;&gt;&lt;/script&gt;&lt;br /&gt;
-Since the tmp file is a dll, that means we can look at it with a wide variety of Tools. I grabbed ResEdit:&lt;br /&gt;
-&lt;a href=&quot;https://jon.glass/wp-content/uploads/2015/03/reseditor.png&quot;&gt;&lt;img src=&quot;/images/reseditor-1024x552.png&quot; alt=&quot;reseditor&quot; width=&quot;780&quot; height=&quot;420&quot; class=&quot;alignleft size-large wp-image-639&quot; /&gt;&lt;/a&gt;&lt;br /&gt;
-So this file is dressed up like a copy of c:\Windows\System32\DInput8.dll from copy of Windows XP Pro with the Russian language pack. In case, anyone is curious, there are some subtle differences between the real and the fake. Most importantly, the real one is digitally signed.&lt;br /&gt;
-&lt;a href=&quot;https://jon.glass/wp-content/uploads/2015/03/sigcheck.png&quot;&gt;&lt;img src=&quot;/images/sigcheck-300x222.png&quot; alt=&quot;sigcheck&quot; width=&quot;300&quot; height=&quot;222&quot; class=&quot;alignleft size-medium wp-image-641&quot; /&gt;&lt;/a&gt;&lt;br /&gt;
-DInput8.dll is a valid Windows DLL used for &lt;a href=&quot;https://msdn.microsoft.com/en-us/library/windows/desktop/ee418998(v=vs.85).aspx&quot;&gt;Microsoft DirectInput&lt;/a&gt;. DirectInput enables an application to retrieve data from input devices even when the application is in the background. At this point, I do not think this technology has anything to do with this malware's capabilities.&lt;/p&gt;
-&lt;p&gt;Finally, we see ASSA.EXE gracefully exits after running for only 4.0371401 seconds by my math.&lt;br /&gt;
-&lt;script src=&quot;https://gist.github.com/glassdfir/67323a8a5b8fb831a5e3.js&quot;&gt;&lt;/script&gt;&lt;/p&gt;
-&lt;p&gt;To summarize, ASSA.EXE's purpose in life is 3 fold:&lt;/p&gt;
-&lt;ol&gt;
-&lt;li&gt;Download the latest third stage from 95.163.121.33:80. The payload I received was a PE file cleverly disguised as a valid but unsigned Windows driver.
-&lt;/li&gt;
-&lt;li&gt;Run the third stage payload using Rundll32.exe&lt;/li&gt;
-&lt;li&gt;Tag the target computer with a unique botnet identifier based on specific characteristics found in the Registry. The tag is a 32-bit hex string stored HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\CLSID\{354BCA22-B264-2DB5-DC3F-114C655B5C92}\ShellFolder\0&lt;/li&gt;
-&lt;/ol&gt;
-&lt;p&gt;I am going to dive deeper into the this tmp/dll file in the next blog post because that is where the really interesting stuff happens.&lt;/p&gt;</content></entry></feed>
+Big thanks to &lt;a href=&quot;http://stackoverflow.com/users/1163893/thijs-van-dien&quot; target=&quot;_blank&quot;&gt;Thjis van Dien&lt;/a&gt; for putting this solution out there.&lt;/p&gt;</content></entry></feed>

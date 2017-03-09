@@ -1,0 +1,280 @@
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8" lang="en"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9" lang="en"><![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<title>Setting up ELK on my MacBook &#8211; Half Full of Security</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+
+
+<!-- Twitter Cards -->
+<meta name="twitter:title" content="Setting up ELK on my MacBook">
+<meta name="twitter:description" content="">
+<meta name="twitter:site" content="@GlassDFIR">
+<meta name="twitter:creator" content="@GlassDFIR">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://jon.glass/images/site-logo.png">
+
+<!-- Open Graph -->
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Setting up ELK on my MacBook">
+<meta property="og:description" content="">
+<meta property="og:url" content="http://jon.glass/blog/My_ELK_Stack/">
+<meta property="og:site_name" content="Half Full of Security">
+
+
+
+
+
+<link rel="canonical" href="http://jon.glass/blog/My_ELK_Stack/">
+<link href="http://jon.glass/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="http://jon.glass/assets/css/main.css">
+<!-- Webfonts -->
+<script src="https://use.edgefonts.net/source-sans-pro:n2,i2,n3,i3,n4,i4,n6,i6,n7,i7,n9,i9;source-code-pro:n4,n7;volkhov.js"></script>
+
+<meta http-equiv="cleartype" content="on">
+
+<!-- HTML5 Shiv and Media Query Support -->
+<!--[if lt IE 9]>
+  <script src="http://jon.glass/assets/js/vendor/html5shiv.min.js"></script>
+  <script src="http://jon.glass/assets/js/vendor/respond.min.js"></script>
+<![endif]-->
+
+<!-- Modernizr -->
+<script src="http://jon.glass/assets/js/vendor/modernizr-2.7.1.custom.min.js"></script>
+
+
+<!-- MathJax -->
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+<!-- Icons -->
+<!-- 16x16 -->
+<link rel="shortcut icon" href="http://jon.glass/favicon.ico">
+<!-- 32x32 -->
+<link rel="shortcut icon" href="http://jon.glass/favicon.png">
+<!-- 57x57 (precomposed) for iPhone 3GS, pre-2011 iPod Touch and older Android devices -->
+<link rel="apple-touch-icon-precomposed" href="http://jon.glass/images/apple-touch-icon-precomposed.png">
+<!-- 72x72 (precomposed) for 1st generation iPad, iPad 2 and iPad mini -->
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://jon.glass/images/apple-touch-icon-72x72-precomposed.png">
+<!-- 114x114 (precomposed) for iPhone 4, 4S, 5 and post-2011 iPod Touch -->
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://jon.glass/images/apple-touch-icon-114x114-precomposed.png">
+<!-- 144x144 (precomposed) for iPad 3rd and 4th generation -->
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://jon.glass/images/apple-touch-icon-144x144-precomposed.png">
+
+</head>
+
+<body id="post">
+
+<div class="navigation-wrapper">
+	<nav role="navigation" id="site-nav" class="animated drop">
+	    <ul>
+      
+		    
+		    <li><a href="http://jon.glass/blog/" >Blog</a></li>
+		  
+		    
+		    <li><a href="http://jon.glass/about/" >About</a></li>
+		  
+		    
+		    <li><a href="http://jon.glass/search/" >Search</a></li>
+		  
+	    </ul>
+	</nav>
+</div><!-- /.navigation-wrapper -->
+
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+
+<header class="masthead">
+	<div class="wrap">
+      
+  		<a href="http://jon.glass/" class="site-logo" rel="home" title="Half Full of Security"><img src="http://jon.glass/images/site-logo.png" width="200" height="200" alt="Half Full of Security logo" class="animated fadeInDown"></a>
+      
+      <h1 class="site-title animated fadeIn"><a href="http://jon.glass/">Half Full of Security</a></h1>
+		<h2 class="site-description animated fadeIn" itemprop="description">Sharpening the ACKs since 2013</h2>
+	</div>
+</header><!-- /.masthead -->
+
+<div class="js-menu-screen menu-screen"></div>
+
+
+<div id="main" role="main">
+  <article class="hentry">
+    
+    <div class="entry-wrapper">
+      <header class="entry-header">
+        <ul class="entry-tags">
+          
+        </ul>
+        
+          <h1 class="entry-title">Setting up ELK on my MacBook</h1>
+        
+      </header>
+
+
+        <time datetime="2017-03-06T19:52:28-05:00"><i class="fa fa-calendar-o"></i> March 06, 2017</time>
+        <p>I am starting up a new run of blog posts to document some malware analysis work I have been doing lately. Since I got my new MacBook, I have used the new hardware to as an opportunity to rebuild my setup from scratch. I am using Elasticsearch, Logstash, and Kibana on my MacBook and WinLogBeat and PacketBeat on my Windows 10 VM. This is post is meant to help me rebuild my ELK stack on MacBook the next time I dork it up. I tried running installing the stack in a few different ways but these are the steps I took that were ultimately successful.</p>
+
+<h3 id="create-some-folders">1. Create some folders:</h3>
+
+<figure class="highlight"><pre><code class="language-raw" data-lang="raw">mkdir ~/Applications/ELK
+cd ~/Applications/ELK
+mkdir Data Logs</code></pre></figure>
+
+<p>I put this off of my profile because as soon as I start burying it off in some directory off of root like a proper admin I can’t remember where I put it.</p>
+
+<h3 id="download-elasticsearch">2. Download Elasticsearch:</h3>
+<p>Elasticsearch is a highly scalable open-source full-text search and analytics engine. It allows you to store, search, and analyze big volumes of data quickly and in near real time.
+Download your copy from here: <a href="https://www.elastic.co/downloads/elasticsearch">https://www.elastic.co/downloads/elasticsearch</a>
+Specifically I downloaded the <a href="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.2.2.tar.gz">https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.2.2.tar.gz</a>
+and extracted it to the ELK folder.</p>
+
+<figure class="highlight"><pre><code class="language-raw" data-lang="raw">tar -xvzf elasticsearch-5.2.2.tar.gz</code></pre></figure>
+
+<h3 id="configure-elasticsearch">3. Configure Elasticsearch:</h3>
+<p>One of the things I ended up doing in my setup was changing the configuration from localhost to 0.0.0.0. I did this because, in addition to Malware Analysis VMs on my MacBook, I also have other boxes around my lab that I wanted logs from as well.</p>
+
+<p>To do this crack open ~/ELK/elasticsearch-5.2.2/config/elasticsearch.yml in your favorite text editor and change:</p>
+
+<figure class="highlight"><pre><code class="language-yml" data-lang="yml"><span class="c1"># ---------------------------------- Network -----------------------------------</span>
+<span class="c1">#</span>
+<span class="c1"># Set the bind address to a specific IP (IPv4 or IPv6):</span>
+<span class="c1">#</span>
+<span class="c1">#network.host: 192.168.0.1</span></code></pre></figure>
+
+<p>to:</p>
+
+<figure class="highlight"><pre><code class="language-yml" data-lang="yml"><span class="c1"># ---------------------------------- Network -----------------------------------</span>
+<span class="c1">#</span>
+<span class="c1"># Set the bind address to a specific IP (IPv4 or IPv6):</span>
+<span class="c1">#</span>
+<span class="s">network.host</span><span class="pi">:</span> <span class="s">0.0.0.0</span></code></pre></figure>
+
+<p>If you are just doing this for local logging, the default configuration is fine.</p>
+
+<p>Next I changed the default Log and Data directories because this allows me to be more resilient when I screw something up and need to reinstall.
+Also in ~/ELK/elasticsearch-5.2.2/config/elasticsearch.yml, change:</p>
+
+<figure class="highlight"><pre><code class="language-yml" data-lang="yml"><span class="c1"># ----------------------------------- Paths ------------------------------------</span>
+<span class="c1">#</span>
+<span class="c1"># Path to directory where to store the data (separate multiple locations by comma):</span>
+<span class="c1">#</span>
+<span class="c1">#path.data: /path/to/data</span>
+<span class="c1">#</span>
+<span class="c1"># Path to log files:</span>
+<span class="c1">#</span>
+<span class="c1">#path.logs: /path/to/logs</span></code></pre></figure>
+
+<p>to…</p>
+
+<figure class="highlight"><pre><code class="language-yml" data-lang="yml"><span class="c1"># ----------------------------------- Paths ------------------------------------</span>
+<span class="c1">#</span>
+<span class="c1"># Path to directory where to store the data (separate multiple locations by comma):</span>
+<span class="c1">#</span>
+<span class="s">path.data</span><span class="pi">:</span> <span class="s">/Users/glass/ELK/Data</span>
+<span class="c1">#</span>
+<span class="c1"># Path to log files:</span>
+<span class="c1">#</span>
+<span class="s">path.logs</span><span class="pi">:</span> <span class="s">/Users/glass/ELK/Logs</span></code></pre></figure>
+
+<h3 id="run-elasticsearch-to-make-sure-it-works">4. Run Elasticsearch to make sure it works:</h3>
+
+<figure class="highlight"><pre><code class="language-raw" data-lang="raw">./elasticsearch-5.2.2/bin/elasticsearch</code></pre></figure>
+
+<p>Once that is running, in a separate tab, curl the service to make sure you are good to go.
+curl -XGET http://localhost:9200/ and you should see something like this:</p>
+
+<figure class="highlight"><pre><code class="language-json" data-lang="json"><span class="p">{</span><span class="w">
+  </span><span class="nt">"name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"D4i86Xk"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"cluster_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"elasticsearch"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"cluster_uuid"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"YNTg9_EpQ46-TDcfKqdgRw"</span><span class="p">,</span><span class="w">
+  </span><span class="nt">"version"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nt">"number"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"5.2.2"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"build_hash"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"f9d9b74"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"build_date"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"2017-02-24T17:26:45.835Z"</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"build_snapshot"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+    </span><span class="nt">"lucene_version"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"6.4.1"</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nt">"tagline"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"You Know, for Search"</span><span class="w">
+</span><span class="p">}</span></code></pre></figure>
+
+<h3 id="download-kibana">3. Download Kibana:</h3>
+<p>Kibana is an open source (Apache Licensed), browser based analytics and search dashboard for Elasticsearch.
+I grabbed [kibana-5.2.2-linux-x86_64.tar.gz]https://artifacts.elastic.co/downloads/kibana/kibana-5.2.2-linux-x86_64.tar.gz)
+and unzipped it in my ~/ELK directory.</p>
+
+<figure class="highlight"><pre><code class="language-raw" data-lang="raw">tar -xvzf kibana-5.2.2-linux-x86_64.tar.gz</code></pre></figure>
+
+<p>I left the default configuration alone because I didn’t need to change anything.</p>
+
+<h3 id="run-kibana">4. Run Kibana:</h3>
+
+<figure class="highlight"><pre><code class="language-raw" data-lang="raw">~/ELK/kibana-5.2.2-darwin-x86_64/bin/kibana</code></pre></figure>
+
+<p>For me, it looks like this:
+<img src="/images/kibanarunning.png" alt="Kibana Running" />
+So, for those ELK stack nerds out there: “You’re right. My first time running Kibana did not look exactly like this because I have installed some plugins.” You caught me not taking screenshots in a timely manner. Feel free to file a complaint and I will refund your subscription fee to this blog. The point is there at the bottom: green means good.
+ Fire up a browser (I like chrome) and navigate to http://localhost:5601 and should look like this:
+ <img src="/images/kibanainchrome.png" alt="Kibana Running" />
+ You will notice that it is immediately complaining about not having an index pattern. That is normal. So far we are good. In my next post, I will cover how I am sending logs into Elasticsearch from my VMs using WinLogBeat and PacketBeat.</p>
+
+        
+
+    </div><!-- /.entry-wrapper -->
+    <nav class="pagination" role="navigation">
+      
+        <a href="http://jon.glass/blog/RogueUsers/" class="btn" title="Dealing with users gone bad…">Previous</a>
+      
+      
+    </nav><!-- /.pagination -->
+  </article>
+</div><!-- /#main -->
+
+<div class="footer-wrapper">
+  <footer role="contentinfo" class="entry-wrapper">
+    
+
+<span>&copy; 2017 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
+<div class="social-icons">
+	<a href="https://twitter.com/GlassDFIR" title="Jon Glass on Twitter" target="_blank"><i class="fa fa-twitter-square fa-2x"></i></a>
+	
+	
+	
+	
+	
+	
+	<a href="https://github.com/GlassDFIR" title="Jon Glass on Github" target="_blank"><i class="fa fa-github-square fa-2x"></i></a>
+	
+  
+	
+  <a href="http://jon.glass/feed.xml" title="Atom/RSS feed"><i class="fa fa-rss-square fa-2x"></i></a>
+</div><!-- /.social-icons -->
+
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+<script type="text/javascript">
+  var BASE_URL = 'http://jon.glass';
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="http://jon.glass/assets/js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script src="http://jon.glass/assets/js/scripts.min.js"></script>
+
+
+
+
+</body>
+</html>

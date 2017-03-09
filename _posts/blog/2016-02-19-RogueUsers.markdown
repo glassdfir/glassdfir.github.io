@@ -14,7 +14,7 @@ This can be done in a number of ways but this post has a PowerShell tag so I rec
 ### 2. Delete All Cached Credentials
 {% highlight powershell %}
 $credential = Get-Credential -Credential "DOMAIN\adminacct"
-Enter-PSSession -ComputerName ComputerX -Credential $credential
+Enter-PSSessio n -ComputerName ComputerX -Credential $credential
 Set-ItemProperty -Path "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name CachedLogonsCount -Value 0
 {% endhighlight %}
 This will set the number of cached creds Windows is storing to 0 and erase the previous creds.

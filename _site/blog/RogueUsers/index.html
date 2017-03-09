@@ -137,7 +137,7 @@
 <h3 id="delete-all-cached-credentials">2. Delete All Cached Credentials</h3>
 
 <figure class="highlight"><pre><code class="language-powershell" data-lang="powershell"><span class="nv">$credential</span> <span class="o">=</span> <span class="nb">Get-Credential</span> -Credential <span class="s2">"DOMAIN</span><span class="se">\a</span><span class="s2">dminacct"</span>
-Enter-PSSession -ComputerName ComputerX -Credential <span class="nv">$credential</span>
+Enter-PSSessio n -ComputerName ComputerX -Credential <span class="nv">$credential</span>
 <span class="nb">Set-ItemProperty</span> -Path <span class="s2">"HKLM:</span><span class="se">\S</span><span class="s2">oftware</span><span class="se">\M</span><span class="s2">icrosoft</span><span class="se">\W</span><span class="s2">indows NT</span><span class="se">\C</span><span class="s2">urrentVersion</span><span class="se">\W</span><span class="s2">inlogon"</span> -Name CachedLogonsCount -Value 0</code></pre></figure>
 
 <p>This will set the number of cached creds Windows is storing to 0 and erase the previous creds.</p>
@@ -175,6 +175,8 @@ shutdown -s -f -t 0 -m ComputerX
       
         <a href="http://jon.glass/blog/Unxoring-a-rat/" class="btn" title="UnXORing a RAT">Previous</a>
       
+      
+        <a href="http://jon.glass/blog/My_ELK_Stack/" class="btn" title="Setting up ELK on my MacBook">Next</a>
       
     </nav><!-- /.pagination -->
   </article>

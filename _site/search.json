@@ -2,6 +2,14 @@
 
   
     {
+      "title"			: "Setting up ELK on my MacBook",
+      "link"			: "http://jon.glass/blog/My_ELK_Stack/",
+      "excerpt"		: ""
+    }
+  
+
+  
+    ,{
       "title"			: "Dealing with users gone bad…",
       "link"			: "http://jon.glass/blog/RogueUsers/",
       "excerpt"		: ""
