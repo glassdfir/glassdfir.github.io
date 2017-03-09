@@ -193,8 +193,11 @@ Also in ~/ELK/elasticsearch-5.2.2/config/elasticsearch.yml, change:</p>
 
 <figure class="highlight"><pre><code class="language-raw" data-lang="raw">./elasticsearch-5.2.2/bin/elasticsearch</code></pre></figure>
 
-<p>Once that is running, in a separate tab, curl the service to make sure you are good to go.
-curl -XGET http://localhost:9200/ and you should see something like this:</p>
+<p>Once that is running, in a separate tab, curl the service to make sure you are good to go.</p>
+
+<figure class="highlight"><pre><code class="language-raw" data-lang="raw">curl -XGET http://localhost:9200/</code></pre></figure>
+
+<p>and you should see something like this:</p>
 
 <figure class="highlight"><pre><code class="language-json" data-lang="json"><span class="p">{</span><span class="w">
   </span><span class="nt">"name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"D4i86Xk"</span><span class="p">,</span><span class="w">

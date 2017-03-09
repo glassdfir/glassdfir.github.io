@@ -75,6 +75,7 @@ path.logs: /Users/glass/ELK/Logs
 ### 4. Run Elasticsearch to make sure it works:
 {% highlight raw %}
 ./elasticsearch-5.2.2/bin/elasticsearch
+{% endhighlight %}
 Once that is running, in a separate tab, curl the service to make sure you are good to go.
 {% highlight raw %}
 curl -XGET http://localhost:9200/
