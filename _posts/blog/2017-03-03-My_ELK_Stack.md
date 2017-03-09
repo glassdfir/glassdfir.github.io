@@ -18,7 +18,7 @@ I put this off of my profile because as soon as I start burying it off in some d
 ### 2. Download Elasticsearch:
 Elasticsearch is a highly scalable open-source full-text search and analytics engine. It allows you to store, search, and analyze big volumes of data quickly and in near real time.
 Download your copy from here: <https://www.elastic.co/downloads/elasticsearch>
-Specifically I downloaded the <https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.2.2.tar.gz>
+Specifically I downloaded the [elasticsearch-5.2.2.tar.gz](https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.2.2.tar.gz)
 and extracted it to the ELK folder.
 {% highlight raw %}
 tar -xvzf elasticsearch-5.2.2.tar.gz
@@ -99,7 +99,7 @@ and you should see something like this:
 
 ### 3. Download Kibana:
 Kibana is an open source (Apache Licensed), browser based analytics and search dashboard for Elasticsearch.
-I grabbed [kibana-5.2.2-linux-x86_64.tar.gz]https://artifacts.elastic.co/downloads/kibana/kibana-5.2.2-linux-x86_64.tar.gz)
+I grabbed [kibana-5.2.2-linux-x86_64.tar.gz](https://artifacts.elastic.co/downloads/kibana/kibana-5.2.2-linux-x86_64.tar.gz)
 and unzipped it in my ~/ELK directory.
 {% highlight raw %}
 tar -xvzf kibana-5.2.2-linux-x86_64.tar.gz
