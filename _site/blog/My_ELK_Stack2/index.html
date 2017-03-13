@@ -202,12 +202,39 @@ Now you should be sending logs from WinLogBeat to Elasticsearch. To confirm, che
 
 <figure class="highlight"><pre><code class="language-raw" data-lang="raw">[2017-03-12T18:07:59,156][INFO ][o.e.c.m.MetaDataMappingService] [Bo2nJmM] [winlogbeat-2017.03.12/Du3zdxHXQvivwrVBi6czJQ] update_mapping [wineventlog]</code></pre></figure>
 
+<h3 id="configure-kibana-to-index-winlogbeat-logs">4. Configure Kibana to index WinLogBeat logs</h3>
 <p>Now that logs have a freely flowing into Elastic, it is time to update Kibana with an index. Under management, go to Index Patterns.
 <a href="/images/winlogbeat4.png"><img src="/images/winlogbeat4.png" alt="WinLogBeat Files" /></a>
 In the field, put “winlogbeat*” to start indexing these logs.
 <a href="/images/winlogbeat5.png"><img src="/images/winlogbeat5.png" alt="WinLogBeat Files" /></a>
 Then click on discover and BOO YAH we have logs.
 <a href="/images/winlogbeat6.png"><img src="/images/winlogbeat6.png" alt="WinLogBeat Files" /></a></p>
+
+<h3 id="download-configure-and-install-packetbeat-the-same-way">5. Download, Configure, and Install PacketBeat The Same Way</h3>
+
+<p>Download PacketBeat from <a href="https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-5.2.2-windows-x86_64.zip">here</a>.
+PacketBeat on Windows does require a prior installation of <a href="https://www.winpcap.org/install/bin/WinPcap_4_1_3.exe">WinPcap</a>. I installed <a href="https://www.wireshark.org/#download">WireShark</a> and opted to install WinPcap at the same time. You do what you feel is best.
+After you extract the packetbeat package on the Windows guest, configure the packbeat.yml to point to the Elasticsearch on the MacBook.
+Change:</p>
+
+<figure class="highlight"><pre><code class="language-yml" data-lang="yml"><span class="c1">#-------------------------- Elasticsearch output ------------------------------</span>
+<span class="s">output.elasticsearch</span><span class="pi">:</span>
+  <span class="c1"># Array of hosts to connect to.</span>
+  <span class="s">hosts</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">localhost:9200"</span><span class="pi">]</span></code></pre></figure>
+
+<p>To:</p>
+
+<figure class="highlight"><pre><code class="language-yml" data-lang="yml"><span class="c1">#-------------------------- Elasticsearch output ------------------------------</span>
+<span class="s">output.elasticsearch</span><span class="pi">:</span>
+  <span class="c1"># Array of hosts to connect to.</span>
+  <span class="s">hosts</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">10.0.2.2:9200"</span><span class="pi">]</span></code></pre></figure>
+
+<p>I also had to change this file again to include authentication creds when I installed the X-Pack plugin but I will get there in the aforementioned post.</p>
+<h3 id="next-post">Next Post?</h3>
+<p>So there you have have it. In my next post I will cover installing the X-Pack plugin and dig into some of the modifications I made to the Graph plugin to make my logs looks like this:
+<a href="/images/winlogbeat7.png"><img src="/images/winlogbeat7.png" alt="WinLogBeat Files" /></a>
+and THIS …
+<a href="/images/winlogbeat8.png"><img src="/images/winlogbeat8.png" alt="WinLogBeat Files" /></a></p>
 
         
 

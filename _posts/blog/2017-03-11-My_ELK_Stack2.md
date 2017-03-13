@@ -79,9 +79,36 @@ Now you should be sending logs from WinLogBeat to Elasticsearch. To confirm, che
 {% highlight raw%}
 [2017-03-12T18:07:59,156][INFO ][o.e.c.m.MetaDataMappingService] [Bo2nJmM] [winlogbeat-2017.03.12/Du3zdxHXQvivwrVBi6czJQ] update_mapping [wineventlog]
 {%endhighlight%}
+### 4. Configure Kibana to index WinLogBeat logs
 Now that logs have a freely flowing into Elastic, it is time to update Kibana with an index. Under management, go to Index Patterns.
 <a href="{{ site.baseurl }}/images/winlogbeat4.png">![WinLogBeat Files]({{ site.baseurl }}/images/winlogbeat4.png)</a>
 In the field, put "winlogbeat*" to start indexing these logs.
 <a href="{{ site.baseurl }}/images/winlogbeat5.png">![WinLogBeat Files]({{ site.baseurl }}/images/winlogbeat5.png)</a>
 Then click on discover and BOO YAH we have logs.
 <a href="{{ site.baseurl }}/images/winlogbeat6.png">![WinLogBeat Files]({{ site.baseurl }}/images/winlogbeat6.png)</a>
+
+### 5. Download, Configure, and Install PacketBeat The Same Way
+
+Download PacketBeat from [here](https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-5.2.2-windows-x86_64.zip).
+PacketBeat on Windows does require a prior installation of [WinPcap](https://www.winpcap.org/install/bin/WinPcap_4_1_3.exe). I installed [WireShark](https://www.wireshark.org/#download) and opted to install WinPcap at the same time. You do what you feel is best.
+After you extract the packetbeat package on the Windows guest, configure the packbeat.yml to point to the Elasticsearch on the MacBook.
+Change:
+{% highlight yml %}
+#-------------------------- Elasticsearch output ------------------------------
+output.elasticsearch:
+  # Array of hosts to connect to.
+  hosts: ["localhost:9200"]
+{% endhighlight %}
+To:
+{% highlight yml %}
+#-------------------------- Elasticsearch output ------------------------------
+output.elasticsearch:
+  # Array of hosts to connect to.
+  hosts: ["10.0.2.2:9200"]
+{% endhighlight %}
+I also had to change this file again to include authentication creds when I installed the X-Pack plugin but I will get there in the aforementioned post.
+### Next Post?
+So there you have have it. In my next post I will cover installing the X-Pack plugin and dig into some of the modifications I made to the Graph plugin to make my logs looks like this:
+<a href="{{ site.baseurl }}/images/winlogbeat7.png">![WinLogBeat Files]({{ site.baseurl }}/images/winlogbeat7.png)</a>
+and THIS ...
+<a href="{{ site.baseurl }}/images/winlogbeat8.png">![WinLogBeat Files]({{ site.baseurl }}/images/winlogbeat8.png)</a>
