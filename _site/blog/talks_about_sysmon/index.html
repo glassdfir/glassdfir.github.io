@@ -5,13 +5,13 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
 <head>
 <meta charset="utf-8">
-<title>TShark Commands &#8211; Half Full of Security</title>
+<title>SysMon! &#8211; Half Full of Security</title>
 <meta name="description" content="">
 <meta name="keywords" content="">
 
 
 <!-- Twitter Cards -->
-<meta name="twitter:title" content="TShark Commands">
+<meta name="twitter:title" content="SysMon!">
 <meta name="twitter:description" content="">
 <meta name="twitter:site" content="@GlassDFIR">
 <meta name="twitter:creator" content="@GlassDFIR">
@@ -22,16 +22,16 @@
 <!-- Open Graph -->
 <meta property="og:locale" content="en_US">
 <meta property="og:type" content="article">
-<meta property="og:title" content="TShark Commands">
+<meta property="og:title" content="SysMon!">
 <meta property="og:description" content="">
-<meta property="og:url" content="http://jon.glass/lists-tshark-commands/">
+<meta property="og:url" content="http://jon.glass/blog/talks_about_sysmon/">
 <meta property="og:site_name" content="Half Full of Security">
 
 
 
 
 
-<link rel="canonical" href="http://jon.glass/lists-tshark-commands/">
+<link rel="canonical" href="http://jon.glass/blog/talks_about_sysmon/">
 <link href="http://jon.glass/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
 
 <!-- https://t.co/dKP3o1e -->
@@ -119,15 +119,42 @@
           
         </ul>
         
-          <h1 class="entry-title">TShark Commands</h1>
+          <h1 class="entry-title">SysMon!</h1>
         
       </header>
 
 
-        <time datetime="2013-07-10T02:55:14-04:00"><i class="fa fa-calendar-o"></i> July 10, 2013</time>
-        <p>Here are some of the more useful commands I am using to sort through tons of pcaps I gathered:<br />
-This one recursively looks for kismet pcap files and runs tshark against them. This example is looking for a count of the SSID and the privacy bit for each of the beacon frames.</p>
-<p>find . -iname '*pcapdump' -exec sh -c 'tshark -r "{}" -T fields -e wlan_mgt.ssid -e wlan_mgt.fixed.capabilities.privacy -R "wlan.fc.type_subtype == 0x08"' ;| sort | uniq -c</p>
+        <time datetime="2014-08-29T03:24:59-04:00"><i class="fa fa-calendar-o"></i> August 29, 2014</time>
+        <p>The Microsoft Sysinternals team recently released System Monitor (<a href="http://technet.microsoft.com/en-us/sysinternals/dn798348.aspx">Sysmon</a>), a Windows system service and device driver that, once installed on a system, remains resident across system reboots to monitor and log system activity to the Windows event log. It provides detailed information about process creations, network connections, and changes to file creation time.</p>
+<p>The timing of this release could not have worked out better for me because I had just spent two weeks reviewing Bit9's <a href="https://www.bit9.com/solutions/carbon-black/">CarbonBlack</a> product. I am not going to provide an in depth review of CarbonBlack here but I found with, a little bit of PowerShell, I could get some similar results out of Sysmon.</p>
+<p>****Disclaimer****  This is my first PowerShell project and the coding is rough. You have been warned.</p>
+<p>I started with something pretty simple:<br />
+<script src="https://gist.github.com/glassdfir/2846607c05079e9bc66a.js"></script><br />
+This little script allowed me to search through the Sysmon Event Logs, define a start and stop time, and if the event data matched a keyword, it would return the event to screen.</p>
+<p>Example:</p>
+<p><strong>PS C:\Users\user\Desktop> .Sysmon.ps1 -StartDate "08/28/2014 21:40" -StopDate "08/28/2014 21:50" -keyword "cmd"</strong></p>
+<p><script src="https://gist.github.com/glassdfir/5c13c0eed0c0fe83cea6.js"></script><br />
+This was great. From this I can see:</p>
+<ol>
+<li><script><br />
+var a = "c m d.exe";<br />
+document.write(a.split(' ').join(''));<br />
+</script> being launched from explorer.exe</li>
+<li><script><br />
+var a = "c m d.exe";<br />
+document.write(a.split(' ').join(''));<br />
+</script> launching conhost.exe</li>
+<li>Ping.exe getting launched from <script><br />
+var a = "c m d.exe";<br />
+document.write(a.split(' ').join(''));<br />
+</script> with the command line of  "Ping google.com"</li>
+</ol>
+<p>One of the coolest features of CarbonBlack was the ability to visualize/map the process creation over time. So I set out to make something that gave me this functionality using the Sysmon logs. I experimented with a few different graphing technologies and I have currently landed on using <a href="https://developers.google.com/chart/interactive/docs/gallery/orgchart">Google's Org Chart API</a> to do the mapping. I know there are other and probably better ways to do this but I was looking for something high speed/low drag that didn't require installing something.</p>
+<p>With this goal in mind, I threw together <a href="https://github.com/glassdfir/SysmonMapper" target="_blank">SysmonMapper</a>. Again, this is some pretty rough PowerShell but it gets the job done.</p>
+<p><strong>PS C:Users\user\Desktop&gt; .SysmonMapper.ps1 -StartDate "08/28/2014 21:40" -StopDate "08/28/2014 21:50" -P 4332</strong></p>
+<p><a href="https://Jon.Glass/wp-content/uploads/2014/08/sysmonmap.png"><img class="alignnone size-medium wp-image-44" src="/assets/sysmonmap-300x236.png" alt="sysmonmap" width="300" height="236" /></a></p>
+<p>Here is another example of sysmonmapper in action: <a href="http://Jon.Glass/wp-content/uploads/2014/08/sysmonmap.html" target="_blank">example</a>.</p>
+<p>In the next few weeks I am going throw together some post that will highlight the functionality of this script and show some use cases that demonstrate the  power of visualizing sysmon logs.</p>
 <p>&nbsp;</p>
 
         
@@ -135,10 +162,10 @@ This one recursively looks for kismet pcap files and runs tshark against them. T
     </div><!-- /.entry-wrapper -->
     <nav class="pagination" role="navigation">
       
-        <a href="http://jon.glass/war-driving/" class="btn" title="War Driving">Previous</a>
+        <a href="http://jon.glass/lists-tshark-commands/" class="btn" title="TShark Commands">Previous</a>
       
       
-        <a href="http://jon.glass/blog/talks_about_sysmon/" class="btn" title="SysMon!">Next</a>
+        <a href="http://jon.glass/blog/shows-more-process-mapping-crap/" class="btn" title="More SysmonMaps and ProcessMapper!">Next</a>
       
     </nav><!-- /.pagination -->
   </article>

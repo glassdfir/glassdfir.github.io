@@ -5,13 +5,13 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
 <head>
 <meta charset="utf-8">
-<title>TShark Commands &#8211; Half Full of Security</title>
+<title>LFO with Powershell &#8211; Half Full of Security</title>
 <meta name="description" content="">
 <meta name="keywords" content="">
 
 
 <!-- Twitter Cards -->
-<meta name="twitter:title" content="TShark Commands">
+<meta name="twitter:title" content="LFO with Powershell">
 <meta name="twitter:description" content="">
 <meta name="twitter:site" content="@GlassDFIR">
 <meta name="twitter:creator" content="@GlassDFIR">
@@ -22,16 +22,16 @@
 <!-- Open Graph -->
 <meta property="og:locale" content="en_US">
 <meta property="og:type" content="article">
-<meta property="og:title" content="TShark Commands">
+<meta property="og:title" content="LFO with Powershell">
 <meta property="og:description" content="">
-<meta property="og:url" content="http://jon.glass/lists-tshark-commands/">
+<meta property="og:url" content="http://jon.glass/blog/mentions-lfo-with-powershell/">
 <meta property="og:site_name" content="Half Full of Security">
 
 
 
 
 
-<link rel="canonical" href="http://jon.glass/lists-tshark-commands/">
+<link rel="canonical" href="http://jon.glass/blog/mentions-lfo-with-powershell/">
 <link href="http://jon.glass/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
 
 <!-- https://t.co/dKP3o1e -->
@@ -119,26 +119,62 @@
           
         </ul>
         
-          <h1 class="entry-title">TShark Commands</h1>
+          <h1 class="entry-title">LFO with Powershell</h1>
         
       </header>
 
 
-        <time datetime="2013-07-10T02:55:14-04:00"><i class="fa fa-calendar-o"></i> July 10, 2013</time>
-        <p>Here are some of the more useful commands I am using to sort through tons of pcaps I gathered:<br />
-This one recursively looks for kismet pcap files and runs tshark against them. This example is looking for a count of the SSID and the privacy bit for each of the beacon frames.</p>
-<p>find . -iname '*pcapdump' -exec sh -c 'tshark -r "{}" -T fields -e wlan_mgt.ssid -e wlan_mgt.fixed.capabilities.privacy -R "wlan.fc.type_subtype == 0x08"' ;| sort | uniq -c</p>
-<p>&nbsp;</p>
+        <time datetime="2014-09-24T02:06:35-04:00"><i class="fa fa-calendar-o"></i> September 24, 2014</time>
+        <p>In the DFIR world, it can be important to understand the principle of Least Frequency of Occurrence (LFO). The first place I read about this was on <a href="http://windowsir.blogspot.com/2010/01/thoughts-on-apt.html" target="_blank">Harlan Carvey's Blog</a> a few years ago. The general concept is that your system processes and favorite applications should be the most abundant items in your process logs. Inversely, malware should be the least abundant by comparison as most are designed to not draw a lot of attention. Sometimes you find yourself without much of a pivot point and you are asked to "find evil".</p>
+<p>With that in mind, here is an example of how you can use Sysmon to list all the processes, sorted by frequency count:<br />
+<script src="https://gist.github.com/glassdfir/210ff631af02e47b14cc.js"></script></p>
+<pre>
+PS C:Temp> C:TempLFO.ps1
+Count Name
+----- ----
+    1 C:\cygwin64\bin\cat.exe
+    1 C:\cygwin64\bin\cygpath.exe
+    1 C:\cygwin64\bin\find.exe
+    1 C:\cygwin64\bin\grep.exe
+    1 C:\cygwin64\bin\mkgroup.exe
+    1 C:\cygwin64binmkpasswd.exe
+    1 C:\cygwin64binrebase.exe
+    1 C:\cygwin64binsort.exe
+    1 C:\Program Files (x86)\Common Files\Java\Java Update\jaureg.exe
+    1 C:\Program Files (x86)\Common FilesVMwareUSBvnetlib64.exe
+    1 C:\Program Files (x86)\FileZilla FTP Client\filezilla.exe
+    1 C:\Program Files (x86)\FileZilla FTP Client\fzsftp.exe
+    1 C:\Program Files (x86)\Inkscape\inkscape.exe
+    1 C:\Program Files (x86)\Java\jre7bin\javaws.exe
+    1 C:\Program Files (x86)\Mozilla Firefox\maintenanceservice_installer.exe
+    1 C:\Program Files (x86)\Mozilla Maintenance Service\maintenanceservice_tmp.exe
+    1 C:\Program Files (x86)\Notepad++\updatergup.exe
+    1 C:\Program Files (x86)\Optimizer Pro\OptProStart.exe
+    1 C:\Program Files (x86)\Optimizer Pro\OptProUninstaller.exe
+    1 C:\Program Files (x86)\Optimizer Pro\unins000.exe
+    1 C:\Program Files (x86)\VMware\VMware Workstation\vmware.exe
+    1 C:\Program Files (x86)\VMware\VMware Workstation\vmware-unity-helper.exe
+    1 C:\Program Files (x86)\VMware\VMware Workstation\vprintproxy.exe
+    1 C:\Program Files (x86)\VMware\VMware Workstation\x64vmware-vmx.exe
+...
+
+</pre>
+<p>Just at a quick glance, I see a few things in there that might be cause for concern. For example:<br />
+C:Users<strong>Guest</strong>Downloadsinstall_flashplayer15x32_mssa_aaa_aih.exe<br />
+I could crack open the Sysmon log and find out more about this if I wanted to dive deeper.</p>
+<p>Here is an example using just the 4688 event from the security logs:<br />
+<script src="https://gist.github.com/glassdfir/80117cbcbe5e6e145c8a.js"></script><br />
+I realize that this is not ground breaking work but it seemed like something that others could use. </p>
 
         
 
     </div><!-- /.entry-wrapper -->
     <nav class="pagination" role="navigation">
       
-        <a href="http://jon.glass/war-driving/" class="btn" title="War Driving">Previous</a>
+        <a href="http://jon.glass/blog/offers-remote-process-mapping-with-wmi/" class="btn" title="Live Process Mapping with WMI">Previous</a>
       
       
-        <a href="http://jon.glass/blog/talks_about_sysmon/" class="btn" title="SysMon!">Next</a>
+        <a href="http://jon.glass/blog/queries-sysmon-for-execution-times/" class="btn" title="Sysmon Continues">Next</a>
       
     </nav><!-- /.pagination -->
   </article>

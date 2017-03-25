@@ -2,6 +2,7 @@
 layout: post
 title: Zip Seeking Missile
 date: 2014-11-22 00:03:37.000000000 -05:00
+categories: blog
 ---
 <p>In the spirit of "don't give a presentation without offering a script/tool", here is something I am currently dubbing the "Zip Seeking Missile€ (not married to that name, suggestions are welcome). This script reads in a file and looks for the Local File Headers, Central Directory File Headers, and Central Directory End Records. If found it will attempt to parse the various fields. It is still pretty rough but it is good enough now that someone might find it useful. I intend on adding analysis of the compressed file data and automating the carving process as well. I realize there are probably dozens of software that already do this but I enjoy the insight that comes with building tools from the ground up.</p>
 <p><a href="https://github.com/glassdfir/ZipFileJunk/blob/master/zsm.py">https://github.com/glassdfir/ZipFileJunk/blob/master/zsm.py</a></p>

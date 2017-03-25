@@ -5,13 +5,13 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
 <head>
 <meta charset="utf-8">
-<title>TShark Commands &#8211; Half Full of Security</title>
+<title>Live Process Mapping with WMI &#8211; Half Full of Security</title>
 <meta name="description" content="">
 <meta name="keywords" content="">
 
 
 <!-- Twitter Cards -->
-<meta name="twitter:title" content="TShark Commands">
+<meta name="twitter:title" content="Live Process Mapping with WMI">
 <meta name="twitter:description" content="">
 <meta name="twitter:site" content="@GlassDFIR">
 <meta name="twitter:creator" content="@GlassDFIR">
@@ -22,16 +22,16 @@
 <!-- Open Graph -->
 <meta property="og:locale" content="en_US">
 <meta property="og:type" content="article">
-<meta property="og:title" content="TShark Commands">
+<meta property="og:title" content="Live Process Mapping with WMI">
 <meta property="og:description" content="">
-<meta property="og:url" content="http://jon.glass/lists-tshark-commands/">
+<meta property="og:url" content="http://jon.glass/blog/offers-remote-process-mapping-with-wmi/">
 <meta property="og:site_name" content="Half Full of Security">
 
 
 
 
 
-<link rel="canonical" href="http://jon.glass/lists-tshark-commands/">
+<link rel="canonical" href="http://jon.glass/blog/offers-remote-process-mapping-with-wmi/">
 <link href="http://jon.glass/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
 
 <!-- https://t.co/dKP3o1e -->
@@ -119,26 +119,34 @@
           
         </ul>
         
-          <h1 class="entry-title">TShark Commands</h1>
+          <h1 class="entry-title">Live Process Mapping with WMI</h1>
         
       </header>
 
 
-        <time datetime="2013-07-10T02:55:14-04:00"><i class="fa fa-calendar-o"></i> July 10, 2013</time>
-        <p>Here are some of the more useful commands I am using to sort through tons of pcaps I gathered:<br />
-This one recursively looks for kismet pcap files and runs tshark against them. This example is looking for a count of the SSID and the privacy bit for each of the beacon frames.</p>
-<p>find . -iname '*pcapdump' -exec sh -c 'tshark -r "{}" -T fields -e wlan_mgt.ssid -e wlan_mgt.fixed.capabilities.privacy -R "wlan.fc.type_subtype == 0x08"' ;| sort | uniq -c</p>
-<p>&nbsp;</p>
+        <time datetime="2014-09-17T04:54:29-04:00"><i class="fa fa-calendar-o"></i> September 17, 2014</time>
+        <p>In previous posts I have discussed how you can parse a Windows event log and, through the magic of Powershell and javascript, create a visual map of process creation. But what if you are more IR than DF?<br />
+Here is an example of how you can leverage the Win32_Process WMI object to pull back the necessary information for a rudimentary process map on a <strong>live machine</strong>:<br />
+<a href="http://jon.glass/wp-content/uploads/2014/09/liveprocessmap.html">liveprocessmap</a></p>
+<p>Its the same principle as before except this time we are pulling the data for the current running processes. The tooltip is programmed to display the command line of the process. Google Chrome has a very noisy command line syntax. This is great because you don't have to install anything or reconfigure your event log auditing.</p>
+<p>Here is the code:<br />
+<script src="https://gist.github.com/glassdfir/24000caf48726ed84a5a.js"></script><br />
+I will throw this script up on the ol' GitHub as well just for kicks.</p>
+<p>Can this script be run on a remote machine? Of course it can! (provided you have the right access)</p>
+<p>LiveProcessMap.ps1 -ComputerName REMOTECOMPUTER</p>
+<p>The other scripts can too now that I think about it...I will be adding that feature soon.</p>
+<p>*************DISCLAIMER*************<br />
+These mapping scripts are not an exact science. The script can only map the information it has to work with. There are gaps in process creation for numerous reasons. I have found that visually mapping them highlights those very quickly.</p>
 
         
 
     </div><!-- /.entry-wrapper -->
     <nav class="pagination" role="navigation">
       
-        <a href="http://jon.glass/war-driving/" class="btn" title="War Driving">Previous</a>
+        <a href="http://jon.glass/blog/uses_his_github/" class="btn" title="GitHub?!">Previous</a>
       
       
-        <a href="http://jon.glass/blog/talks_about_sysmon/" class="btn" title="SysMon!">Next</a>
+        <a href="http://jon.glass/blog/mentions-lfo-with-powershell/" class="btn" title="LFO with Powershell">Next</a>
       
     </nav><!-- /.pagination -->
   </article>

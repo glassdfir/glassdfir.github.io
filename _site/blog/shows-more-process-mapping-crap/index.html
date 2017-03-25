@@ -5,13 +5,13 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
 <head>
 <meta charset="utf-8">
-<title>TShark Commands &#8211; Half Full of Security</title>
+<title>More SysmonMaps and ProcessMapper! &#8211; Half Full of Security</title>
 <meta name="description" content="">
 <meta name="keywords" content="">
 
 
 <!-- Twitter Cards -->
-<meta name="twitter:title" content="TShark Commands">
+<meta name="twitter:title" content="More SysmonMaps and ProcessMapper!">
 <meta name="twitter:description" content="">
 <meta name="twitter:site" content="@GlassDFIR">
 <meta name="twitter:creator" content="@GlassDFIR">
@@ -22,16 +22,16 @@
 <!-- Open Graph -->
 <meta property="og:locale" content="en_US">
 <meta property="og:type" content="article">
-<meta property="og:title" content="TShark Commands">
+<meta property="og:title" content="More SysmonMaps and ProcessMapper!">
 <meta property="og:description" content="">
-<meta property="og:url" content="http://jon.glass/lists-tshark-commands/">
+<meta property="og:url" content="http://jon.glass/blog/shows-more-process-mapping-crap/">
 <meta property="og:site_name" content="Half Full of Security">
 
 
 
 
 
-<link rel="canonical" href="http://jon.glass/lists-tshark-commands/">
+<link rel="canonical" href="http://jon.glass/blog/shows-more-process-mapping-crap/">
 <link href="http://jon.glass/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
 
 <!-- https://t.co/dKP3o1e -->
@@ -119,26 +119,46 @@
           
         </ul>
         
-          <h1 class="entry-title">TShark Commands</h1>
+          <h1 class="entry-title">More SysmonMaps and ProcessMapper!</h1>
         
       </header>
 
 
-        <time datetime="2013-07-10T02:55:14-04:00"><i class="fa fa-calendar-o"></i> July 10, 2013</time>
-        <p>Here are some of the more useful commands I am using to sort through tons of pcaps I gathered:<br />
-This one recursively looks for kismet pcap files and runs tshark against them. This example is looking for a count of the SSID and the privacy bit for each of the beacon frames.</p>
-<p>find . -iname '*pcapdump' -exec sh -c 'tshark -r "{}" -T fields -e wlan_mgt.ssid -e wlan_mgt.fixed.capabilities.privacy -R "wlan.fc.type_subtype == 0x08"' ;| sort | uniq -c</p>
+        <time datetime="2014-09-12T03:24:37-04:00"><i class="fa fa-calendar-o"></i> September 12, 2014</time>
+        <p>Here is a sample of the processes running on my Windows 8 machine for the past 2 hours:<br />
+<a title="Map of Time Period" href="http://jon.glass/wp-content/uploads/2014/09/sysmonmap.html" target="_blank">Sysmonmap of Time Period</a></p>
+<p>This shows tons of interesting information about the boot process. One thing I have noticed is that Google Chrome is noisy.</p>
+<p>Also just for kicks I coded an example of the same thing using the native Security log:</p>
+<p>To use this make sure Process Creation auditing is enabled. This has been turned on in every environment I have ever worked in but if you are following along at home, here are some fun articles to consider:<br />
+<a href="http://technet.microsoft.com/en-us/library/dd941613(v=ws.10).aspx" target="_blank">http://technet.microsoft.com/en-us/library/dd941613(v=ws.10).aspx</a><br />
+<a href="http://technet.microsoft.com/en-us/library/dn535776.aspx" target="_blank">http://technet.microsoft.com/en-us/library/dn535776.aspx</a></p>
+<p>Or go here and turn it on:<br />
+<a href="http://Jon.Glass/wp-content/uploads/2014/09/turnonprocessauditing.png"><img class="alignnone wp-image-58 size-medium" src="/images/turnonprocessauditing-300x178.png" alt="turnonprocessauditing" width="300" height="178" /></a></p>
+<p>Then you can see logs like this:</p>
+<p><a href="http://jon.glass/wp-content/uploads/2014/09/4688.png"><img class="alignnone wp-image-59 size-medium" src="/images/4688-300x205.png" alt="4688" width="300" height="205" /></a></p>
+<p>********Update Code can be found on the <a href="https://github.com/glassdfir/SysmonMapper">GitHub</a> *********</p>
+<p>Then use some PowerShell to whip up the same Google Org chart from the last post.<br />
+<script src="https://gist.github.com/glassdfir/a8077a890670e7a4eca0.js"></script><br />
+Then you can look at things like this:<a href="http://jon.glass/wp-content/uploads/2014/09/processmap.html" target="_blank">processmap</a></p>
+<p>Not as sexy as sysmon but this script can be used in most environments without the need to install anything.<br />
+Also this PowerShell Script could be pointed at a recovered security log, perhaps from a disk image, instead of a live system.<br />
+<a title="Offline log analysis with PowerShell" href="http://social.technet.microsoft.com/Forums/windowsserver/en-US/c8330f58-f2e5-4681-beb2-b2b6a185f818/how-to-geteventlog-for-offline-evtx-files?forum=winserverpowershell" target="_blank">http://social.technet.microsoft.com/Forums/windowsserver/en-US/c8330f58-f2e5-4681-beb2-b2b6a185f818/how-to-geteventlog-for-offline-evtx-files?forum=winserverpowershell</a></p>
+<p>Change:<br />
+$events = Get-WinEvent -FilterHashtable @{Logname='Security';Id=4688}|Where-Object { ( $_.TimeCreated -gt $StartDate -and $_.TimeCreated -le $StopDate)}|Sort-Object TimeCreated<br />
+To this:<br />
+$events = Get-WinEvent <strong>-path "c:\pathtosecurity.evtx"</strong> -FilterHashtable @{Logname='Security';Id=4688}|Where-Object { ( $_.TimeCreated -gt $StartDate -and $_.TimeCreated -le $StopDate)}|Sort-Object TimeCreated</p>
 <p>&nbsp;</p>
+<pre></pre>
 
         
 
     </div><!-- /.entry-wrapper -->
     <nav class="pagination" role="navigation">
       
-        <a href="http://jon.glass/war-driving/" class="btn" title="War Driving">Previous</a>
+        <a href="http://jon.glass/blog/talks_about_sysmon/" class="btn" title="SysMon!">Previous</a>
       
       
-        <a href="http://jon.glass/blog/talks_about_sysmon/" class="btn" title="SysMon!">Next</a>
+        <a href="http://jon.glass/blog/uses_his_github/" class="btn" title="GitHub?!">Next</a>
       
     </nav><!-- /.pagination -->
   </article>

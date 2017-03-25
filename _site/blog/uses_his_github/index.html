@@ -5,13 +5,13 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
 <head>
 <meta charset="utf-8">
-<title>TShark Commands &#8211; Half Full of Security</title>
+<title>GitHub?! &#8211; Half Full of Security</title>
 <meta name="description" content="">
 <meta name="keywords" content="">
 
 
 <!-- Twitter Cards -->
-<meta name="twitter:title" content="TShark Commands">
+<meta name="twitter:title" content="GitHub?!">
 <meta name="twitter:description" content="">
 <meta name="twitter:site" content="@GlassDFIR">
 <meta name="twitter:creator" content="@GlassDFIR">
@@ -22,16 +22,16 @@
 <!-- Open Graph -->
 <meta property="og:locale" content="en_US">
 <meta property="og:type" content="article">
-<meta property="og:title" content="TShark Commands">
+<meta property="og:title" content="GitHub?!">
 <meta property="og:description" content="">
-<meta property="og:url" content="http://jon.glass/lists-tshark-commands/">
+<meta property="og:url" content="http://jon.glass/blog/uses_his_github/">
 <meta property="og:site_name" content="Half Full of Security">
 
 
 
 
 
-<link rel="canonical" href="http://jon.glass/lists-tshark-commands/">
+<link rel="canonical" href="http://jon.glass/blog/uses_his_github/">
 <link href="http://jon.glass/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
 
 <!-- https://t.co/dKP3o1e -->
@@ -119,26 +119,33 @@
           
         </ul>
         
-          <h1 class="entry-title">TShark Commands</h1>
+          <h1 class="entry-title">GitHub?!</h1>
         
       </header>
 
 
-        <time datetime="2013-07-10T02:55:14-04:00"><i class="fa fa-calendar-o"></i> July 10, 2013</time>
-        <p>Here are some of the more useful commands I am using to sort through tons of pcaps I gathered:<br />
-This one recursively looks for kismet pcap files and runs tshark against them. This example is looking for a count of the SSID and the privacy bit for each of the beacon frames.</p>
-<p>find . -iname '*pcapdump' -exec sh -c 'tshark -r "{}" -T fields -e wlan_mgt.ssid -e wlan_mgt.fixed.capabilities.privacy -R "wlan.fc.type_subtype == 0x08"' ;| sort | uniq -c</p>
-<p>&nbsp;</p>
+        <time datetime="2014-09-15T03:17:28-04:00"><i class="fa fa-calendar-o"></i> September 15, 2014</time>
+        <p>I received a lot of great feedback from my blog post on SysmonMapper. Most people complained about how the code was too easy to read, wasn't confusing enough and didn't involve excessive use of JavaScript and PowerShell escape characters.  To appease the masses, I wrote a substantial update to the SysmonMapper tooltip functionality.<br />
+<a href="https://developers.google.com/chart/interactive/docs/customizing_tooltip_content#full">Google's Chart developer site</a> says you can customize the ToolTip for the charts to support HTML tags and other such goodies. I am not sure this works for all charts as I was not able to get the Org Chart's tooltips to support HTML but I could have been doing something wrong.<br />
+****UPDATE**** This was confirmed by the nice folks at Google. HTML tooltips no workie with the Org Chart. Oh well.</p>
+<p>However, I did get close enough to what I was looking for to post an update. Note: It can be a pain in the ass to write a script that writes another script in a different language and then passes command line syntax between them. Avoid if possible.</p>
+<p>Now the when you hover over an event you get the entire log entry displayed on screen:</p>
+<p><a href="http://jon.glass/wp-content/uploads/2014/09/ToolTip.png"><img class="alignnone size-medium wp-image-70" src="/images/ToolTip-300x238.png" alt="ToolTip" width="300" height="238" /></a></p>
+<p><a href="http://jon.glass/wp-content/uploads/2014/09/sysmonmap1.html">sysmonmap</a></p>
+<p>I got tired of uploading my scripts to this site SO I finally broke down and started using the GitHub account I created forever ago.</p>
+<p><a href="https://github.com/glassdfir">https://github.com/glassdfir</a></p>
+<p>Look for more to come in the near future. I have a bunch of useful scripts laying around that I will post when I get the time to clean them up.</p>
+<p>I am really digging the idea of visualizing the DFIR data in meaningful ways and I am trying figure out ways to display other relevant information. If any of you have any ideas, feel free to drop me a comment.</p>
 
         
 
     </div><!-- /.entry-wrapper -->
     <nav class="pagination" role="navigation">
       
-        <a href="http://jon.glass/war-driving/" class="btn" title="War Driving">Previous</a>
+        <a href="http://jon.glass/blog/shows-more-process-mapping-crap/" class="btn" title="More SysmonMaps and ProcessMapper!">Previous</a>
       
       
-        <a href="http://jon.glass/blog/talks_about_sysmon/" class="btn" title="SysMon!">Next</a>
+        <a href="http://jon.glass/blog/offers-remote-process-mapping-with-wmi/" class="btn" title="Live Process Mapping with WMI">Next</a>
       
     </nav><!-- /.pagination -->
   </article>

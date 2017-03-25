@@ -5,13 +5,13 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
 <head>
 <meta charset="utf-8">
-<title>TShark Commands &#8211; Half Full of Security</title>
+<title>Sysmon Continues &#8211; Half Full of Security</title>
 <meta name="description" content="">
 <meta name="keywords" content="">
 
 
 <!-- Twitter Cards -->
-<meta name="twitter:title" content="TShark Commands">
+<meta name="twitter:title" content="Sysmon Continues">
 <meta name="twitter:description" content="">
 <meta name="twitter:site" content="@GlassDFIR">
 <meta name="twitter:creator" content="@GlassDFIR">
@@ -22,16 +22,16 @@
 <!-- Open Graph -->
 <meta property="og:locale" content="en_US">
 <meta property="og:type" content="article">
-<meta property="og:title" content="TShark Commands">
+<meta property="og:title" content="Sysmon Continues">
 <meta property="og:description" content="">
-<meta property="og:url" content="http://jon.glass/lists-tshark-commands/">
+<meta property="og:url" content="http://jon.glass/blog/queries-sysmon-for-execution-times/">
 <meta property="og:site_name" content="Half Full of Security">
 
 
 
 
 
-<link rel="canonical" href="http://jon.glass/lists-tshark-commands/">
+<link rel="canonical" href="http://jon.glass/blog/queries-sysmon-for-execution-times/">
 <link href="http://jon.glass/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
 
 <!-- https://t.co/dKP3o1e -->
@@ -119,15 +119,44 @@
           
         </ul>
         
-          <h1 class="entry-title">TShark Commands</h1>
+          <h1 class="entry-title">Sysmon Continues</h1>
         
       </header>
 
 
-        <time datetime="2013-07-10T02:55:14-04:00"><i class="fa fa-calendar-o"></i> July 10, 2013</time>
-        <p>Here are some of the more useful commands I am using to sort through tons of pcaps I gathered:<br />
-This one recursively looks for kismet pcap files and runs tshark against them. This example is looking for a count of the SSID and the privacy bit for each of the beacon frames.</p>
-<p>find . -iname '*pcapdump' -exec sh -c 'tshark -r "{}" -T fields -e wlan_mgt.ssid -e wlan_mgt.fixed.capabilities.privacy -R "wlan.fc.type_subtype == 0x08"' ;| sort | uniq -c</p>
+        <time datetime="2014-09-25T19:28:50-04:00"><i class="fa fa-calendar-o"></i> September 25, 2014</time>
+        <p>Q: Imaginary Reader writes "Sysmon is great and all but how can I quickly search for specific information from it?"</p>
+<p>A: To be honest, Imaginary Reader, I was wondering the same thing. So I threw this together to perform a very common function: return the dates and times that a process was executed.<br />
+<script src="https://gist.github.com/glassdfir/a12cbad63fad91ff90d5.js"></script><br />
+I ended up with two scripts that I jammed together; one for exact matches using -FilterXPath (which is very quick) and one for matching a partial string in the Image name (not so quick). As far as I can tell FilterXPath doesn't support partial matches.</p>
+<pre>
+PS C:demo> .ExecTimeQuery.ps1 -query "C:\Program Files (x86)\Mozilla Firefox\firefox.exe" -exact
+9/20/2014 5:33:16 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/20/2014 3:42:32 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/20/2014 3:38:58 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/20/2014 1:01:13 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/20/2014 1:01:12 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/19/2014 9:02:39 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/19/2014 9:02:18 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/19/2014 8:50:46 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/19/2014 3:26:02 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+
+PS C:demo> .ExecTimeQuery.ps1 -query "firefox"
+9/20/2014 5:33:16 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/20/2014 3:42:32 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/20/2014 3:38:58 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/20/2014 1:01:13 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/20/2014 1:01:13 PM	C:\Program Files (x86)Mozilla Firefox\uninstallhelper.exe
+9/20/2014 1:01:12 PM	C:\Program Files (x86)Mozilla Firefox\uninstallhelper.exe
+9/20/2014 1:01:12 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/19/2014 9:02:39 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/19/2014 9:02:18 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/19/2014 8:50:46 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+9/19/2014 3:26:18 PM	C:\Program Files (x86)\Mozilla Firefox\uninstallhelper.exe
+9/19/2014 3:26:13 PM	C:\Program Files (x86)\Mozilla Firefox\uninstallhelper.exe
+9/19/2014 3:26:02 PM	C:\Program Files (x86)\Mozilla Firefox\firefox.exe
+</pre>
+<p>I am looking for ways to speed this up so if anyone has any suggestions, let me know.</p>
 <p>&nbsp;</p>
 
         
@@ -135,10 +164,10 @@ This one recursively looks for kismet pcap files and runs tshark against them. T
     </div><!-- /.entry-wrapper -->
     <nav class="pagination" role="navigation">
       
-        <a href="http://jon.glass/war-driving/" class="btn" title="War Driving">Previous</a>
+        <a href="http://jon.glass/blog/mentions-lfo-with-powershell/" class="btn" title="LFO with Powershell">Previous</a>
       
       
-        <a href="http://jon.glass/blog/talks_about_sysmon/" class="btn" title="SysMon!">Next</a>
+        <a href="http://jon.glass/blog/reads-e-mail-with-powershell/" class="btn" title="Reading e-mail with Powershell">Next</a>
       
     </nav><!-- /.pagination -->
   </article>

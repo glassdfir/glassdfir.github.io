@@ -179,7 +179,7 @@
   
     ,{
       "title"			: "Stupid VBS tricks I discovered...",
-      "link"			: "http://jon.glass/discovers-stupid-vbs-tricks/",
+      "link"			: "http://jon.glass/blog/discovers-stupid-vbs-tricks/",
       "excerpt"		: ""
     }
   
@@ -187,7 +187,7 @@
   
     ,{
       "title"			: "Misadventures in Parsing the WebCacheV01.dat (Part 3)",
-      "link"			: "http://jon.glass/dfir/misadventures-in-parsing-the-webcachev01-dat-part-3/",
+      "link"			: "http://jon.glass/blog/misadventures-in-parsing-the-webcachev01-dat-part-3/",
       "excerpt"		: ""
     }
   
@@ -195,7 +195,7 @@
   
     ,{
       "title"			: "Misadventures in Parsing the WebCacheV01.dat (Part 2)",
-      "link"			: "http://jon.glass/misadventures-in-parsing-the-webcachev01-dat-part-2/",
+      "link"			: "http://jon.glass/blog/misadventures-in-parsing-the-webcachev01-dat-part-2/",
       "excerpt"		: ""
     }
   
@@ -203,7 +203,7 @@
   
     ,{
       "title"			: "Misadventures in Parsing the WebCacheV01.dat (Part 1)",
-      "link"			: "http://jon.glass/attempts-to-parse-webcachev01-dat/",
+      "link"			: "http://jon.glass/blog/attempts-to-parse-webcachev01-dat/",
       "excerpt"		: ""
     }
   
@@ -211,7 +211,7 @@
   
     ,{
       "title"			: "Use Python zlib to recover Zip Files",
-      "link"			: "http://jon.glass/has-fun-with-zlib/",
+      "link"			: "http://jon.glass/blog/has-fun-with-zlib/",
       "excerpt"		: ""
     }
   
@@ -219,7 +219,7 @@
   
     ,{
       "title"			: "Zip Seeking Missile",
-      "link"			: "http://jon.glass/makes-zip-seeking-missile/",
+      "link"			: "http://jon.glass/blog/makes-zip-seeking-missile/",
       "excerpt"		: ""
     }
   
@@ -227,7 +227,7 @@
   
     ,{
       "title"			: "Zip File Presentation from RaDFIRe",
-      "link"			: "http://jon.glass/talks-about-zip-files/",
+      "link"			: "http://jon.glass/blog/talks-about-zip-files/",
       "excerpt"		: ""
     }
   
@@ -235,7 +235,7 @@
   
     ,{
       "title"			: "Get Internet headers from MailItem in PowerShell",
-      "link"			: "http://jon.glass/get-internet-headers-from-mailitem-in-powershell/",
+      "link"			: "http://jon.glass/blog/get-internet-headers-from-mailitem-in-powershell/",
       "excerpt"		: ""
     }
   
@@ -243,7 +243,7 @@
   
     ,{
       "title"			: "Reading e-mail with Powershell",
-      "link"			: "http://jon.glass/reads-e-mail-with-powershell/",
+      "link"			: "http://jon.glass/blog/reads-e-mail-with-powershell/",
       "excerpt"		: ""
     }
   
@@ -251,7 +251,7 @@
   
     ,{
       "title"			: "Sysmon Continues",
-      "link"			: "http://jon.glass/queries-sysmon-for-execution-times/",
+      "link"			: "http://jon.glass/blog/queries-sysmon-for-execution-times/",
       "excerpt"		: ""
     }
   
@@ -259,7 +259,7 @@
   
     ,{
       "title"			: "LFO with Powershell",
-      "link"			: "http://jon.glass/mentions-lfo-with-powershell/",
+      "link"			: "http://jon.glass/blog/mentions-lfo-with-powershell/",
       "excerpt"		: ""
     }
   
@@ -267,7 +267,7 @@
   
     ,{
       "title"			: "Live Process Mapping with WMI",
-      "link"			: "http://jon.glass/offers-remote-process-mapping-with-wmi/",
+      "link"			: "http://jon.glass/blog/offers-remote-process-mapping-with-wmi/",
       "excerpt"		: ""
     }
   
@@ -275,7 +275,7 @@
   
     ,{
       "title"			: "GitHub?!",
-      "link"			: "http://jon.glass/uses_his_github/",
+      "link"			: "http://jon.glass/blog/uses_his_github/",
       "excerpt"		: ""
     }
   
@@ -283,7 +283,7 @@
   
     ,{
       "title"			: "More SysmonMaps and ProcessMapper!",
-      "link"			: "http://jon.glass/shows-more-process-mapping-crap/",
+      "link"			: "http://jon.glass/blog/shows-more-process-mapping-crap/",
       "excerpt"		: ""
     }
   
@@ -291,23 +291,7 @@
   
     ,{
       "title"			: "SysMon!",
-      "link"			: "http://jon.glass/talks_about_sysmon/",
-      "excerpt"		: ""
-    }
-  
-
-  
-    ,{
-      "title"			: "Creating a Toolkit for Live Incident Response Data Acquisition and Tips for Better Timeline Analysis",
-      "link"			: "http://jon.glass/talks-about-live-response/",
-      "excerpt"		: ""
-    }
-  
-
-  
-    ,{
-      "title"			: "Because I consistently forget how to install Kismet from source...",
-      "link"			: "http://jon.glass/because-i-consistently-forget-how-to-install-kismet-from-source/",
+      "link"			: "http://jon.glass/blog/talks_about_sysmon/",
       "excerpt"		: ""
     }
   

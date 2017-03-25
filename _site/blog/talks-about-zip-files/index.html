@@ -5,13 +5,13 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
 <head>
 <meta charset="utf-8">
-<title>TShark Commands &#8211; Half Full of Security</title>
+<title>Zip File Presentation from RaDFIRe &#8211; Half Full of Security</title>
 <meta name="description" content="">
 <meta name="keywords" content="">
 
 
 <!-- Twitter Cards -->
-<meta name="twitter:title" content="TShark Commands">
+<meta name="twitter:title" content="Zip File Presentation from RaDFIRe">
 <meta name="twitter:description" content="">
 <meta name="twitter:site" content="@GlassDFIR">
 <meta name="twitter:creator" content="@GlassDFIR">
@@ -22,16 +22,16 @@
 <!-- Open Graph -->
 <meta property="og:locale" content="en_US">
 <meta property="og:type" content="article">
-<meta property="og:title" content="TShark Commands">
+<meta property="og:title" content="Zip File Presentation from RaDFIRe">
 <meta property="og:description" content="">
-<meta property="og:url" content="http://jon.glass/lists-tshark-commands/">
+<meta property="og:url" content="http://jon.glass/blog/talks-about-zip-files/">
 <meta property="og:site_name" content="Half Full of Security">
 
 
 
 
 
-<link rel="canonical" href="http://jon.glass/lists-tshark-commands/">
+<link rel="canonical" href="http://jon.glass/blog/talks-about-zip-files/">
 <link href="http://jon.glass/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
 
 <!-- https://t.co/dKP3o1e -->
@@ -119,26 +119,28 @@
           
         </ul>
         
-          <h1 class="entry-title">TShark Commands</h1>
+          <h1 class="entry-title">Zip File Presentation from RaDFIRe</h1>
         
       </header>
 
 
-        <time datetime="2013-07-10T02:55:14-04:00"><i class="fa fa-calendar-o"></i> July 10, 2013</time>
-        <p>Here are some of the more useful commands I am using to sort through tons of pcaps I gathered:<br />
-This one recursively looks for kismet pcap files and runs tshark against them. This example is looking for a count of the SSID and the privacy bit for each of the beacon frames.</p>
-<p>find . -iname '*pcapdump' -exec sh -c 'tshark -r "{}" -T fields -e wlan_mgt.ssid -e wlan_mgt.fixed.capabilities.privacy -R "wlan.fc.type_subtype == 0x08"' ;| sort | uniq -c</p>
-<p>&nbsp;</p>
+        <time datetime="2014-11-14T00:05:03-05:00"><i class="fa fa-calendar-o"></i> November 14, 2014</time>
+        <p>Recently, I had the opportunity to create a forensic challenge at work that focused on data loss. The scenario included a several instances of data exfiltration but one specifically seemed more forensically challenging than the rest. A portion of the challenge included a zip file that was uploaded directly from a mapped network drive to Google Docs. The file was never logically written directly to the C: drive.<br />
+Participants were given only the memory dump and a dd of the workstation hard drive to work with.<br />
+No other information was provided.<br />
+I threw together some slides on how I tackled the problem. Working through the process manually taught me WAY more about zip files than I ever wanted to know but I am a better forensicator for it.</p>
+<p>Here are the slides:</p>
+<p><a href="http://jon.glass/wp-content/uploads/2014/11/The-Anatomy-of-A-Zip-File.pptx">The Anatomy of A Zip File</a></p>
 
         
 
     </div><!-- /.entry-wrapper -->
     <nav class="pagination" role="navigation">
       
-        <a href="http://jon.glass/war-driving/" class="btn" title="War Driving">Previous</a>
+        <a href="http://jon.glass/blog/get-internet-headers-from-mailitem-in-powershell/" class="btn" title="Get Internet headers from MailItem in PowerShell">Previous</a>
       
       
-        <a href="http://jon.glass/blog/talks_about_sysmon/" class="btn" title="SysMon!">Next</a>
+        <a href="http://jon.glass/blog/makes-zip-seeking-missile/" class="btn" title="Zip Seeking Missile">Next</a>
       
     </nav><!-- /.pagination -->
   </article>
