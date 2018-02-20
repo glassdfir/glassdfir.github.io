@@ -2,6 +2,22 @@
 
   
     {
+      "title"			: "Using FullEventLogView From Nirsoft",
+      "link"			: "http://jon.glass/tips/FullEventLogView/",
+      "excerpt"		: ""
+    }
+  
+
+  
+    ,{
+      "title"			: "Setting up ELK on my MacBook (Part 2)",
+      "link"			: "http://jon.glass/tips/My_ELK_Stack2/",
+      "excerpt"		: ""
+    }
+  
+
+  
+    ,{
       "title"			: "Setting up ELK on my MacBook (Part 2)",
       "link"			: "http://jon.glass/tips/My_ELK_Stack2/",
       "excerpt"		: ""
