@@ -1,7 +1,7 @@
 ---
 layout: page
-title: Blog
-excerpt: "An archive of blog posts sorted by date."
+title: "Tips And Tricks"
+excerpt: "Quick blobs of Fu that gets me through my day..."
 search_omit: true
 ---
 
