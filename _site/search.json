@@ -325,29 +325,11 @@
   
 
   
-    ,{
-      "title"			: "Using Nirsoft's FullEventLogView",
-      "link"			: "http://jon.glass/tips/FullEventLogView/",
-      "excerpt"		: ""
-    }
-  
 
   
 
   
 
-  
-
-  
-
-  
-
-  
-    ,{
-      "title"			: "Theme Setup",
-      "link"			: "http://jon.glass/theme-setup/",
-      "excerpt"		: "Instructions on how to install and customize the Jekyll theme So Simple."
-    }
   
 
   
@@ -355,6 +337,14 @@
       "title"			: "About the Jon",
       "link"			: "http://jon.glass/about/",
       "excerpt"		: "Security dude"
+    }
+  
+
+  
+    ,{
+      "title"			: "Theme Setup",
+      "link"			: "http://jon.glass/theme-setup/",
+      "excerpt"		: "Instructions on how to install and customize the Jekyll theme So Simple."
     }
   
 
