@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  Find Windows Filetime objects in Binary Data
-date:   2018-02-30 15:33:28 -0500
+date:   2018-02-20 15:33:28 -0500
 categories: tips
 ---
 

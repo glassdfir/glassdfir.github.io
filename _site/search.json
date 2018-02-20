@@ -2,6 +2,22 @@
 
   
     {
+      "title"			: "Find Windows Filetime objects in Binary Data",
+      "link"			: "http://jon.glass/tips/LookForWindowsTimestamps/",
+      "excerpt"		: ""
+    }
+  
+
+  
+    ,{
+      "title"			: "Remotely Change BitLocker Protections",
+      "link"			: "http://jon.glass/tips/ChangeBitlockerKeys/",
+      "excerpt"		: ""
+    }
+  
+
+  
+    ,{
       "title"			: "Using FullEventLogView From Nirsoft",
       "link"			: "http://jon.glass/tips/FullEventLogView/",
       "excerpt"		: ""

@@ -5,14 +5,14 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
 <head>
 <meta charset="utf-8">
-<title>Tips And Tricks &#8211; Half Full of Security</title>
-<meta name="description" content="Quick blobs of Fu that gets me through my day...">
-
+<title>Remotely Change BitLocker Protections &#8211; Half Full of Security</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
 
 
 <!-- Twitter Cards -->
-<meta name="twitter:title" content="Tips And Tricks">
-<meta name="twitter:description" content="Quick blobs of Fu that gets me through my day...">
+<meta name="twitter:title" content="Remotely Change BitLocker Protections">
+<meta name="twitter:description" content="">
 <meta name="twitter:site" content="@GlassDFIR">
 <meta name="twitter:creator" content="@GlassDFIR">
 
@@ -22,16 +22,16 @@
 <!-- Open Graph -->
 <meta property="og:locale" content="en_US">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Tips And Tricks">
-<meta property="og:description" content="Quick blobs of Fu that gets me through my day...">
-<meta property="og:url" content="http://jon.glass/tips/">
+<meta property="og:title" content="Remotely Change BitLocker Protections">
+<meta property="og:description" content="">
+<meta property="og:url" content="http://jon.glass/tips/ChangeBitlockerKeys/">
 <meta property="og:site_name" content="Half Full of Security">
 
 
 
 
 
-<link rel="canonical" href="http://jon.glass/tips/">
+<link rel="canonical" href="http://jon.glass/tips/ChangeBitlockerKeys/">
 <link href="http://jon.glass/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
 
 <!-- https://t.co/dKP3o1e -->
@@ -76,7 +76,7 @@
 
 </head>
 
-<body id="page">
+<body id="post">
 
 <div class="navigation-wrapper">
 	<nav role="navigation" id="site-nav" class="animated drop">
@@ -114,25 +114,43 @@
 
 
 <div id="main" role="main">
-  <article class="entry">
+  <article class="hentry">
     
     <div class="entry-wrapper">
       <header class="entry-header">
-        <h1 class="entry-title">Tips And Tricks</h1>
+        <ul class="entry-tags">
+          
+        </ul>
+        
+          <h1 class="entry-title">Remotely Change BitLocker Protections</h1>
+        
       </header>
-      <div class="entry-content">
-        <ul class="post-list">
- 
-  <li><article><a href="http://jon.glass/tips/LookForWindowsTimestamps/">Find Windows Filetime objects in Binary Data <span class="entry-date"><time datetime="2018-02-20T15:33:28-05:00">February 20, 2018</time></span> <span class="excerpt"></span></a></article></li>
- 
-  <li><article><a href="http://jon.glass/tips/ChangeBitlockerKeys/">Remotely Change BitLocker Protections <span class="entry-date"><time datetime="2018-02-20T15:33:28-05:00">February 20, 2018</time></span> <span class="excerpt"></span></a></article></li>
- 
-  <li><article><a href="http://jon.glass/tips/FullEventLogView/">Using FullEventLogView From Nirsoft <span class="entry-date"><time datetime="2018-02-19T15:33:28-05:00">February 19, 2018</time></span> <span class="excerpt"></span></a></article></li>
 
-</ul>
 
-      </div><!-- /.entry-content -->
+        <time datetime="2018-02-20T15:33:28-05:00"><i class="fa fa-calendar-o"></i> February 20, 2018</time>
+        
+<figure class="highlight"><pre><code class="language-powershell" data-lang="powershell"><span class="c1">#Delete existing protections</span>
+manage-bde.exe -cn ComputerName -protectors -delete c: -Type TPMAndPIN
+manage-bde.exe -cn ComputerName -protectors -delete c: -Type RecoveryPassword
+<span class="c1">#Now that all of the previous Protectors are gone, let's add our own.</span>
+<span class="c1">#Let's add a new password that only the security team will need to know.</span>
+manage-bde.exe -cn ComputerName -protectors -add c: -TPMandPIN SuperDuperPassword
+<span class="c1">#As a backup, let's also add a couple of recovery keys just in case noone can find the sticky note with the password.</span>
+manage-bde.exe -cn ComputerName -protectors -add c: -RecoveryPassword 111111-111111-111111-111111-111111-111111-111111-111111 
+manage-bde.exe -cn ComputerName -protectors -add c: -RecoveryPassword 222222-222222-222222-222222-222222-222222-222222-222222 
+manage-bde.exe -cn ComputerName -on c:</code></pre></figure>
+
+        
+
     </div><!-- /.entry-wrapper -->
+    <nav class="pagination" role="navigation">
+      
+        <a href="http://jon.glass/tips/FullEventLogView/" class="btn" title="Using FullEventLogView From Nirsoft">Previous</a>
+      
+      
+        <a href="http://jon.glass/tips/LookForWindowsTimestamps/" class="btn" title="Find Windows Filetime objects in Binary Data">Next</a>
+      
+    </nav><!-- /.pagination -->
   </article>
 </div><!-- /#main -->
 
