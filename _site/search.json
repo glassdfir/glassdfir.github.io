@@ -323,12 +323,6 @@
 
 
   
-    {
-      "title"			: "Using Nirsoft's FullEventLogView",
-      "link"			: "http://jon.glass/Tips/2017-03-11-My_ELK_Stack2/",
-      "excerpt"		: ""
-    }
-  
 
   
 
@@ -338,14 +332,6 @@
 
   
 
-  
-
-  
-    ,{
-      "title"			: "About the Jon",
-      "link"			: "http://jon.glass/about/",
-      "excerpt"		: "Security dude"
-    }
   
 
   
@@ -358,6 +344,12 @@
 
   
 
+  
+    ,{
+      "title"			: "About the Jon",
+      "link"			: "http://jon.glass/about/",
+      "excerpt"		: "Security dude"
+    }
   
 
   
