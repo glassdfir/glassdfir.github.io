@@ -1,9 +1,12 @@
 # Site navigation links
 - title: Blog
-  url: /
+  url: /blog/
 
 - title: Courses
   url: /Courses/
+
+- title: Tips and Tricks
+  url: /TipsAndTricks/
 
 - title: About
   url: /about/

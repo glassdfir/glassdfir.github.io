@@ -5,14 +5,14 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
 <head>
 <meta charset="utf-8">
-<title>Useless Trivia about Windows Process IDs &#8211; Half Full of Security</title>
-<meta name="description" content="">
-<meta name="keywords" content="">
+<title>Tips And Tricks &#8211; Half Full of Security</title>
+<meta name="description" content="Listing of Tips and Tricks I use to get through the day...">
+
 
 
 <!-- Twitter Cards -->
-<meta name="twitter:title" content="Useless Trivia about Windows Process IDs">
-<meta name="twitter:description" content="">
+<meta name="twitter:title" content="Tips And Tricks">
+<meta name="twitter:description" content="Listing of Tips and Tricks I use to get through the day...">
 <meta name="twitter:site" content="@GlassDFIR">
 <meta name="twitter:creator" content="@GlassDFIR">
 
@@ -22,16 +22,16 @@
 <!-- Open Graph -->
 <meta property="og:locale" content="en_US">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Useless Trivia about Windows Process IDs">
-<meta property="og:description" content="">
-<meta property="og:url" content="http://jon.glass/blog/notes-about-windows-process-ids/">
+<meta property="og:title" content="Tips And Tricks">
+<meta property="og:description" content="Listing of Tips and Tricks I use to get through the day...">
+<meta property="og:url" content="http://jon.glass/TipsAndTricks/">
 <meta property="og:site_name" content="Half Full of Security">
 
 
 
 
 
-<link rel="canonical" href="http://jon.glass/blog/notes-about-windows-process-ids/">
+<link rel="canonical" href="http://jon.glass/TipsAndTricks/">
 <link href="http://jon.glass/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
 
 <!-- https://t.co/dKP3o1e -->
@@ -76,7 +76,7 @@
 
 </head>
 
-<body id="post">
+<body id="page">
 
 <div class="navigation-wrapper">
 	<nav role="navigation" id="site-nav" class="animated drop">
@@ -117,45 +117,19 @@
 
 
 <div id="main" role="main">
-  <article class="hentry">
+  <article class="entry">
     
     <div class="entry-wrapper">
       <header class="entry-header">
-        <ul class="entry-tags">
-          
-        </ul>
-        
-          <h1 class="entry-title">Useless Trivia about Windows Process IDs</h1>
-        
+        <h1 class="entry-title">Tips And Tricks</h1>
       </header>
+      <div class="entry-content">
+        <ul class="post-list">
 
+</ul>
 
-        <time datetime="2015-02-20T11:05:14-05:00"><i class="fa fa-calendar-o"></i> February 20, 2015</time>
-        <p>Here are somethings I discovered about Windows Process IDs that I did not previously know...</p>
-
-ProcessIDs are stored as DWORDs.<br />
-A DWORD is a 32-bit unsigned integer (range: 0 through 4294967295 decimal).<br />
-ProcessIDs are divisible by 4 so the highest possible pid is 4,294,967,292.<br />
-Since they are divisible by 4, there are only 1,073,741,823 possible PIDs.<br />
-I wrote a script to keep launching and closing "calc.exe" until it gave me the PID I wanted.<br />
-<script src="https://gist.github.com/glassdfir/28f4311cceaf1fa7f069.js"></script><br />
-On average, it took around 103 tries to get the pid I wanted.<br />
-I knew PIDs get reused all the time but its weird that it happens so often.<br />
-The whole problem with the sysmonmap from <a href="https://jon.glass/looks-at-the-win10-boot-process/" target="_blank">here</a><br />
-is that there was a PID reused in under a second. That has got to cause other problems than just logging.</p>
-<p>I am not investing any actual research time on this but I am documenting the trivia nonetheless.</p>
-
-        
-
+      </div><!-- /.entry-content -->
     </div><!-- /.entry-wrapper -->
-    <nav class="pagination" role="navigation">
-      
-        <a href="http://jon.glass/blog/mass-undelete-from-the-recycle-bin/" class="btn" title="Mass Undelete from the Recycle Bin">Previous</a>
-      
-      
-        <a href="http://jon.glass/blog/examines-usb-transfer-cable/" class="btn" title="Evidence of USB Transfer Cable">Next</a>
-      
-    </nav><!-- /.pagination -->
   </article>
 </div><!-- /#main -->
 
