@@ -325,6 +325,14 @@
   
 
   
+    ,{
+      "title"			: "Using Nirsoft's FullEventLogView",
+      "link"			: "http://jon.glass/tips/FullEventLogView/",
+      "excerpt"		: ""
+    }
+  
+
+  
 
   
 
@@ -343,13 +351,13 @@
   
 
   
-
-  
     ,{
       "title"			: "About the Jon",
       "link"			: "http://jon.glass/about/",
       "excerpt"		: "Security dude"
     }
+  
+
   
 
   
