@@ -131,19 +131,123 @@
 
 
         <time datetime="2017-03-11T15:33:28-05:00"><i class="fa fa-calendar-o"></i> March 11, 2017</time>
-        <p>Parsing Windows Event Logs from an incident collection can be a pain without the right tools. IMHO, the native Windows Event Viewer is largely garbage.</p>
+        <p>Now that I have Elasticsearch and Kibana up and running, I need to start feeding in those sweet, sweet logs.
+Normally, one would setup LogStash to import these logs into Elasticsearch but those clever cats at Elastic have created Beats to help. <a href="https://www.elastic.co/products/beats/winlogbeat">Beats</a> is the platform for single-purpose data shippers. They install as lightweight agents and send data from hundreds or thousands of machines to Logstash or Elasticsearch. In this post I am going to cover installing winlogbeat and packetbeat on my Windows 10 VM and configuring them to talk to my Elasticsearch running on my MacBook.</p>
+<h3 id="virtual-machine-setup">0. Virtual Machine Setup</h3>
+<p>Although not extremely important to the process below, here is the high level notes about the VM:</p>
+<ul>
+  <li>OS Name:                   Microsoft Windows 10</li>
+  <li>OS Version:                10.0.14393 N/A Build 14393</li>
+  <li>System Model:              VirtualBox</li>
+  <li>System Type:               x64-based PC</li>
+  <li>Total Physical Memory:     2,048 MB</li>
+  <li>Installed Software:
+    <ul>
+      <li>Sysmon v6.0</li>
+      <li>Chrome Version 57.0.2987.98 (64-bit)</li>
+      <li>Notepad++ 7.3.3</li>
+      <li>WireShark Version 2.2.5 (v2.2.5-0-g440fd4d)</li>
+      <li>Greenshot 1.2.9.129</li>
+    </ul>
+  </li>
+</ul>
 
-<p><a href="https://www.nirsoft.net/utils/full_event_log_view.html">Download</a></p>
+<h3 id="download-winlogbeat">1. Download WinLogBeat</h3>
+<p>I grabbed my copy (5.2.2) from <a href="https://www.elastic.co/downloads/beats/winlogbeat">https://www.elastic.co/downloads/beats/winlogbeat</a></p>
 
-<p>I found this parser to be fast, free, and fully featured. Has a good GUI and CLI.</p>
+<h3 id="unzip-and-configure-winlogbeat">2. Unzip and configure WinLogBeat</h3>
+<p>Should look like this:</p>
 
+<p><a href="/images/winlogbeat1.png"><img src="/images/winlogbeat1.png" alt="WinLogBeat Files" /></a></p>
+
+<p>We need to edit the winlogbeat.yml before we install the service.</p>
+<h4 id="edit-the-logs-winlogbeat-is-listening-to">2.1 Edit the Logs WinLogBeat is listening to</h4>
+<p>I changed the default config from this:</p>
+
+<figure class="highlight"><pre><code class="language-yml" data-lang="yml"><span class="s">winlogbeat.event_logs</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s">Application</span>
+    <span class="s">ignore_older</span><span class="pi">:</span> <span class="s">72h</span>
+  <span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s">Security</span>
+  <span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s">System</span></code></pre></figure>
+
+<p>to include sysmon and a few of the other bigger logs from this Windows 10 machine:</p>
+
+<figure class="highlight"><pre><code class="language-yml" data-lang="yml"><span class="s">winlogbeat.event_logs</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s">Application</span>
+    <span class="s">ignore_older</span><span class="pi">:</span> <span class="s">72h</span>
+  <span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s">Security</span>
+  <span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s">System</span>
+  <span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s">Microsoft-Windows-Sysmon/Operational</span>
+  <span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s">Microsoft-Windows-Store/Operational</span>
+  <span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s">Windows PowerShell</span></code></pre></figure>
+
+<h4 id="configure-network-settings-for-elasticsearch">2.2 Configure network settings for Elasticsearch</h4>
+<p>On my MacBook I have Elasticsearch configured to run on 0.0.0.0:9200 which means port 9200 on all network interfaces including the network interface VirtualBox setup for the default gateway for the VM.
+<a href="/images/winlogbeat2.png"><img src="/images/winlogbeat2.png" alt="WinLogBeat Files" /></a></p>
+
+<p>A quick check of the VM’s network info tells me the default gateway is 10.0.2.2.
+So I changed:</p>
+
+<figure class="highlight"><pre><code class="language-yml" data-lang="yml"><span class="c1">#-------------------------- Elasticsearch output ------------------------------</span>
+<span class="s">output.elasticsearch</span><span class="pi">:</span>
+  <span class="c1"># Array of hosts to connect to.</span>
+  <span class="s">hosts</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">localhost:9200"</span><span class="pi">]</span></code></pre></figure>
+
+<p>To:</p>
+
+<figure class="highlight"><pre><code class="language-yml" data-lang="yml"><span class="c1">#-------------------------- Elasticsearch output ------------------------------</span>
+<span class="s">output.elasticsearch</span><span class="pi">:</span>
+  <span class="c1"># Array of hosts to connect to.</span>
+  <span class="s">hosts</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">10.0.2.2:9200"</span><span class="pi">]</span></code></pre></figure>
+
+<p>I had to change this file again to include authentication creds when I installed the XPACK plugin but I will get there in another post. Baby steps people. Baby steps.</p>
+<h3 id="install-winlogbeat">3. Install WinLogBeat</h3>
+<p>Included in the WinLogBeat files is a handy dandy install-service-winlogbeat.ps1 that does the heavy lifting for installing the WinLogBeat service. Simply Run that file and then start the service.
+<a href="/images/winlogbeat3.png"><img src="/images/winlogbeat3.png" alt="WinLogBeat Files" /></a>
+Now you should be sending logs from WinLogBeat to Elasticsearch. To confirm, check out the terminal window running Elasticsearch and you should see something like this:</p>
+
+<figure class="highlight"><pre><code class="language-raw" data-lang="raw">[2017-03-12T18:07:59,156][INFO ][o.e.c.m.MetaDataMappingService] [Bo2nJmM] [winlogbeat-2017.03.12/Du3zdxHXQvivwrVBi6czJQ] update_mapping [wineventlog]</code></pre></figure>
+
+<h3 id="configure-kibana-to-index-winlogbeat-logs">4. Configure Kibana to index WinLogBeat logs</h3>
+<p>Now that logs have a freely flowing into Elastic, it is time to update Kibana with an index. Under management, go to Index Patterns.
+<a href="/images/winlogbeat4.png"><img src="/images/winlogbeat4.png" alt="WinLogBeat Files" /></a>
+In the field, put “winlogbeat*” to start indexing these logs.
+<a href="/images/winlogbeat5.png"><img src="/images/winlogbeat5.png" alt="WinLogBeat Files" /></a>
+Then click on discover and BOO YAH we have logs.
+<a href="/images/winlogbeat6.png"><img src="/images/winlogbeat6.png" alt="WinLogBeat Files" /></a></p>
+
+<h3 id="download-configure-and-install-packetbeat-the-same-way">5. Download, Configure, and Install PacketBeat The Same Way</h3>
+
+<p>Download PacketBeat from <a href="https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-5.2.2-windows-x86_64.zip">here</a>.
+PacketBeat on Windows does require a prior installation of <a href="https://www.winpcap.org/install/bin/WinPcap_4_1_3.exe">WinPcap</a>. I installed <a href="https://www.wireshark.org/#download">WireShark</a> and opted to install WinPcap at the same time. You do what you feel is best.
+After you extract the packetbeat package on the Windows guest, configure the packbeat.yml to point to the Elasticsearch on the MacBook.
+Change:</p>
+
+<figure class="highlight"><pre><code class="language-yml" data-lang="yml"><span class="c1">#-------------------------- Elasticsearch output ------------------------------</span>
+<span class="s">output.elasticsearch</span><span class="pi">:</span>
+  <span class="c1"># Array of hosts to connect to.</span>
+  <span class="s">hosts</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">localhost:9200"</span><span class="pi">]</span></code></pre></figure>
+
+<p>To:</p>
+
+<figure class="highlight"><pre><code class="language-yml" data-lang="yml"><span class="c1">#-------------------------- Elasticsearch output ------------------------------</span>
+<span class="s">output.elasticsearch</span><span class="pi">:</span>
+  <span class="c1"># Array of hosts to connect to.</span>
+  <span class="s">hosts</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">10.0.2.2:9200"</span><span class="pi">]</span></code></pre></figure>
+
+<p>I also had to change this file again to include authentication creds when I installed the X-Pack plugin but I will get there in the aforementioned post.</p>
+<h3 id="next-post">Next Post?</h3>
+<p>So there you have have it. In my next post I will cover installing the X-Pack plugin and dig into some of the modifications I made to the Graph plugin to make my logs looks like this:
+<a href="/images/winlogbeat7.png"><img src="/images/winlogbeat7.png" alt="WinLogBeat Files" /></a>
+and THIS …
+<a href="/images/winlogbeat8.png"><img src="/images/winlogbeat8.png" alt="WinLogBeat Files" /></a></p>
 
         
 
     </div><!-- /.entry-wrapper -->
     <nav class="pagination" role="navigation">
       
-        <a href="http://jon.glass/tips/My_ELK_Stack2/" class="btn" title="Setting up ELK on my MacBook (Part 2)">Previous</a>
+        <a href="http://jon.glass/blog/My_ELK_Stack/" class="btn" title="Setting up ELK on my MacBook (Part 1)">Previous</a>
       
       
         <a href="http://jon.glass/tips/FullEventLogView/" class="btn" title="Using FullEventLogView From Nirsoft">Next</a>
