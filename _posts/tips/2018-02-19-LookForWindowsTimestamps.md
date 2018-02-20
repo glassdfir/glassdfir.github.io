@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  Remotely Change BitLocker Protections
+title:  Find Windows Filetime objects in Binary Data
 date:   2018-02-30 15:33:28 -0500
 categories: tips
 ---
