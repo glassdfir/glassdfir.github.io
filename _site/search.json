@@ -27,6 +27,14 @@
   
     ,{
       "title"			: "Setting up ELK on my MacBook (Part 2)",
+      "link"			: "http://jon.glass/blog/grep-like-you-mean-it/",
+      "excerpt"		: ""
+    }
+  
+
+  
+    ,{
+      "title"			: "Setting up ELK on my MacBook (Part 2)",
       "link"			: "http://jon.glass/blog/My_ELK_Stack2/",
       "excerpt"		: ""
     }
@@ -345,6 +353,8 @@
   
 
 
+
+  
 
   
 

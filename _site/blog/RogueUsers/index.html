@@ -146,18 +146,16 @@ Enter-PSSessio n -ComputerName ComputerX -Credential <span class="nv">$credentia
 <p>This will set the number of cached creds Windows is storing to 0 and erase the previous creds.</p>
 <h3 id="change-their-bitlocker-key-remotely">3. Change their BitLocker Key Remotely</h3>
 
-<figure class="highlight"><pre><code class="language-powershell" data-lang="powershell"><span class="nv">$BitLocker</span> <span class="o">=</span> <span class="nb">Get-WmiObject</span> -ComputerName ComputerX -Namespace <span class="s2">"Root</span><span class="se">\c</span><span class="s2">imv2</span><span class="se">\S</span><span class="s2">ecurity</span><span class="se">\M</span><span class="s2">icrosoftVolumeEncryption"</span> -Class <span class="s2">"Win32_EncryptableVolume"</span> -Filter <span class="s2">"DriveLetter = 'C:'"</span>
-<span class="nv">$VolumeKeyProtectorIDs</span> <span class="o">=</span> <span class="nv">$BitLocker</span>.GetKeyProtectors<span class="o">()</span>|Select-Object VolumeKeyProtectorID
-<span class="c1">#Let's loop through all of the VolumeKeyProtectorIDs for the C Volume and delete them.</span>
-<span class="k">ForEach</span><span class="o">(</span><span class="nv">$ID</span> <span class="k">in</span> <span class="nv">$VolumeKeyProtectorIDs</span><span class="o">){</span><span class="nv">$BitLocker</span>.DeleteKeyProtector<span class="o">(</span><span class="nv">$ID</span><span class="o">)}</span>
+<figure class="highlight"><pre><code class="language-powershell" data-lang="powershell"><span class="c1">#Delete existing protections</span>
+manage-bde.exe -protectors -delete c: -Type TPMAndPIN
+manage-bde.exe -protectors -delete c: -Type RecoveryPassword
 <span class="c1">#Now that all of the previous Protectors are gone, let's add our own.</span>
 <span class="c1">#Let's add a new password that only the security team will need to know.</span>
-<span class="nv">$BitLocker</span>.ProtectKeyWithTPMAndPin<span class="o">(</span><span class="s2">""</span>,<span class="s2">""</span>,<span class="s2">"BrandNewPassword123"</span><span class="o">)</span>
+manage-bde.exe -protectors -add c: -TPMandPIN SuperDuperPassword
 <span class="c1">#As a backup, let's also add a couple of recovery keys just in case noone can find the sticky note with the password.</span>
-<span class="nv">$BitLocker</span>.ProtectKeyWithNumericalPassword<span class="o">(</span><span class="s2">"Primary"</span>,<span class="s2">"555555-555555-555555-555555-555555-555555-555555-555555"</span><span class="o">)</span>
-<span class="c1">#Adding an additional optional recovery key might be helpful if you have more than one team that might need to gain access.</span>
-<span class="nv">$BitLocker</span>.ProtectKeyWithNumericalPassword<span class="o">(</span><span class="s2">"Secondary"</span>,<span class="s2">"050505-050505-050505-050505-050505-050505-050505-050505"</span><span class="o">)</span>
-<span class="nv">$BitLocker</span>.EnableKeyProtectors<span class="o">()</span></code></pre></figure>
+manage-bde.exe -protectors -add c: -RecoveryPassword 111111-111111-111111-111111-111111-111111-111111-111111 
+manage-bde.exe -protectors -add c: -RecoveryPassword 222222-222222-222222-222222-222222-222222-222222-222222 
+manage-bde.exe -on c:</code></pre></figure>
 
 <p>This is a fun one. This will delete the user’s BitLocker key and save a new one that the user doesn’t know so they can’t unlock the drive after a reboot.</p>
 <h3 id="shut-down-the-remote-system-using-any-number-of-methods">4. Shut down the remote system using any number of methods.</h3>

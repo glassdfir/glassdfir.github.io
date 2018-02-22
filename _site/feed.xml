@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://jon.glass/feed.xml" rel="self" type="application/atom+xml" /><link href="http://jon.glass/" rel="alternate" type="text/html" /><updated>2018-02-20T17:46:51-05:00</updated><id>http://jon.glass/</id><title type="html">Half Full of Security</title><subtitle>Sharpening the ACKs since 2013</subtitle><entry><title type="html">Find Windows Filetime objects in Binary Data</title><link href="http://jon.glass/tips/LookForWindowsTimestamps/" rel="alternate" type="text/html" title="Find Windows Filetime objects in Binary Data" /><published>2018-02-20T15:33:28-05:00</published><updated>2018-02-20T15:33:28-05:00</updated><id>http://jon.glass/tips/LookForWindowsTimestamps</id><content type="html" xml:base="http://jon.glass/tips/LookForWindowsTimestamps/">&lt;p&gt;I did some reverse engineering of 3rd party software in a client environment and wrote this script to help  determine how they logged events.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://jon.glass/feed.xml" rel="self" type="application/atom+xml" /><link href="http://jon.glass/" rel="alternate" type="text/html" /><updated>2018-02-22T15:21:36-05:00</updated><id>http://jon.glass/</id><title type="html">Half Full of Security</title><subtitle>Sharpening the ACKs since 2013</subtitle><entry><title type="html">Find Windows Filetime objects in Binary Data</title><link href="http://jon.glass/tips/LookForWindowsTimestamps/" rel="alternate" type="text/html" title="Find Windows Filetime objects in Binary Data" /><published>2018-02-20T15:33:28-05:00</published><updated>2018-02-20T15:33:28-05:00</updated><id>http://jon.glass/tips/LookForWindowsTimestamps</id><content type="html" xml:base="http://jon.glass/tips/LookForWindowsTimestamps/">&lt;p&gt;I did some reverse engineering of 3rd party software in a client environment and wrote this script to help  determine how they logged events.&lt;/p&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;struct&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;time&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;os&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;sys&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;conv_time&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;l&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;h&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
@@ -45,7 +45,116 @@ manage-bde.exe -cn ComputerName -on c:&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;</
 
 &lt;p&gt;&lt;a href=&quot;https://www.nirsoft.net/utils/full_event_log_view.html&quot;&gt;Download&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;I found this parser to be fast, free, and fully featured. Has a good GUI and CLI.&lt;/p&gt;</content></entry><entry><title type="html">Setting up ELK on my MacBook (Part 2)</title><link href="http://jon.glass/blog/My_ELK_Stack2/" rel="alternate" type="text/html" title="Setting up ELK on my MacBook (Part 2)" /><published>2017-03-11T15:33:28-05:00</published><updated>2017-03-11T15:33:28-05:00</updated><id>http://jon.glass/blog/My_ELK_Stack2</id><content type="html" xml:base="http://jon.glass/blog/My_ELK_Stack2/">&lt;p&gt;Now that I have Elasticsearch and Kibana up and running, I need to start feeding in those sweet, sweet logs.
+&lt;p&gt;I found this parser to be fast, free, and fully featured. Has a good GUI and CLI.&lt;/p&gt;</content></entry><entry><title type="html">Setting up ELK on my MacBook (Part 2)</title><link href="http://jon.glass/blog/grep-like-you-mean-it/" rel="alternate" type="text/html" title="Setting up ELK on my MacBook (Part 2)" /><published>2017-03-11T15:33:28-05:00</published><updated>2017-03-11T15:33:28-05:00</updated><id>http://jon.glass/blog/grep-like-you-mean-it</id><content type="html" xml:base="http://jon.glass/blog/grep-like-you-mean-it/">&lt;p&gt;Now that I have Elasticsearch and Kibana up and running, I need to start feeding in those sweet, sweet logs.
+Normally, one would setup LogStash to import these logs into Elasticsearch but those clever cats at Elastic have created Beats to help. &lt;a href=&quot;https://www.elastic.co/products/beats/winlogbeat&quot;&gt;Beats&lt;/a&gt; is the platform for single-purpose data shippers. They install as lightweight agents and send data from hundreds or thousands of machines to Logstash or Elasticsearch. In this post I am going to cover installing winlogbeat and packetbeat on my Windows 10 VM and configuring them to talk to my Elasticsearch running on my MacBook.&lt;/p&gt;
+&lt;h3 id=&quot;virtual-machine-setup&quot;&gt;0. Virtual Machine Setup&lt;/h3&gt;
+&lt;p&gt;Although not extremely important to the process below, here is the high level notes about the VM:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;OS Name:                   Microsoft Windows 10&lt;/li&gt;
+  &lt;li&gt;OS Version:                10.0.14393 N/A Build 14393&lt;/li&gt;
+  &lt;li&gt;System Model:              VirtualBox&lt;/li&gt;
+  &lt;li&gt;System Type:               x64-based PC&lt;/li&gt;
+  &lt;li&gt;Total Physical Memory:     2,048 MB&lt;/li&gt;
+  &lt;li&gt;Installed Software:
+    &lt;ul&gt;
+      &lt;li&gt;Sysmon v6.0&lt;/li&gt;
+      &lt;li&gt;Chrome Version 57.0.2987.98 (64-bit)&lt;/li&gt;
+      &lt;li&gt;Notepad++ 7.3.3&lt;/li&gt;
+      &lt;li&gt;WireShark Version 2.2.5 (v2.2.5-0-g440fd4d)&lt;/li&gt;
+      &lt;li&gt;Greenshot 1.2.9.129&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;download-winlogbeat&quot;&gt;1. Download WinLogBeat&lt;/h3&gt;
+&lt;p&gt;I grabbed my copy (5.2.2) from &lt;a href=&quot;https://www.elastic.co/downloads/beats/winlogbeat&quot;&gt;https://www.elastic.co/downloads/beats/winlogbeat&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;unzip-and-configure-winlogbeat&quot;&gt;2. Unzip and configure WinLogBeat&lt;/h3&gt;
+&lt;p&gt;Should look like this:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;/images/winlogbeat1.png&quot;&gt;&lt;img src=&quot;/images/winlogbeat1.png&quot; alt=&quot;WinLogBeat Files&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;We need to edit the winlogbeat.yml before we install the service.&lt;/p&gt;
+&lt;h4 id=&quot;edit-the-logs-winlogbeat-is-listening-to&quot;&gt;2.1 Edit the Logs WinLogBeat is listening to&lt;/h4&gt;
+&lt;p&gt;I changed the default config from this:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-yml&quot; data-lang=&quot;yml&quot;&gt;&lt;span class=&quot;s&quot;&gt;winlogbeat.event_logs&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Application&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;ignore_older&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;72h&lt;/span&gt;
+  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Security&lt;/span&gt;
+  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;System&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;to include sysmon and a few of the other bigger logs from this Windows 10 machine:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-yml&quot; data-lang=&quot;yml&quot;&gt;&lt;span class=&quot;s&quot;&gt;winlogbeat.event_logs&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Application&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;ignore_older&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;72h&lt;/span&gt;
+  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Security&lt;/span&gt;
+  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;System&lt;/span&gt;
+  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Microsoft-Windows-Sysmon/Operational&lt;/span&gt;
+  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Microsoft-Windows-Store/Operational&lt;/span&gt;
+  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Windows PowerShell&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h4 id=&quot;configure-network-settings-for-elasticsearch&quot;&gt;2.2 Configure network settings for Elasticsearch&lt;/h4&gt;
+&lt;p&gt;On my MacBook I have Elasticsearch configured to run on 0.0.0.0:9200 which means port 9200 on all network interfaces including the network interface VirtualBox setup for the default gateway for the VM.
+&lt;a href=&quot;/images/winlogbeat2.png&quot;&gt;&lt;img src=&quot;/images/winlogbeat2.png&quot; alt=&quot;WinLogBeat Files&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;A quick check of the VM’s network info tells me the default gateway is 10.0.2.2.
+So I changed:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-yml&quot; data-lang=&quot;yml&quot;&gt;&lt;span class=&quot;c1&quot;&gt;#-------------------------- Elasticsearch output ------------------------------&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;output.elasticsearch&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;c1&quot;&gt;# Array of hosts to connect to.&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;hosts&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;localhost:9200&quot;&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;]&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;To:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-yml&quot; data-lang=&quot;yml&quot;&gt;&lt;span class=&quot;c1&quot;&gt;#-------------------------- Elasticsearch output ------------------------------&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;output.elasticsearch&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;c1&quot;&gt;# Array of hosts to connect to.&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;hosts&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;10.0.2.2:9200&quot;&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;]&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;I had to change this file again to include authentication creds when I installed the XPACK plugin but I will get there in another post. Baby steps people. Baby steps.&lt;/p&gt;
+&lt;h3 id=&quot;install-winlogbeat&quot;&gt;3. Install WinLogBeat&lt;/h3&gt;
+&lt;p&gt;Included in the WinLogBeat files is a handy dandy install-service-winlogbeat.ps1 that does the heavy lifting for installing the WinLogBeat service. Simply Run that file and then start the service.
+&lt;a href=&quot;/images/winlogbeat3.png&quot;&gt;&lt;img src=&quot;/images/winlogbeat3.png&quot; alt=&quot;WinLogBeat Files&quot; /&gt;&lt;/a&gt;
+Now you should be sending logs from WinLogBeat to Elasticsearch. To confirm, check out the terminal window running Elasticsearch and you should see something like this:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-raw&quot; data-lang=&quot;raw&quot;&gt;[2017-03-12T18:07:59,156][INFO ][o.e.c.m.MetaDataMappingService] [Bo2nJmM] [winlogbeat-2017.03.12/Du3zdxHXQvivwrVBi6czJQ] update_mapping [wineventlog]&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;h3 id=&quot;configure-kibana-to-index-winlogbeat-logs&quot;&gt;4. Configure Kibana to index WinLogBeat logs&lt;/h3&gt;
+&lt;p&gt;Now that logs have a freely flowing into Elastic, it is time to update Kibana with an index. Under management, go to Index Patterns.
+&lt;a href=&quot;/images/winlogbeat4.png&quot;&gt;&lt;img src=&quot;/images/winlogbeat4.png&quot; alt=&quot;WinLogBeat Files&quot; /&gt;&lt;/a&gt;
+In the field, put “winlogbeat*” to start indexing these logs.
+&lt;a href=&quot;/images/winlogbeat5.png&quot;&gt;&lt;img src=&quot;/images/winlogbeat5.png&quot; alt=&quot;WinLogBeat Files&quot; /&gt;&lt;/a&gt;
+Then click on discover and BOO YAH we have logs.
+&lt;a href=&quot;/images/winlogbeat6.png&quot;&gt;&lt;img src=&quot;/images/winlogbeat6.png&quot; alt=&quot;WinLogBeat Files&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;download-configure-and-install-packetbeat-the-same-way&quot;&gt;5. Download, Configure, and Install PacketBeat The Same Way&lt;/h3&gt;
+
+&lt;p&gt;Download PacketBeat from &lt;a href=&quot;https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-5.2.2-windows-x86_64.zip&quot;&gt;here&lt;/a&gt;.
+PacketBeat on Windows does require a prior installation of &lt;a href=&quot;https://www.winpcap.org/install/bin/WinPcap_4_1_3.exe&quot;&gt;WinPcap&lt;/a&gt;. I installed &lt;a href=&quot;https://www.wireshark.org/#download&quot;&gt;WireShark&lt;/a&gt; and opted to install WinPcap at the same time. You do what you feel is best.
+After you extract the packetbeat package on the Windows guest, configure the packbeat.yml to point to the Elasticsearch on the MacBook.
+Change:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-yml&quot; data-lang=&quot;yml&quot;&gt;&lt;span class=&quot;c1&quot;&gt;#-------------------------- Elasticsearch output ------------------------------&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;output.elasticsearch&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;c1&quot;&gt;# Array of hosts to connect to.&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;hosts&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;localhost:9200&quot;&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;]&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;To:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-yml&quot; data-lang=&quot;yml&quot;&gt;&lt;span class=&quot;c1&quot;&gt;#-------------------------- Elasticsearch output ------------------------------&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;output.elasticsearch&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;c1&quot;&gt;# Array of hosts to connect to.&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;hosts&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;10.0.2.2:9200&quot;&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;]&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;I also had to change this file again to include authentication creds when I installed the X-Pack plugin but I will get there in the aforementioned post.&lt;/p&gt;
+&lt;h3 id=&quot;next-post&quot;&gt;Next Post?&lt;/h3&gt;
+&lt;p&gt;So there you have have it. In my next post I will cover installing the X-Pack plugin and dig into some of the modifications I made to the Graph plugin to make my logs looks like this:
+&lt;a href=&quot;/images/winlogbeat7.png&quot;&gt;&lt;img src=&quot;/images/winlogbeat7.png&quot; alt=&quot;WinLogBeat Files&quot; /&gt;&lt;/a&gt;
+and THIS …
+&lt;a href=&quot;/images/winlogbeat8.png&quot;&gt;&lt;img src=&quot;/images/winlogbeat8.png&quot; alt=&quot;WinLogBeat Files&quot; /&gt;&lt;/a&gt;&lt;/p&gt;</content></entry><entry><title type="html">Setting up ELK on my MacBook (Part 2)</title><link href="http://jon.glass/blog/My_ELK_Stack2/" rel="alternate" type="text/html" title="Setting up ELK on my MacBook (Part 2)" /><published>2017-03-11T15:33:28-05:00</published><updated>2017-03-11T15:33:28-05:00</updated><id>http://jon.glass/blog/My_ELK_Stack2</id><content type="html" xml:base="http://jon.glass/blog/My_ELK_Stack2/">&lt;p&gt;Now that I have Elasticsearch and Kibana up and running, I need to start feeding in those sweet, sweet logs.
 Normally, one would setup LogStash to import these logs into Elasticsearch but those clever cats at Elastic have created Beats to help. &lt;a href=&quot;https://www.elastic.co/products/beats/winlogbeat&quot;&gt;Beats&lt;/a&gt; is the platform for single-purpose data shippers. They install as lightweight agents and send data from hundreds or thousands of machines to Logstash or Elasticsearch. In this post I am going to cover installing winlogbeat and packetbeat on my Windows 10 VM and configuring them to talk to my Elasticsearch running on my MacBook.&lt;/p&gt;
 &lt;h3 id=&quot;virtual-machine-setup&quot;&gt;0. Virtual Machine Setup&lt;/h3&gt;
 &lt;p&gt;Although not extremely important to the process below, here is the high level notes about the VM:&lt;/p&gt;
@@ -278,18 +387,16 @@ Enter-PSSessio n -ComputerName ComputerX -Credential &lt;span class=&quot;nv&quo
 &lt;p&gt;This will set the number of cached creds Windows is storing to 0 and erase the previous creds.&lt;/p&gt;
 &lt;h3 id=&quot;change-their-bitlocker-key-remotely&quot;&gt;3. Change their BitLocker Key Remotely&lt;/h3&gt;
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-powershell&quot; data-lang=&quot;powershell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$BitLocker&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Get-WmiObject&lt;/span&gt; -ComputerName ComputerX -Namespace &lt;span class=&quot;s2&quot;&gt;&quot;Root&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\c&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;imv2&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\S&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;ecurity&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\M&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;icrosoftVolumeEncryption&quot;&lt;/span&gt; -Class &lt;span class=&quot;s2&quot;&gt;&quot;Win32_EncryptableVolume&quot;&lt;/span&gt; -Filter &lt;span class=&quot;s2&quot;&gt;&quot;DriveLetter = 'C:'&quot;&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$VolumeKeyProtectorIDs&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$BitLocker&lt;/span&gt;.GetKeyProtectors&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt;|Select-Object VolumeKeyProtectorID
-&lt;span class=&quot;c1&quot;&gt;#Let's loop through all of the VolumeKeyProtectorIDs for the C Volume and delete them.&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;ForEach&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$ID&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$VolumeKeyProtectorIDs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;){&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$BitLocker&lt;/span&gt;.DeleteKeyProtector&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$ID&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)}&lt;/span&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-powershell&quot; data-lang=&quot;powershell&quot;&gt;&lt;span class=&quot;c1&quot;&gt;#Delete existing protections&lt;/span&gt;
+manage-bde.exe -protectors -delete c: -Type TPMAndPIN
+manage-bde.exe -protectors -delete c: -Type RecoveryPassword
 &lt;span class=&quot;c1&quot;&gt;#Now that all of the previous Protectors are gone, let's add our own.&lt;/span&gt;
 &lt;span class=&quot;c1&quot;&gt;#Let's add a new password that only the security team will need to know.&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$BitLocker&lt;/span&gt;.ProtectKeyWithTPMAndPin&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;,&lt;span class=&quot;s2&quot;&gt;&quot;&quot;&lt;/span&gt;,&lt;span class=&quot;s2&quot;&gt;&quot;BrandNewPassword123&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+manage-bde.exe -protectors -add c: -TPMandPIN SuperDuperPassword
 &lt;span class=&quot;c1&quot;&gt;#As a backup, let's also add a couple of recovery keys just in case noone can find the sticky note with the password.&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$BitLocker&lt;/span&gt;.ProtectKeyWithNumericalPassword&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Primary&quot;&lt;/span&gt;,&lt;span class=&quot;s2&quot;&gt;&quot;555555-555555-555555-555555-555555-555555-555555-555555&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;#Adding an additional optional recovery key might be helpful if you have more than one team that might need to gain access.&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$BitLocker&lt;/span&gt;.ProtectKeyWithNumericalPassword&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Secondary&quot;&lt;/span&gt;,&lt;span class=&quot;s2&quot;&gt;&quot;050505-050505-050505-050505-050505-050505-050505-050505&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$BitLocker&lt;/span&gt;.EnableKeyProtectors&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+manage-bde.exe -protectors -add c: -RecoveryPassword 111111-111111-111111-111111-111111-111111-111111-111111 
+manage-bde.exe -protectors -add c: -RecoveryPassword 222222-222222-222222-222222-222222-222222-222222-222222 
+manage-bde.exe -on c:&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;This is a fun one. This will delete the user’s BitLocker key and save a new one that the user doesn’t know so they can’t unlock the drive after a reboot.&lt;/p&gt;
 &lt;h3 id=&quot;shut-down-the-remote-system-using-any-number-of-methods&quot;&gt;4. Shut down the remote system using any number of methods.&lt;/h3&gt;
@@ -511,103 +618,4 @@ c:\Windows\WinSxS\amd64_windows-defender-am-engine_31bf3856ad364e35_6.3.9600.163
 
 &lt;p&gt;Looks like this:&lt;br /&gt;
 &lt;a href=&quot;/images/mpengine.dll_.rc4_.png&quot;&gt;&lt;img src=&quot;/images/mpengine.dll_.rc4_.png&quot; alt=&quot;mpengine.dll.rc4&quot; width=&quot;75%&quot; class=&quot;aligncenter size-large wp-image-797&quot; /&gt;&lt;/a&gt;&lt;br /&gt;
-I might dig a little deeper on this but this is all for now. Hope this helps.&lt;/p&gt;</content></entry><entry><title type="html">Parsing Chrome Artifacts with Python! Part 3</title><link href="http://jon.glass/blog/parsing-chrome-artifacts-with-python-part-3/" rel="alternate" type="text/html" title="Parsing Chrome Artifacts with Python! Part 3" /><published>2015-10-25T19:55:08-04:00</published><updated>2015-10-25T19:55:08-04:00</updated><id>http://jon.glass/blog/parsing-chrome-artifacts-with-python-part-3</id><content type="html" xml:base="http://jon.glass/blog/parsing-chrome-artifacts-with-python-part-3/">&lt;p&gt;Continuing on my mission to bore the crap out of my readers, I took a look at the html local storage databases I discovered in Part One.&lt;/p&gt;
-
-&lt;h1&gt;What is HTML Local Storage?&lt;/h1&gt;
-&lt;blockquote&gt;&lt;p&gt;With local storage, web applications can store data locally within the user's browser.&lt;br /&gt;
-Before HTML5, application data had to be stored in cookies, included in every server request. Local storage is more secure, and large amounts of data can be stored locally, without affecting website performance. Unlike cookies, the storage limit is far larger (at least 5MB) and information is never transferred to the server. Local storage is per origin (per domain and protocol). All pages, from one origin, can store and access the same data.&lt;br /&gt;
---http://www.w3schools.com/html/html5_webstorage.asp&lt;/p&gt;&lt;/blockquote&gt;
-&lt;p&gt;If this is a foreign concept to you, try it out:&lt;br /&gt;
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-html&quot; data-lang=&quot;html&quot;&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;!DOCTYPE html&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;html&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;body&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;div&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;result&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;script&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;// Check browser support&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;typeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;Storage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!==&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;undefined&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;// Store&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;localStorage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;setItem&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;secret message&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Congratulations! This sentence is now stored in your local storage.&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;c1&quot;&gt;// Retrieve&lt;/span&gt;
-    &lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getElementById&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;result&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;style&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;color&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Green&quot;&lt;/span&gt;
-    &lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getElementById&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;result&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;innerHTML&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;localStorage&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getItem&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;secret message&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getElementById&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;result&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;style&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;color&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Red&quot;&lt;/span&gt;
-    &lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getElementById&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;result&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;innerHTML&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Sorry, your browser does not support HTML5 Web Storage...&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;/script&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;/body&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;/html&amp;gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-Pretty simple stuff. If you browsed this from Chrome you should now have a &lt;code class=&quot;highlighter-rouge&quot;&gt;https_jon.glass_0.localstorage&lt;/code&gt; in your local storage directory.&lt;br /&gt;
-On my Windows 7 VM the Chrome Local Storage files are located here:&lt;br /&gt;
-&lt;code&gt;C:\Users\UserName\AppData\Local\Google\Chrome\User Data\Default\Local Storage&lt;/code&gt;&lt;br /&gt;
-Here is a look at a few of mine:&lt;br /&gt;
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-raw&quot; data-lang=&quot;raw&quot;&gt;C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\Local Storage&amp;gt;dir *e /o:s
- Volume in drive C has no label.
- Volume Serial Number is D6AE-9F0B
-
- Directory of C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\Local Storage
-
-07/07/2015  10:24 AM             3,072 https_www.mandiant.com_0.localstorage
-10/09/2015  09:49 PM             3,072 chrome-extension_pafkbggdmjlpgkdkcbjmhmfcdpncadgh_0.localstorage
-10/09/2015  09:52 PM             3,072 chrome-extension_pbjikboenpfhbbejgkoklgkhjpfogcam_0.localstorage
-03/19/2015  11:41 AM             3,072 http_www.nirsoft.net_0.localstorage
-07/22/2015  11:46 AM             3,072 https_bitbucket.org_0.localstorage
-03/12/2015  12:20 PM             3,072 http_www.arduino.cc_0.localstorage
-12/27/2014  08:22 PM             3,072 https_support.google.com_0.localstorage
-01/26/2015  11:06 AM             3,072 https_technet.microsoft.com_0.localstorage
-03/09/2015  02:45 PM             3,072 http_samy.pl_0.localstorage
-07/27/2015  04:33 PM             3,072 https_www.mozilla.org_0.localstorage
-03/12/2015  02:32 PM             3,072 https_www.youtube.com_0.localstorage
-05/17/2015  02:16 PM             3,072 http_ad.doubleclick.net_0.localstorage
-07/15/2015  11:48 AM             3,072 http_ib.adnxs.com_0.localstorage
-03/12/2015  12:29 PM             3,072 http_arduino.cc_0.localstorage
-01/26/2015  11:06 AM             3,072 http_blogs.technet.com_0.localstorage
-07/27/2015  12:49 PM             3,072 http_googleads.g.doubleclick.net_0.localstorage
-10/25/2015  10:19 PM             3,072 https_jon.glass_0.localstorage
-09/15/2015  09:41 AM             4,096 https_github.com_0.localstorage
-07/27/2015  12:40 PM             4,096 https_www.facebook.com_0.localstorage
-10/10/2015  09:58 PM             8,192 https_www.google.com_0.localstorage
-05/14/2015  11:27 AM            35,840 chrome-devtools_devtools_0.localstorage
-10/09/2015  09:52 PM            45,056 https_analytics.app.amazonbrowserapp.com_0.localstorage
-06/08/2015  01:50 PM            52,224 http_sourceforge.net_0.localstorage
-05/15/2015  09:02 AM           150,528 https_c.betrad.com_0.localstorage
-10/09/2015  10:46 PM           225,280 http_c.betrad.com_0.localstorage
-10/10/2015  09:59 PM           732,160 https_en.wikipedia.org_0.localstorage
-03/12/2015  02:36 PM         1,492,992 http_en.wikipedia.org_0.localstorage&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-It is worthy to mention there are a few investigative points you can glean from just this directory listing:&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;The protocol of the site (http/https).&lt;/li&gt;
-&lt;li&gt;The domain.&lt;/li&gt;
-&lt;li&gt;The last modified date and time of the local storage file&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;Let's look at my local storage entry from a few angles.&lt;br /&gt;
-First lets checkout Chrome's developer tools &gt; Resources &gt; Local Storage:&lt;br /&gt;
-&lt;a href=&quot;/images/devtool2.png&quot;&gt;&lt;img src=&quot;/images/devtool2.png&quot; /&gt;&lt;/a&gt;&lt;br /&gt;
-Here is a shot of what it looks like in the ol' SQLITE Browser:&lt;br /&gt;
-&lt;a href=&quot;/images/devtool3.png&quot;&gt;&lt;img src=&quot;/images/devtool3.png&quot; /&gt;&lt;/a&gt;&lt;br /&gt;
-Here is some Python that will read it too:&lt;br /&gt;
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;sqlite3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;datetime&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;selectStatement&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'SELECT * FROM ItemTable'&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;LocalStorageFile&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'C:&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\\&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;Users&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\\&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;User&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\\&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;AppData&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\\&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;Local&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\\&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;Google&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\\&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;Chrome&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\\&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;User Data&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\\&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;Default&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\\&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;Local Storage&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\\&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;https_jon.glass_0.localstorage'&lt;/span&gt;
-&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sqlite3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;LocalStorageFile&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;row&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;execute&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;selectStatement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;row&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;decode&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;utf-16&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-&lt;a href=&quot;/images/devtool5.png&quot;&gt;&lt;img src=&quot;/images/devtool5.png&quot; /&gt;&lt;/a&gt;&lt;br /&gt;
-I have looked at a bunch of these and the format is mostly developers choice. It is interesting to see how they are leveraged. For example, Wikipedia's local storage is so big, comparatively, because they are storing Base64 encoded images in the SQLite database.&lt;br /&gt;
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-raw&quot; data-lang=&quot;raw&quot;&gt;...
-background-image:url(//bits.wikimedia.org/static-1.25wmf20/skins/Vector/skinStyles/jquery.ui/
-images/ui-icons_666666_256x240.png?2015-03-04T20:18:20Z)!ie}.ui-state-highlight .ui-icon{back
-ground-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAADwCAMAAADYSUr5AAABDlBMVE
-Uug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8
-ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8u
-g/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug
-/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8ug/8bvOpvAAAAWX
-RSTlMAGRAzBAhQv4KZLyJVcUBmYBoTMswNITwWQkhLIB5aIycxUyyFNIeAw2rIz8Y4RRy8uL58q7WljKqorR+yKf0BnlE
-k7woGAgOPomKUSqCvbd+cR2M/b3+RaPlAXvEAAAABYktHRACIBR1IAAAACXBIWXMAAABIAAAASABGyWs+AAAPZElEQVR4
-2u1dC2PbthEGyUiq6ZiSXblLE6ex1mTO5iXZq+u6ro3abG26pOkSd13v//+RAXzhcIeHWMoUbeOTLesIEMB9PIB3ACgLE
-...&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-Kinda makes you wonder about what is hiding in YOUR local storage.&lt;br /&gt;
-Well that is all for now... &lt;/p&gt;</content></entry></feed>
+I might dig a little deeper on this but this is all for now. Hope this helps.&lt;/p&gt;</content></entry></feed>
