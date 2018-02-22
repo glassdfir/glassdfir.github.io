@@ -1,0 +1,532 @@
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8" lang="en"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9" lang="en"><![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<title>Courses &#8211; Half Full of Security</title>
+<meta name="description" content="The Advanced DFIR Wizard Master Class">
+
+
+
+<!-- Twitter Cards -->
+<meta name="twitter:title" content="Courses">
+<meta name="twitter:description" content="The Advanced DFIR Wizard Master Class">
+<meta name="twitter:site" content="@GlassDFIR">
+<meta name="twitter:creator" content="@GlassDFIR">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://jon.glass/images/site-logo.png">
+
+<!-- Open Graph -->
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Courses">
+<meta property="og:description" content="The Advanced DFIR Wizard Master Class">
+<meta property="og:url" content="http://jon.glass/DFIRCourse/Whole%20Course/">
+<meta property="og:site_name" content="Half Full of Security">
+
+
+
+
+
+<link rel="canonical" href="http://jon.glass/DFIRCourse/Whole%20Course/">
+<link href="http://jon.glass/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="http://jon.glass/assets/css/main.css">
+<!-- Webfonts -->
+<script src="https://use.edgefonts.net/source-sans-pro:n2,i2,n3,i3,n4,i4,n6,i6,n7,i7,n9,i9;source-code-pro:n4,n7;volkhov.js"></script>
+
+<meta http-equiv="cleartype" content="on">
+
+<!-- HTML5 Shiv and Media Query Support -->
+<!--[if lt IE 9]>
+  <script src="http://jon.glass/assets/js/vendor/html5shiv.min.js"></script>
+  <script src="http://jon.glass/assets/js/vendor/respond.min.js"></script>
+<![endif]-->
+
+<!-- Modernizr -->
+<script src="http://jon.glass/assets/js/vendor/modernizr-2.7.1.custom.min.js"></script>
+
+
+<!-- MathJax -->
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+<!-- Icons -->
+<!-- 16x16 -->
+<link rel="shortcut icon" href="http://jon.glass/favicon.ico">
+<!-- 32x32 -->
+<link rel="shortcut icon" href="http://jon.glass/favicon.png">
+<!-- 57x57 (precomposed) for iPhone 3GS, pre-2011 iPod Touch and older Android devices -->
+<link rel="apple-touch-icon-precomposed" href="http://jon.glass/images/apple-touch-icon-precomposed.png">
+<!-- 72x72 (precomposed) for 1st generation iPad, iPad 2 and iPad mini -->
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://jon.glass/images/apple-touch-icon-72x72-precomposed.png">
+<!-- 114x114 (precomposed) for iPhone 4, 4S, 5 and post-2011 iPod Touch -->
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://jon.glass/images/apple-touch-icon-114x114-precomposed.png">
+<!-- 144x144 (precomposed) for iPad 3rd and 4th generation -->
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://jon.glass/images/apple-touch-icon-144x144-precomposed.png">
+
+</head>
+
+<body id="page">
+
+<div class="navigation-wrapper">
+	<nav role="navigation" id="site-nav" class="animated drop">
+	    <ul>
+      
+		    
+		    <li><a href="http://jon.glass/blog/" >Blog</a></li>
+		  
+		    
+		    <li><a href="http://jon.glass/tips/" >Tips and Tricks</a></li>
+		  
+		    
+		    <li><a href="http://jon.glass/about/" >About</a></li>
+		  
+		    
+		    <li><a href="http://jon.glass/search/" >Search</a></li>
+		  
+	    </ul>
+	</nav>
+</div><!-- /.navigation-wrapper -->
+
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+
+<header class="masthead">
+	<div class="wrap">
+      
+  		<a href="http://jon.glass/" class="site-logo" rel="home" title="Half Full of Security"><img src="http://jon.glass/images/site-logo.png" width="200" height="200" alt="Half Full of Security logo" class="animated fadeInDown"></a>
+      
+      <h1 class="site-title animated fadeIn"><a href="http://jon.glass/">Half Full of Security</a></h1>
+		<h2 class="site-description animated fadeIn" itemprop="description">Sharpening the ACKs since 2013</h2>
+	</div>
+</header><!-- /.masthead -->
+
+<div class="js-menu-screen menu-screen"></div>
+
+
+<div id="main" role="main">
+  <article class="entry">
+    
+    <div class="entry-wrapper">
+      <header class="entry-header">
+        <h1 class="entry-title">Courses</h1>
+      </header>
+      <div class="entry-content">
+        <h2 id="welcome">Welcome</h2>
+
+<p>Welcome to the Advanced DFIR Wizard Master Class
+by Jonathan Glass</p>
+<h2 id="scope-of-this-course">Scope of this Course</h2>
+
+<p>In scope for this class:</p>
+<ul>
+  <li>Hands on Tools, Tactics, and Techniques of DFIR
+    <ul>
+      <li>Computer Science for Incident Responders</li>
+      <li>Acquisition and Analysis of Windows artifacts</li>
+      <li>System Administration for Incident Responders</li>
+    </ul>
+  </li>
+  <li>Examples and Exercises</li>
+  <li>Python and PowerShell</li>
+</ul>
+
+<p>Out of scope for this class:</p>
+<ul>
+  <li>The 4 Step Digital Forensics Process</li>
+  <li>Legal crap
+    <ul>
+      <li>Federal Rules of Evidence</li>
+      <li>Chain of custody</li>
+      <li>4th and 5th amendments</li>
+      <li>U.S. Statutory laws</li>
+    </ul>
+  </li>
+  <li>Still important but learn it somewhere else.</li>
+</ul>
+
+<h2 id="course-overview">Course Overview</h2>
+<ol>
+  <li>Disclaimer</li>
+  <li>Windows Remote Admin for Incident Responders</li>
+  <li>Remote Acquisition of Windows Artifacts</li>
+  <li>Computer Science for Incident Responders</li>
+  <li>The Value of Unstructured Analysis</li>
+  <li>Windows Disk Artifact Analysis</li>
+  <li>Windows Memory Analysis</li>
+  <li>Network Analysis</li>
+  <li>Timelining for Fun and Profit</li>
+</ol>
+
+<h2 id="disclaimers">Disclaimers</h2>
+
+<h3 id="you-have-to-dig">You have to dig</h3>
+<p>As I built this course, I started realizing that perhaps the reader might not understand everything I am talking about. DFIR is not a field where everyone can know everything. It’s just too wide and too deep. Attempting to define every term and provide background on all material would bloat this project beyond scope and diminish the value. If I didn’t cover something, you might have to look it up. Searching for information is the crux of this job.</p>
+<h3 id="i-tried-to-keep-it-cheap">I tried to keep it cheap</h3>
+<p>In an effort to limit barriers to education, I tried to limit the examples in this course to native, open source, or readily available free tools. If for some reason I mention a commercial tool, it’s because it is worth documenting for completeness. You are going to need a Windows 7 or newer system to play with to put a lot of this to use.</p>
+<h3 id="audience">Audience</h3>
+<p>I think this course is written for two groups of people:</p>
+<ol>
+  <li>System Admins/Computer Enthusiasts who are trying to get into the exciting world of Digital Forensics and Incident Response.</li>
+  <li>Folks that have been in Information Security in one capacity or another and are looking to get into more technical work.</li>
+</ol>
+
+<p>This should not be the first computer related course you attempt.</p>
+<h3 id="omissions">Omissions</h3>
+<p>There are two reasons I didn’t include something in this course:</p>
+<ol>
+  <li>I didn’t know about it. <em>It happens. Often.</em></li>
+  <li>I thought you wouldn’t immediately benefit from knowing it. This career field is deep, wide, and almost any fact about how things work can be refuted with an exception. This course is not designed to be extremely comprehensive, just helpful.</li>
+</ol>
+
+<p>Either way, feel free to send me feedback and I will take a look.</p>
+
+<h2 id="windows-remote-admin-for-incident-responders">Windows Remote Admin for Incident Responders</h2>
+<p>Without a system administration background, many incident responders struggle with basic tasks like remotely starting and stopping processes on target machines. Inversely, Incident Responders with sysadmin experience are often faster and more effective. The more familiar you are with native Windows commands, the faster your can operate.</p>
+
+<p>While this course cannot hope to supplant the experience gained by years at your average help desk, I will try to highlight some of the more helpful techniques that get me from A to B.</p>
+
+<h3 id="topics">Topics</h3>
+
+<ul>
+  <li>WMI</li>
+  <li>MMC</li>
+  <li>PsExec</li>
+</ul>
+
+<h3 id="wmi">WMI</h3>
+<p>One of the most practical skills you can have as a Windows Admin is an understanding of WMI. Windows Management Instrumentation (WMI) is the infrastructure for management data and operations on Windows-based operating systems.</p>
+
+<h4 id="wmi-terminology">WMI Terminology</h4>
+
+<p>The four big vocabulary terms we are going to use for the section are:</p>
+
+<ul>
+  <li>Namespaces: A hierarchical structure of WMI objects used to organize Classes</li>
+  <li>Classes: A WMI Object that contains fun stuff like Properties and Methods</li>
+  <li>Property: Information that can be retrieved.</li>
+  <li>Method: Actions that can be taken.</li>
+</ul>
+
+<p>For a much better explanation, I recommend: 
+https://www.darkoperator.com/blog/2013/1/31/introduction-to-wmi-basics-with-powershell-part-1-what-it-is.html</p>
+
+<h4 id="wmi-example">WMI Example</h4>
+<p>To get a list of all processes running on a workstation that match a certain name with process IDs, you could use something like this:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>SELECT processid,name FROM Win32_Process where name='powershell.exe'
+</code></pre>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Term</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Namespace</td>
+      <td>Isn’t defined so the default (root\CIMV2) is assumed</td>
+    </tr>
+    <tr>
+      <td>Class</td>
+      <td>Win32_Process</td>
+    </tr>
+    <tr>
+      <td>Properties</td>
+      <td>processid and name</td>
+    </tr>
+    <tr>
+      <td>Methods</td>
+      <td>Not used because we are just listing process info</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="wql">WQL</h4>
+
+<p>WMI Query Language (WQL) is a bastardized version of SQL used to administer WMI. WQL is a deep dark rabbit hole of COM objects that I refuse to try to document but the main statements you need to know are <strong>SELECT, FROM, and WHERE</strong>.</p>
+
+<p>“WQL looks neat but where do I use it?” Great question!  WMI is accessible in a variety of flavors on modern Windows systems. You can leverage WQL with these handy native Windows solutions:</p>
+<h4 id="powershell">PowerShell</h4>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$query = "SELECT processid,name FROM Win32_Process where name='powershell.exe'"
+Get-WmiObject -query $query
+</code></pre>
+</div>
+
+<p><img src="https://lh3.googleusercontent.com/W2YwSbJPP5ZRd79J3mP9H_ZqiybcoQwrkN_x1mR_3ZS_swhaH8ri8_pvTNPVMZ27huGsNO2uA2pH" alt="enter image description here" title="PowerShell WMI" />
+Reference: https://blogs.technet.microsoft.com/heyscriptingguy/2012/07/10/three-easy-ways-to-use-powershell-and-wql-to-get-wmi-data/</p>
+<h4 id="wmic">WMIC</h4>
+<p>The WMI command-line (WMIC) utility provides a command-line interface for WMI. WMIC is one of my favorite command line applications because it condenses a lot of the</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code> wmic /node:computername process where (name = "cmd.exe") get processid,name
+</code></pre>
+</div>
+
+<p><img src="https://lh3.googleusercontent.com/uyxzXKI-aGm7aV7z4dSCphLneWEmEWAILGnnJ5QNbFijiOEyAVtpDLWpse4bCuQw7b6sEuTR5iFv" alt="WMIC Example" title="WMIC" />
+References: 
+https://msdn.microsoft.com/en-us/library/aa394531(v=vs.85).aspx
+http://jon.glass/blog/lists-some-wmic-commands/</p>
+
+<h4 id="visual-basic-scripting-example-more-or-less-deprecated">Visual Basic Scripting Example (more or less deprecated)</h4>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>strComputer = "."
+Set objWMIService = GetObject("winmgmts:\\" &amp; strComputer &amp; "\root\CIMV2")
+Set colItems = objWMIService.ExecQuery( _"SELECT * FROM Win32_Process WHERE name=’cscript.exe’",,48)
+For Each objItem in colItems
+    Wscript.Echo "Name: " &amp; objItem.Name
+    Wscript.Echo "ProcessId: " &amp; objItem.ProcessId
+Next
+</code></pre>
+</div>
+
+<p>While VBS is not my first choice, it is good to at least be aware of it because it is still very much in use by admins and attackers alike.</p>
+
+<p>Depending on what 3rd party tools you have in your environment you might be able to utilize these:</p>
+<h4 id="python">Python</h4>
+<p>The Python WMI module is a lightweight wrapper on top of the pywin32 extensions.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>import wmi
+c = wmi.WMI ()
+for s in c.Win32_Process ():
+    if s.Name == "python.exe":
+	    print(s.Name, s.ProcessID)
+</code></pre>
+</div>
+
+<h4 id="bigfix-relevance">BigFix Relevance</h4>
+
+<p>You might not have this in your environment but many companies have clients on endpoints that are designed for system administration or patching that can to utilized to perform incident response functions as well. This is especially true in SMBs where the security guy is also the patching and sysadmin team.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>(selects "processid,name from Win32_Process where name = 'explorer.exe'" of wmi)
+</code></pre>
+</div>
+
+<p><img src="https://lh3.googleusercontent.com/WrEf_EacizTtvxfYBGPqP9Y3vuzrbgC88tEvFoc7_83-_LOIuIk8Vi8A8iym3lZWmhp6UQBZGeC1" alt="enter image description here" title="BigFix WMI Relevance" /></p>
+
+<h4 id="wmi-classes-of-dfir-interest">WMI classes of DFIR interest</h4>
+<p>There is a lot of super geeky DFIR information you can pull out of WMI properties and methods that can give you wizard like powers over remote machines. Here are a few of my favorites :</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Class</th>
+      <th>Properties</th>
+      <th>Methods</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Win32_Process</td>
+      <td>CommandLine CreationDate Description ExecutablePath Name OSName ParentProcessId ProcessId SessionId</td>
+      <td>AttachDebugger Create GetOwner GetOwnerSid Terminate</td>
+    </tr>
+    <tr>
+      <td>Win32_Service</td>
+      <td>Description DisplayName InstallDate Name PathName ProcessId ServiceType Started StartMode StartName State Status</td>
+      <td>Change ChangeStartMode Create Delete PauseService ResumeService StartService StopService</td>
+    </tr>
+    <tr>
+      <td>Win32_LogonSession</td>
+      <td>AuthenticationPackage Description InstallDate LogonId LogonType Name StartTime Status</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Win32_NetworkLoginProfile</td>
+      <td>AccountExpires BadPasswordCount Description FullName LastLogoff LastLogon LogonServer Name NumberOfLogons PasswordAge PasswordExpires PrimaryGroupId Privileges Profile UserId UserType</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Win32_LogicalDisk</td>
+      <td>BlockSize Description DeviceID DriveType FileSystem FreeSpace MediaType Name Size VolumeName VolumeSerialNumber</td>
+      <td>Chkdsk Reset SetPowerState</td>
+    </tr>
+    <tr>
+      <td>Win32_StartupCommand</td>
+      <td>Caption Command Description Location Name SettingID User UserSID</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Win32_OperatingSystem</td>
+      <td>BootDevice BuildNumber CurrentTimeZone InstallDate LastBootUpTime LocalDateTime Locale Manufacturer Name NumberOfProcesses NumberOfUsers Organization OSArchitecture OSType SerialNumber ServicePackMajorVersion ServicePackMinorVersion SystemDrive</td>
+      <td>Reboot SetDateTime Shutdown</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="putting-it-to-work">Putting It To Work</h4>
+
+<p>Scenario: Your detection team says a user on RemoteComputerName received a malicious Word document that downloads a Remote Access Trojan that your antivirus doesn’t have a signature for. From your threat intelligence, this malicious Word document uses a macro to drop an EvilFile.exe in the users Temp directory.</p>
+
+<p>Let’s verify the alert..maybe the user didn’t open the Word doc…(yeah right)</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>wmic /node:RemoteComputerName process where (name like '%scchost.exe%') get executablepath,processid,parentprocessid /format:list
+    ExecutablePath=C:\Users\Username\AppData\Local\Temp\Scchost.EXE
+    ParentProcessId=1040
+    ProcessId=3712
+</code></pre>
+</div>
+
+<p>Crap. Looks like the user might have clicked on it. Let’s verify that parent process just to be sure:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>wmic /node:RemoteComputerName process where (ProcessId = 1040) get executablepath /format:list
+    ExecutablePath=C:\Program Files\Microsoft Office\Office16\WINWORD.EXE
+</code></pre>
+</div>
+
+<p>Double crap. Looks like this is a confirmed compromise of a workstation. 
+For fun and containment, let’s kill that malicious process using a WMI method:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>wmic /node:RemoteComputerName process where (name ='Scchost.exe') CALL Terminate
+Executing (\\RemoteComputerName\ROOT\CIMV2:Win32_Process.Handle="3712")-&gt;Terminate()
+Method execution successful.
+Out Parameters:
+instance of __PARAMETERS
+{
+        ReturnValue = 0;
+};
+</code></pre>
+</div>
+
+<p>For even MORE fun, like copy that malicious file to an analysis share so we can get a better look at it:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>wmic /node:RemoteComputerName process call create "xcopy  /Y C:\Users\Username\AppData\Local\Temp\Scchost.EXE \\AnalysisShare\Scchost.exe.bin" 
+</code></pre>
+</div>
+
+<p>For a lot less fun, let’s call the User explain the situation, shut it down remotely, and go get the workstation to determine what this malware did :</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>wmic /node:RemoteComputerName os call Shutdown *Disclaimer: This scenario is largely BS. Malware isn't usually this easy to kill and as more work becomes remote, it is increasingly rare to physically walk over to the user's cube and take their workstation.*
+</code></pre>
+</div>
+
+<h3 id="mmc">MMC</h3>
+<p>I imagine I scared some of off you with all that “coding” and “command line stuff”. While there are GUIer options to accomplish Windows administration tasks, they aren’t as efficient or sexy. If you are against coding all together, there is an X at the top right or left of your browser. We can part ways now and no one’s feelings need to get hurt. For the sake of completeness, I will cover MMC which is a GUI and can do Windows admin tasks but it is not my “go to”.
+According to the big M, the Microsoft Management Console (MMC) is an extensible common presentation service for management applications.
+<img src="https://lh3.googleusercontent.com/VUInzDZt324UY94jaySlPnC2g8pGlmA39EPc44acT7pGVBHkGpe7gfVk8wkTZFV-kvA3KqoKOCw8" alt="MMC" title="MMC" /></p>
+
+<p>This console gives you access to some a lot of administration tools.</p>
+<ul>
+  <li>Computer Management Snap-In
+    <ul>
+      <li>System Tools
+        <ul>
+          <li>Task Scheduler
+            <ul>
+              <li>Good for running processes remotely, shutting down workstations, and whatnot</li>
+            </ul>
+          </li>
+          <li>Event Viewer
+            <ul>
+              <li>Good for remotely viewing logs but not great</li>
+            </ul>
+          </li>
+          <li>Local Users and Groups
+            <ul>
+              <li>Good for administering local user accounts</li>
+            </ul>
+          </li>
+          <li>Device Manager
+            <ul>
+              <li>Handy when you need to see if a USB is plugged in</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>Storage
+        <ul>
+          <li>Disk Management
+            <ul>
+              <li>Also handy for seeing if external media is plugged in</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>Services and Applications
+        <ul>
+          <li>Services</li>
+          <li>Allows for administration of Windows services. (start, pause, stop)</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<p>I don’t use this much for IR but if you are in an environment where you don’t have any other tools, this is a native GUI solution that might get you where you need to go.</p>
+
+<h3 id="psexec">PsExec</h3>
+
+<p>From <a href="https://docs.microsoft.com/en-us/sysinternals/downloads/psexec">Microsoft</a></p>
+
+<blockquote>
+  <p>“PsExec is a light-weight application that lets you execute processes
+on other systems, complete with full interactivity for console
+applications, without having to manually install client software.
+PsExec’s most powerful uses include launching interactive
+command-prompts on remote systems and remote-enabling tools like
+IpConfig that otherwise do not have the ability to show information
+about remote systems.”</p>
+</blockquote>
+
+<p>I can’t tell you how many times PsExec has saved my bacon. Not to mention how many times I have pulled off some nifty DFIRfu with it’s various options. One of my favorite tricks is to run remote processes as the System account and not a puny User account as seen below:
+<img src="https://lh3.googleusercontent.com/4-ZH1TrrQnf95Lku4Nkxs1fyJ3N4ZztMg5jfmNHiGbMpCJn8hNj2mMSk3X8efsZ4m6N8_WRzsK8uneUtxdO76eTLQTKLz58vC-FY1wpVoGcVkTalEUngYDjZjoEy6yXshejM8rVmqkhsDHMISqAycVlM54BUNPUh5KGR4jjuqGiBiRLlXhJhF5zEvjGRErZjcV7mWL-B4nEyWaCCngUyawLFXZ0m5G_lXBIFJoxxL-RwxwgFjIPZKT89is13pXGBcQ0VwecPhelabM7oezdQhbQ2gBLkZ6wXDUD0Kh0Q4TqbFMOOwYPHyEdpu62bILZ5R5ffQASlVA2krJjS-PFArzREuKsWkl-RqBP3RoN6yZNltWfGXO2qqFctGMdkgA19Bq7tcrN7C1KEBgDez6EaxzeQoeMBD8PXNcavGmly5zPKWx-_TLPk-xDChRL_c2uztTg5hsq_bizOMA8TnLfJLHGL1LkWINdIcAFO8EstoTdUbUL5JdJeYnublDODahz7f_O8_PDYAFM9B-J7I3hD5MNTKCbBcJPhly_ZrdogRZMW3lEKVhKX9y4rMhSXHCwmZEtiapGwM5IaW7ra6aQrKZF2jtKxWJH-FHnRK_Q=w1838-h1166-no" alt="PsExec As System" />
+This grants a higher level of privileges and leaves less of a footprint on the remote machine. I rarely want to use my own account for anything on a remote machine unless I have to.</p>
+
+<p>Pro Tip: If you are copying evidence from a remote machine to a collection share using PsExec to run as the system account, make sure the share is configured to grant Computer account of the target workstation write permission or you will get errors that will run you in circles. Doesn’t matter if your admin account has rights if you are running as the Computer.</p>
+
+<p>Pro Tip: PsExec runs a console session by default but can be configured to interact with the logged on user’s session using the -i option. This is helpful in those rare instances where you need to user to see something you are doing. 99% of the time the user is going to be logged in under the second session or session 1. It’s not often but I have used this a couple times over the years.</p>
+
+
+      </div><!-- /.entry-content -->
+    </div><!-- /.entry-wrapper -->
+  </article>
+</div><!-- /#main -->
+
+<div class="footer-wrapper">
+  <footer role="contentinfo" class="entry-wrapper">
+    
+
+<span>&copy; 2018 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
+<div class="social-icons">
+	<a href="https://twitter.com/GlassDFIR" title="Jon Glass on Twitter" target="_blank"><i class="fa fa-twitter-square fa-2x"></i></a>
+	
+	
+	
+	
+	
+	
+	<a href="https://github.com/GlassDFIR" title="Jon Glass on Github" target="_blank"><i class="fa fa-github-square fa-2x"></i></a>
+	
+  
+	
+  <a href="http://jon.glass/feed.xml" title="Atom/RSS feed"><i class="fa fa-rss-square fa-2x"></i></a>
+</div><!-- /.social-icons -->
+
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+<script type="text/javascript">
+  var BASE_URL = 'http://jon.glass';
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="http://jon.glass/assets/js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script src="http://jon.glass/assets/js/scripts.min.js"></script>
+
+
+
+
+</body>
+</html>

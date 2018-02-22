@@ -1,9 +1,8 @@
-
 ---
 layout: page
-title:  Advanced DFIR Wizard Master Class
-date:   2018-02-20 15:33:28 -0500
-categories: course
+title: Courses
+excerpt: "The Advanced DFIR Wizard Master Class"
+search_omit: true
 ---
 
 
