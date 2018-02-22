@@ -1,9 +1,15 @@
----
+<!DOCTYPE html>
+<html>
 
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Whole Course</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
 
----
-
-<h2 id="welcome">Welcome</h2>
+<body class="stackedit">
+  <div class="stackedit__html"><h2 id="welcome">Welcome</h2>
 <p>Welcome to the Advanced DFIR Wizard Master Class<br>
 by Jonathan Glass</p>
 <h2 id="scope-of-this-course">Scope of this Course</h2>
@@ -106,4 +112,7 @@ BigFix Relevance</p>
 <pre><code>(selects "processid,name from Win32_Process where name = 'explorer.exe'" of wmi)
 </code></pre>
 <p><img src="https://lh3.googleusercontent.com/WrEf_EacizTtvxfYBGPqP9Y3vuzrbgC88tEvFoc7_83-_LOIuIk8Vi8A8iym3lZWmhp6UQBZGeC1" alt="enter image description here" title="BigFix WMI Relevance"></p>
+</div>
+</body>
 
+</html>
