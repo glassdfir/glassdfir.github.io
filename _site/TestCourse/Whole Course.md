@@ -1,3 +1,8 @@
+---
+
+
+---
+
 <h2 id="welcome">Welcome</h2>
 <p>Welcome to the Advanced DFIR Wizard Master Class<br>
 by Jonathan Glass</p>
