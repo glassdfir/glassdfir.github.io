@@ -20,18 +20,16 @@ Set-ItemProperty -Path "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\Winlo
 This will set the number of cached creds Windows is storing to 0 and erase the previous creds.
 ### 3. Change their BitLocker Key Remotely
 {% highlight powershell %}
-$BitLocker = Get-WmiObject -ComputerName ComputerX -Namespace "Root\cimv2\Security\MicrosoftVolumeEncryption" -Class "Win32_EncryptableVolume" -Filter "DriveLetter = 'C:'"
-$VolumeKeyProtectorIDs = $BitLocker.GetKeyProtectors()|Select-Object VolumeKeyProtectorID
-#Let's loop through all of the VolumeKeyProtectorIDs for the C Volume and delete them.
-ForEach($ID in $VolumeKeyProtectorIDs){$BitLocker.DeleteKeyProtector($ID)}
+#Delete existing protections
+manage-bde.exe -protectors -delete c: -Type TPMAndPIN
+manage-bde.exe -protectors -delete c: -Type RecoveryPassword
 #Now that all of the previous Protectors are gone, let's add our own.
 #Let's add a new password that only the security team will need to know.
-$BitLocker.ProtectKeyWithTPMAndPin("","","BrandNewPassword123")
+manage-bde.exe -protectors -add c: -TPMandPIN SuperDuperPassword
 #As a backup, let's also add a couple of recovery keys just in case noone can find the sticky note with the password.
-$BitLocker.ProtectKeyWithNumericalPassword("Primary","555555-555555-555555-555555-555555-555555-555555-555555")
-#Adding an additional optional recovery key might be helpful if you have more than one team that might need to gain access.
-$BitLocker.ProtectKeyWithNumericalPassword("Secondary","050505-050505-050505-050505-050505-050505-050505-050505")
-$BitLocker.EnableKeyProtectors()
+manage-bde.exe -protectors -add c: -RecoveryPassword 111111-111111-111111-111111-111111-111111-111111-111111 
+manage-bde.exe -protectors -add c: -RecoveryPassword 222222-222222-222222-222222-222222-222222-222222-222222 
+manage-bde.exe -on c:
 {% endhighlight %}
 This is a fun one. This will delete the user’s BitLocker key and save a new one that the user doesn’t know so they can’t unlock the drive after a reboot.
 ### 4. Shut down the remote system using any number of methods.
