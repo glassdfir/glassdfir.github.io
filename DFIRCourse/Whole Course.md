@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Courses
+title: "The Advanced DFIR Wizard Master Class"
 excerpt: "The Advanced DFIR Wizard Master Class"
 search_omit: true
 ---
