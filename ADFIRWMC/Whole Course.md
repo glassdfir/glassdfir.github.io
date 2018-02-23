@@ -150,7 +150,7 @@ You might not have this in your environment but many companies have clients on e
 
     (selects "processid,name from Win32_Process where name = 'explorer.exe'" of wmi)
 
-![enter image description here](https://lh3.googleusercontent.com/WrEf_EacizTtvxfYBGPqP9Y3vuzrbgC88tEvFoc7_83-_LOIuIk8Vi8A8iym3lZWmhp6UQBZGeC1 "BigFix WMI Relevance")
+![enter image description here](https://lh3.googleusercontent.com/V08obkAb126reJMrLmqptWgKYIU0HpIcfYJdxdy4Indpl7g5GUhf80584brJNQmLbDMrIfd5CPGdDmqZyMZEgFBNa7r4mRjFtbOqzJw7Upi0XDUzi9bp02wmWaXeY724oWnjy9RcGQYixmqWSzcYE75yyN4r_Rx95Fnnarltu5Ejr3goSx_6YWasGywL-eMVW6ODCncJgfYvCJO9qCojaQB60gAqleTXnt0wD6LpGw-vkaxjILWBvhapK38s8G3wSJKMHC0QcngbHiBp4wrPMAhma4y9QCFLsUe97e_3K3VX__g1-Fi2F-z0stiF9K0rbeshhDxe-bV7pb8WtnugyHrKsUyng_P52HhRqI4jd5SkbBAEvdcgULOEpfGpVVacSbPjWdLj7lmtb-So0aKMjEaFTw5fAbVdYhEeQDdP1h5w4w2YL8DZqZwK8exc8djEv4gHYZZBCjWhTAme6doPr90nYIAr9_r1wXVWr0OJqRGmItCRFY6JGhtZO35scbrz2JBDuYtaep87eHgmRE1CkyJI0SBpiY7t5b_qSi3fpexye-Wjw8tBJQXfCw9BqJXUtLSOg7KeflkxgnbJBBgbq3OX9eUHI-yibHqX3yQ=w713-h369-no "BigFix WMI Relevance")
 
 #### WMI classes of DFIR interest
  There is a lot of super geeky DFIR information you can pull out of WMI properties and methods that can give you wizard like powers over remote machines. Here are a few of my favorites :
@@ -205,7 +205,7 @@ For a lot less fun, let's call the User explain the situation, shut it down remo
 ### MMC
 I imagine I scared some of off you with all that "coding" and "command line stuff". While there are GUIer options to accomplish Windows administration tasks, they aren't as efficient or sexy. If you are against coding all together, there is an X at the top right or left of your browser. We can part ways now and no one's feelings need to get hurt. For the sake of completeness, I will cover MMC which is a GUI and can do Windows admin tasks but it is not my "go to".
 According to the big M, the Microsoft Management Console (MMC) is an extensible common presentation service for management applications.
-![MMC](https://lh3.googleusercontent.com/VUInzDZt324UY94jaySlPnC2g8pGlmA39EPc44acT7pGVBHkGpe7gfVk8wkTZFV-kvA3KqoKOCw8 "MMC")
+![MMC](https://lh3.googleusercontent.com/NanubjKU20LumPPeCb6u6DjOVIGuCPbKk6JfZMIW83MBlv0GKKCfLgELQ_CzwY2V6J_1FPLSXx1CzkDIn4I1X-_ph_Tccf9xwRfQ1dVilCaIQMD9hk7JLFoekVDj_9ubwqyr0vaMZthJ2U7bE-MPPKLsDsDUJ_1ipSI6X-VDIWelsgWgqwoD9eGUG7hlbW-m3Oe0uIQs4GdRkhvwAZVWGEboSzGax6r5ElU_zPpXora44uC4uDusr1vb-ta_RDsnVt4fREUI82y0GH4D_aEUntSAYbzcJbZ_etRhjpsfX5nJyDrjzTTzo2u_KOT-Sp7KV_bRrwSwZC_TSGtB-OyPk0GtfJT9Se6tSP7EQsFcbS5uFjz_5VjNleTYk0IzKoFlEoinX5aOhY2D0yn0-iLLCMIz8UhkJkTZpOfo99sRDy8iw145qrh6NouhLkIyV1pAMqixLULH2MEWvT_a0J7dOMlUNFZh_J-Z39wIx3ems3L6BLxvmcT2TP2wAG9ALAO6FxLZrZKbPjmsYED7WqwbdklHglIMV9uQMuSH6ir_wRdzdz6Y-b1rNbHFa8XCSbxGhoHVeTVP9KNWhf4X-OelK1YJ4TgPs4gdiZ9FtU8=w2320-h1418-no "MMC")
 
 This console gives you access to some a lot of administration tools.
  - Computer Management Snap-In
@@ -248,5 +248,5 @@ Pro Tip: If you are copying evidence from a remote machine to a collection share
 Pro Tip: PsExec runs a console session by default but can be configured to interact with the logged on user's session using the -i option. This is helpful in those rare instances where you need to user to see something you are doing. 99% of the time the user is going to be logged in under the second session or session 1. It's not often but I have used this a couple times over the years.
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMjcwNTIwMzA5XX0=
+eyJoaXN0b3J5IjpbLTQxOTg4ODQxMF19
 -->
