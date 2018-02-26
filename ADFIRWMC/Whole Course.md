@@ -1,4 +1,3 @@
-
 ---
 layout: page
 title:  Advanced DFIR Wizard Master Class

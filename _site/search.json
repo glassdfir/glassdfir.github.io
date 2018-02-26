@@ -357,21 +357,21 @@
   
 
   
-
-  
-
-  
-
-  
-
-  
-
-  
     ,{
-      "title"			: "About the Jon",
-      "link"			: "http://jon.glass/about/",
-      "excerpt"		: "Security dude"
+      "title"			: "Advanced DFIR Wizard Master Class",
+      "link"			: "http://jon.glass/ADFIRWMC/Whole%20Course/",
+      "excerpt"		: ""
     }
+  
+
+  
+
+  
+
+  
+
+  
+
   
 
   
@@ -382,6 +382,12 @@
     }
   
 
+  
+    ,{
+      "title"			: "About the Jon",
+      "link"			: "http://jon.glass/about/",
+      "excerpt"		: "Security dude"
+    }
   
 
   
