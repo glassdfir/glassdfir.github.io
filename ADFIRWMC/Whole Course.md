@@ -276,6 +276,3 @@ There is a lot going on in this example so let's break it down...
 ##### Example: Interacting with the User:
 Pro Tip: PsExec runs a console session by default but can be configured to interact with the logged on user's session using the -i option. This is helpful in those rare instances where you need to user to see something you are doing. 99% of the time the user is going to be logged in under the second session or session 1. It's not often but I have used this a couple times over the years.
 
-<!--stackedit_data:
-eyJoaXN0b3J5IjpbMTIyNzU1MDczXX0=
--->
