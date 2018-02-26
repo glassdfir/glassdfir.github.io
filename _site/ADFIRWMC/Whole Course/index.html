@@ -471,14 +471,14 @@ According to the big M, the Microsoft Management Console (MMC) is an extensible 
 <p>Way way way back in 1996, Mark Russinovich and Bryce Cogswell created a little company called Winternals Software LP that created a bunch of software to help administer Windows 2000 boxes. Long story short…in 2006 Microsoft bought the company and all their tools now known as <a href="https://docs.microsoft.com/en-us/sysinternals/">Windows Sysinternals</a>. There is a cornucopia of awesome tools that I will mention throughout the duration of this course but for now we are going to focus on some of the PsTools Suite I find most handy. While you can accomplish all of these functions via WMI via PowerShell or WMIC, these tools are helpful for those who prefer tools with a dedicated tasks and help menus. While there is absolutely no shame in that, the more comfortable you become with WMI scripting, the less you will need this suite.</p>
 
 <h4 id="windows-admin-using-pstools-suite">Windows Admin using PsTools Suite</h4>
-<p>|Tool                                                                            |Purpose                                                                       |
-|——————————————————————————–|——————————————————————————|
-|<a href="https://docs.microsoft.com/en-us/sysinternals/downloads/psexec">PsExec</a>        |execute processes remotely                                                    |
-|<a href="https://docs.microsoft.com/en-us/sysinternals/downloads/pskill">PsKill</a>        |kill processes by name or process ID                                          |
-|<a href="https://docs.microsoft.com/en-us/sysinternals/downloads/pslist">PsList</a>        |list detailed information about processes                                     |
-|<a href="https://docs.microsoft.com/en-us/sysinternals/downloads/psloggedon">PsLoggedOn</a>|see who’s logged on locally and via resource sharing (full source is included)|
-|<a href="https://docs.microsoft.com/en-us/sysinternals/downloads/psservice">PsService</a>  |view and control services                                                     |
-|<a href="https://docs.microsoft.com/en-us/sysinternals/downloads/psshutdown">PsShutdown</a>|shuts down and optionally reboots a computer                                  |</p>
+<p>|Tool  |Purpose |
+|—–|—-|
+|<a href="https://docs.microsoft.com/en-us/sysinternals/downloads/psexec/">PsExec</a>|execute processes remotely |
+|<a href="https://docs.microsoft.com/en-us/sysinternals/downloads/pskill/">PsKill</a>|kill processes by name or process ID |
+|<a href="https://docs.microsoft.com/en-us/sysinternals/downloads/pslist/">PsList</a> |list detailed information about processes |
+|<a href="https://docs.microsoft.com/en-us/sysinternals/downloads/psloggedon/">PsLoggedOn</a>|see who’s logged on locally and via resource sharing (full source is included)|
+|<a href="https://docs.microsoft.com/en-us/sysinternals/downloads/psservice/">PsService</a>  |view and control services |
+|<a href="https://docs.microsoft.com/en-us/sysinternals/downloads/psshutdown/">PsShutdown</a>|shuts down and optionally reboots a computer |</p>
 
 <h4 id="psexec">PsExec</h4>
 <p>From <a href="https://docs.microsoft.com/en-us/sysinternals/downloads/psexec">Microsoft</a></p>
@@ -521,7 +521,7 @@ This grants a higher level of privileges and leaves less of a footprint on the r
 <p>Pro Tip: PsExec runs a console session by default but can be configured to interact with the logged on user’s session using the -i option. This is helpful in those rare instances where you need to user to see something you are doing. 99% of the time the user is going to be logged in under the second session or session 1. It’s not often but I have used this a couple times over the years.</p>
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbNjU4NTE4MzU1XX0=
+eyJoaXN0b3J5IjpbLTE3Mjk2OTEwOThdfQ==
 -->
 
       </div><!-- /.entry-content -->
