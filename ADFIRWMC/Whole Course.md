@@ -230,6 +230,7 @@ I don't use this much for IR but if you are in an environment where you don't ha
 Way way way back in 1996, Mark Russinovich and Bryce Cogswell created a little company called Winternals Software LP that created a bunch of software to help administer Windows 2000 boxes. Long story short...in 2006 Microsoft bought the company and all their tools now known as [Windows Sysinternals](https://docs.microsoft.com/en-us/sysinternals/). There is a cornucopia of awesome tools that I will mention throughout the duration of this course but for now we are going to focus on some of the PsTools Suite I find most handy. While you can accomplish all of these functions via WMI via PowerShell or WMIC, these tools are helpful for those who prefer tools with a dedicated tasks and help menus. While there is absolutely no shame in that, the more comfortable you become with WMI scripting, the less you will need this suite.
 
 #### Windows Admin using PsTools Suite
+
 |Tool  |Purpose |
 |-----|----|
 |[PsExec](https://docs.microsoft.com/en-us/sysinternals/downloads/psexec/)|execute processes remotely |
