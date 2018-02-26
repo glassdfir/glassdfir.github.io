@@ -274,8 +274,8 @@ There is a lot going on in this example so let's break it down...
  - After RawCopy finished, I check my dropbox folder to confirm the $MFT landed safely.
 
 ##### Example: Interacting with the User:
-Pro Tip: PsExec runs a console session by default but can be configured to interact with the logged on user's session using the -i option. This is helpful in those rare instances where you need to user to see something you are doing. 99% of the time the user is going to be logged in under the second session or session 1. It's not often but I have used this a couple times over the years.
-
+PsExec runs a console session by default but can be configured to interact with the logged on user's session using the -i option. This is helpful in those rare instances where you need to user to see something you are doing. 99% of the time the user is going to be logged in under the second session or session 1. It's not often but I have used this a couple times over the years.
+![enter image description here](https://lh3.googleusercontent.com/sMBcjApvoza1Hp4hzlr1f-nKdi7dP6UB648V73m_D-E-VBv0k9l17mVoB01RUqBLf9yRItKKC3f6I26gbTfmEba7H6PmrbLmwlBQII8-hymfizrbwI5RtmhtZh228ldB9_51PGlp2mHa5sBXwsyAGfQya_Ou5b64-wWh_DM6bqUTF1Tx2FvPsPOc2F0EM2BQBFPnnT6DspUJRi-HjhSfzvTg6641xB1rQ8_VkPx6IpGu1Yg59B0fpLU0HtuDJ3iwHBfPwiXMEGMFnSqLe-HQVdr3nG0QgFG1eZNzV0UrNKxK8OuNTwAcsqW1Aly1GXHrupn1eb02kID4vBhtHTYphMxGMSC5QFTawzO8eGS67KGsCXKDAeFd5M9LUgLeR2XMm8I1tBpqOrxruFfI54BTEErZLRVDg16hQ5zXJJ1gwO1HgxCyHc0RiNxohtB_fWxlyHfk6uNxSfLEmUFCk2HD48r_GLcn7WFudHikoLXVvDLkDmyZMkCH7ZvY_cqFZKkz7J0FFQi_9esLBPxuRUJSz_jahZnhuNktoV6CkSY-kCaMOzZyA6ARMlkm3fY2_uv276qT5r4LxrL4dN902kYVSxo07WwJrzhkQh76iY8=w1839-h1663-no)
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTExMTYyNjU3OTFdfQ==
+eyJoaXN0b3J5IjpbMTk2Mzk4NDk3MV19
 -->
