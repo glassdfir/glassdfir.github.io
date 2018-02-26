@@ -230,7 +230,7 @@ I don't use this much for IR but if you are in an environment where you don't ha
 Way way way back in 1996, Mark Russinovich and Bryce Cogswell created a little company called Winternals Software LP that created a bunch of software to help administer Windows 2000 boxes. Long story short...in 2006 Microsoft bought the company and all their tools now known as [Windows Sysinternals](https://docs.microsoft.com/en-us/sysinternals/). There is a cornucopia of awesome tools that I will mention throughout the duration of this course but for now we are going to focus on some of the PsTools Suite I find most handy. While you can accomplish all of these functions via WMI via PowerShell or WMIC, these tools are helpful for those who prefer tools with a dedicated tasks and help menus. While there is absolutely no shame in that, the more comfortable you become with WMI scripting, the less you will need this suite.
 
 #### Windows Admin using PsTools Suite
-|Tool                                                                            |Purpose                                                                       |
+|Tool                                                                         |Purpose                                                                       |
 |--------------------------------------------------------------------------------|------------------------------------------------------------------------------|
 |[PsExec](https://docs.microsoft.com/en-us/sysinternals/downloads/psexec)        |execute processes remotely                                                    |
 |[PsKill](https://docs.microsoft.com/en-us/sysinternals/downloads/pskill)        |kill processes by name or process ID                                          |
@@ -276,5 +276,5 @@ There is a lot going on in this example so let's break it down...
 Pro Tip: PsExec runs a console session by default but can be configured to interact with the logged on user's session using the -i option. This is helpful in those rare instances where you need to user to see something you are doing. 99% of the time the user is going to be logged in under the second session or session 1. It's not often but I have used this a couple times over the years.
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbNjU4NTE4MzU1XX0=
+eyJoaXN0b3J5IjpbLTc4OTIwMDg3M119
 -->
