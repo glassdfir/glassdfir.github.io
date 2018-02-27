@@ -278,8 +278,8 @@ In this example, I use PsExec to create two instances of notepad.exe on my local
 
 The **-d** flag is used to detach the PsExec session from the child process so we don't have to wait until notepad exits to continue. This is very handy for DFIR collection scripts that might take a while. Detach the process and let it do it's thing. I like to use **-d** on targets that are on flakey VPN connections so that if the connection drops, the process is still running on the remote system. The obvious downside is, you can't interact with the session after it is detached.
 
-##### Example: Running commands on more than one machine at a time
-PsExec allows you to perform administrative tasks on more than one workstation at a time.
+##### Example: Running commands on multiple machines
+PsExec allows you to perform administrative tasks on multiple workstations but they are in
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTEzNzY3NzA2NzBdfQ==
+eyJoaXN0b3J5IjpbLTE1NTEwMzQxMF19
 -->
