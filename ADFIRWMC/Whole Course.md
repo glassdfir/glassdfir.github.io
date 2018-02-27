@@ -293,16 +293,11 @@ When would you ever need to do this? Let's say you want to collect evidence from
     #Bit of a cheat code to copy a file over before using it.
     \tools\PsExec.exe \\DESKTOP-132B1OL,RemoteMachine -d -f -c \Tools\RawCopy.exe
   
-  What does this do? PsExec will copy \Tools\RawCopy.exe to the c:\Windows folder of DESKTOP-132B1OL and try to run it. Same with RemoteMachine. RawCopy needs all sorts of command line options so it will fail BUT the tool has be in place. Why didn't i use the -c switch? I'll show you:
-  
+  What does this do? PsExec will copy \Tools\RawCopy.exe to the c:\Windows folder of DESKTOP-132B1OL and try to run it. Same with RemoteMachine. RawCopy needs all sorts of command line options so it will fail BUT the tool has be in place. Why didn't i use the **-c** switch? I'll show you:
 
-The breakdown:
+    \tools\PsExec.exe \\DESKTOP-132B1OL,RemoteMachine -d cmd /c c:\Windows\RawCopy.exe /FileNamePath:C:0 /OutputPath:"\\vmware-host\Shared Folders\Evidence\" /OutputName:^%computername^%-$MFT
 
- - I am running PsExec with a list of two computers, DESKTOP-132B1OL and RemoteMachine 
- - I am using **-d** to detach the process we are launching from the PsExec Session so I don't have to wait for the first one to finish
- - I am using **-f -c** to force copy RawCopy to the remote machines.
- - I am running RawCopy with the same commands as in the previous example except I need to cha 
-
+On my evidence share, I am looking to have two seperate files from 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTIwMjAxMDgxNThdfQ==
+eyJoaXN0b3J5IjpbMTA5MzUxOTQwMV19
 -->
