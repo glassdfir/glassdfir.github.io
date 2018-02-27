@@ -49,7 +49,7 @@ In an effort to limit barriers to education, I tried to limit the examples in th
 I think this course is written for three groups of people:
  1. System Admins/Computer Enthusiasts who are trying to get into the exciting world of Digital Forensics and Incident Response.
  2. Folks that have been in Information Security in one capacity or another and are looking to get into more technical work.
- 3. Other people that might find this information useful in some capacity.
+ 3. Other people that might find this information useful or interesting.
 
 This should not be the first computer related course you attempt.
 ### Omissions
@@ -312,5 +312,5 @@ If all this sounds convoluted, you're paying attention. The point of this course
 
 ## 2. Remote Acquisition of Windows Artifacts 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE2NDMwMTkxN119
+eyJoaXN0b3J5IjpbLTE1MjI4MDU5MzNdfQ==
 -->
