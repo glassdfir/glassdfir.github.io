@@ -293,7 +293,8 @@ When would you ever need to do this? Let's say you want to collect evidence from
     #Bit of a cheat code to copy a file over before using it.
     \tools\PsExec.exe \\DESKTOP-132B1OL,RemoteMachine -d -f -c \Tools\RawCopy.exe
   
-  What does this do? PsExec will copy \Tools\RawCopy.exe to the c:\Windows folder of DESKTOP-132B1OL and try to run it. Same with RemoteMachine. RawCopy needs all sorts of command line options so it will fail BUT the tool has be in place. Why didn't i use the -c switch?
+  What does this do? PsExec will copy \Tools\RawCopy.exe to the c:\Windows folder of DESKTOP-132B1OL and try to run it. Same with RemoteMachine. RawCopy needs all sorts of command line options so it will fail BUT the tool has be in place. Why didn't i use the -c switch? I'll show you:
+  
 
 The breakdown:
 
@@ -303,5 +304,5 @@ The breakdown:
  - I am running RawCopy with the same commands as in the previous example except I need to cha 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbNzY3NTM2MDQwXX0=
+eyJoaXN0b3J5IjpbLTIwMjAxMDgxNThdfQ==
 -->
