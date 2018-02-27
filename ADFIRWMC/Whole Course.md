@@ -287,11 +287,14 @@ I can't access the second machine until I exit the session with the first one. T
 ![enter image description here](https://lh3.googleusercontent.com/oMg_WV5sdeF1Yy1qy1Mr44hJe3IfJQNTXSVrKSv30ksqnxafZ3zgND9Qf9NPRgUlFwy7KUEXssuvJRG2iVE-dH9M0XlMrO1-4J8rJ5__ZMA6F3SniNEp1Rrc58I_EIOvc14jFDuQBHkVcjhGcH_VYqOcNm5YubOEqF04hlkTdZmW9f4IO5WplB7PTmWLEtLj5xWipiiwXKna1XL9i1LnYREEesYJOuvjmogfwRfyzC_KgKk0niWddeDPpJVEm6WbqUgLN9uhaYnl_KwkklBB7iWUF4oF9i9hzt-l6WcFYWASDbYMW-D7PxscdFkmZftEvUz-ETYKFnSOSiyn8xRMfrqeOXnEBUnUOfNaz-ABsVKS5425qsi_Re9-xT4G4C8x1ODBjMsQ4NlM74RAamg5Z9goZcSTc9t3jqVtRDrp6ms3iZskOfAGBnWbhwmgHveYDg2tvjeaoeIr3NJozhTTjdIx6UzAjDas2TgErq1aBzMb456hQptWdj78a15yn5s55ZFiEU5RydlIcAg8sFDj4CuYV1XPAb5OZRo0icEyXq0nhaH8V8UO701Mdc2PvMKjDs-aJtieAzmPLeXJSf4fGZMevX26Kkb-m9LhBFc=w1594-h578-no)
 When would you ever need to do this? Let's say you want to collect evidence from the two machines involved in an alert you received from your detection team. You could bust out your PsExec skills and do something like this:
 ![enter image description here](https://lh3.googleusercontent.com/O_NXTxm26jK189cjK-VRYepC77rJjMRqDOolWC8jwRqWvefI1Tc2Jj_N-ftLgSoXc1UGvRDD9cBR0T-l1Zxe1lhBrla8fLOZCYqzcDDy6RdMWfNnrpR10q4drNClaGO7cGqWz7qElFqRs_CoTcEKYvLYlGlwXyz1EJIA0W1yOaIGwVC1u481VIJxETiWLwWRY-c5weVsd9Jpcusw6Fb8qk4TFMAL0v4ZQ8TTkfKcHuS4VuzoeW200-mj55bXRd1G2nSDtNrKweBSCxEnqtw6ioQ5Q5TJsaUI7BSzByIJBZHUb2-S9WdHcqGlJFPH-xeEQ05LFeUc0A_3y8AykJKmox3CTOfPF2J6arziECLnbmN8gO0u28yYGau2zeLShmEMNT-Hfd67EwAXy60OdLCDlbO7sx8vPzkJuM2X4qUWrJTyZb67cE5hz_02254zk0M3b7uPpL12AZvjryDXSkHbcUHtpzFgtExi2U-O4CWl-lo47B6kb05A2F4jBc5lnWNdPPb3kgBLUDCDtb8Dda87fhQgtAXS5K0ogoP1IX_501RTuOvcJYiM-moCaETD1hj1FeoYaZnh7AfS0uHktHJqzmUlT7bs3g7YxX_alzw=w1590-h780-no)
-PsExec.exe \\DESKTOP-132B1OL,RemoteMachine -d -f -c RawCopy.exe /FileNamePath:C:0 /OutputPath:"\\vmware-host\Shared Folders\Evidence\" /OutputName:%computername%-$MFT
+
+    PsExec.exe \\DESKTOP-132B1OL,RemoteMachine -d -f -c RawCopy.exe /FileNamePath:C:0 /OutputPath:"\\vmware-host\Shared Folders\Evidence\" /OutputName:%computername%-$MFT
+
 The breakdown:
 
- - I am running PsExec with a list of two computers
+ - I am running PsExec with a list of two computers, DESKTOP-132B1OL and RemoteMachine 
+ - I am detaching the process we are launching from the PsExec Session so I don't have to wait for the first one to finish
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTAzMjg0MTQ5M119
+eyJoaXN0b3J5IjpbNjI2Mjk3NDEwXX0=
 -->
