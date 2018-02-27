@@ -297,7 +297,7 @@ When would you ever need to do this? Let's say you want to collect evidence from
 
     \tools\PsExec.exe \\DESKTOP-132B1OL,RemoteMachine -d cmd /c c:\Windows\RawCopy.exe /FileNamePath:C:0 /OutputPath:"\\vmware-host\Shared Folders\Evidence\" /OutputName:^%computername^%-$MFT
 
-On my evidence share, I am looking to have two seperate files from 
+On my evidence share, I am looking to have two seperate files 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTA5MzUxOTQwMV19
+eyJoaXN0b3J5IjpbMTYzMDk4Nzg2MV19
 -->
