@@ -227,7 +227,7 @@ I don't use this much for IR but if you are in an environment where you don't ha
 
 ### PsTools
 
-Way way way back in 1996, Mark Russinovich and Bryce Cogswell created a little company called Winternals Software LP that created a bunch of software to help administer Windows 2000 boxes. Long story short...in 2006 Microsoft bought the company and all their tools now known as [Windows Sysinternals](https://docs.microsoft.com/en-us/sysinternals/). There is a cornucopia of awesome tools that I will mention throughout the duration of this course but for now we are going to focus on some of the PsTools Suite I find most handy. While you can accomplish all of these functions via WMI via PowerShell or WMIC, these tools are helpful for those who prefer tools with a dedicated tasks and help menus. While there is absolutely no shame in that, the more comfortable you become with WMI scripting, the less you will need this suite.
+Way way way back in 1996, Mark Russinovich and Bryce Cogswell created a little company called Winternals Software LP that created a bunch of software to help administer Windows 2000 boxes. Long story short...in 2006 Microsoft bought the company and all their tools now known as [Windows Sysinternals](https://docs.microsoft.com/en-us/sysinternals/). There is a cornucopia of awesome tools that I will mention throughout the duration of this course but for now we are going to focus on some of the PsTools Suite I find most handy. While you can accomplish all of these functions via WMI via PowerShell or WMIC, these tools are helpful for those who prefer tools with a dedicated tasks and help menus. There is absolutely no shame in that but I found, the more comfortable I become with WMI scripting, the less you will need this suite.
 
 #### Windows Admin using PsTools Suite
 
@@ -303,5 +303,5 @@ To access the remote environment variables, I needed to use cmd to launch RawCop
 
 If all this sounds convoluted, you're paying attention. The point of this course highlight some more complicated methods of approaching the litany of challenges you will encounter during your DFIR day.
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTQ5NzE2MDEzMV19
+eyJoaXN0b3J5IjpbNjQ3NTc4MjY4XX0=
 -->
