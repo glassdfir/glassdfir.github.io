@@ -299,9 +299,9 @@ When would you ever need to do this? Let's say you want to collect evidence from
 
 On my evidence share, I am looking to have one file from each of these workstations. To make sure I can tell the two $MFTs apart, I used the environment variable %COMPUTERNAME% from the remote computer for file name passed to RawCopy.
 
-To access the remote environment variables, I needed to use cmd to launch RawCopy which means I couldn't use the **-c** to copy it over in one foul swoop. Using the carets to escape the parenthesis, like this `^%computername^%-$MFT`, you can pass the 
+To access the remote environment variables, I needed to use cmd to launch RawCopy which means I couldn't use the **-c** to copy it over in one foul swoop. Using the carets to escape the parenthesis, like this `^%computername^%-$MFT`, you can pass the variable to the next command interpreter. If you don't, your command prompt will interpret it and save all of the file names as YOUR computer name
 
 If all this sounds convoluted, you're paying attention. The point of this course highlight some more complicated methods of approaching the litany of challenges you will encounter during your DFIR day.
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE3OTUxMDIwNjBdfQ==
+eyJoaXN0b3J5IjpbMTQ0NTgyOTEzNl19
 -->
