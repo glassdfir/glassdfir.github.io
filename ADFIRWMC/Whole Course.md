@@ -290,7 +290,7 @@ I can't access the second machine until I exit the session with the first one. T
 
 ![enter image description here](https://lh3.googleusercontent.com/oMg_WV5sdeF1Yy1qy1Mr44hJe3IfJQNTXSVrKSv30ksqnxafZ3zgND9Qf9NPRgUlFwy7KUEXssuvJRG2iVE-dH9M0XlMrO1-4J8rJ5__ZMA6F3SniNEp1Rrc58I_EIOvc14jFDuQBHkVcjhGcH_VYqOcNm5YubOEqF04hlkTdZmW9f4IO5WplB7PTmWLEtLj5xWipiiwXKna1XL9i1LnYREEesYJOuvjmogfwRfyzC_KgKk0niWddeDPpJVEm6WbqUgLN9uhaYnl_KwkklBB7iWUF4oF9i9hzt-l6WcFYWASDbYMW-D7PxscdFkmZftEvUz-ETYKFnSOSiyn8xRMfrqeOXnEBUnUOfNaz-ABsVKS5425qsi_Re9-xT4G4C8x1ODBjMsQ4NlM74RAamg5Z9goZcSTc9t3jqVtRDrp6ms3iZskOfAGBnWbhwmgHveYDg2tvjeaoeIr3NJozhTTjdIx6UzAjDas2TgErq1aBzMb456hQptWdj78a15yn5s55ZFiEU5RydlIcAg8sFDj4CuYV1XPAb5OZRo0icEyXq0nhaH8V8UO701Mdc2PvMKjDs-aJtieAzmPLeXJSf4fGZMevX26Kkb-m9LhBFc=w1594-h578-no)
 
-When would you ever need to do this? Let's say you want to collect evidence from the two machines involved in an alert you received from your detection team. You could bust out your PsExec skills and do something like this:
+When would you ever need to do this? Let's say you want to collect artifacts from the two machines involved in an alert you received from your detection team. You could bust out your PsExec skills and do something like this:
 
 ![enter image description here](https://lh3.googleusercontent.com/8mpVTn-5vj4-urOuoC5xfSTqS3GmiKOAeIFjYvd0Vy1s0i1qM1usobRum4xNFtAFXqqdn5rO02-Elf2pkqNHSr7bu7ECE-1E7Nz_JHjD8XWMaZGFzMd-woTS5vEM7iFCalc4mUDTlu1AaHxpvobeW7pXH2y1kjHAjCfQz5Axiz-4bWv9E11u8Yb1CLP5DPjX0f1KsgGKLsoJBpQsrJGR5V0L7Sd1LJhVOWlXbl2fHJBUtdmW19ODiq1eaNC9oVWssydRYqBQC0SwLfyJbCJui5FpHQHmIgGxEtbZ-Hge1_41lNmaFJJL1Do_TnYbBEn2pbnHQL6d_sktsRoFDFRgzirlt7B5qq8BJzQkbZYijdMmCafWOCFxedC5JwE9FITisXMLnqftsCEhsz4_wP6R04EawJRnCf2wPyY9Iim_d12vgFoXaUQR87mb2IiP7voJ_QDc-nUYyd1D0BJgJRArknRnk5JAHkEusCUwrit3sgzttTYMoH6pkfi3xdBQDQ3Y_SCmmxYZY99Kb1vpI9UJYfC-pjyWjvSR-1GsV4SnJpFH8p2w78POIeEf0CFrktvTC-Cp5hQKB4mGtqIjCc1j0jWH0P_XND77D2ZrjtU=w1598-h1154-no)
 
@@ -312,5 +312,5 @@ If all this sounds convoluted, you're paying attention. The point of this course
 
 ## 2. Remote Acquisition of Windows Artifacts 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE1MjI4MDU5MzNdfQ==
+eyJoaXN0b3J5IjpbMTk0Mjk2NzU5XX0=
 -->
