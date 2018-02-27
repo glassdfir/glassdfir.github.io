@@ -301,7 +301,7 @@ On my evidence share, I am looking to have one file from each of these workstati
 
 To access the remote environment variables, I needed to use cmd to launch RawCopy which means I couldn't use the **-c** to copy it over in one foul swoop. 
 
-If this sounds convoluted, it is BUT the point of this course
+If this sounds convoluted, it is BUT the point of this course highlight some more complicated methods of approaching the litany of challenges you will encounter in DFIR
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTk1MzQ2MDIyN119
+eyJoaXN0b3J5IjpbMjU4ODYzNjQ5XX0=
 -->
