@@ -290,8 +290,8 @@ When would you ever need to do this? Let's say you want to collect evidence from
 The breakdown:
 
  - I created a mapped drive to a network share to make the commands a little cleaner:
-	 - net use * \\S
+	 - `net use * \\Server\Sharename` will give you the 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTEyNjU0MzUwOTFdfQ==
+eyJoaXN0b3J5IjpbMTkxMzI2MTU2NF19
 -->
