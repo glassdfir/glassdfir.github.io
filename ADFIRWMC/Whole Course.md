@@ -29,17 +29,17 @@ Out of scope for this class:
 * Still important but learn it somewhere else.
 
 ## Course Overview
- 1. Disclaimer
- 2. Windows Remote Admin for Incident Responders
- 3. Remote Acquisition of Windows Artifacts
- 4. Computer Science for Incident Responders
- 5. The Value of Unstructured Analysis
- 6. Windows Disk Artifact Analysis
- 7. Windows Memory Analysis
- 8. Network Analysis
- 9. Timelining for Fun and Profit
+ 0. Disclaimers
+ 1. Windows Remote Admin for Incident Responders
+ 2. Remote Acquisition of Windows Artifacts
+ 3. Computer Science for Incident Responders
+ 4. The Value of Unstructured Analysis
+ 5. Windows Disk Artifact Analysis
+ 6. Windows Memory Analysis
+ 7. Network Analysis
+ 8. Timelining for Fun and Profit
 
-## Disclaimers
+## 0. Disclaimers
 
 ### You have to dig
 As I built this course, I started realizing that perhaps the reader might not understand everything I am talking about. DFIR is not a field where everyone can know everything. It's just too wide and too deep. Attempting to define every term and provide background on all material would bloat this project beyond scope and diminish the value. If I didn't cover something, you might have to look it up. Searching for information is the crux of this job.
@@ -308,5 +308,5 @@ To access the remote environment variables, I needed to use cmd to launch RawCop
 
 If all this sounds convoluted, you're paying attention. The point of this course highlight some more complicated methods of approaching the litany of challenges you will encounter during your DFIR day.
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMzU0MzEwNjA0XX0=
+eyJoaXN0b3J5IjpbMTUwOTM3MzE1Ml19
 -->
