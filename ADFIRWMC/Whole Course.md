@@ -18,6 +18,7 @@ In scope for this class:
 	* System Administration for Incident Responders
 * Examples and Exercises
 * Python and PowerShell
+
 Out of scope for this class:
 * The 4 Step Digital Forensics Process
 * OSI Model
@@ -310,5 +311,5 @@ If all this sounds convoluted, you're paying attention. The point of this course
 
 ## 2. Remote Acquisition of Windows Artifacts 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE3NDU3NjEzMzFdfQ==
+eyJoaXN0b3J5IjpbLTE3MDA4NTQ1OTddfQ==
 -->
