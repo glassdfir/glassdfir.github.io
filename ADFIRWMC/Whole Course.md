@@ -278,7 +278,7 @@ PsExec runs a console session by default but can be configured to interact with 
 In this example, I use PsExec to create two instances of notepad.exe on my local machine. One is in user session and visible, the other is not. 
 ![enter image description here](https://lh3.googleusercontent.com/sMBcjApvoza1Hp4hzlr1f-nKdi7dP6UB648V73m_D-E-VBv0k9l17mVoB01RUqBLf9yRItKKC3f6I26gbTfmEba7H6PmrbLmwlBQII8-hymfizrbwI5RtmhtZh228ldB9_51PGlp2mHa5sBXwsyAGfQya_Ou5b64-wWh_DM6bqUTF1Tx2FvPsPOc2F0EM2BQBFPnnT6DspUJRi-HjhSfzvTg6641xB1rQ8_VkPx6IpGu1Yg59B0fpLU0HtuDJ3iwHBfPwiXMEGMFnSqLe-HQVdr3nG0QgFG1eZNzV0UrNKxK8OuNTwAcsqW1Aly1GXHrupn1eb02kID4vBhtHTYphMxGMSC5QFTawzO8eGS67KGsCXKDAeFd5M9LUgLeR2XMm8I1tBpqOrxruFfI54BTEErZLRVDg16hQ5zXJJ1gwO1HgxCyHc0RiNxohtB_fWxlyHfk6uNxSfLEmUFCk2HD48r_GLcn7WFudHikoLXVvDLkDmyZMkCH7ZvY_cqFZKkz7J0FFQi_9esLBPxuRUJSz_jahZnhuNktoV6CkSY-kCaMOzZyA6ARMlkm3fY2_uv276qT5r4LxrL4dN902kYVSxo07WwJrzhkQh76iY8=w1839-h1663-no)
 
-The **-d** flag is used to detach the PsExec session from the child process so we don't have to wait until notepad exits to continue. This is very handy for DFIR collection scripts that might take a while. Detach the process and let it do it's thing. I like to use **-d** on targets that are on a VPN connection so
+The **-d** flag is used to detach the PsExec session from the child process so we don't have to wait until notepad exits to continue. This is very handy for DFIR collection scripts that might take a while. Detach the process and let it do it's thing. I like to use **-d** on targets that are on flakey VPN connections so that if the connection drops, the process is still running on the remote system. The obvious downside is, you can't i
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTEyMTEwNzg4MDFdfQ==
+eyJoaXN0b3J5IjpbMTI0MDMwODk2MF19
 -->
