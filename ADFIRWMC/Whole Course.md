@@ -240,6 +240,8 @@ Way way way back in 1996, Mark Russinovich and Bryce Cogswell created a little c
 |[PsService](https://docs.microsoft.com/en-us/sysinternals/downloads/psservice/)  |view and control services |
 |[PsShutdown](https://docs.microsoft.com/en-us/sysinternals/downloads/psshutdown/)|shuts down and optionally reboots a computer |
 
+Most of the PsTools sui
+
 #### PsExec
 From [Microsoft](https://docs.microsoft.com/en-us/sysinternals/downloads/psexec) 
 
@@ -303,5 +305,5 @@ To access the remote environment variables, I needed to use cmd to launch RawCop
 
 If all this sounds convoluted, you're paying attention. The point of this course highlight some more complicated methods of approaching the litany of challenges you will encounter during your DFIR day.
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTUxNTg5NzYyOV19
+eyJoaXN0b3J5IjpbLTkyNTg0NTQxOV19
 -->
