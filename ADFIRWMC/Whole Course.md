@@ -285,7 +285,8 @@ PsExec allows you to perform administrative tasks on multiple workstations but y
     PsExec.exe \\DESKTOP-132B1OL,192.168.164.130 cmd
 I can't access the second machine until I exit the session with the first one. To speed that process up, using the **-d** to detach the session from the process will make it much faster.
 ![enter image description here](https://lh3.googleusercontent.com/oMg_WV5sdeF1Yy1qy1Mr44hJe3IfJQNTXSVrKSv30ksqnxafZ3zgND9Qf9NPRgUlFwy7KUEXssuvJRG2iVE-dH9M0XlMrO1-4J8rJ5__ZMA6F3SniNEp1Rrc58I_EIOvc14jFDuQBHkVcjhGcH_VYqOcNm5YubOEqF04hlkTdZmW9f4IO5WplB7PTmWLEtLj5xWipiiwXKna1XL9i1LnYREEesYJOuvjmogfwRfyzC_KgKk0niWddeDPpJVEm6WbqUgLN9uhaYnl_KwkklBB7iWUF4oF9i9hzt-l6WcFYWASDbYMW-D7PxscdFkmZftEvUz-ETYKFnSOSiyn8xRMfrqeOXnEBUnUOfNaz-ABsVKS5425qsi_Re9-xT4G4C8x1ODBjMsQ4NlM74RAamg5Z9goZcSTc9t3jqVtRDrp6ms3iZskOfAGBnWbhwmgHveYDg2tvjeaoeIr3NJozhTTjdIx6UzAjDas2TgErq1aBzMb456hQptWdj78a15yn5s55ZFiEU5RydlIcAg8sFDj4CuYV1XPAb5OZRo0icEyXq0nhaH8V8UO701Mdc2PvMKjDs-aJtieAzmPLeXJSf4fGZMevX26Kkb-m9LhBFc=w1594-h578-no)
-When would you ever need to do this? Let's say you want to collect evidence from the two machines 
+When would you ever need to do this? Let's say you want to collect evidence from the two machines involved in an alert you received from your detection team. You could bust out your PsExec skills and do something like this:
+![enter image description here](https://lh3.googleusercontent.com/bkLmf4hGuTh5yv4gl97g9ymAxG_deq0osC0o0mFuxIvLCB9Kjfiih2SzuwXbZMkmPWhsQm3CzDYyGz9ahM4VsNs8CR-OB26ZVreamBLbwfpa-Qm8wto9TPKKo8-Fus9Vm_bOBv0mNAf0q0aQHIkW2Mqry7nEsiNBfAH-PL-g9yfxglYtmv6gANRb55Ut4qsNbFwZLP29a42s1P0uixkDrd0RLpCIX-9EdzoDv1L65ZAAMFiPy-n1Ufyk48HgsOyYAK92wTsRVF8d6vL_O3TmOhopf9DJ25636UnEFK46ljnJ-3vyLWAf0opcnBzr4PruEZZCntun__Tmnn6aXxcgWg_9U7KCyV3axxhHzBUti4aWDAy1XN0BZ7LL6NmkaU2wBvGqH8vnETx__iOa3Ia3kq6lDneaFrpxBnPyJXYMkCeq3R7-h0CPHiTYtJ0i-uZqnhd8td_LjXk2F2yGf_YffkilxMr6bBHx1olr6ZLI3MkT4_nWOlunLphV5mavflhji8AWF-s28dGb6dMYU5b06jwETZCpQN4ZoCM-Mbxc8gIOldvhEFIPrQM9eAp_FH1a40Tzl4Vp1PKYyt2taqRFku2snnW8yLNj3q80TKg=w1584-h990-no)
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbNjIyMzk2ODI5XX0=
+eyJoaXN0b3J5IjpbLTE5MTA4MTQ1MDldfQ==
 -->
