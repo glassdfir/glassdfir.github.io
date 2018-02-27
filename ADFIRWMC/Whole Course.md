@@ -291,8 +291,8 @@ The breakdown:
 
  - I created a mapped drive to a network share to make the commands a little cleaner:
 	 - `net use * \\Server\Sharename` will map the next available drive letter. In this example, X:
- - I used PsExec with  
+ - I used PsExec with two machines listed 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTcxODQ0OTc0XX0=
+eyJoaXN0b3J5IjpbLTE1ODUxOTcwNTddfQ==
 -->
