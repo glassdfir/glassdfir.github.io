@@ -289,8 +289,9 @@ When would you ever need to do this? Let's say you want to collect evidence from
 ![enter image description here](https://lh3.googleusercontent.com/bkLmf4hGuTh5yv4gl97g9ymAxG_deq0osC0o0mFuxIvLCB9Kjfiih2SzuwXbZMkmPWhsQm3CzDYyGz9ahM4VsNs8CR-OB26ZVreamBLbwfpa-Qm8wto9TPKKo8-Fus9Vm_bOBv0mNAf0q0aQHIkW2Mqry7nEsiNBfAH-PL-g9yfxglYtmv6gANRb55Ut4qsNbFwZLP29a42s1P0uixkDrd0RLpCIX-9EdzoDv1L65ZAAMFiPy-n1Ufyk48HgsOyYAK92wTsRVF8d6vL_O3TmOhopf9DJ25636UnEFK46ljnJ-3vyLWAf0opcnBzr4PruEZZCntun__Tmnn6aXxcgWg_9U7KCyV3axxhHzBUti4aWDAy1XN0BZ7LL6NmkaU2wBvGqH8vnETx__iOa3Ia3kq6lDneaFrpxBnPyJXYMkCeq3R7-h0CPHiTYtJ0i-uZqnhd8td_LjXk2F2yGf_YffkilxMr6bBHx1olr6ZLI3MkT4_nWOlunLphV5mavflhji8AWF-s28dGb6dMYU5b06jwETZCpQN4ZoCM-Mbxc8gIOldvhEFIPrQM9eAp_FH1a40Tzl4Vp1PKYyt2taqRFku2snnW8yLNj3q80TKg=w1584-h990-no)
 The breakdown:
 
- - I created a mapped drive to a network share to make the 
+ - I created a mapped drive to a network share to make the commands a little cleaner:
+	 - net use * \\S
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTU2Mjk1MDQwNF19
+eyJoaXN0b3J5IjpbLTEyNjU0MzUwOTFdfQ==
 -->
