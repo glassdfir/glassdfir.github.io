@@ -294,8 +294,8 @@ The breakdown:
 
  - I am running PsExec with a list of two computers, DESKTOP-132B1OL and RemoteMachine 
  - I am using **-d** to detach the process we are launching from the PsExec Session so I don't have to wait for the first one to finish
- - I am using **-f -c**  
+ - I am using **-f -c** to force copy RawCopy to the remote machines 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE5NzExNjM4NTldfQ==
+eyJoaXN0b3J5IjpbNzI1ODU1MzE1XX0=
 -->
