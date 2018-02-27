@@ -290,8 +290,9 @@ When would you ever need to do this? Let's say you want to collect evidence from
 The breakdown:
 
  - I created a mapped drive to a network share to make the commands a little cleaner:
-	 - `net use * \\Server\Sharename` will 
+	 - `net use * \\Server\Sharename` will map the next available drive letter. In this example, X:
+ - I used PsExec with  
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbODEyODEwMTk3XX0=
+eyJoaXN0b3J5IjpbMTcxODQ0OTc0XX0=
 -->
