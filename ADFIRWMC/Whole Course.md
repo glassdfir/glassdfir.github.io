@@ -26,7 +26,7 @@ Out of scope for this class:
 	* Federal Rules of Evidence
 	* Chain of custody
 * Where babies come from
-* Still important but learn it somewhere else.
+* Important stuff but learn it somewhere else.
 
 ## Course Overview
  0. Disclaimers
@@ -311,5 +311,5 @@ If all this sounds convoluted, you're paying attention. The point of this course
 
 ## 2. Remote Acquisition of Windows Artifacts 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTE5NTMyOTAxXX0=
+eyJoaXN0b3J5IjpbMTAzNTk2ODMwNV19
 -->
