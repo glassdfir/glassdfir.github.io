@@ -293,8 +293,9 @@ When would you ever need to do this? Let's say you want to collect evidence from
 The breakdown:
 
  - I am running PsExec with a list of two computers, DESKTOP-132B1OL and RemoteMachine 
- - I am detaching the process we are launching from the PsExec Session so I don't have to wait for the first one to finish
+ - I am using **-d** to detach the process we are launching from the PsExec Session so I don't have to wait for the first one to finish
+ - I am **-f -c**
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbNjI2Mjk3NDEwXX0=
+eyJoaXN0b3J5IjpbLTEyNDYyMTAzNTFdfQ==
 -->
