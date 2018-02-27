@@ -13,9 +13,9 @@ by Jonathan Glass
 
 In scope for this class:
 * Hands on Tools, Tactics, and Techniques of DFIR
+	* System Administration for Incident Responders
 	* Computer Science for Incident Responders
 	* Acquisition and Analysis of Windows artifacts
-	* System Administration for Incident Responders
 * Examples and Exercises
 * Python and PowerShell
 
@@ -311,5 +311,5 @@ If all this sounds convoluted, you're paying attention. The point of this course
 
 ## 2. Remote Acquisition of Windows Artifacts 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE3MDA4NTQ1OTddfQ==
+eyJoaXN0b3J5IjpbMTE5NTMyOTAxXX0=
 -->
