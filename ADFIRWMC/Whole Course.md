@@ -46,7 +46,7 @@ As I built this course, I started realizing that perhaps the reader might not un
 ### I tried to keep it cheap
 In an effort to limit barriers to education, I tried to limit the examples in this course to native, open source, or readily available free tools. If for some reason I mention a commercial tool, it's because it is worth documenting for completeness. You are going to need a Windows 7 or newer system to play with to put a lot of this to use. 
 ### Audience
-I think this course is written for two groups of people:
+I think this course is written for three groups of people:
  1. System Admins/Computer Enthusiasts who are trying to get into the exciting world of Digital Forensics and Incident Response.
  2. Folks that have been in Information Security in one capacity or another and are looking to get into more technical work.
 
@@ -311,5 +311,5 @@ If all this sounds convoluted, you're paying attention. The point of this course
 
 ## 2. Remote Acquisition of Windows Artifacts 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTAzNTk2ODMwNV19
+eyJoaXN0b3J5IjpbLTEyMTkxMzg4MTNdfQ==
 -->
