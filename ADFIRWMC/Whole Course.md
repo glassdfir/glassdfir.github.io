@@ -294,8 +294,8 @@ The breakdown:
 
  - I am running PsExec with a list of two computers, DESKTOP-132B1OL and RemoteMachine 
  - I am using **-d** to detach the process we are launching from the PsExec Session so I don't have to wait for the first one to finish
- - I am **-f -c**
+ - I am **-f -c** 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTEyNDYyMTAzNTFdfQ==
+eyJoaXN0b3J5IjpbMTE5MTA0MDc5OV19
 -->
