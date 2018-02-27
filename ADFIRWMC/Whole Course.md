@@ -290,7 +290,7 @@ When would you ever need to do this? Let's say you want to collect evidence from
 
     #Bit of a cheat code to copy a file over before using it.
     \tools\PsExec.exe \\DESKTOP-132B1OL,RemoteMachine -d -f -c \Tools\RawCopy.exe
-    #What does this do? PsExec will copy \Tools\RawCopy.exe to the 
+    #What does this do? PsExec will copy \Tools\RawCopy.exe to the c:\Windows folder of DESKTOP-132B1OL and try to run it. Same with RemoteMachine. RawCopy needs all sorts of command line options so  
 
 The breakdown:
 
@@ -300,5 +300,5 @@ The breakdown:
  - I am running RawCopy with the same commands as in the previous example except I need to cha 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTc1MDMyNTI1Ml19
+eyJoaXN0b3J5IjpbLTIyMjk2MDk5NF19
 -->
