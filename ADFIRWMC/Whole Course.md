@@ -288,7 +288,8 @@ I can't access the second machine until I exit the session with the first one. T
 When would you ever need to do this? Let's say you want to collect evidence from the two machines involved in an alert you received from your detection team. You could bust out your PsExec skills and do something like this:
 ![enter image description here](https://lh3.googleusercontent.com/O_NXTxm26jK189cjK-VRYepC77rJjMRqDOolWC8jwRqWvefI1Tc2Jj_N-ftLgSoXc1UGvRDD9cBR0T-l1Zxe1lhBrla8fLOZCYqzcDDy6RdMWfNnrpR10q4drNClaGO7cGqWz7qElFqRs_CoTcEKYvLYlGlwXyz1EJIA0W1yOaIGwVC1u481VIJxETiWLwWRY-c5weVsd9Jpcusw6Fb8qk4TFMAL0v4ZQ8TTkfKcHuS4VuzoeW200-mj55bXRd1G2nSDtNrKweBSCxEnqtw6ioQ5Q5TJsaUI7BSzByIJBZHUb2-S9WdHcqGlJFPH-xeEQ05LFeUc0A_3y8AykJKmox3CTOfPF2J6arziECLnbmN8gO0u28yYGau2zeLShmEMNT-Hfd67EwAXy60OdLCDlbO7sx8vPzkJuM2X4qUWrJTyZb67cE5hz_02254zk0M3b7uPpL12AZvjryDXSkHbcUHtpzFgtExi2U-O4CWl-lo47B6kb05A2F4jBc5lnWNdPPb3kgBLUDCDtb8Dda87fhQgtAXS5K0ogoP1IX_501RTuOvcJYiM-moCaETD1hj1FeoYaZnh7AfS0uHktHJqzmUlT7bs3g7YxX_alzw=w1590-h780-no)
 
-    PsExec.exe \\DESKTOP-132B1OL,RemoteMachine -d -f -c RawCopy.exe /FileNamePath:C:0 /OutputPath:"\\vmware-host\Shared Folders\Evidence\" /OutputName:%computername%-$MFT
+    #Bit of a cheat code to copy a file over before using it
+    \tools\PsExec.exe \\DESKTOP-132B1OL,RemoteMachine -d -f -c \Tools\RawCopy.exe
 
 The breakdown:
 
@@ -298,5 +299,5 @@ The breakdown:
  - I am running RawCopy with the same commands as in the previous example except I need to cha 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTY1OTYwMjE0XX0=
+eyJoaXN0b3J5IjpbMTcwMTM5Nzk0OV19
 -->
