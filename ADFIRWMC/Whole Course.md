@@ -59,7 +59,7 @@ There are two reasons I didn't include something in this course:
 Either way, feel free to send me feedback and I will take a look.
 
 
-## Windows Remote Admin for Incident Responders
+## 1. Windows Remote Admin for Incident Responders
 Without a system administration background, many incident responders struggle with basic tasks like remotely starting and stopping processes on target machines. Inversely, Incident Responders with sysadmin experience are often faster and more effective. The more familiar you are with native Windows commands, the faster your can operate.
 
 While this course cannot hope to supplant the experience gained by years at your average help desk, I will try to highlight some of the more helpful techniques that get me from A to B.
@@ -308,5 +308,5 @@ To access the remote environment variables, I needed to use cmd to launch RawCop
 
 If all this sounds convoluted, you're paying attention. The point of this course highlight some more complicated methods of approaching the litany of challenges you will encounter during your DFIR day.
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTY5NDc2OTk1XX0=
+eyJoaXN0b3J5IjpbMzU0MzEwNjA0XX0=
 -->
