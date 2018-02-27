@@ -253,8 +253,6 @@ From [Microsoft](https://docs.microsoft.com/en-us/sysinternals/downloads/psexec)
 
 PsExec is to DFIR as a good blaster is to Han Solo.  I can't tell you how many times PsExec has saved my bacon. Not to mention how many times I have pulled off some nifty DFIRfu with it's various options. Everytime I read PsExec's Usage I learn something new that it does.
 
-
-
 ##### Example: Elevating to System Account:
 One of my favorite tricks is to run remote processes as the System account and not a puny User account as seen below:
 ![PsExec As System](https://lh3.googleusercontent.com/4-ZH1TrrQnf95Lku4Nkxs1fyJ3N4ZztMg5jfmNHiGbMpCJn8hNj2mMSk3X8efsZ4m6N8_WRzsK8uneUtxdO76eTLQTKLz58vC-FY1wpVoGcVkTalEUngYDjZjoEy6yXshejM8rVmqkhsDHMISqAycVlM54BUNPUh5KGR4jjuqGiBiRLlXhJhF5zEvjGRErZjcV7mWL-B4nEyWaCCngUyawLFXZ0m5G_lXBIFJoxxL-RwxwgFjIPZKT89is13pXGBcQ0VwecPhelabM7oezdQhbQ2gBLkZ6wXDUD0Kh0Q4TqbFMOOwYPHyEdpu62bILZ5R5ffQASlVA2krJjS-PFArzREuKsWkl-RqBP3RoN6yZNltWfGXO2qqFctGMdkgA19Bq7tcrN7C1KEBgDez6EaxzeQoeMBD8PXNcavGmly5zPKWx-_TLPk-xDChRL_c2uztTg5hsq_bizOMA8TnLfJLHGL1LkWINdIcAFO8EstoTdUbUL5JdJeYnublDODahz7f_O8_PDYAFM9B-J7I3hD5MNTKCbBcJPhly_ZrdogRZMW3lEKVhKX9y4rMhSXHCwmZEtiapGwM5IaW7ra6aQrKZF2jtKxWJH-FHnRK_Q=w1838-h1166-no)
@@ -280,5 +278,5 @@ In this example, I use PsExec to create two instances of notepad.exe on my local
 
 The **-d** flag is used to detach the PsExec session from the child process so we don't have to wait until notepad exits to continue. This is very handy for DFIR collection scripts that might take a while. Detach the process and let it do it's thing. I like to use **-d** on targets that are on flakey VPN connections so that if the connection drops, the process is still running on the remote system. The obvious downside is, you can't interact with the session after it is detached.
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTU1NTY3NDgyMV19
+eyJoaXN0b3J5IjpbNzk5NzQ5MjcxXX0=
 -->
