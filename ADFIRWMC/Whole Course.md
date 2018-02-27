@@ -289,6 +289,7 @@ When would you ever need to do this? Let's say you want to collect evidence from
 ![enter image description here](https://lh3.googleusercontent.com/8mpVTn-5vj4-urOuoC5xfSTqS3GmiKOAeIFjYvd0Vy1s0i1qM1usobRum4xNFtAFXqqdn5rO02-Elf2pkqNHSr7bu7ECE-1E7Nz_JHjD8XWMaZGFzMd-woTS5vEM7iFCalc4mUDTlu1AaHxpvobeW7pXH2y1kjHAjCfQz5Axiz-4bWv9E11u8Yb1CLP5DPjX0f1KsgGKLsoJBpQsrJGR5V0L7Sd1LJhVOWlXbl2fHJBUtdmW19ODiq1eaNC9oVWssydRYqBQC0SwLfyJbCJui5FpHQHmIgGxEtbZ-Hge1_41lNmaFJJL1Do_TnYbBEn2pbnHQL6d_sktsRoFDFRgzirlt7B5qq8BJzQkbZYijdMmCafWOCFxedC5JwE9FITisXMLnqftsCEhsz4_wP6R04EawJRnCf2wPyY9Iim_d12vgFoXaUQR87mb2IiP7voJ_QDc-nUYyd1D0BJgJRArknRnk5JAHkEusCUwrit3sgzttTYMoH6pkfi3xdBQDQ3Y_SCmmxYZY99Kb1vpI9UJYfC-pjyWjvSR-1GsV4SnJpFH8p2w78POIeEf0CFrktvTC-Cp5hQKB4mGtqIjCc1j0jWH0P_XND77D2ZrjtU=w1598-h1154-no)
 
 Breakdown:
+
     #Bit of a cheat code to copy a file over before using it.
     \tools\PsExec.exe \\DESKTOP-132B1OL,RemoteMachine -d -f -c \Tools\RawCopy.exe
   
@@ -302,5 +303,5 @@ The breakdown:
  - I am running RawCopy with the same commands as in the previous example except I need to cha 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTkwNzk1MzIzNl19
+eyJoaXN0b3J5IjpbLTIwMzUxMDAxNThdfQ==
 -->
