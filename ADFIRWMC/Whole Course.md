@@ -309,7 +309,7 @@ To access the remote environment variables, I needed to use cmd to launch RawCop
 If all this sounds convoluted, you're paying attention. The point of this course highlight some more complicated methods of approaching the litany of challenges you will encounter during your DFIR day.
 
 
-## 2. Remote 
+## 2. Remote Acquisition of Windows Artifacts 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTM1NTUwNjE5Nl19
+eyJoaXN0b3J5IjpbMTA5ODc3MjUyNl19
 -->
