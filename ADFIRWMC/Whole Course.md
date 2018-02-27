@@ -297,7 +297,8 @@ When would you ever need to do this? Let's say you want to collect evidence from
 
     \tools\PsExec.exe \\DESKTOP-132B1OL,RemoteMachine -d cmd /c c:\Windows\RawCopy.exe /FileNamePath:C:0 /OutputPath:"\\vmware-host\Shared Folders\Evidence\" /OutputName:^%computername^%-$MFT
 
-On my evidence share, I am looking to have one file from each of these workstations. To make sure I can tell the two $MFTs apart, I used the environment variable %COMPUTERNAME% from the remote computer  
+On my evidence share, I am looking to have one file from each of these workstations. To make sure I can tell the two $MFTs apart, I used the environment variable %COMPUTERNAME% from the remote computer for file name passed to RawCopy.
+To access the remote environment variables, I needed to use cmd to launch RawCopy 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTg5ODk4MDEyMV19
+eyJoaXN0b3J5IjpbLTYwODE4NzY1OF19
 -->
