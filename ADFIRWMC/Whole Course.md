@@ -298,7 +298,7 @@ When would you ever need to do this? Let's say you want to collect evidence from
     #Bit of a cheat code to copy a file over before using it.
     \tools\PsExec.exe \\DESKTOP-132B1OL,RemoteMachine -d -f -c \Tools\RawCopy.exe
   
-  What does this do? PsExec will copy \Tools\RawCopy.exe to the c:\Windows folder of DESKTOP-132B1OL and try to run it. Same with RemoteMachine. RawCopy needs all sorts of command line options so it will fail BUT the tool has be in place. Why didn't i use the **-c** switch? I'll show you:
+  What does this do? PsExec will copy \Tools\RawCopy.exe to the c:\Windows folder of DESKTOP-132B1OL and try to run it. Same with RemoteMachine. RawCopy needs all sorts of command line options so it will gracefully exit BUT the tool has be in place. Why didn't i use the **-c** switch? I'll show you:
 
     \tools\PsExec.exe \\DESKTOP-132B1OL,RemoteMachine -d cmd /c c:\Windows\RawCopy.exe /FileNamePath:C:0 /OutputPath:"\\vmware-host\Shared Folders\Evidence\" /OutputName:^%computername^%-$MFT
 
@@ -308,5 +308,5 @@ To access the remote environment variables, I needed to use cmd to launch RawCop
 
 If all this sounds convoluted, you're paying attention. The point of this course highlight some more complicated methods of approaching the litany of challenges you will encounter during your DFIR day.
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTE3OTA4OTk2NV19
+eyJoaXN0b3J5IjpbLTY5NDc2OTk1XX0=
 -->
