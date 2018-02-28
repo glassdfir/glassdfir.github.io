@@ -316,6 +316,10 @@ Some folks reading this are convinced that Incident Response is all done through
 The first thing you should know is you will run into problems. Even when your collection tool is working perfectly; network connections drop, hard drives run out of room, antivirus and data loss prevention software will freak out... this is going to happen. Embrace it.
 
 This chapter is going to cover as many of the lessons learned as I can think of.
+
+### Tools for Remote File Acquisition
+
+This can quickly get religious but I am not a fan of most commercial tools. 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTI0MDQzNjY5NF19
+eyJoaXN0b3J5IjpbLTIxMTUwNzMzNTFdfQ==
 -->
