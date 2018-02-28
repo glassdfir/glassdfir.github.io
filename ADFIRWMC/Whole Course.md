@@ -323,9 +323,8 @@ This can quickly get religious but I am not a fan of most commercial tools. Many
 
 Things I have found annoying about collection tools:
 
- - List item
-
-Some require special dongles which is often not practical with a distributed team.
+ - Some tools require special dongles which is often not practical with modern global enterprises.
+ - Some want to talk 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTIwMTc1NDE4MV19
+eyJoaXN0b3J5IjpbMTA5MDMzMDU0Ml19
 -->
