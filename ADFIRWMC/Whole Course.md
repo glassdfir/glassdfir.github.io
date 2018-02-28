@@ -333,7 +333,7 @@ Things I have found annoying about collection tools:
 
 Enough of my complaining. I will explain my reasoning for the tools I use and let you figure out what works best for your work flow and environment.
 
-In g
+In general
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE0NjExMTI5MjddfQ==
+eyJoaXN0b3J5IjpbMTM4MzkxMjI1Nl19
 -->
