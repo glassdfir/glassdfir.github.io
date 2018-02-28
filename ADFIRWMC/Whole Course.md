@@ -332,6 +332,8 @@ Things I have found annoying about collection tools:
  - Most are WAY overpriced for what they offer.
 
 Enough of my complaining. I will explain my reasoning for the tools I use and let you figure out what works best for your work flow and environment.
+
+In g
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE5OTg0MzU5NTFdfQ==
+eyJoaXN0b3J5IjpbLTE0NjExMTI5MjddfQ==
 -->
