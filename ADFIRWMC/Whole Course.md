@@ -311,7 +311,9 @@ If all this sounds convoluted, you're paying attention. The point of this course
 
 
 ## 2. Remote Acquisition of Windows Artifacts
-Some folks reading this are convinced that Incident Response is all done through Endpoint Detection and Response solutions and in 2018 no one drops collection scripts to gather artifacts for analysis. Those people are wrong. 
+Some folks reading this are convinced that Incident Response is all done through Endpoint Detection and Response solutions and in 2018 no one drops collection scripts to gather artifacts for analysis. Those people are wrong.
+
+I have tried a variety of tools 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE4NDY5MTE1MDZdfQ==
+eyJoaXN0b3J5IjpbLTgyOTAxNDQ2Ml19
 -->
