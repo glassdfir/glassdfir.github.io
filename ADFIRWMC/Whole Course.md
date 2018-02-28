@@ -333,7 +333,7 @@ Things I have found annoying about collection tools:
 
 Enough of my complaining. I will explain my reasoning for the tools I use and let you figure out what works best for your work flow and environment.
 
-In general, I either use The Sleuth Kit
+In general, I either use [The Sleuth Kit tools](https://www.sleuthkit.org/sleuthkit/download.php) or some other tool or script that uses the 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTU4NTY1NjE1MV19
+eyJoaXN0b3J5IjpbLTg0MjI2NDI4MF19
 -->
