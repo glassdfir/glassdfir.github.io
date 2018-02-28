@@ -322,7 +322,10 @@ This chapter is going to cover as many of the lessons learned as I can think of.
 This can quickly get religious but I am not a fan of most commercial tools. Many do WAY too much stuff I don't need or want for my OCD to handle. I am not going to bad mouth any particular vendor but there are a lot of solutions that just don't work for my exact needs. 
 
 Things I have found annoying about collection tools:
+
+ - List item
+
 Some require special dongles which is often not practical with a distributed team.
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTEwMjYwNTc5NjVdfQ==
+eyJoaXN0b3J5IjpbLTIwMTc1NDE4MV19
 -->
