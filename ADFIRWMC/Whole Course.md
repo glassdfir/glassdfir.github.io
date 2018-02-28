@@ -326,6 +326,7 @@ Things I have found annoying about collection tools:
  - Some tools require special dongles which is often not practical with modern global enterprises.
  - Some use netcat like functionality to talk directly from your workstation to target which triggers NIDS and is blocked by NIPS.
  - Some won't copy or even find some files on the target because they are locked by the OS or a third party tool like AV or DLP.
+ - Some tools take too long and then produce too little.
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTIxODc1MzQzN119
+eyJoaXN0b3J5IjpbMjE2NDc5MTY0XX0=
 -->
