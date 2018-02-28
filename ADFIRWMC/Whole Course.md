@@ -319,7 +319,7 @@ This chapter is going to cover as many of the lessons learned as I can think of.
 
 ### Tools for Remote File Acquisition
 
-This can quickly get religious but I am not a fan of most commercial tools. Many do WAY too much stuff I don't need or want for my OCD to handle. I am not going to bad mouth any particular vendor but there are a lot of solutions that just don't work for my exact needs. Some require 
+This can quickly get religious but I am not a fan of most commercial tools. Many do WAY too much stuff I don't need or want for my OCD to handle. I am not going to bad mouth any particular vendor but there are a lot of solutions that just don't work for my exact needs. Some require special dongles
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbODYzNDMzNTg3XX0=
+eyJoaXN0b3J5IjpbNDk4NjgxMDEwXX0=
 -->
