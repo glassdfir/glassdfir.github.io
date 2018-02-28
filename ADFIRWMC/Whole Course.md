@@ -331,7 +331,7 @@ Things I have found annoying about collection tools:
  - Some tools are primarily geared for Law Enforcement and don't cater to the enterprise teams that will probably never testify in court. 
  - Most are WAY overpriced for what they offer.
 
-Enough of my complaining. I will explain my reasoning for the tools I use and let you figure out what works best for your 
+Enough of my complaining. I will explain my reasoning for the tools I use and let you figure out what works best for your work flow and environment.
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE2MTUwOTMzMjBdfQ==
+eyJoaXN0b3J5IjpbLTE5OTg0MzU5NTFdfQ==
 -->
