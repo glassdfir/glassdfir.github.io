@@ -328,6 +328,8 @@ Things I have found annoying about collection tools:
  - Some won't copy or even find some files on the target because they are locked by the OS or a third party tool like AV or DLP.
  - Some tools take too long and then produce too little.
  - Some tools are primarily geared for Law Enforcement and don't cater to the enterprise teams that will probably never testify in court. 
+
+I have a found
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTExMzQwOTE0OTFdfQ==
+eyJoaXN0b3J5IjpbMTk2NDkxNzE3NV19
 -->
