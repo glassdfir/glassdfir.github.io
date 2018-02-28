@@ -326,10 +326,12 @@ Things I have found annoying about collection tools:
  - Some tools require special dongles which is often not practical with modern global enterprises.
  - Some use netcat like functionality to talk directly from your workstation to target which triggers NIDS and is blocked by NIPS.
  - Some won't copy or even find some files on the target because they are locked by the OS or a third party tool like AV or DLP.
+ - Some tools get flagged by 
  - Some tools take too long and then produce too little.
  - Some tools are primarily geared for Law Enforcement and don't cater to the enterprise teams that will probably never testify in court. 
+ - Most are WAY overpriced for what they offer.
 
-I have a found
+I have a found a few tried and true tools
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTk2NDkxNzE3NV19
+eyJoaXN0b3J5IjpbMTk3MDQ5MDY1OF19
 -->
