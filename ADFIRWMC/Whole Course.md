@@ -59,6 +59,8 @@ There are two reasons I didn't include something in this course:
 
 Either way, feel free to send me feedback and I will take a look.
 
+### Tone
+This is meant to be informal. While that might come across as unprofessional and lacking academic polish, I find it makes the material more digestible and that is point of learning, right?
 
 ## 1. Windows Remote Admin for Incident Responders
 Without a system administration background, many incident responders struggle with basic tasks like remotely starting and stopping processes on target machines. Inversely, Incident Responders with sysadmin experience are often faster and more effective. The more familiar you are with native Windows commands, the faster your can operate.
@@ -333,7 +335,49 @@ Things I have found annoying about collection tools:
 
 Enough of my complaining. I will explain my reasoning for the tools I use and let you figure out what works best for your work flow and environment.
 
-In general, I either use [The Sleuth Kit tools](https://www.sleuthkit.org/sleuthkit/download.php) or some other tool or script that uses the TSK Bindings.
+#### The Underlying Mechanics of Copying Locked Files on Windows
+
+Before we discuss tools and examples, an understanding of the mechanics of the NTFS filesystem is helpful to ensure you can adapt and overcome when various things get in between you and your artifacts. Here is a piece of DFIRfu using completely native windows commands. Admittedly, this is more DF than IR and I know it is a lot of hexadecimal but stick with me...
+![enter image description here](https://lh3.googleusercontent.com/4fkQo7HOWuSnvKwxT6ve0wt53KsXBSeLuOAehtP1VabUj1qRztY5rrmkzGd4ysu8ilRvzkeX7N7d0-hzW-R9UrgBJerAtcLDe725IToCI8hp5DV3pjgZxlk5sZBwJdHGFU98DquUftQO58s18ldiR9W0MzRGJ1-FpjgjGp1k_nVFdnjgSZpseLcQ2f8cvuwwTIaGGfYnkUOv9HDWtQKvkmpw-mnoHUTcLRLsTIpyXAAPMjcAjI4t_B-jhLP9GnLNKJzdnMtygMy2_VX3rGgJbV6nxQa8CtdBKBrQNJwvfdnsdIaQm2Ac1Rryuwi3v3g-seW5gzLq9BSZCEsg4N_HpeBRPduSmTl-4d0aQ7lEGPIorHDtNuiowaSVNwmeHIkFIEUe6U94dWRn-5orwT2m-ZMlYsfLQD25TAuy4cwYDCbZftCQaOmSgXc_-Axk0moH445BJIlztCaxC51cs1pqwOHottAR7KTC0uL5zIIZSSn4l_tpq4TAaWt3DaYvm9pCgmo8D4QfbwadA3l45EH69hCSglxxZkfMFes3XNU-9xHj0v8i55X6G_EZVJHYoAgCwMIo-dzaXpbUUjVjvqfK0ScrwtnoB2tBrSEWWxA=w1352-h1600-no)
+
+**Breakdown**
+
+ - `fsutil.exe fsinfo ntfsInfo c:`
+	 - This command shows us a bunch of useful information for how data is stored on this Volume but all we need for now is the Bytes per Cluster: 4096.
+	 - We could have used something like this:
+	 `wmic volume where (name="c:\\") get blocksize`
+	 - This tells us that the file system allocates space to files in chunks of 4096 bytes. Even if the file is smaller, it gets the whole 4K to itself.
+ - `fsutil.exe file queryextents c:\$MFT`
+	 - This command shows use the clusters allocated to the $MFT. I pick on the $MFT a lot in my examples for two reasons : it contains almost all of the file system information on the system and it is not directly accessible through the operating system.
+	 - This command outputs three columns of information:
+		 - **VCN**: Virtual Cluster Numbers are used to sequence chunks of allocated data kinda like numbered puzzle pieces.
+		 - **Clusters**: This is the number of contiguous Clusters allocated per Data Run. 
+		 - **LCN**: Logical Cluster Numbers are basically used as addresses. This run of contiguous data begins at X number of clusters from the beginning of the volume.
+ - `echo Size of $MFT in Bytes: && set /a (0xC820 + 0x4720) * 4096`
+	 - This is just an example of how to do math on the Windows command line.
+	 - `set /a` can be used for sorts of fun stuff like converting hex to decimal and arithmetic.
+	 - Here I am adding the number of clusters from the first data run and second data run to determine the total number of clusters allocated to the $MFT. Since we know the clusters are 4096 bytes large, we multiple to determine the number of bytes allocated to the $MFT.
+ - `dir "\\vmware-host\Shared Folders\Evidence"` 
+	 - Here I am just showing you that the $MFT we collected from the previous examples using RawCopy is in fact the same size as the crazy math we just did.
+
+Here is another way to look at that information:
+![enter image description here](https://lh3.googleusercontent.com/TOV-skgYPfVb2ZJa6Ho85mXxKH2-Jqnr5uTkgTkHCP32ICXuIcfNqt-Wl5XDp2LPeH1Cj57eFZxvwpa4C7rKHdEoLma7AEFxSiu51ojiq2kipSO54_NKY10uMufcOxFCIOK1TJgpPcOA1kNT0tGgNLXpi35ZPqwF5wmqcMLCD4UADvruXD1NWeuFZdeHJORrgKT9Y99Dts5zeg5XtwPfTELySE04lcB19PhqXSpf3Sq_B2vlAVT40jgL1VUEhr22SUWysRfi4KeiDcN2mIHDozjnYKkqRJrz6oZxH1oEc0yMir-2w1mhpF3MRpp7CVV_giutSnaa6kOKgWzPOk1V0qMuCytpkj7Z9HoohN2MdgoeMp0TtXfRHrkh5UY8naE-c8ovDUkoiVSeB7dYBy6mjx7ZW84pW4NMT0gVVQbA4i8b-K-y1Gn5mnzys8APXkGUMYIx00WwoRS2mSUzufpRIsYaIAkbjGlt_-bSvHHFrnrTH7QfBd9bx1oS6hQNkQ_BU3ulb5q0Ktg__FES3aB2ZiME35I4PAw6x_gG2HWqCshgDjRg14Ve4obRnAmICQNu-iB4rZFCofrOeEauvCbktivR2jyN2l5JjsdvGaM=w880-h1458-no)
+That $MFT only has two but it is common for larger files to have many data runs:
+![enter image description here](https://lh3.googleusercontent.com/P-13U43z4-qgZKWvwiDWhcSYrEk_4J28iXhpv6TP8KBZ8FVJnn6SK5gediUHRWaHfhTg2Jr3wyaZTL_ki5Ozi-NwrjRjVX0M7xeuizuiWlk-YMgDpHIGw3hMP1l-pe9vgZQBMmH4Hndv-g1V2nZm9gISbVKzALhUc2nrlMcUgzDpKwEBuSDOrn6p8mgS9psJtj1cHsOwvTBVXPnjx4Mmia4bldAYGE0cWKmwtkDo9SLbGmd226Lo2eTQUjarEHCntOnw5NTI-1-F_u-C2lFCTd6GnQtaMUUKvogk0gcHX3FgNt0xcivDyc4XXbaXU6pT7ks8AVsF5qfvOXFRnJTdh_OBC_EvUWc4z75TQu627uKBVXmOWWNcBC-kb8Psyct3KPyVYJgzL0jDH4bi5STLnSf4p8p5gqR1yIKLuSuoPIvW8FNhF6n2x73Z2B9mBJbxvRfSfrF7TQrbAqV48avCy8Gra4NsSZ5kmslUdDBN9tfHnbZp1mWcTGu138xiUujLktsF1z0EwPEpjYR0wkuycREEiZMCALyIMVF9RJZV_TRqRsepup-pRx5kwll1JG_MvWHlBg7voHRDBKZ8KLQMBVWpqEgRrhn6vl5hd_8=w1054-h1024-no)
+This WebCacheV01.dat file has 25 runs spread out all over the volume.
+
+**The Point**
+To access locked files on a live Windows system, your acquisition tool needs to:
+
+ 1. Determine what physical clusters have been allocated for that file. This is stored in terms of LCN and number of clusters *(inside the $MFT as it just so happens, but we will cover that later)*.
+ 2. Open the Volume for direct read access.
+ 3. Seek to the offset of the LCN on disk and read the numbers of clusters specified. Repeat as needed for all Data Runs.
+ 4. Write the collected information to an output file in the sequence specified by the VCNs.
+
+Piece of cake right? Well the first 3 steps can trip up tools for one reason or another.
+
+
+
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTUzMjU2MjcyMF19
+eyJoaXN0b3J5IjpbMTU1NDQ4NjBdfQ==
 -->
