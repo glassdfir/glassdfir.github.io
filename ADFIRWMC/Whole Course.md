@@ -367,6 +367,7 @@ That $MFT only has two but it is common for larger files to have many data runs:
 This WebCacheV01.dat file has 25 runs spread out all over the volume.
 
 **The Point**
+
 To access locked files on a live Windows system, your acquisition tool needs to:
 
  1. Determine what physical clusters have been allocated for that file. This is stored in terms of LCN and number of clusters *(inside the $MFT as it just so happens, but we will cover that later)*.
@@ -379,5 +380,5 @@ Piece of cake right? Well the first 3 steps can trip up tools for one reason or 
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTU1NDQ4NjBdfQ==
+eyJoaXN0b3J5IjpbLTEwMTY4NTc1MjZdfQ==
 -->
