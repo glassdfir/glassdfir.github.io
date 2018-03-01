@@ -131,9 +131,9 @@ by Jonathan Glass</p>
 <ul>
   <li>Hands on Tools, Tactics, and Techniques of DFIR
     <ul>
+      <li>System Administration for Incident Responders</li>
       <li>Computer Science for Incident Responders</li>
       <li>Acquisition and Analysis of Windows artifacts</li>
-      <li>System Administration for Incident Responders</li>
     </ul>
   </li>
   <li>Examples and Exercises</li>
@@ -143,20 +143,20 @@ by Jonathan Glass</p>
 <p>Out of scope for this class:</p>
 <ul>
   <li>The 4 Step Digital Forensics Process</li>
+  <li>OSI Model</li>
   <li>Legal crap
     <ul>
       <li>Federal Rules of Evidence</li>
       <li>Chain of custody</li>
-      <li>4th and 5th amendments</li>
-      <li>U.S. Statutory laws</li>
     </ul>
   </li>
-  <li>Still important but learn it somewhere else.</li>
+  <li>Where babies come from</li>
+  <li>Important stuff but learn it somewhere else.</li>
 </ul>
 
 <h2 id="course-overview">Course Overview</h2>
 <ol>
-  <li>Disclaimer</li>
+  <li>Disclaimers</li>
   <li>Windows Remote Admin for Incident Responders</li>
   <li>Remote Acquisition of Windows Artifacts</li>
   <li>Computer Science for Incident Responders</li>
@@ -167,17 +167,18 @@ by Jonathan Glass</p>
   <li>Timelining for Fun and Profit</li>
 </ol>
 
-<h2 id="disclaimers">Disclaimers</h2>
+<h2 id="disclaimers">0. Disclaimers</h2>
 
 <h3 id="you-have-to-dig">You have to dig</h3>
 <p>As I built this course, I started realizing that perhaps the reader might not understand everything I am talking about. DFIR is not a field where everyone can know everything. It’s just too wide and too deep. Attempting to define every term and provide background on all material would bloat this project beyond scope and diminish the value. If I didn’t cover something, you might have to look it up. Searching for information is the crux of this job.</p>
 <h3 id="i-tried-to-keep-it-cheap">I tried to keep it cheap</h3>
 <p>In an effort to limit barriers to education, I tried to limit the examples in this course to native, open source, or readily available free tools. If for some reason I mention a commercial tool, it’s because it is worth documenting for completeness. You are going to need a Windows 7 or newer system to play with to put a lot of this to use.</p>
 <h3 id="audience">Audience</h3>
-<p>I think this course is written for two groups of people:</p>
+<p>I think this course is written for three groups of people:</p>
 <ol>
   <li>System Admins/Computer Enthusiasts who are trying to get into the exciting world of Digital Forensics and Incident Response.</li>
   <li>Folks that have been in Information Security in one capacity or another and are looking to get into more technical work.</li>
+  <li>Other people that might find this information useful or interesting.</li>
 </ol>
 
 <p>This should not be the first computer related course you attempt.</p>
@@ -190,7 +191,10 @@ by Jonathan Glass</p>
 
 <p>Either way, feel free to send me feedback and I will take a look.</p>
 
-<h2 id="windows-remote-admin-for-incident-responders">Windows Remote Admin for Incident Responders</h2>
+<h3 id="tone">Tone</h3>
+<p>This is meant to be informal. While that might come across as unprofessional and lacking academic polish, I find it makes the material more digestible and that is point of learning, right?</p>
+
+<h2 id="windows-remote-admin-for-incident-responders">1. Windows Remote Admin for Incident Responders</h2>
 <p>Without a system administration background, many incident responders struggle with basic tasks like remotely starting and stopping processes on target machines. Inversely, Incident Responders with sysadmin experience are often faster and more effective. The more familiar you are with native Windows commands, the faster your can operate.</p>
 
 <p>While this course cannot hope to supplant the experience gained by years at your average help desk, I will try to highlight some of the more helpful techniques that get me from A to B.</p>
@@ -468,7 +472,7 @@ According to the big M, the Microsoft Management Console (MMC) is an extensible 
 
 <h3 id="pstools">PsTools</h3>
 
-<p>Way way way back in 1996, Mark Russinovich and Bryce Cogswell created a little company called Winternals Software LP that created a bunch of software to help administer Windows 2000 boxes. Long story short…in 2006 Microsoft bought the company and all their tools now known as <a href="https://docs.microsoft.com/en-us/sysinternals/">Windows Sysinternals</a>. There is a cornucopia of awesome tools that I will mention throughout the duration of this course but for now we are going to focus on some of the PsTools Suite I find most handy. While you can accomplish all of these functions via WMI via PowerShell or WMIC, these tools are helpful for those who prefer tools with a dedicated tasks and help menus. While there is absolutely no shame in that, the more comfortable you become with WMI scripting, the less you will need this suite.</p>
+<p>Way way way back in 1996, Mark Russinovich and Bryce Cogswell created a little company called Winternals Software LP that created a bunch of software to help administer Windows 2000 boxes. Long story short…in 2006 Microsoft bought the company and all their tools now known as <a href="https://docs.microsoft.com/en-us/sysinternals/">Windows Sysinternals</a>. There is a cornucopia of awesome tools that I will mention throughout the duration of this course but for now we are going to focus on some of the PsTools Suite I find most handy. While you can accomplish all of these functions via WMI via PowerShell or WMIC, these tools are helpful for those who prefer tools with a dedicated tasks and help menus. There is absolutely no shame in that but I found, the more comfortable I become with WMI scripting, the less I needed most of this suite.</p>
 
 <h4 id="windows-admin-using-pstools-suite">Windows Admin using PsTools Suite</h4>
 
@@ -506,6 +510,8 @@ According to the big M, the Microsoft Management Console (MMC) is an extensible 
     </tr>
   </tbody>
 </table>
+
+<p>Most of the PsTools suites are fairly straightforward and require almost no explanation but PsExec is robust enough that it bears covering.</p>
 
 <h4 id="psexec">PsExec</h4>
 <p>From <a href="https://docs.microsoft.com/en-us/sysinternals/downloads/psexec">Microsoft</a></p>
@@ -545,10 +551,132 @@ This grants a higher level of privileges and leaves less of a footprint on the r
 </ul>
 
 <h5 id="example-interacting-with-the-user">Example: Interacting with the User:</h5>
-<p>Pro Tip: PsExec runs a console session by default but can be configured to interact with the logged on user’s session using the -i option. This is helpful in those rare instances where you need to user to see something you are doing. 99% of the time the user is going to be logged in under the second session or session 1. It’s not often but I have used this a couple times over the years.</p>
+<p>PsExec runs a console session by default but can be configured to interact with the logged on user’s session using the <strong>-i</strong> option. This is helpful in those rare instances where you need to user to see something you are doing. 99% of the time the user is going to be logged in under the second session or session 1. It’s not often but I have used this a couple times over the years.
+In this example, I use PsExec to create two instances of notepad.exe on my local machine. One is in user session and visible, the other is not. 
+<img src="https://lh3.googleusercontent.com/sMBcjApvoza1Hp4hzlr1f-nKdi7dP6UB648V73m_D-E-VBv0k9l17mVoB01RUqBLf9yRItKKC3f6I26gbTfmEba7H6PmrbLmwlBQII8-hymfizrbwI5RtmhtZh228ldB9_51PGlp2mHa5sBXwsyAGfQya_Ou5b64-wWh_DM6bqUTF1Tx2FvPsPOc2F0EM2BQBFPnnT6DspUJRi-HjhSfzvTg6641xB1rQ8_VkPx6IpGu1Yg59B0fpLU0HtuDJ3iwHBfPwiXMEGMFnSqLe-HQVdr3nG0QgFG1eZNzV0UrNKxK8OuNTwAcsqW1Aly1GXHrupn1eb02kID4vBhtHTYphMxGMSC5QFTawzO8eGS67KGsCXKDAeFd5M9LUgLeR2XMm8I1tBpqOrxruFfI54BTEErZLRVDg16hQ5zXJJ1gwO1HgxCyHc0RiNxohtB_fWxlyHfk6uNxSfLEmUFCk2HD48r_GLcn7WFudHikoLXVvDLkDmyZMkCH7ZvY_cqFZKkz7J0FFQi_9esLBPxuRUJSz_jahZnhuNktoV6CkSY-kCaMOzZyA6ARMlkm3fY2_uv276qT5r4LxrL4dN902kYVSxo07WwJrzhkQh76iY8=w1839-h1663-no" alt="enter image description here" /></p>
+
+<p>The <strong>-d</strong> flag is used to detach the PsExec session from the child process so we don’t have to wait until notepad exits to continue. This is very handy for DFIR collection scripts that might take a while. Detach the process and let it do it’s thing. I like to use <strong>-d</strong> on targets that are on flakey VPN connections so that if the connection drops, the process is still running on the remote system. The obvious downside is, you can’t interact with the session after it is detached.</p>
+
+<h5 id="example-running-commands-on-multiple-machines">Example: Running commands on multiple machines</h5>
+<p>PsExec allows you to perform administrative tasks on multiple workstations but you can only interact with one at a time. Here is an example of getting a command shell on two different machines:
+<img src="https://lh3.googleusercontent.com/CVjqlkjIhosl9bGrBIJ9q1CLMfJpvJmHNfeKRqGnowW2cwyMmdqntBTJfcPYKybtOTmTfS97uyWogZibRiKDaU8pI_PP4H68K4PSlk4MB0l6JitHyr7zqVUV0EPXeRl5BAH1NpBiL9oG4HHiJeQxODwjNpiHmp2ENKBUxpskTXsr1nOhqJ69nX-HB1tPJ1co1vNp0vhcWJljSSC_rIrx8Sl7Ej2mIIUcCPV3jqpPMvTbMG1ZZHDZfSYnSrFDtx9U19aMPXKaN3rx2818f1NxIePymXRJuJ8HG-nsp0HLFrlH8MrVCLf-F3wIj_OY78Bd-LV4bIMy_G44FlOGvj9BuTcEZr9JqjBnCftQSRtzmrvrPcYjIj79IkSWSiFvgZxkAZZ6e7IR-GShQiLqrLqOZtsZ4n4ETb2ujqT4aaESiMp7wTvvd9HPl6jBExjz97bTuWeo6RJoCCaAM1_HkBsJVXnV6QjWGY3wa9fxRSjQxkwrhqpiH6KgADgBaHn78BS5xaNrygamkuUcu-lT63PIfpZvlLT19QdxxwAncnGUxodnSMem8-kPCa8_tyORKck0oQcG_vsj9A1nK1r_2C1MplAVoJZAxDlE_2VixUg=w1324-h1166-no" alt="enter image description here" /></p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>PsExec.exe \\DESKTOP-132B1OL,192.168.164.130 cmd I can't access the second machine until I exit the session with the first one. To speed that process up, using the **-d** to detach the session from the process will make it much faster.
+</code></pre>
+</div>
+
+<p><img src="https://lh3.googleusercontent.com/oMg_WV5sdeF1Yy1qy1Mr44hJe3IfJQNTXSVrKSv30ksqnxafZ3zgND9Qf9NPRgUlFwy7KUEXssuvJRG2iVE-dH9M0XlMrO1-4J8rJ5__ZMA6F3SniNEp1Rrc58I_EIOvc14jFDuQBHkVcjhGcH_VYqOcNm5YubOEqF04hlkTdZmW9f4IO5WplB7PTmWLEtLj5xWipiiwXKna1XL9i1LnYREEesYJOuvjmogfwRfyzC_KgKk0niWddeDPpJVEm6WbqUgLN9uhaYnl_KwkklBB7iWUF4oF9i9hzt-l6WcFYWASDbYMW-D7PxscdFkmZftEvUz-ETYKFnSOSiyn8xRMfrqeOXnEBUnUOfNaz-ABsVKS5425qsi_Re9-xT4G4C8x1ODBjMsQ4NlM74RAamg5Z9goZcSTc9t3jqVtRDrp6ms3iZskOfAGBnWbhwmgHveYDg2tvjeaoeIr3NJozhTTjdIx6UzAjDas2TgErq1aBzMb456hQptWdj78a15yn5s55ZFiEU5RydlIcAg8sFDj4CuYV1XPAb5OZRo0icEyXq0nhaH8V8UO701Mdc2PvMKjDs-aJtieAzmPLeXJSf4fGZMevX26Kkb-m9LhBFc=w1594-h578-no" alt="enter image description here" /></p>
+
+<p>When would you ever need to do this? Let’s say you want to collect artifacts from the two machines involved in an alert you received from your detection team. You could bust out your PsExec skills and do something like this:</p>
+
+<p><img src="https://lh3.googleusercontent.com/8mpVTn-5vj4-urOuoC5xfSTqS3GmiKOAeIFjYvd0Vy1s0i1qM1usobRum4xNFtAFXqqdn5rO02-Elf2pkqNHSr7bu7ECE-1E7Nz_JHjD8XWMaZGFzMd-woTS5vEM7iFCalc4mUDTlu1AaHxpvobeW7pXH2y1kjHAjCfQz5Axiz-4bWv9E11u8Yb1CLP5DPjX0f1KsgGKLsoJBpQsrJGR5V0L7Sd1LJhVOWlXbl2fHJBUtdmW19ODiq1eaNC9oVWssydRYqBQC0SwLfyJbCJui5FpHQHmIgGxEtbZ-Hge1_41lNmaFJJL1Do_TnYbBEn2pbnHQL6d_sktsRoFDFRgzirlt7B5qq8BJzQkbZYijdMmCafWOCFxedC5JwE9FITisXMLnqftsCEhsz4_wP6R04EawJRnCf2wPyY9Iim_d12vgFoXaUQR87mb2IiP7voJ_QDc-nUYyd1D0BJgJRArknRnk5JAHkEusCUwrit3sgzttTYMoH6pkfi3xdBQDQ3Y_SCmmxYZY99Kb1vpI9UJYfC-pjyWjvSR-1GsV4SnJpFH8p2w78POIeEf0CFrktvTC-Cp5hQKB4mGtqIjCc1j0jWH0P_XND77D2ZrjtU=w1598-h1154-no" alt="enter image description here" /></p>
+
+<p><strong>Breakdown:</strong></p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>#Bit of a cheat code to copy a file over before using it.
+\tools\PsExec.exe \\DESKTOP-132B1OL,RemoteMachine -d -f -c \Tools\RawCopy.exe
+</code></pre>
+</div>
+
+<p>What does this do? PsExec will copy \Tools\RawCopy.exe to the c:\Windows folder of DESKTOP-132B1OL and try to run it. Same with RemoteMachine. RawCopy needs all sorts of command line options so it will gracefully exit BUT the tool has be in place. Why didn’t i use the <strong>-c</strong> switch? I’ll show you:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>\tools\PsExec.exe \\DESKTOP-132B1OL,RemoteMachine -d cmd /c c:\Windows\RawCopy.exe /FileNamePath:C:0 /OutputPath:"\\vmware-host\Shared Folders\Evidence\" /OutputName:^%computername^%-$MFT
+</code></pre>
+</div>
+
+<p>On my evidence share, I am looking to have one file from each of these workstations. To make sure I can tell the two $MFTs apart, I used the environment variable %COMPUTERNAME% from the remote computer for file name passed to RawCopy.</p>
+
+<p>To access the remote environment variables, I needed to use cmd to launch RawCopy which means I couldn’t use the <strong>-c</strong> to copy it over in one foul swoop. By using the carets to escape the percent signs, like this <code class="highlighter-rouge">^%computername^%-$MFT</code>, you can pass the variable to the next command interpreter. If you don’t, your command prompt will interpret it and save all of the file names as YOUR computer name and overwrite each other. Took me a second to figure that out.</p>
+
+<p>If all this sounds convoluted, you’re paying attention. The point of this course highlight some more complicated methods of approaching the litany of challenges you will encounter during your DFIR day.</p>
+
+<h2 id="remote-acquisition-of-windows-artifacts">2. Remote Acquisition of Windows Artifacts</h2>
+<p>Some folks reading this are convinced that Incident Response is all done through Endpoint Detection and Response solutions and in 2018 no one drops collection scripts to gather artifacts for analysis. Those people are wrong.</p>
+
+<p>The first thing you should know is you will run into problems. Even when your collection tool is working perfectly; network connections drop, hard drives run out of room, antivirus and data loss prevention software will freak out… this is going to happen. Embrace it.</p>
+
+<p>This chapter is going to cover as many of the lessons learned as I can think of.</p>
+
+<h3 id="tools-for-remote-file-acquisition">Tools for Remote File Acquisition</h3>
+
+<p>This can quickly get religious but I am not a fan of most commercial tools. Many do WAY too much stuff I don’t need or want for my OCD to handle. I am not going to bad mouth any particular vendor but there are a lot of solutions that just don’t work for my exact needs.</p>
+
+<p>Things I have found annoying about collection tools:</p>
+
+<ul>
+  <li>Some tools require special dongles which is often not practical with modern global enterprises.</li>
+  <li>Some use netcat like functionality to talk directly from your workstation to target which triggers NIDS and is blocked by NIPS.</li>
+  <li>Some won’t copy or even find some files on the target because they are locked by the OS or a third party tool like AV or DLP.</li>
+  <li>Some free tools get flagged by AV because they are not signed or what they are written in.</li>
+  <li>Some tools take too long and then produce too little.</li>
+  <li>Some tools are primarily geared for Law Enforcement and don’t cater to the enterprise teams that will probably never testify in court.</li>
+  <li>Most are WAY overpriced for what they offer.</li>
+</ul>
+
+<p>Enough of my complaining. I will explain my reasoning for the tools I use and let you figure out what works best for your work flow and environment.</p>
+
+<h4 id="the-underlying-mechanics-of-copying-locked-files-on-windows">The Underlying Mechanics of Copying Locked Files on Windows</h4>
+
+<p>Before we discuss tools and examples, an understanding of the mechanics of the NTFS filesystem is helpful to ensure you can adapt and overcome when various things get in between you and your artifacts. Here is a piece of DFIRfu using completely native windows commands. Admittedly, this is more DF than IR and I know it is a lot of hexadecimal but stick with me…
+<img src="https://lh3.googleusercontent.com/4fkQo7HOWuSnvKwxT6ve0wt53KsXBSeLuOAehtP1VabUj1qRztY5rrmkzGd4ysu8ilRvzkeX7N7d0-hzW-R9UrgBJerAtcLDe725IToCI8hp5DV3pjgZxlk5sZBwJdHGFU98DquUftQO58s18ldiR9W0MzRGJ1-FpjgjGp1k_nVFdnjgSZpseLcQ2f8cvuwwTIaGGfYnkUOv9HDWtQKvkmpw-mnoHUTcLRLsTIpyXAAPMjcAjI4t_B-jhLP9GnLNKJzdnMtygMy2_VX3rGgJbV6nxQa8CtdBKBrQNJwvfdnsdIaQm2Ac1Rryuwi3v3g-seW5gzLq9BSZCEsg4N_HpeBRPduSmTl-4d0aQ7lEGPIorHDtNuiowaSVNwmeHIkFIEUe6U94dWRn-5orwT2m-ZMlYsfLQD25TAuy4cwYDCbZftCQaOmSgXc_-Axk0moH445BJIlztCaxC51cs1pqwOHottAR7KTC0uL5zIIZSSn4l_tpq4TAaWt3DaYvm9pCgmo8D4QfbwadA3l45EH69hCSglxxZkfMFes3XNU-9xHj0v8i55X6G_EZVJHYoAgCwMIo-dzaXpbUUjVjvqfK0ScrwtnoB2tBrSEWWxA=w1352-h1600-no" alt="enter image description here" /></p>
+
+<p><strong>Breakdown</strong></p>
+
+<ul>
+  <li><code class="highlighter-rouge">fsutil.exe fsinfo ntfsInfo c:</code>
+    <ul>
+      <li>This command shows us a bunch of useful information for how data is stored on this Volume but all we need for now is the Bytes per Cluster: 4096.</li>
+      <li>We could have used something like this:
+  <code class="highlighter-rouge">wmic volume where (name="c:\\") get blocksize</code></li>
+      <li>This tells us that the file system allocates space to files in chunks of 4096 bytes. Even if the file is smaller, it gets the whole 4K to itself.</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">fsutil.exe file queryextents c:\$MFT</code>
+    <ul>
+      <li>This command shows use the clusters allocated to the $MFT. I pick on the $MFT a lot in my examples for two reasons : it contains almost all of the file system information on the system and it is not directly accessible through the operating system.</li>
+      <li>This command outputs three columns of information:
+        <ul>
+          <li><strong>VCN</strong>: Virtual Cluster Numbers are used to sequence chunks of allocated data kinda like numbered puzzle pieces.</li>
+          <li><strong>Clusters</strong>: This is the number of contiguous Clusters allocated per Data Run.</li>
+          <li><strong>LCN</strong>: Logical Cluster Numbers are basically used as addresses. This run of contiguous data begins at X number of clusters from the beginning of the volume.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">echo Size of $MFT in Bytes: &amp;&amp; set /a (0xC820 + 0x4720) * 4096</code>
+    <ul>
+      <li>This is just an example of how to do math on the Windows command line.</li>
+      <li><code class="highlighter-rouge">set /a</code> can be used for sorts of fun stuff like converting hex to decimal and arithmetic.</li>
+      <li>Here I am adding the number of clusters from the first data run and second data run to determine the total number of clusters allocated to the $MFT. Since we know the clusters are 4096 bytes large, we multiple to determine the number of bytes allocated to the $MFT.</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">dir "\\vmware-host\Shared Folders\Evidence"</code>
+    <ul>
+      <li>Here I am just showing you that the $MFT we collected from the previous examples using RawCopy is in fact the same size as the crazy math we just did.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Here is another way to look at that information:
+<img src="https://lh3.googleusercontent.com/TOV-skgYPfVb2ZJa6Ho85mXxKH2-Jqnr5uTkgTkHCP32ICXuIcfNqt-Wl5XDp2LPeH1Cj57eFZxvwpa4C7rKHdEoLma7AEFxSiu51ojiq2kipSO54_NKY10uMufcOxFCIOK1TJgpPcOA1kNT0tGgNLXpi35ZPqwF5wmqcMLCD4UADvruXD1NWeuFZdeHJORrgKT9Y99Dts5zeg5XtwPfTELySE04lcB19PhqXSpf3Sq_B2vlAVT40jgL1VUEhr22SUWysRfi4KeiDcN2mIHDozjnYKkqRJrz6oZxH1oEc0yMir-2w1mhpF3MRpp7CVV_giutSnaa6kOKgWzPOk1V0qMuCytpkj7Z9HoohN2MdgoeMp0TtXfRHrkh5UY8naE-c8ovDUkoiVSeB7dYBy6mjx7ZW84pW4NMT0gVVQbA4i8b-K-y1Gn5mnzys8APXkGUMYIx00WwoRS2mSUzufpRIsYaIAkbjGlt_-bSvHHFrnrTH7QfBd9bx1oS6hQNkQ_BU3ulb5q0Ktg__FES3aB2ZiME35I4PAw6x_gG2HWqCshgDjRg14Ve4obRnAmICQNu-iB4rZFCofrOeEauvCbktivR2jyN2l5JjsdvGaM=w880-h1458-no" alt="enter image description here" />
+That $MFT only has two but it is common for larger files to have many data runs:
+<img src="https://lh3.googleusercontent.com/P-13U43z4-qgZKWvwiDWhcSYrEk_4J28iXhpv6TP8KBZ8FVJnn6SK5gediUHRWaHfhTg2Jr3wyaZTL_ki5Ozi-NwrjRjVX0M7xeuizuiWlk-YMgDpHIGw3hMP1l-pe9vgZQBMmH4Hndv-g1V2nZm9gISbVKzALhUc2nrlMcUgzDpKwEBuSDOrn6p8mgS9psJtj1cHsOwvTBVXPnjx4Mmia4bldAYGE0cWKmwtkDo9SLbGmd226Lo2eTQUjarEHCntOnw5NTI-1-F_u-C2lFCTd6GnQtaMUUKvogk0gcHX3FgNt0xcivDyc4XXbaXU6pT7ks8AVsF5qfvOXFRnJTdh_OBC_EvUWc4z75TQu627uKBVXmOWWNcBC-kb8Psyct3KPyVYJgzL0jDH4bi5STLnSf4p8p5gqR1yIKLuSuoPIvW8FNhF6n2x73Z2B9mBJbxvRfSfrF7TQrbAqV48avCy8Gra4NsSZ5kmslUdDBN9tfHnbZp1mWcTGu138xiUujLktsF1z0EwPEpjYR0wkuycREEiZMCALyIMVF9RJZV_TRqRsepup-pRx5kwll1JG_MvWHlBg7voHRDBKZ8KLQMBVWpqEgRrhn6vl5hd_8=w1054-h1024-no" alt="enter image description here" />
+This WebCacheV01.dat file has 25 runs spread out all over the volume.</p>
+
+<p><strong>The Point</strong>
+To access locked files on a live Windows system, your acquisition tool needs to:</p>
+
+<ol>
+  <li>Determine what physical clusters have been allocated for that file. This is stored in terms of LCN and number of clusters <em>(inside the $MFT as it just so happens, but we will cover that later)</em>.</li>
+  <li>Open the Volume for direct read access.</li>
+  <li>Seek to the offset of the LCN on disk and read the numbers of clusters specified. Repeat as needed for all Data Runs.</li>
+  <li>Write the collected information to an output file in the sequence specified by the VCNs.</li>
+</ol>
+
+<p>Piece of cake right? Well the first 3 steps can trip up tools for one reason or another.</p>
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTI4OTI4NjAzNV19
+eyJoaXN0b3J5IjpbMTU1NDQ4NjBdfQ==
 -->
 
       </div><!-- /.entry-content -->
