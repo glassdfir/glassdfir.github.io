@@ -363,7 +363,7 @@ Before we discuss tools and examples, an understanding of the mechanics of the N
 Here is another way to look at that information:
 ![enter image description here](https://lh3.googleusercontent.com/TOV-skgYPfVb2ZJa6Ho85mXxKH2-Jqnr5uTkgTkHCP32ICXuIcfNqt-Wl5XDp2LPeH1Cj57eFZxvwpa4C7rKHdEoLma7AEFxSiu51ojiq2kipSO54_NKY10uMufcOxFCIOK1TJgpPcOA1kNT0tGgNLXpi35ZPqwF5wmqcMLCD4UADvruXD1NWeuFZdeHJORrgKT9Y99Dts5zeg5XtwPfTELySE04lcB19PhqXSpf3Sq_B2vlAVT40jgL1VUEhr22SUWysRfi4KeiDcN2mIHDozjnYKkqRJrz6oZxH1oEc0yMir-2w1mhpF3MRpp7CVV_giutSnaa6kOKgWzPOk1V0qMuCytpkj7Z9HoohN2MdgoeMp0TtXfRHrkh5UY8naE-c8ovDUkoiVSeB7dYBy6mjx7ZW84pW4NMT0gVVQbA4i8b-K-y1Gn5mnzys8APXkGUMYIx00WwoRS2mSUzufpRIsYaIAkbjGlt_-bSvHHFrnrTH7QfBd9bx1oS6hQNkQ_BU3ulb5q0Ktg__FES3aB2ZiME35I4PAw6x_gG2HWqCshgDjRg14Ve4obRnAmICQNu-iB4rZFCofrOeEauvCbktivR2jyN2l5JjsdvGaM=w880-h1458-no)
 That $MFT only has two but it is common for larger files to have many data runs:
-
+![enter image description here](https://lh3.googleusercontent.com/MALDVKOp0k4-eq39zZCaH5MmrPX0CvsqXWPr5H6c4qaO_G_xQk7QUkL96D7dHG-r-NN4cTTai5ai=s100000000 "Data Runs")
 This WebCacheV01.dat file has 25 runs spread out all over the volume.
 
 **The Point**
@@ -380,5 +380,5 @@ Piece of cake right? Well the first 3 steps can trip up tools for one reason or 
 
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbNjYyODYxMjQzXX0=
+eyJoaXN0b3J5IjpbLTE5NDEyMjU1MzRdfQ==
 -->
