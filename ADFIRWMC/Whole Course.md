@@ -386,12 +386,12 @@ Piece of cake right? Well the first 3 steps can trip up tools for one reason or 
 
 #### Tools I use for Remote File Acquisition
 
-Here is a list of tables 
+Here is a list of tables in
 
 |Tool|Pros  | Cons|
 |--|--|--|
 |  |  |  |
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTUyODM4NTc5NF19
+eyJoaXN0b3J5IjpbMTAxMzg5MzU0M119
 -->
