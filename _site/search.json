@@ -365,12 +365,6 @@
   
 
   
-    ,{
-      "title"			: "Advanced DFIR Wizard Master Class",
-      "link"			: "http://jon.glass/DFIRCourse/Whole%20Course/",
-      "excerpt"		: ""
-    }
-  
 
   
 
@@ -378,14 +372,6 @@
 
   
 
-  
-
-  
-    ,{
-      "title"			: "About the Jon",
-      "link"			: "http://jon.glass/about/",
-      "excerpt"		: "Security dude"
-    }
   
 
   
@@ -396,6 +382,12 @@
     }
   
 
+  
+    ,{
+      "title"			: "About the Jon",
+      "link"			: "http://jon.glass/about/",
+      "excerpt"		: "Security dude"
+    }
   
 
   
