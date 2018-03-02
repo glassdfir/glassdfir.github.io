@@ -211,7 +211,7 @@ For a lot less fun, let's call the User explain the situation, shut it down remo
 ### MMC
 I imagine I scared some of off you with all that "coding" and "command line stuff". While there are GUIer options to accomplish Windows administration tasks, they aren't as efficient or sexy. If you are against coding all together, there is an X at the top right or left of your browser. We can part ways now and no one's feelings need to get hurt. For the sake of completeness, I will cover MMC which is a GUI and can do Windows admin tasks but it is not my "go to".
 According to the big M, the Microsoft Management Console (MMC) is an extensible common presentation service for management applications.
-![MMC](/Users/glass/Blog/ADFIRWMC/Images/2018-02-22-MMC.png "MMC")
+![MMC](../Images/2018-02-22-MMC.png "MMC")
 
 This console gives you access to some a lot of administration tools.
  - Computer Management Snap-In
