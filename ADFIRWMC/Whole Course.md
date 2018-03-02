@@ -206,6 +206,7 @@ For even MORE fun, like copy that malicious file to an analysis share so we can 
 For a lot less fun, let's call the User explain the situation, shut it down remotely, and go get the workstation to determine what this malware did :
 
     wmic /node:RemoteComputerName os call Shutdown
+
 *Disclaimer: This scenario is largely BS. Malware isn't usually this easy to kill and as more work becomes remote, it is increasingly rare to physically walk over to the user's cube and take their workstation.*
 
 ### MMC

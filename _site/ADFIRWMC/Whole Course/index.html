@@ -414,9 +414,11 @@ instance of __PARAMETERS
 
 <p>For a lot less fun, let’s call the User explain the situation, shut it down remotely, and go get the workstation to determine what this malware did :</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>wmic /node:RemoteComputerName os call Shutdown *Disclaimer: This scenario is largely BS. Malware isn't usually this easy to kill and as more work becomes remote, it is increasingly rare to physically walk over to the user's cube and take their workstation.*
+<div class="highlighter-rouge"><pre class="highlight"><code>wmic /node:RemoteComputerName os call Shutdown
 </code></pre>
 </div>
+
+<p><em>Disclaimer: This scenario is largely BS. Malware isn’t usually this easy to kill and as more work becomes remote, it is increasingly rare to physically walk over to the user’s cube and take their workstation.</em></p>
 
 <h3 id="mmc">MMC</h3>
 <p>I imagine I scared some of off you with all that “coding” and “command line stuff”. While there are GUIer options to accomplish Windows administration tasks, they aren’t as efficient or sexy. If you are against coding all together, there is an X at the top right or left of your browser. We can part ways now and no one’s feelings need to get hurt. For the sake of completeness, I will cover MMC which is a GUI and can do Windows admin tasks but it is not my “go to”.
