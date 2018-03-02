@@ -390,8 +390,8 @@ Here is a table of tools I like in no particular order:
 
 |Tool|Pros  | Cons|Cost|
 |--|--|--|--|
-|RawCopy  | <ul><li>Does a good job copying locked files.</li><li>Can reference files by path or record number.</li>  | <ul><li>Written in AutoIt</li>< | Free |
+|RawCopy  | <ul><li>Does a good job copying locked files.</li><li>Can reference files by path or record number.</li><li>Open Source</li></ul>  | <ul><li>Written in AutoIt</li> | Free |
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE0NzA0MDA1NTddfQ==
+eyJoaXN0b3J5IjpbMTc1OTk5MTc2NV19
 -->
