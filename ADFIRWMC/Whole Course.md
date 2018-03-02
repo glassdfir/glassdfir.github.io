@@ -156,7 +156,7 @@ You might not have this in your environment but many companies have clients on e
 
     (selects "processid,name from Win32_Process where name = 'explorer.exe'" of wmi)
 
-![BigFix WMI Relevance](/Users/glass/Blog/ADFIRWMC/Images/bigfix.png)
+![BigFix WMI Relevance](../Images/bigfix.png)
 
 #### WMI classes of DFIR interest
  There is a lot of super geeky DFIR information you can pull out of WMI properties and methods that can give you wizard like powers over remote machines. Here are a few of my favorites :
