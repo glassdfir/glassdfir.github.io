@@ -390,8 +390,8 @@ Here is a table of tools I like in no particular order:
 
 |Tool|Pros  | Cons|Cost|
 |--|--|--|--|
-|[RawCopy](https://github.com/jschicht/RawCopy)  | <ul><li>Does a good job copying locked files.</li><li>Can reference files by path or record number.</li><li>Open Source</li></ul>  | <ul><li>Since it is written in AutoIt and includes </li> | Free |
+|[RawCopy](https://github.com/jschicht/RawCopy)  | <ul><li>Does a good job copying locked files.</li><li>Can reference files by path or record number.</li><li>Open Source</li></ul>  | <ul><li>Since it is written in AutoIt and includes the ability to send raw TCP packets, gets it flagged as a Hack Tool by a lot of A/V vendors.</li> | Free |
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE4NTkxODUxMjldfQ==
+eyJoaXN0b3J5IjpbLTE4MjI2OTY5MDBdfQ==
 -->
