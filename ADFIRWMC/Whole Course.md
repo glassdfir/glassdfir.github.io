@@ -390,8 +390,8 @@ Here is a table of tools I like in no particular order:
 
 |Tool|Pros  | Cons|Cost|
 |--|--|--|--|
-|  |  |  |  |
+|RawCopy  |  |  |  |
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTExOTkyNjk5NF19
+eyJoaXN0b3J5IjpbLTEzOTYxNDMwNzFdfQ==
 -->
