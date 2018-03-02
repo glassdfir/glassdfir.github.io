@@ -385,6 +385,11 @@ To access locked files on a live Windows system, your acquisition tool needs to:
 Piece of cake right? Well the first 3 steps can trip up tools for one reason or another.
 
 #### Tools I use for Remote File Acquisition
+
+|Tool|  |
+|--|--|
+|  |  |
+
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMjE0Njc3MjEzMF19
+eyJoaXN0b3J5IjpbLTIxMzY5MzgwMzJdfQ==
 -->
