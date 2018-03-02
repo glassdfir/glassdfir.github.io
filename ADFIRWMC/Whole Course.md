@@ -390,8 +390,8 @@ Here is a table of tools I like in no particular order:
 
 |Tool|Pros  | Cons|Cost|
 |--|--|--|--|
-|RawCopy  | <ul><li>Does a good job copying locked files.  |  |  |
+|RawCopy  | <ul><li>Does a good job copying locked files.</li><li>Can reference files by path or record number.</li>  |  |  |
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTQ5ODM4NTQ5M119
+eyJoaXN0b3J5IjpbLTE0MjkyNTI2NzddfQ==
 -->
