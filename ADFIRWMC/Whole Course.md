@@ -391,8 +391,8 @@ Here is a table of tools I like enough to mention in no particular order:
 |Tool|Pros  | Cons|Cost|
 |--|--|--|--|
 |[RawCopy](https://github.com/jschicht/RawCopy)  | <ul><li>Does a good job copying locked files.</li><li>Can reference files by path or record number.</li><li>Open Source</li></ul>  | <ul><li>Written in AutoIt</li><li>Includes the ability to send raw TCP packets which gets it flagged as a Hack Tool by some A/V vendors.</li> | Free |
-|SleuthKit|<ul><li>Written by Brian Carrier, author of File System Forensic Analysis</li><li>Open Source, Python Bindings
+|SleuthKit|<ul><li>Written by Brian Carrier, author of File System Forensic Analysis</li><li>Open Source</li><li>Python Bindings</li><li>Succeeds when others fail.</li></ul>|
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTEwMjkzMDA0MV19
+eyJoaXN0b3J5IjpbMTI5NzMyMTgxMV19
 -->
