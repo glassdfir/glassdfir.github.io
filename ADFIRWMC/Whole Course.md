@@ -326,7 +326,7 @@ The first thing you should know is you will run into problems. Even when your co
 
 This chapter is going to cover as many of the lessons learned as I can think of.
 
-### Tools for Remote File Acquisition
+### Issues with Tools for Remote File Acquisition
 
 This can quickly get religious but I am not a fan of most commercial tools. Many do WAY too much stuff I don't need or want for my OCD to handle. I am not going to bad mouth any particular vendor but there are a lot of solutions that just don't work for my exact needs. 
 
@@ -386,5 +386,5 @@ Piece of cake right? Well the first 3 steps can trip up tools for one reason or 
 
 #### 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTExMjk5ODc5NF19
+eyJoaXN0b3J5IjpbMjA5NTM0MjY2Nl19
 -->
