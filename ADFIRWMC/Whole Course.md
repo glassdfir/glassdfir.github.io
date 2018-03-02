@@ -384,7 +384,7 @@ To access locked files on a live Windows system, your acquisition tool needs to:
 
 Piece of cake right? Well the first 3 steps can trip up tools for one reason or another.
 
-#### What I us
+#### 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTUzMjM1MDU0N119
+eyJoaXN0b3J5IjpbLTExMjk5ODc5NF19
 -->
