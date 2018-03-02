@@ -383,12 +383,3 @@ To access locked files on a live Windows system, your acquisition tool needs to:
  4. Write the collected information to an output file in the sequence specified by the VCNs.
 
 Piece of cake right? Well the first 3 steps can trip up tools for one reason or another.
-<<<<<<< HEAD
-=======
-
-
-
-<!--stackedit_data:
-eyJoaXN0b3J5IjpbLTEwMTY4NTc1MjZdfQ==
--->
->>>>>>> origin/master
