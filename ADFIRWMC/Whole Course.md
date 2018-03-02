@@ -340,7 +340,7 @@ Things I have found annoying about collection tools:
  - Some tools are primarily geared for Law Enforcement and don't cater to the enterprise teams that will probably never testify in court. 
  - Most are WAY overpriced for what they offer.
 
-Enough of my complaining. I will explain my reasoning for the tools I use and let you figure out what works best for your work flow and environment.
+Enough of my complaining. After a little science, I will explain my reasoning for the tools I use and let you figure out what works best for your work flow and environment.
 
 #### The Underlying Mechanics of Copying Locked Files on Windows
 
@@ -384,7 +384,7 @@ To access locked files on a live Windows system, your acquisition tool needs to:
 
 Piece of cake right? Well the first 3 steps can trip up tools for one reason or another.
 
-#### 
+#### Tools I use for Remote File Acquisition
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMjA5NTM0MjY2Nl19
+eyJoaXN0b3J5IjpbMjE0Njc3MjEzMF19
 -->
