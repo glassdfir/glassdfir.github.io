@@ -51,12 +51,12 @@ As I built this course, I started realizing that perhaps the reader might not un
 ### I tried to keep it cheap
 In an effort to limit barriers to education, I tried to limit the examples in this course to native, open source, or readily available free tools. If for some reason I mention a commercial tool, it's because it is worth documenting for completeness. You are going to need a Windows 7 or newer system to play with to put a lot of this to use. 
 ### Audience
-I think this course is written for three groups of people:
- 1. System Admins/Computer Enthusiasts who are trying to get into the exciting world of Digital Forensics and Incident Response.
- 2. Folks that have been in Information Security in one capacity or another and are looking to get into more technical work.
- 3. Other people that might find this information useful or interesting.
+I think this course is written to provide examples of DFIR techniques for two groups of people:
+ 1. Folks that have been in Information Security in one capacity or another and are looking to get into more DFIR work.
+ 2. Others who might find this information useful or interesting.
 
 This should not be the first computer related course you attempt.
+
 ### Omissions
 There are two reasons I didn't include something in this course:
 1. I didn't know about it. *It happens. Often.*
@@ -382,4 +382,9 @@ To access locked files on a live Windows system, your acquisition tool needs to:
  3. Seek to the offset of the LCN on disk and read the numbers of clusters specified. Repeat as needed for all Data Runs.
  4. Write the collected information to an output file in the sequence specified by the VCNs.
 
-Piece of cake right? Well the first 3 steps can trip up tools for one reason or another.
+Here is an example using 10 lines of Python:
+![Extents2Raw](../Images/Extents2Raw.png)
+
+Piece of cake right? Well the first 3 steps can trip up many tools for one reason or another.
+
+#### Pros and Cons 
