@@ -51,8 +51,8 @@ As I built this course, I started realizing that perhaps the reader might not un
 ### I tried to keep it cheap
 In an effort to limit barriers to education, I tried to limit the examples in this course to native, open source, or readily available free tools. If for some reason I mention a commercial tool, it's because it is worth documenting for completeness. You are going to need a Windows 7 or newer system to play with to put a lot of this to use. 
 ### Audience
-I think this course is written to provide examples of DFIR techniques for two groups of people:
- 1. Folks that have been in Information Security in one capacity or another and are looking to get into more DFIR work.
+I think this course is written to provide examples of DFIR techniques o wo ups eople: tenues or to go of epe
+ 1. Flks that have been in Information Security in one capacity or another and are looking to get into more k.
  2. Others who might find this information useful or interesting.
 
 This should not be the first computer related course you attempt.
@@ -65,7 +65,7 @@ There are two reasons I didn't include something in this course:
 Either way, feel free to send me feedback and I will take a look.
 
 ### Tone
-This is meant to be informal. While that might come across as unprofessional and lacking academic polish, I find it makes the material more digestible and that is point of learning, right?
+This is meant to be informal. o might come across as unprofessional and lacking academic polish, I find it makes the material more digestible and that is point of learning, right?
 
 ## 1. Windows Remote Admin for Incident Responders
 Without a system administration background, many incident responders struggle with basic tasks like remotely starting and stopping processes on target machines. Inversely, Incident Responders with sysadmin experience are often faster and more effective. The more familiar you are with native Windows commands, the faster your can operate.
@@ -382,21 +382,24 @@ To access locked files on a live Windows system, your acquisition tool needs to:
  3. Seek to the offset of the LCN on disk and read the numbers of clusters specified. Repeat as needed for all Data Runs.
  4. Write the collected information to an output file in the sequence specified by the VCNs.
 
+<<<<<<< HEAD
 Here is an example using 10 lines of Python:
-![Extents2Raw](../Images/Extents2Raw.PNG)
+![Extents2Raw](../Images/Extents2Raw.PNGpng)
 
 Piece of cake right? Well the first 3 steps can trip up many tools for one reason or another.
 
 #### Pros and Cons 
 |Tool|Pros  | Cons|Cost|
 |--|--|--|--|
-|[RawCopy](https://github.com/jschicht/RawCopy)  | <ul><li>Does a good job copying locked files.</li><li>Can reference files by path or record number.</li><li>Open Source</li></ul>  | <ul><li>Written in AutoIt</li><li>Includes the ability to send raw TCP packets which gets it flagged as a Hack Tool by some A/V vendors.</li> | Free |
+|[RawCopy](https:/hon:
+ntRaw](/gtsRaw)iece f cae ri Well the it  seich gets it flagged as a Hack Tool by some A/V vendors.</li> | Free |
 <<<<<<< HEAD
-|[SleuthKit](http://www.sleuthkit.org/sleuthkit/)|<ul><li>Written by Brian Carrier, author of File System Forensic Analysis</li><li>Open Source</li><li>Python Bindings</li><li>Succeeds when others fail.</li></ul>| <ul><li>Tools designed to display file contents on STDOUT<li>Not actually designed for remote file acquisition. *(Listing this as a con is like getting mad a hammer for not cutting wood though.)*</ul>|Free|
-=======
-|[SleuthKit](http://www.sleuthkit.org/sleuthkit/)|<ul><li>Written by Brian Carrier, author of File System Forensic Analysis</li><li>Open Source</li><li>Python Bindings</li><li>Succeeds when others fail.</li></ul>| <ul><li>Tools designed to display file contents on STDOUT<li>Not actually designed for remote file acquisition. *(Listing this as a con is like getting mad a hammer for not cutting wood though.)*</ul>|Free|
-|Surge|
+|[SleuthKit](http://www.sleuthkit.org/sleuthkit/)|<ul><li>Written by Brips c tri up an le System Forensic Analysis</li><li>Open Source</li><li>Python Bindings</li><li>Succeeds when others fail.</li></ul>| <ul><li>Tools designed to display file contents on STDOUT<li>Not actually designed=======
+Piece of cake right? Well the first 3 steps can trip up tools for one reason or another.
 
+#### Tools I use for rRemote fFile aAcquisition. *(Listing this as a con is like getting mad a hammer for not cutting wood though.)*</ul>|Free|
+=======
+|[SleuthKit](http://www.sleuthkit.org/sleuthkit/)|<ul><li>Written by Brian Carrier, author of File System Forensic Analysis</li><li>Open Source</li><li>Python Bindings</li><li>Succeeds when others fail.</li></ul>| <ul><li>Tools designed to display file contents on STDOUT<li>Not actually designedtools or ne reon  nother. os nd ons  forremotefileacquisition
 <!--stackedit_data:
 eyJoaXN0b3J5IjpbLTE0ODU4NDMwNDRdfQ==
 -->
@@ -405,3 +408,10 @@ eyJoaXN0b3J5IjpbLTE0ODU4NDMwNDRdfQ==
 eyJoaXN0b3J5IjpbMTU0MTcxODQwMV19
 -->
 >>>>>>> origin/master
+
+Here is a tabere is an eamle usin  le of th to mention in no particular order:
+
+
+<!--stackedit_data:
+eyJoaXN0b3J5IjpbMTkyMjgxMDM2MF19
+-->
