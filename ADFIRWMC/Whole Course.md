@@ -406,3 +406,6 @@ Here is a table of tools I like enough to mention in no particular order:
 eyJoaXN0b3J5IjpbLTE0ODU4NDMwNDRdfQ==
 -->
 >>>>>>> origin/master
+<!--stackedit_data:
+eyJoaXN0b3J5IjpbMTU0MTcxODQwMV19
+-->
