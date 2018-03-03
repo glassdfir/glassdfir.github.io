@@ -326,7 +326,7 @@ The first thing you should know is you will run into problems. Even when your co
 
 This chapter is going to cover as many of the lessons learned as I can think of.
 
-### Tools for Remote File Acquisition
+### Issues with Tools for Remote File Acquisition
 
 This can quickly get religious but I am not a fan of most commercial tools. Many do WAY too much stuff I don't need or want for my OCD to handle. I am not going to bad mouth any particular vendor but there are a lot of solutions that just don't work for my exact needs. 
 
@@ -340,7 +340,7 @@ Things I have found annoying about collection tools:
  - Some tools are primarily geared for Law Enforcement and don't cater to the enterprise teams that will probably never testify in court. 
  - Most are WAY overpriced for what they offer.
 
-Enough of my complaining. I will explain my reasoning for the tools I use and let you figure out what works best for your work flow and environment.
+Enough of my complaining. After a little science, I will explain my reasoning for the tools I use and let you figure out what works best for your work flow and environment.
 
 #### The Underlying Mechanics of Copying Locked Files on Windows
 
@@ -382,9 +382,27 @@ To access locked files on a live Windows system, your acquisition tool needs to:
  3. Seek to the offset of the LCN on disk and read the numbers of clusters specified. Repeat as needed for all Data Runs.
  4. Write the collected information to an output file in the sequence specified by the VCNs.
 
+<<<<<<< HEAD
 Here is an example using 10 lines of Python:
 ![Extents2Raw](../Images/Extents2Raw.png)
 
 Piece of cake right? Well the first 3 steps can trip up many tools for one reason or another.
 
 #### Pros and Cons 
+=======
+Piece of cake right? Well the first 3 steps can trip up tools for one reason or another.
+
+#### Tools I use for Remote File Acquisition
+
+Here is a table of tools I like enough to mention in no particular order:
+
+|Tool|Pros  | Cons|Cost|
+|--|--|--|--|
+|[RawCopy](https://github.com/jschicht/RawCopy)  | <ul><li>Does a good job copying locked files.</li><li>Can reference files by path or record number.</li><li>Open Source</li></ul>  | <ul><li>Written in AutoIt</li><li>Includes the ability to send raw TCP packets which gets it flagged as a Hack Tool by some A/V vendors.</li> | Free |
+|[SleuthKit](http://www.sleuthkit.org/sleuthkit/)|<ul><li>Written by Brian Carrier, author of File System Forensic Analysis</li><li>Open Source</li><li>Python Bindings</li><li>Succeeds when others fail.</li></ul>| <ul><li>Tools designed to display file contents on STDOUT<li>Not actually designed for remote file acquisition. *(Listing this as a con is like getting mad a hammer for not cutting wood though.)*</ul>|Free|
+|Surge|
+
+<!--stackedit_data:
+eyJoaXN0b3J5IjpbLTE0ODU4NDMwNDRdfQ==
+-->
+>>>>>>> origin/master
