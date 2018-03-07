@@ -9,6 +9,10 @@ categories: course
 
 Welcome to the Advanced DFIR Wizard Master Class
 by Jonathan Glass
+
+## Goal
+The goal of this course is to explain the principles behind Windows Digital Forensics and Incident Response (DFIR) tools, tactics, and tactics. This course will demonstrate how to accomplish collection and analysis of Windows artifacts using open source or free tools.  
+
 ## Scope of this Course
 
 In scope for this class:
@@ -48,11 +52,13 @@ Out of scope for this class:
 
 ### You have to dig
 As I built this course, I started realizing that perhaps the reader might not understand everything I am talking about. DFIR is not a field where everyone can know everything. It's just too wide and too deep. Attempting to define every term and provide background on all material would bloat this project beyond scope and diminish the value. If I didn't cover something, you might have to look it up. Searching for information is the crux of this job.
+
 ### I tried to keep it cheap
-In an effort to limit barriers to education, I tried to limit the examples in this course to native, open source, or readily available free tools. If for some reason I mention a commercial tool, it's because it is worth documenting for completeness. You are going to need a Windows 7 or newer system to play with to put a lot of this to use. 
+In an effort to limit barriers to education, I tried to limit the examples in this course to native, open source, or readily available free tools. Does that excluding commecial tools limit the completeness of this course? Yes, but this course is about developing your skills and not lining a vendor's pocket. Sadly, you are going to need a Windows 7 or newer system to play with to put a lot of this to use.
+
 ### Audience
 I think this course is written to provide examples of DFIR techniques for two groups of people:
- 1. Folks that have been in Information Security in one capacity or another and are looking to get into more DFIR work.
+ 1. Folks that have been in Information Security in one capacity or another and are looking to get into more hands on DFIR work.
  2. Others who might find this information useful or interesting.
 
 This should not be the first computer related course you attempt.
@@ -65,17 +71,17 @@ There are two reasons I didn't include something in this course:
 Either way, feel free to send me feedback and I will take a look.
 
 ### Tone
-This is meant to be informal. While that might come across as unprofessional and lacking academic polish, I find it makes the material more digestible and that is point of learning, right?
+This is meant to be informal. I authored 3 university courses last year and one of the consistent items of feedback I received was how well the frankly dry material was conveyed. While that might come across as unprofessional and lacking academic polish, I find it makes the material more digestible and that is point of learning, right?
 
-## 1. Windows Remote Admin for Incident Responders
+## 1. Windows Remote Administration for Incident Responders
 Without a system administration background, many incident responders struggle with basic tasks like remotely starting and stopping processes on target machines. Inversely, Incident Responders with sysadmin experience are often faster and more effective. The more familiar you are with native Windows commands, the faster your can operate.
 
 While this course cannot hope to supplant the experience gained by years at your average help desk, I will try to highlight some of the more helpful techniques that get me from A to B.
 
 ### Topics
 
- - WMI
- - MMC
+ - Windows Management Instrumentation
+ - Microsoft Management Console
  - PsExec
 
 ### WMI
@@ -340,7 +346,7 @@ Things I have found annoying about collection tools:
  - Some tools are primarily geared for Law Enforcement and don't cater to the enterprise teams that will probably never testify in court. 
  - Most are WAY overpriced for what they offer.
 
-Enough of my complaining. After a little science, I will explain my reasoning for the tools I use and let you figure out what works best for your work flow and environment.
+Enough of my complaining. After a little science, I will explain two completely free tools you can use to carve Windows artifacts.
 
 #### The Underlying Mechanics of Copying Locked Files on Windows
 
@@ -382,26 +388,78 @@ To access locked files on a live Windows system, your acquisition tool needs to:
  3. Seek to the offset of the LCN on disk and read the numbers of clusters specified. Repeat as needed for all Data Runs.
  4. Write the collected information to an output file in the sequence specified by the VCNs.
 
-Here is an example using 10 lines of Python:
-![Extents2Raw](../Images/Extents2Raw.PNG)
+Piece of cake right? Well the first 3 steps can trip up tools for one reason or another.
 
-Piece of cake right? Well the first 3 steps can trip up many tools for one reason or another.
+### Building a Toolkit for Live File Collection:
 
-#### Pros and Cons 
-|Tool|Pros  | Cons|Cost|
-|--|--|--|--|
-|[RawCopy](https://github.com/jschicht/RawCopy)  | <ul><li>Does a good job copying locked files.</li><li>Can reference files by path or record number.</li><li>Open Source</li></ul>  | <ul><li>Written in AutoIt</li><li>Includes the ability to send raw TCP packets which gets it flagged as a Hack Tool by some A/V vendors.</li> | Free |
-<<<<<<< HEAD
-|[SleuthKit](http://www.sleuthkit.org/sleuthkit/)|<ul><li>Written by Brian Carrier, author of File System Forensic Analysis</li><li>Open Source</li><li>Python Bindings</li><li>Succeeds when others fail.</li></ul>| <ul><li>Tools designed to display file contents on STDOUT<li>Not actually designed for remote file acquisition. *(Listing this as a con is like getting mad a hammer for not cutting wood though.)*</ul>|Free|
-=======
-|[SleuthKit](http://www.sleuthkit.org/sleuthkit/)|<ul><li>Written by Brian Carrier, author of File System Forensic Analysis</li><li>Open Source</li><li>Python Bindings</li><li>Succeeds when others fail.</li></ul>| <ul><li>Tools designed to display file contents on STDOUT<li>Not actually designed for remote file acquisition. *(Listing this as a con is like getting mad a hammer for not cutting wood though.)*</ul>|Free|
-|Surge|
+I wish I could point you to a single perfect free tool that does exactly what you need but sadly, I can't recommend one that checks all the blocks. So, since this is a course designed to expand your knowledge and experience, let's just build one from scratch(ish)!
 
-<!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE0ODU4NDMwNDRdfQ==
--->
->>>>>>> origin/master
-<!--stackedit_data:
-eyJoaXN0b3J5IjpbMTU0MTcxODQwMV19
--->
->>>>>>> origin/master
+Lets make a basic collection script with PowerShell and fcat from SleuthKit:
+{% highlight powershell %}
+#1. Timestamps are a great way to make unique folder names with context.
+$timestamp = (get-date).ToString('M-d-y-h-m-s')
+
+#2. Array of Files to Collect
+$files_to_collect = @()
+
+#3. NTFS Files
+$files_to_collect += 'c:\$MFT'
+$files_to_collect += 'c:\$LogFile'
+$files_to_collect += 'c:\$Extend\$USNJrnl:$J'
+
+#4. Array for Regex Signatures for Files of Interest
+$filesigs = @()
+
+#User Registry Files
+$filesigs += '^c:\\Users\\.*\\ntuser.dat$'
+$filesigs += '^c:\\Users\\.*\\usrclass.dat$'
+
+#System Registry Files
+$filesigs += '^c:\\Windows\\System32\\config\\.*'
+
+#Event Logs
+$filesigs += '^c:\\Windows\\System32\\winevt\\Logs\\.*.evtx$'
+
+$files_to_collect += gci -Path C:\Users,C:\Windows -Recurse -Force -File -ErrorAction SilentlyContinue | 
+                     Where-Object { $_.FullName -imatch $($filesigs -join "|") }| % { $_.FullName }
+
+#5. Collect Files of Interest
+foreach($file in $files_to_collect){
+    #6. Bastardized Multiprocessing. Counts the number of fcats running and sleep if it
+    #If it is more than 20.
+    
+    while(@(Get-Process fcat -ErrorAction SilentlyContinue).Count -ge 20){
+        Start-Sleep -Seconds 5
+    }
+    #7. Manipulating the path to get what we need
+    $unixname = $file -replace "c:","" -replace "\\","/"
+    $dirlocation = $file.Substring(0,$file.LastIndexOf("\")) -replace ":",""
+    $outdir  = $('{0}{1}{2}' -f $($timestamp),'\',$($dirlocation))
+    $outfile = $('{0}{1}{2}' -f $($timestamp),'\',$($file) -replace ':','')
+    #8. Building the command string
+    $cmdstr = ""
+    $cmdstr += "/c mkdir $('{0}{1}{0}', -f $([char]34), $outdir) & "
+    $cmdstr += "\\Scripts\\fcat.exe -h -f ntfs $('{0}{1}{0}', -f $([char]34), $unixname) \\.\c: "
+    $cmdstr += " > $('{0}{1}{0}', -f $([char]34), $outfile) "
+    #Run
+    Start-Process cmd.exe -ArgumentList $cmdstr -WindowStyle Hidden
+}
+
+#9. Wait until all of the fcats are done
+while(@(Get-Process fcat  -ErrorAction SilentlyContinue).Count){
+    write-host "Collectors are still running..."
+    Start-Sleep -Seconds 60
+}
+write-host "Zipping..."
+#10. Zip it real good.
+Add-Type -assembly "system.io.compression.filesystem"
+[io.compression.zipfile]::CreateFromDirectory($('{0}\\{1}' -f $pwd,$timestamp), $('{0}\\{1}.zip' -f $pwd,$timestamp))
+write-host "Done"
+{% endhighlight %}
+
+This is the platform we will add use and augment throughout the rest of the course. It's free and it works. Strap in because the breakdown on this is going to be brutal.
+
+
+
+
+

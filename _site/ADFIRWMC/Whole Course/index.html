@@ -125,6 +125,10 @@
 
 <p>Welcome to the Advanced DFIR Wizard Master Class
 by Jonathan Glass</p>
+
+<h2 id="goal">Goal</h2>
+<p>The goal of this course is to explain the principles behind Windows Digital Forensics and Incident Response (DFIR) tools, tactics, and tactics. This course will demonstrate how to accomplish collection and analysis of Windows artifacts using open source or free tools.</p>
+
 <h2 id="scope-of-this-course">Scope of this Course</h2>
 
 <p>In scope for this class:</p>
@@ -173,12 +177,14 @@ by Jonathan Glass</p>
 
 <h3 id="you-have-to-dig">You have to dig</h3>
 <p>As I built this course, I started realizing that perhaps the reader might not understand everything I am talking about. DFIR is not a field where everyone can know everything. It’s just too wide and too deep. Attempting to define every term and provide background on all material would bloat this project beyond scope and diminish the value. If I didn’t cover something, you might have to look it up. Searching for information is the crux of this job.</p>
+
 <h3 id="i-tried-to-keep-it-cheap">I tried to keep it cheap</h3>
-<p>In an effort to limit barriers to education, I tried to limit the examples in this course to native, open source, or readily available free tools. If for some reason I mention a commercial tool, it’s because it is worth documenting for completeness. You are going to need a Windows 7 or newer system to play with to put a lot of this to use.</p>
+<p>In an effort to limit barriers to education, I tried to limit the examples in this course to native, open source, or readily available free tools. Does that excluding commecial tools limit the completeness of this course? Yes, but this course is about developing your skills and not lining a vendor’s pocket. Sadly, you are going to need a Windows 7 or newer system to play with to put a lot of this to use.</p>
+
 <h3 id="audience">Audience</h3>
 <p>I think this course is written to provide examples of DFIR techniques for two groups of people:</p>
 <ol>
-  <li>Folks that have been in Information Security in one capacity or another and are looking to get into more DFIR work.</li>
+  <li>Folks that have been in Information Security in one capacity or another and are looking to get into more hands on DFIR work.</li>
   <li>Others who might find this information useful or interesting.</li>
 </ol>
 
@@ -194,9 +200,9 @@ by Jonathan Glass</p>
 <p>Either way, feel free to send me feedback and I will take a look.</p>
 
 <h3 id="tone">Tone</h3>
-<p>This is meant to be informal. While that might come across as unprofessional and lacking academic polish, I find it makes the material more digestible and that is point of learning, right?</p>
+<p>This is meant to be informal. I authored 3 university courses last year and one of the consistent items of feedback I received was how well the frankly dry material was conveyed. While that might come across as unprofessional and lacking academic polish, I find it makes the material more digestible and that is point of learning, right?</p>
 
-<h2 id="windows-remote-admin-for-incident-responders">1. Windows Remote Admin for Incident Responders</h2>
+<h2 id="windows-remote-administration-for-incident-responders">1. Windows Remote Administration for Incident Responders</h2>
 <p>Without a system administration background, many incident responders struggle with basic tasks like remotely starting and stopping processes on target machines. Inversely, Incident Responders with sysadmin experience are often faster and more effective. The more familiar you are with native Windows commands, the faster your can operate.</p>
 
 <p>While this course cannot hope to supplant the experience gained by years at your average help desk, I will try to highlight some of the more helpful techniques that get me from A to B.</p>
@@ -204,8 +210,8 @@ by Jonathan Glass</p>
 <h3 id="topics">Topics</h3>
 
 <ul>
-  <li>WMI</li>
-  <li>MMC</li>
+  <li>Windows Management Instrumentation</li>
+  <li>Microsoft Management Console</li>
   <li>PsExec</li>
 </ul>
 
@@ -619,7 +625,7 @@ In this example, I use PsExec to create two instances of notepad.exe on my local
   <li>Most are WAY overpriced for what they offer.</li>
 </ul>
 
-<p>Enough of my complaining. After a little science, I will explain my reasoning for the tools I use and let you figure out what works best for your work flow and environment.</p>
+<p>Enough of my complaining. After a little science, I will explain two completely free tools you can use to carve Windows artifacts.</p>
 
 <h4 id="the-underlying-mechanics-of-copying-locked-files-on-windows">The Underlying Mechanics of Copying Locked Files on Windows</h4>
 
@@ -680,16 +686,76 @@ This WebCacheV01.dat file has 25 runs spread out all over the volume.</p>
   <li>Write the collected information to an output file in the sequence specified by the VCNs.</li>
 </ol>
 
-<p>Here is an example using 10 lines of Python:
-<img src="../Images/Extents2Raw.PNG" alt="Extents2Raw" /></p>
+<p>Piece of cake right? Well the first 3 steps can trip up tools for one reason or another.</p>
 
-<p>Piece of cake right? Well the first 3 steps can trip up many tools for one reason or another.</p>
+<h3 id="building-a-toolkit-for-live-file-collection">Building a Toolkit for Live File Collection:</h3>
 
-<h4 id="pros-and-cons">Pros and Cons</h4>
-<p>|Tool|Pros  | Cons|Cost|
-|–|–|–|–|
-|<a href="https://github.com/jschicht/RawCopy">RawCopy</a>  | &lt;ul&gt;&lt;li&gt;Does a good job copying locked files.&lt;/li&gt;&lt;li&gt;Can reference files by path or record number.&lt;/li&gt;&lt;li&gt;Open Source&lt;/li&gt;&lt;/ul&gt;  | &lt;ul&gt;&lt;li&gt;Written in AutoIt&lt;/li&gt;&lt;li&gt;Includes the ability to send raw TCP packets which gets it flagged as a Hack Tool by some A/V vendors.&lt;/li&gt; | Free |
-|<a href="http://www.sleuthkit.org/sleuthkit/">SleuthKit</a>|&lt;ul&gt;&lt;li&gt;Written by Brian Carrier, author of File System Forensic Analysis&lt;/li&gt;&lt;li&gt;Open Source&lt;/li&gt;&lt;li&gt;Python Bindings&lt;/li&gt;&lt;li&gt;Succeeds when others fail.&lt;/li&gt;&lt;/ul&gt;| &lt;ul&gt;&lt;li&gt;Tools designed to display file contents on STDOUT&lt;li&gt;Not actually designed for remote file acquisition. <em>(Listing this as a con is like getting mad a hammer for not cutting wood though.)</em>&lt;/ul&gt;|Free|</p>
+<p>I wish I could point you to a single perfect free tool that does exactly what you need but sadly, I can’t recommend one that checks all the blocks. So, since this is a course designed to expand your knowledge and experience, let’s just build one from scratch(ish)!</p>
+
+<p>Lets make a basic collection script with PowerShell and fcat from SleuthKit:</p>
+
+<figure class="highlight"><pre><code class="language-powershell" data-lang="powershell"><span class="c1">#1. Timestamps are a great way to make unique folder names with context.</span>
+<span class="nv">$timestamp</span> <span class="o">=</span> <span class="o">(</span><span class="nb">get-date</span><span class="o">)</span>.ToString<span class="o">(</span><span class="s1">'M-d-y-h-m-s'</span><span class="o">)</span>
+
+<span class="c1">#2. Array of Files to Collect</span>
+<span class="nv">$files_to_collect</span> <span class="o">=</span> @<span class="o">()</span>
+
+<span class="c1">#3. NTFS Files</span>
+<span class="nv">$files_to_collect</span> +<span class="o">=</span> <span class="s1">'c:\$MFT'</span>
+<span class="nv">$files_to_collect</span> +<span class="o">=</span> <span class="s1">'c:\$LogFile'</span>
+<span class="nv">$files_to_collect</span> +<span class="o">=</span> <span class="s1">'c:\$Extend\$USNJrnl:$J'</span>
+
+<span class="c1">#4. Array for Regex Signatures for Files of Interest</span>
+<span class="nv">$filesigs</span> <span class="o">=</span> @<span class="o">()</span>
+
+<span class="c1">#User Registry Files</span>
+<span class="nv">$filesigs</span> +<span class="o">=</span> <span class="s1">'^c:\\Users\\.*\\ntuser.dat$'</span>
+<span class="nv">$filesigs</span> +<span class="o">=</span> <span class="s1">'^c:\\Users\\.*\\usrclass.dat$'</span>
+
+<span class="c1">#System Registry Files</span>
+<span class="nv">$filesigs</span> +<span class="o">=</span> <span class="s1">'^c:\\Windows\\System32\\config\\.*'</span>
+
+<span class="c1">#Event Logs</span>
+<span class="nv">$filesigs</span> +<span class="o">=</span> <span class="s1">'^c:\\Windows\\System32\\winevt\\Logs\\.*.evtx$'</span>
+
+<span class="nv">$files_to_collect</span> +<span class="o">=</span> <span class="nb">gci</span> -Path C:<span class="se">\U</span>sers,C:<span class="se">\W</span>indows -Recurse -Force -File -ErrorAction SilentlyContinue | 
+                     <span class="nb">Where-Object</span> <span class="o">{</span> <span class="nv">$_</span>.FullName -imatch <span class="k">$(</span><span class="nv">$filesigs</span> -join <span class="s2">"|"</span><span class="k">)</span> <span class="o">}</span>| % <span class="o">{</span> <span class="nv">$_</span>.FullName <span class="o">}</span>
+
+<span class="c1">#5. Collect Files of Interest</span>
+<span class="k">foreach</span><span class="o">(</span><span class="nv">$file</span> <span class="k">in</span> <span class="nv">$files_to_collect</span><span class="o">){</span>
+    <span class="c1">#6. Bastardized Multiprocessing. Counts the number of fcats running and sleep if it</span>
+    <span class="c1">#If it is more than 20.</span>
+    
+    <span class="k">while</span><span class="o">(</span>@<span class="o">(</span><span class="nb">Get-Process </span>fcat -ErrorAction SilentlyContinue<span class="o">)</span>.Count -ge 20<span class="o">){</span>
+        <span class="nb">Start-Sleep</span> -Seconds 5
+    <span class="o">}</span>
+    <span class="c1">#7. Manipulating the path to get what we need</span>
+    <span class="nv">$unixname</span> <span class="o">=</span> <span class="nv">$file</span> -replace <span class="s2">"c:"</span>,<span class="s2">""</span> -replace <span class="s2">"</span><span class="se">\\</span><span class="s2">"</span>,<span class="s2">"/"</span>
+    <span class="nv">$dirlocation</span> <span class="o">=</span> <span class="nv">$file</span>.Substring<span class="o">(</span>0,<span class="nv">$file</span>.LastIndexOf<span class="o">(</span><span class="s2">"</span><span class="se">\"</span><span class="s2">)) -replace "</span>:<span class="s2">",""
+    </span><span class="nv">$outdir</span><span class="s2">  = </span><span class="k">$(</span><span class="s1">'{0}{1}{2}'</span> -f <span class="k">$(</span><span class="nv">$timestamp</span><span class="k">)</span>,<span class="s1">'\'</span>,<span class="k">$(</span><span class="nv">$dirlocation</span><span class="k">))</span><span class="s2">
+    </span><span class="nv">$outfile</span><span class="s2"> = </span><span class="k">$(</span><span class="s1">'{0}{1}{2}'</span> -f <span class="k">$(</span><span class="nv">$timestamp</span><span class="k">)</span>,<span class="s1">'\'</span>,<span class="k">$(</span><span class="nv">$file</span><span class="k">)</span> -replace <span class="s1">':'</span>,<span class="s1">''</span><span class="k">)</span><span class="s2">
+    #8. Building the command string
+    </span><span class="nv">$cmdstr</span><span class="s2"> = ""
+    </span><span class="nv">$cmdstr</span><span class="s2"> += "</span>/c mkdir <span class="k">$(</span><span class="s1">'{0}{1}{0}'</span>, -f <span class="k">$(</span><span class="o">[</span><span class="kt">char</span><span class="o">]</span>34<span class="k">)</span>, <span class="nv">$outdir</span><span class="k">)</span> &amp; <span class="s2">"
+    </span><span class="nv">$cmdstr</span><span class="s2"> += "</span><span class="se">\\</span>Scripts<span class="se">\\</span>fcat.exe -h -f ntfs <span class="k">$(</span><span class="s1">'{0}{1}{0}'</span>, -f <span class="k">$(</span><span class="o">[</span><span class="kt">char</span><span class="o">]</span>34<span class="k">)</span>, <span class="nv">$unixname</span><span class="k">)</span> <span class="se">\\</span>.<span class="se">\c</span>: <span class="s2">"
+    </span><span class="nv">$cmdstr</span><span class="s2"> += "</span> &gt; <span class="k">$(</span><span class="s1">'{0}{1}{0}'</span>, -f <span class="k">$(</span><span class="o">[</span><span class="kt">char</span><span class="o">]</span>34<span class="k">)</span>, <span class="nv">$outfile</span><span class="k">)</span> <span class="s2">"
+    #Run
+    Start-Process cmd.exe -ArgumentList </span><span class="nv">$cmdstr</span><span class="s2"> -WindowStyle Hidden
+}
+
+#9. Wait until all of the fcats are done
+while(@(Get-Process fcat  -ErrorAction SilentlyContinue).Count){
+    write-host "</span>Collectors are still running...<span class="s2">"
+    Start-Sleep -Seconds 60
+}
+write-host "</span>Zipping...<span class="s2">"
+#10. Zip it real good.
+Add-Type -assembly "</span>system.io.compression.filesystem<span class="s2">"
+[io.compression.zipfile]::CreateFromDirectory(</span><span class="k">$(</span><span class="s1">'{0}\\{1}'</span> -f <span class="nv">$pwd</span>,<span class="nv">$timestamp</span><span class="k">)</span><span class="s2">, </span><span class="k">$(</span><span class="s1">'{0}\\{1}.zip'</span> -f <span class="nv">$pwd</span>,<span class="nv">$timestamp</span><span class="k">)</span><span class="s2">)
+write-host "</span>Done<span class="s2">"</span></code></pre></figure>
+
+<p>This is the platform we will add use and augment throughout the rest of the course. It’s free and it works. Strap in because the breakdown on this is going to be brutal.</p>
+
 
       </div><!-- /.entry-content -->
     </div><!-- /.entry-wrapper -->
