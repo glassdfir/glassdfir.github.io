@@ -428,22 +428,21 @@ $files_to_collect += gci -Path C:\Users,C:\Windows -Recurse -Force -File -ErrorA
 
 #5. Collect Files of Interest
 foreach($file in $files_to_collect){
-    #6. Bastardized Multiprocessing. Counts the number of fcats running and sleep if it
-    #If it is more than 20.
-    
-    while(@(Get-Process fcat -ErrorAction SilentlyContinue).Count -ge 20){
-        Start-Sleep -Seconds 5
+    #6. Bastardized Multiprocessing. Counts the number of fcats running and sleep if it is more than 5.
+    while(@(Get-Process fcat -ErrorAction SilentlyContinue).Count -ge 5){
+        Start-Sleep -Seconds 10
     }
     #7. Manipulating the path to get what we need
     $unixname = $file -replace "c:","" -replace "\\","/"
     $dirlocation = $file.Substring(0,$file.LastIndexOf("\")) -replace ":",""
-    $outdir  = $('{0}{1}{2}' -f $($timestamp),'\',$($dirlocation))
-    $outfile = $('{0}{1}{2}' -f $($timestamp),'\',$($file) -replace ':','')
+    $outdir  = $('{0}{1}{2}' -f $timestamp,'\',$dirlocation)
+    $outfile = $('{0}{1}{2}' -f $timestamp,'\',$file -replace ':','')
+    
     #8. Building the command string
     $cmdstr = ""
-    $cmdstr += "/c mkdir $('{0}{1}{0}', -f $([char]34), $outdir) & "
-    $cmdstr += "$('{0}\\{1}' -f $pwd,"fcat.exe") -h -f ntfs $('{0}{1}{0}', -f $([char]34), $unixname) $([char]34)$unixname$([char]34) \\.\c: "
-    $cmdstr += " > $('{0}{1}{0}', -f $([char]34), $outfile) "
+    $cmdstr += "/c mkdir $('{0}{1}{0}' -f [char]34, $outdir) & "
+    $cmdstr += "$('{0}\\{1}' -f $pwd,"fcat.exe") -h -f ntfs $('{0}{1}{0}' -f [char]34, $unixname) \\.\c: "
+    $cmdstr += " > $('{0}{1}{0}' -f [char]34, $outfile) "
     #Run
     Start-Process cmd.exe -ArgumentList $cmdstr -WindowStyle Hidden
 }
@@ -451,7 +450,7 @@ foreach($file in $files_to_collect){
 #9. Wait until all of the fcats are done
 while(@(Get-Process fcat  -ErrorAction SilentlyContinue).Count){
     write-host "Collectors are still running..."
-    Start-Sleep -Seconds 60
+    Start-Sleep -Seconds 30
 }
 write-host "Zipping..."
 #10. Zip it real good.

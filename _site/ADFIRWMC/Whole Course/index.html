@@ -717,22 +717,21 @@ This WebCacheV01.dat file has 25 runs spread out all over the volume.</p>
 
 <span class="c1">#5. Collect Files of Interest</span>
 <span class="k">foreach</span><span class="o">(</span><span class="nv">$file</span> <span class="k">in</span> <span class="nv">$files_to_collect</span><span class="o">){</span>
-    <span class="c1">#6. Bastardized Multiprocessing. Counts the number of fcats running and sleep if it</span>
-    <span class="c1">#If it is more than 20.</span>
-    
-    <span class="k">while</span><span class="o">(</span>@<span class="o">(</span><span class="nb">Get-Process </span>fcat -ErrorAction SilentlyContinue<span class="o">)</span>.Count -ge 20<span class="o">){</span>
-        <span class="nb">Start-Sleep</span> -Seconds 5
+    <span class="c1">#6. Bastardized Multiprocessing. Counts the number of fcats running and sleep if it is more than 5.</span>
+    <span class="k">while</span><span class="o">(</span>@<span class="o">(</span><span class="nb">Get-Process </span>fcat -ErrorAction SilentlyContinue<span class="o">)</span>.Count -ge 5<span class="o">){</span>
+        <span class="nb">Start-Sleep</span> -Seconds 10
     <span class="o">}</span>
     <span class="c1">#7. Manipulating the path to get what we need</span>
     <span class="nv">$unixname</span> <span class="o">=</span> <span class="nv">$file</span> -replace <span class="s2">"c:"</span>,<span class="s2">""</span> -replace <span class="s2">"</span><span class="se">\\</span><span class="s2">"</span>,<span class="s2">"/"</span>
     <span class="nv">$dirlocation</span> <span class="o">=</span> <span class="nv">$file</span>.Substring<span class="o">(</span>0,<span class="nv">$file</span>.LastIndexOf<span class="o">(</span><span class="s2">"</span><span class="se">\"</span><span class="s2">)) -replace "</span>:<span class="s2">",""
-    </span><span class="nv">$outdir</span><span class="s2">  = </span><span class="k">$(</span><span class="s1">'{0}{1}{2}'</span> -f <span class="k">$(</span><span class="nv">$timestamp</span><span class="k">)</span>,<span class="s1">'\'</span>,<span class="k">$(</span><span class="nv">$dirlocation</span><span class="k">))</span><span class="s2">
-    </span><span class="nv">$outfile</span><span class="s2"> = </span><span class="k">$(</span><span class="s1">'{0}{1}{2}'</span> -f <span class="k">$(</span><span class="nv">$timestamp</span><span class="k">)</span>,<span class="s1">'\'</span>,<span class="k">$(</span><span class="nv">$file</span><span class="k">)</span> -replace <span class="s1">':'</span>,<span class="s1">''</span><span class="k">)</span><span class="s2">
+    </span><span class="nv">$outdir</span><span class="s2">  = </span><span class="k">$(</span><span class="s1">'{0}{1}{2}'</span> -f <span class="nv">$timestamp</span>,<span class="s1">'\'</span>,<span class="nv">$dirlocation</span><span class="k">)</span><span class="s2">
+    </span><span class="nv">$outfile</span><span class="s2"> = </span><span class="k">$(</span><span class="s1">'{0}{1}{2}'</span> -f <span class="nv">$timestamp</span>,<span class="s1">'\'</span>,<span class="nv">$file</span> -replace <span class="s1">':'</span>,<span class="s1">''</span><span class="k">)</span><span class="s2">
+    
     #8. Building the command string
     </span><span class="nv">$cmdstr</span><span class="s2"> = ""
-    </span><span class="nv">$cmdstr</span><span class="s2"> += "</span>/c mkdir <span class="k">$(</span><span class="s1">'{0}{1}{0}'</span>, -f <span class="k">$(</span><span class="o">[</span><span class="kt">char</span><span class="o">]</span>34<span class="k">)</span>, <span class="nv">$outdir</span><span class="k">)</span> &amp; <span class="s2">"
-    </span><span class="nv">$cmdstr</span><span class="s2"> += "</span><span class="k">$(</span><span class="s1">'{0}\\{1}'</span> -f <span class="nv">$pwd</span>,<span class="s2">"fcat.exe"</span><span class="k">)</span> -h -f ntfs <span class="k">$(</span><span class="s1">'{0}{1}{0}'</span>, -f <span class="k">$(</span><span class="o">[</span><span class="kt">char</span><span class="o">]</span>34<span class="k">)</span>, <span class="nv">$unixname</span><span class="k">)</span> <span class="k">$(</span><span class="o">[</span><span class="kt">char</span><span class="o">]</span>34<span class="k">)</span><span class="nv">$unixname</span><span class="k">$(</span><span class="o">[</span><span class="kt">char</span><span class="o">]</span>34<span class="k">)</span> <span class="se">\\</span>.<span class="se">\c</span>: <span class="s2">"
-    </span><span class="nv">$cmdstr</span><span class="s2"> += "</span> &gt; <span class="k">$(</span><span class="s1">'{0}{1}{0}'</span>, -f <span class="k">$(</span><span class="o">[</span><span class="kt">char</span><span class="o">]</span>34<span class="k">)</span>, <span class="nv">$outfile</span><span class="k">)</span> <span class="s2">"
+    </span><span class="nv">$cmdstr</span><span class="s2"> += "</span>/c mkdir <span class="k">$(</span><span class="s1">'{0}{1}{0}'</span> -f <span class="o">[</span><span class="kt">char</span><span class="o">]</span>34, <span class="nv">$outdir</span><span class="k">)</span> &amp; <span class="s2">"
+    </span><span class="nv">$cmdstr</span><span class="s2"> += "</span><span class="k">$(</span><span class="s1">'{0}\\{1}'</span> -f <span class="nv">$pwd</span>,<span class="s2">"fcat.exe"</span><span class="k">)</span> -h -f ntfs <span class="k">$(</span><span class="s1">'{0}{1}{0}'</span> -f <span class="o">[</span><span class="kt">char</span><span class="o">]</span>34, <span class="nv">$unixname</span><span class="k">)</span> <span class="se">\\</span>.<span class="se">\c</span>: <span class="s2">"
+    </span><span class="nv">$cmdstr</span><span class="s2"> += "</span> &gt; <span class="k">$(</span><span class="s1">'{0}{1}{0}'</span> -f <span class="o">[</span><span class="kt">char</span><span class="o">]</span>34, <span class="nv">$outfile</span><span class="k">)</span> <span class="s2">"
     #Run
     Start-Process cmd.exe -ArgumentList </span><span class="nv">$cmdstr</span><span class="s2"> -WindowStyle Hidden
 }
@@ -740,7 +739,7 @@ This WebCacheV01.dat file has 25 runs spread out all over the volume.</p>
 #9. Wait until all of the fcats are done
 while(@(Get-Process fcat  -ErrorAction SilentlyContinue).Count){
     write-host "</span>Collectors are still running...<span class="s2">"
-    Start-Sleep -Seconds 60
+    Start-Sleep -Seconds 30
 }
 write-host "</span>Zipping...<span class="s2">"
 #10. Zip it real good.
