@@ -442,7 +442,7 @@ foreach($file in $files_to_collect){
     #8. Building the command string
     $cmdstr = ""
     $cmdstr += "/c mkdir $('{0}{1}{0}', -f $([char]34), $outdir) & "
-    $cmdstr += "\\Scripts\\fcat.exe -h -f ntfs $('{0}{1}{0}', -f $([char]34), $unixname) $([char]34)$unixname$([char]34) \\.\c: "
+    $cmdstr += "$('{0}\\{1}' -f $pwd,"fcat.exe") -h -f ntfs $('{0}{1}{0}', -f $([char]34), $unixname) $([char]34)$unixname$([char]34) \\.\c: "
     $cmdstr += " > $('{0}{1}{0}', -f $([char]34), $outfile) "
     #Run
     Start-Process cmd.exe -ArgumentList $cmdstr -WindowStyle Hidden
