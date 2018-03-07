@@ -273,10 +273,8 @@ https://www.darkoperator.com/blog/2013/1/31/introduction-to-wmi-basics-with-powe
 <p>“WQL looks neat but where do I use it?” Great question!  WMI is accessible in a variety of flavors on modern Windows systems. You can leverage WQL with these handy native Windows solutions:</p>
 <h4 id="powershell">PowerShell</h4>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>$query = "SELECT processid,name FROM Win32_Process where name='powershell.exe'"
-Get-WmiObject -query $query
-</code></pre>
-</div>
+<figure class="highlight"><pre><code class="language-powershell" data-lang="powershell"><span class="nv">$query</span> <span class="o">=</span> <span class="s2">"SELECT processid,name FROM Win32_Process where name='powershell.exe'"</span>
+<span class="nb">Get-WmiObject</span> -query <span class="nv">$query</span></code></pre></figure>
 
 <p><img src="../Images/2018-02-21 12_56_53-Windows PowerShell.png" alt="PowerShell WMI" />
 Reference: https://blogs.technet.microsoft.com/heyscriptingguy/2012/07/10/three-easy-ways-to-use-powershell-and-wql-to-get-wmi-data/</p>
@@ -294,15 +292,13 @@ http://jon.glass/blog/lists-some-wmic-commands/</p>
 
 <h4 id="visual-basic-scripting-example-more-or-less-deprecated">Visual Basic Scripting Example (more or less deprecated)</h4>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>strComputer = "."
+<figure class="highlight"><pre><code class="language-vbscript" data-lang="vbscript">strComputer = "."
 Set objWMIService = GetObject("winmgmts:\\" &amp; strComputer &amp; "\root\CIMV2")
 Set colItems = objWMIService.ExecQuery( _"SELECT * FROM Win32_Process WHERE name=’cscript.exe’",,48)
 For Each objItem in colItems
     Wscript.Echo "Name: " &amp; objItem.Name
     Wscript.Echo "ProcessId: " &amp; objItem.ProcessId
-Next
-</code></pre>
-</div>
+Next</code></pre></figure>
 
 <p>While VBS is not my first choice, it is good to at least be aware of it because it is still very much in use by admins and attackers alike.</p>
 
@@ -310,13 +306,11 @@ Next
 <h4 id="python">Python</h4>
 <p>The Python WMI module is a lightweight wrapper on top of the pywin32 extensions.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>import wmi
-c = wmi.WMI ()
-for s in c.Win32_Process ():
-    if s.Name == "python.exe":
-	    print(s.Name, s.ProcessID)
-</code></pre>
-</div>
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span>
+<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_Process</span> <span class="p">():</span>
+    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">Name</span> <span class="o">==</span> <span class="s">"python.exe"</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">Name</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">ProcessID</span><span class="p">)</span></code></pre></figure>
 
 <h4 id="bigfix-relevance">BigFix Relevance</h4>
 

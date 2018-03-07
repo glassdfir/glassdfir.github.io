@@ -117,9 +117,10 @@ WMI Query Language (WQL) is a bastardized version of SQL used to administer WMI.
 
 "WQL looks neat but where do I use it?" Great question!  WMI is accessible in a variety of flavors on modern Windows systems. You can leverage WQL with these handy native Windows solutions:
 #### PowerShell
-
-    $query = "SELECT processid,name FROM Win32_Process where name='powershell.exe'"
-    Get-WmiObject -query $query
+{% highlight powershell %}
+$query = "SELECT processid,name FROM Win32_Process where name='powershell.exe'"
+Get-WmiObject -query $query
+{% endhighlight %}
 
 ![PowerShell WMI](../Images/2018-02-21 12_56_53-Windows PowerShell.png )
 Reference: https://blogs.technet.microsoft.com/heyscriptingguy/2012/07/10/three-easy-ways-to-use-powershell-and-wql-to-get-wmi-data/
@@ -135,26 +136,28 @@ http://jon.glass/blog/lists-some-wmic-commands/
 
 
 #### Visual Basic Scripting Example (more or less deprecated)
-
-    strComputer = "."
-    Set objWMIService = GetObject("winmgmts:\\" & strComputer & "\root\CIMV2")
-    Set colItems = objWMIService.ExecQuery( _"SELECT * FROM Win32_Process WHERE name=’cscript.exe’",,48)
-    For Each objItem in colItems
-        Wscript.Echo "Name: " & objItem.Name
-        Wscript.Echo "ProcessId: " & objItem.ProcessId
-    Next
+{% highlight vbscript %}
+strComputer = "."
+Set objWMIService = GetObject("winmgmts:\\" & strComputer & "\root\CIMV2")
+Set colItems = objWMIService.ExecQuery( _"SELECT * FROM Win32_Process WHERE name=’cscript.exe’",,48)
+For Each objItem in colItems
+    Wscript.Echo "Name: " & objItem.Name
+    Wscript.Echo "ProcessId: " & objItem.ProcessId
+Next
+{% endhighlight %}
 
 While VBS is not my first choice, it is good to at least be aware of it because it is still very much in use by admins and attackers alike. 
 
 Depending on what 3rd party tools you have in your environment you might be able to utilize these:
 #### Python
 The Python WMI module is a lightweight wrapper on top of the pywin32 extensions.
-
-    import wmi
-    c = wmi.WMI ()
-    for s in c.Win32_Process ():
-	    if s.Name == "python.exe":
-		    print(s.Name, s.ProcessID)
+{% highlight python %}
+import wmi
+c = wmi.WMI ()
+for s in c.Win32_Process ():
+    if s.Name == "python.exe":
+        print(s.Name, s.ProcessID)
+{% endhighlight %}
 
 #### BigFix Relevance
 
