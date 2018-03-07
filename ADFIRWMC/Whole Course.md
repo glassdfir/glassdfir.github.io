@@ -57,8 +57,13 @@ As I built this course, I started realizing that perhaps the reader might not un
 In an effort to limit barriers to education, I tried to limit the examples in this course to native, open source, or readily available free tools. Does that excluding commecial tools limit the completeness of this course? Yes, but this course is about developing your skills and not lining a vendor's pocket. Sadly, you are going to need a Windows 7 or newer system to play with to put a lot of this to use.
 
 ### Audience
+<<<<<<< HEAD
 I think this course is written to provide examples of DFIR techniques for two groups of people:
  1. Folks that have been in Information Security in one capacity or another and are looking to get into more hands on DFIR work.
+=======
+I think this course is written to provide examples of DFIR techniques o wo ups eople: tenues or to go of epe
+ 1. Flks that have been in Information Security in one capacity or another and are looking to get into more k.
+>>>>>>> origin/master
  2. Others who might find this information useful or interesting.
 
 This should not be the first computer related course you attempt.
@@ -71,7 +76,11 @@ There are two reasons I didn't include something in this course:
 Either way, feel free to send me feedback and I will take a look.
 
 ### Tone
+<<<<<<< HEAD
 This is meant to be informal. I authored 3 university courses last year and one of the consistent items of feedback I received was how well the frankly dry material was conveyed. While that might come across as unprofessional and lacking academic polish, I find it makes the material more digestible and that is point of learning, right?
+=======
+This is meant to be informal. o might come across as unprofessional and lacking academic polish, I find it makes the material more digestible and that is point of learning, right?
+>>>>>>> origin/master
 
 ## 1. Windows Remote Administration for Incident Responders
 Without a system administration background, many incident responders struggle with basic tasks like remotely starting and stopping processes on target machines. Inversely, Incident Responders with sysadmin experience are often faster and more effective. The more familiar you are with native Windows commands, the faster your can operate.
@@ -388,6 +397,7 @@ To access locked files on a live Windows system, your acquisition tool needs to:
  3. Seek to the offset of the LCN on disk and read the numbers of clusters specified. Repeat as needed for all Data Runs.
  4. Write the collected information to an output file in the sequence specified by the VCNs.
 
+<<<<<<< HEAD
 Piece of cake right? Well the first 3 steps can trip up tools for one reason or another.
 
 ### Building a Toolkit for Live File Collection:
@@ -463,3 +473,38 @@ This is the platform we will add use and augment throughout the rest of the cour
 
 
 
+=======
+<<<<<<< HEAD
+Here is an example using 10 lines of Python:
+![Extents2Raw](../Images/Extents2Raw.PNGpng)
+
+Piece of cake right? Well the first 3 steps can trip up many tools for one reason or another.
+
+#### Pros and Cons 
+|Tool|Pros  | Cons|Cost|
+|--|--|--|--|
+|[RawCopy](https:/hon:
+ntRaw](/gtsRaw)iece f cae ri Well the it  seich gets it flagged as a Hack Tool by some A/V vendors.</li> | Free |
+<<<<<<< HEAD
+|[SleuthKit](http://www.sleuthkit.org/sleuthkit/)|<ul><li>Written by Brips c tri up an le System Forensic Analysis</li><li>Open Source</li><li>Python Bindings</li><li>Succeeds when others fail.</li></ul>| <ul><li>Tools designed to display file contents on STDOUT<li>Not actually designed=======
+Piece of cake right? Well the first 3 steps can trip up tools for one reason or another.
+
+#### Tools I use for rRemote fFile aAcquisition. *(Listing this as a con is like getting mad a hammer for not cutting wood though.)*</ul>|Free|
+=======
+|[SleuthKit](http://www.sleuthkit.org/sleuthkit/)|<ul><li>Written by Brian Carrier, author of File System Forensic Analysis</li><li>Open Source</li><li>Python Bindings</li><li>Succeeds when others fail.</li></ul>| <ul><li>Tools designed to display file contents on STDOUT<li>Not actually designedtools or ne reon  nother. os nd ons  forremotefileacquisition
+<!--stackedit_data:
+eyJoaXN0b3J5IjpbLTE0ODU4NDMwNDRdfQ==
+-->
+>>>>>>> origin/master
+<!--stackedit_data:
+eyJoaXN0b3J5IjpbMTU0MTcxODQwMV19
+-->
+>>>>>>> origin/master
+
+Here is a tabere is an eamle usin  le of th to mention in no particular order:
+
+
+<!--stackedit_data:
+eyJoaXN0b3J5IjpbMTkyMjgxMDM2MF19
+-->
+>>>>>>> origin/master
