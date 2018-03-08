@@ -63,12 +63,15 @@ I think this course is written to provide examples of DFIR techniques for two gr
 
 This should not be the first computer related course you attempt.
 
-### Omissions
+### Omissions and Errors
 There are two reasons I didn't include something in this course:
 1. I didn't know about it. *It happens. Often.*
 2. I thought you wouldn't immediately benefit from knowing it. This career field is deep, wide, and almost any fact about how things work can be refuted with an exception. This course is not designed to be extremely comprehensive, just helpful.
 
 Either way, feel free to send me feedback and I will take a look.
+### Organization
+
+This course will cover a lot of material and most of it will be shown by example. While that is helpful in some respects, it can leave some topics less explicitly documented and more demonstrated during the course of scenario. Tools and command line utilities are going to be covered in this manner because I am not wasting our collective time documenting a technique AND all of a tool's command line functions when you can easily find that information elsewhere. 
 
 ### Tone
 This is meant to be informal. I authored 3 university courses last year and one of the consistent items of feedback I received was how well the frankly dry material was conveyed. While that might come across as unprofessional and lacking academic polish, I find it makes the material more digestible and that is point of learning, right?
@@ -400,7 +403,7 @@ I wish I could point you to a single perfect free tool that does exactly what yo
 Lets make a basic collection script with PowerShell and fcat from SleuthKit:
 {% highlight powershell %}
 #1. Timestamps are a great way to make unique folder names with context.
-$timestamp = (get-date).ToString('M-d-y-h-m-s')
+$timestamp = (get-date).ToString('y-M-d-h-m-s')
 
 #2. Array of Files to Collect
 $files_to_collect = @()
@@ -428,9 +431,9 @@ $files_to_collect += gci -Path C:\Users,C:\Windows -Recurse -Force -File -ErrorA
 
 #5. Collect Files of Interest
 foreach($file in $files_to_collect){
-    #6. Bastardized Multiprocessing. Counts the number of fcats running and sleep if it is more than 5.
-    while(@(Get-Process fcat -ErrorAction SilentlyContinue).Count -ge 5){
-        Start-Sleep -Seconds 10
+    #6. Bastardized Multiprocessing. Counts the number of fcats running and sleep if it is more than 10.
+    while(@(Get-Process fcat -ErrorAction SilentlyContinue).Count -ge 10){
+        Start-Sleep -Seconds 5
     }
     #7. Manipulating the path to get what we need
     $unixname = $file -replace "c:","" -replace "\\","/"
@@ -445,6 +448,8 @@ foreach($file in $files_to_collect){
     $cmdstr += " > $('{0}{1}{0}' -f [char]34, $outfile) "
     #Run
     Start-Process cmd.exe -ArgumentList $cmdstr -WindowStyle Hidden
+    Start-Sleep -Seconds 5
+
 }
 
 #9. Wait until all of the fcats are done
@@ -462,7 +467,30 @@ write-host "Done"
 This is the platform we will add use and augment throughout the rest of the course. It's free and it works. Strap in because the breakdown on this is going to be brutal.
 
 **Breakdown**
+-  `$timestamp = (get-date).ToString('y-M-d-h-m-s')`
+    - This creates a string of the current time in Year-Month-Day-Hour-Minute-Second format
+    - This is helpful for creating unique folder names that are organized and easy to sort
+- `$files_to_collect = @()`
+    - [Ref: Arrays in PowerShell](https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_arrays?view=powershell-6) 
 
+- `$files_to_collect += 'c:\$MFT'`
+    - Some files are a part of the filesystem but not direct accessible via a directory listing so we add their paths manually to $files_to_collect array
 
-
-
+- `$filesigs = @()`
+    - This is going to be an array of Regular Expressions "RegEx" that we use to find files of interest on the target system.
+- `$filesigs += '^c:\\Users\\.*\\ntuser.dat$'`
+    - This RegEx allows us to collect registry files from all of the profiles on a system without having to explictedly know the path for each
+    - We are using double back slashes to "escape" the single blackslash. If we didn't, it would be interpreted as a RegEx operator.
+-  `$files_to_collect += gci -Path C:\Users,C:\Windows -Recurse -Force -File -ErrorAction SilentlyContinue | Where-Object { $_.FullName -imatch $($filesigs -join "|") }| % { $_.FullName }`
+    - Here we are using the gci alias for the PowerShell command Get-ChildItem which is a fancy command that can enumerate through a directory listing among other things.
+    - We specify 2 directories for the **-Path** argument to define the scope of our search.
+    - **-Recurse** continues the seach throughout all of the subdirectories.
+    - **-Force** adds hidden files to the search and levitates rocks.
+    - **-File** is used to exclude directories from my results. This is actually important to the mechanincs of the rest of the script.
+    - I specified SilentlyContinue for **-ErrorAction** because as it tries to get directory for every file in the C:\Windows folder, there are Access Denied Errors on files I didn't ask for and I don't want to see them.
+    - We redirect the output of the gci command into the Where-Object to filter our results to compare the **FullName** of the file to our array of RegEx $filesigs. $filesigs is an array of strings until use **-Join** to merge each signature together with a pipe which acts as an OR statement in RegEx. "Signature 1 OR Signature 2 OR ..."
+    - Finally, we redirect THAT output and grab the Fullname of the file that matches one of our signatures and add it to the $files_to_collect array.
+- `foreach($file in $files_to_collect){`
+    - This is a For loop in PowerShell. We take the array and iterate across each element until we run out.
+- `while(@(Get-Process fcat -ErrorAction SilentlyContinue).Count -ge 10){Start-Sleep -Seconds 5}`
+    - This is a While loop in PowerShell. This statement will keep going until the condition is not True. This statement is counting the number of processes containing "fcat" and if it is greater than or equal to 10; it will sleep for 5 seconds and check again. This is being used to keep the number of fcat collectors to a reasonable amount. Is this a perfect solution? No. This is more "Tactical" Multiprocessing, meaning I want more than one instance running at a time but I don't care enough to code true multiprocessing into the script. High yield, low drag. The process count and sleep timer can be adjusted to the desired amount of noise you want the target systems fan to make.

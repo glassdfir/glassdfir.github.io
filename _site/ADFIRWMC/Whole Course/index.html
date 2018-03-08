@@ -190,7 +190,7 @@ by Jonathan Glass</p>
 
 <p>This should not be the first computer related course you attempt.</p>
 
-<h3 id="omissions">Omissions</h3>
+<h3 id="omissions-and-errors">Omissions and Errors</h3>
 <p>There are two reasons I didn’t include something in this course:</p>
 <ol>
   <li>I didn’t know about it. <em>It happens. Often.</em></li>
@@ -198,6 +198,9 @@ by Jonathan Glass</p>
 </ol>
 
 <p>Either way, feel free to send me feedback and I will take a look.</p>
+<h3 id="organization">Organization</h3>
+
+<p>This course will cover a lot of material and most of it will be shown by example. While that is helpful in some respects, it can leave some topics less explicitly documented and more demonstrated during the course of scenario. Tools and command line utilities are going to be covered in this manner because I am not wasting our collective time documenting a technique AND all of a tool’s command line functions when you can easily find that information elsewhere.</p>
 
 <h3 id="tone">Tone</h3>
 <p>This is meant to be informal. I authored 3 university courses last year and one of the consistent items of feedback I received was how well the frankly dry material was conveyed. While that might come across as unprofessional and lacking academic polish, I find it makes the material more digestible and that is point of learning, right?</p>
@@ -689,7 +692,7 @@ This WebCacheV01.dat file has 25 runs spread out all over the volume.</p>
 <p>Lets make a basic collection script with PowerShell and fcat from SleuthKit:</p>
 
 <figure class="highlight"><pre><code class="language-powershell" data-lang="powershell"><span class="c1">#1. Timestamps are a great way to make unique folder names with context.</span>
-<span class="nv">$timestamp</span> <span class="o">=</span> <span class="o">(</span><span class="nb">get-date</span><span class="o">)</span>.ToString<span class="o">(</span><span class="s1">'M-d-y-h-m-s'</span><span class="o">)</span>
+<span class="nv">$timestamp</span> <span class="o">=</span> <span class="o">(</span><span class="nb">get-date</span><span class="o">)</span>.ToString<span class="o">(</span><span class="s1">'y-M-d-h-m-s'</span><span class="o">)</span>
 
 <span class="c1">#2. Array of Files to Collect</span>
 <span class="nv">$files_to_collect</span> <span class="o">=</span> @<span class="o">()</span>
@@ -717,9 +720,9 @@ This WebCacheV01.dat file has 25 runs spread out all over the volume.</p>
 
 <span class="c1">#5. Collect Files of Interest</span>
 <span class="k">foreach</span><span class="o">(</span><span class="nv">$file</span> <span class="k">in</span> <span class="nv">$files_to_collect</span><span class="o">){</span>
-    <span class="c1">#6. Bastardized Multiprocessing. Counts the number of fcats running and sleep if it is more than 5.</span>
-    <span class="k">while</span><span class="o">(</span>@<span class="o">(</span><span class="nb">Get-Process </span>fcat -ErrorAction SilentlyContinue<span class="o">)</span>.Count -ge 5<span class="o">){</span>
-        <span class="nb">Start-Sleep</span> -Seconds 10
+    <span class="c1">#6. Bastardized Multiprocessing. Counts the number of fcats running and sleep if it is more than 10.</span>
+    <span class="k">while</span><span class="o">(</span>@<span class="o">(</span><span class="nb">Get-Process </span>fcat -ErrorAction SilentlyContinue<span class="o">)</span>.Count -ge 10<span class="o">){</span>
+        <span class="nb">Start-Sleep</span> -Seconds 5
     <span class="o">}</span>
     <span class="c1">#7. Manipulating the path to get what we need</span>
     <span class="nv">$unixname</span> <span class="o">=</span> <span class="nv">$file</span> -replace <span class="s2">"c:"</span>,<span class="s2">""</span> -replace <span class="s2">"</span><span class="se">\\</span><span class="s2">"</span>,<span class="s2">"/"</span>
@@ -734,6 +737,8 @@ This WebCacheV01.dat file has 25 runs spread out all over the volume.</p>
     </span><span class="nv">$cmdstr</span><span class="s2"> += "</span> &gt; <span class="k">$(</span><span class="s1">'{0}{1}{0}'</span> -f <span class="o">[</span><span class="kt">char</span><span class="o">]</span>34, <span class="nv">$outfile</span><span class="k">)</span> <span class="s2">"
     #Run
     Start-Process cmd.exe -ArgumentList </span><span class="nv">$cmdstr</span><span class="s2"> -WindowStyle Hidden
+    Start-Sleep -Seconds 5
+
 }
 
 #9. Wait until all of the fcats are done
@@ -750,7 +755,57 @@ write-host "</span>Done<span class="s2">"</span></code></pre></figure>
 <p>This is the platform we will add use and augment throughout the rest of the course. It’s free and it works. Strap in because the breakdown on this is going to be brutal.</p>
 
 <p><strong>Breakdown</strong></p>
-
+<ul>
+  <li><code class="highlighter-rouge">$timestamp = (get-date).ToString('y-M-d-h-m-s')</code>
+    <ul>
+      <li>This creates a string of the current time in Year-Month-Day-Hour-Minute-Second format</li>
+      <li>This is helpful for creating unique folder names that are organized and easy to sort</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">$files_to_collect = @()</code>
+    <ul>
+      <li><a href="https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_arrays?view=powershell-6">Ref: Arrays in PowerShell</a></li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">$files_to_collect += 'c:\$MFT'</code>
+    <ul>
+      <li>Some files are a part of the filesystem but not direct accessible via a directory listing so we add their paths manually to $files_to_collect array</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">$filesigs = @()</code>
+    <ul>
+      <li>This is going to be an array of Regular Expressions “RegEx” that we use to find files of interest on the target system.</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">$filesigs += '^c:\\Users\\.*\\ntuser.dat$'</code>
+    <ul>
+      <li>This RegEx allows us to collect registry files from all of the profiles on a system without having to explictedly know the path for each</li>
+      <li>We are using double back slashes to “escape” the single blackslash. If we didn’t, it would be interpreted as a RegEx operator.</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">$files_to_collect += gci -Path C:\Users,C:\Windows -Recurse -Force -File -ErrorAction SilentlyContinue | Where-Object { $_.FullName -imatch $($filesigs -join "|") }| % { $_.FullName }</code>
+    <ul>
+      <li>Here we are using the gci alias for the PowerShell command Get-ChildItem which is a fancy command that can enumerate through a directory listing among other things.</li>
+      <li>We specify 2 directories for the <strong>-Path</strong> argument to define the scope of our search.</li>
+      <li><strong>-Recurse</strong> continues the seach throughout all of the subdirectories.</li>
+      <li><strong>-Force</strong> adds hidden files to the search and levitates rocks.</li>
+      <li><strong>-File</strong> is used to exclude directories from my results. This is actually important to the mechanincs of the rest of the script.</li>
+      <li>I specified SilentlyContinue for <strong>-ErrorAction</strong> because as it tries to get directory for every file in the C:\Windows folder, there are Access Denied Errors on files I didn’t ask for and I don’t want to see them.</li>
+      <li>We redirect the output of the gci command into the Where-Object to filter our results to compare the <strong>FullName</strong> of the file to our array of RegEx $filesigs. $filesigs is an array of strings until use <strong>-Join</strong> to merge each signature together with a pipe which acts as an OR statement in RegEx. “Signature 1 OR Signature 2 OR …”</li>
+      <li>Finally, we redirect THAT output and grab the Fullname of the file that matches one of our signatures and add it to the $files_to_collect array.</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">foreach($file in $files_to_collect){</code>
+    <ul>
+      <li>This is a For loop in PowerShell. We take the array and iterate across each element until we run out.</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">while(@(Get-Process fcat -ErrorAction SilentlyContinue).Count -ge 10){Start-Sleep -Seconds 5}</code>
+    <ul>
+      <li>This is a While loop in PowerShell. This statement will keep going until the condition is not True. This statement is counting the number of processes containing “fcat” and if it is greater than or equal to 10; it will sleep for 5 seconds and check again. This is being used to keep the number of fcat collectors to a reasonable amount. Is this a perfect solution? No. This is more “Tactical” Multiprocessing, meaning I want more than one instance running at a time but I don’t care enough to code true multiprocessing into the script. High yield, low drag. The process count and sleep timer can be adjusted to the desired amount of noise you want the target systems fan to make.</li>
+    </ul>
+  </li>
+</ul>
 
       </div><!-- /.entry-content -->
     </div><!-- /.entry-wrapper -->
