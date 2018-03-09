@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://jon.glass/feed.xml" rel="self" type="application/atom+xml" /><link href="http://jon.glass/" rel="alternate" type="text/html" /><updated>2018-03-09T11:39:53-05:00</updated><id>http://jon.glass/</id><title type="html">Half Full of Security</title><subtitle>Sharpening the ACKs since 2013</subtitle><entry><title type="html">ADFIRWMC - 2. Remote Acquisition of Windows Artifacts</title><link href="http://jon.glass/adfirwmc/Ch2/" rel="alternate" type="text/html" title="ADFIRWMC - 2. Remote Acquisition of Windows Artifacts" /><published>2018-03-03T15:33:28-05:00</published><updated>2018-03-03T15:33:28-05:00</updated><id>http://jon.glass/adfirwmc/Ch2</id><content type="html" xml:base="http://jon.glass/adfirwmc/Ch2/">&lt;p&gt;Some folks reading this are convinced that Incident Response is all done through Endpoint Detection and Response solutions and in 2018 no one drops collection scripts to gather artifacts for analysis. Those people are wrong.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://jon.glass/feed.xml" rel="self" type="application/atom+xml" /><link href="http://jon.glass/" rel="alternate" type="text/html" /><updated>2018-03-09T11:46:11-05:00</updated><id>http://jon.glass/</id><title type="html">Half Full of Security</title><subtitle>Sharpening the ACKs since 2013</subtitle><entry><title type="html">ADFIRWMC - 2. Remote Acquisition of Windows Artifacts</title><link href="http://jon.glass/adfirwmc/Ch2/" rel="alternate" type="text/html" title="ADFIRWMC - 2. Remote Acquisition of Windows Artifacts" /><published>2018-03-03T15:33:28-05:00</published><updated>2018-03-03T15:33:28-05:00</updated><id>http://jon.glass/adfirwmc/Ch2</id><content type="html" xml:base="http://jon.glass/adfirwmc/Ch2/">&lt;p&gt;Some folks reading this are convinced that Incident Response is all done through Endpoint Detection and Response solutions and in 2018 no one drops collection scripts to gather artifacts for analysis. Those people are wrong.&lt;/p&gt;
 
 &lt;p&gt;The first thing you should know is you will run into problems. Even when your collection tool is working perfectly; network connections drop, hard drives run out of room, antivirus and data loss prevention software will freak out… this is going to happen. Embrace it.&lt;/p&gt;
 
@@ -387,7 +387,7 @@ Next&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;&lt;img src=&quot;../images/bigfix.png&quot; alt=&quot;BigFix WMI Relevance&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;../images/2018-bigfix.png&quot; alt=&quot;BigFix WMI Relevance&quot; /&gt;&lt;/p&gt;
 
 &lt;h4 id=&quot;wmi-classes-of-dfir-interest&quot;&gt;WMI classes of DFIR interest&lt;/h4&gt;
 &lt;p&gt;There is a lot of super geeky DFIR information you can pull out of WMI properties and methods that can give you wizard like powers over remote machines. Here are a few of my favorites :&lt;/p&gt;
@@ -601,7 +601,7 @@ about remote systems.”&lt;/p&gt;
 
 &lt;h5 id=&quot;example-elevating-to-system-account&quot;&gt;Example: Elevating to System Account:&lt;/h5&gt;
 &lt;p&gt;One of my favorite tricks is to run remote processes as the System account and not a puny User account as seen below:
-&lt;img src=&quot;../images/2018-02-22 114324-192.168.164.130cmd.png&quot; alt=&quot;PsExec As System&quot; /&gt;
+&lt;img src=&quot;../images/2018-02-22114324-192.168.164.130cmd.png&quot; alt=&quot;PsExec As System&quot; /&gt;
 This grants a higher level of privileges and leaves less of a footprint on the remote machine. I rarely want to use my own account for anything on a remote machine unless I have to.&lt;/p&gt;
 
 &lt;p&gt;Pro Tip: If you are copying evidence from a remote machine to a collection share using PsExec to run as the system account, make sure the share is configured to grant Computer account of the target workstation write permission or you will get errors that will run you in circles. Doesn’t matter if your admin account has rights if you are running as the Computer.&lt;/p&gt;
