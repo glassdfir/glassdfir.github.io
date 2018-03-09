@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://jon.glass/feed.xml" rel="self" type="application/atom+xml" /><link href="http://jon.glass/" rel="alternate" type="text/html" /><updated>2018-03-09T00:20:53-05:00</updated><id>http://jon.glass/</id><title type="html">Half Full of Security</title><subtitle>Sharpening the ACKs since 2013</subtitle><entry><title type="html">ADFIRWMC - 2. Remote Acquisition of Windows Artifacts</title><link href="http://jon.glass/adfirwmc/Ch2/" rel="alternate" type="text/html" title="ADFIRWMC - 2. Remote Acquisition of Windows Artifacts" /><published>2018-03-03T15:33:28-05:00</published><updated>2018-03-03T15:33:28-05:00</updated><id>http://jon.glass/adfirwmc/Ch2</id><content type="html" xml:base="http://jon.glass/adfirwmc/Ch2/">&lt;p&gt;Some folks reading this are convinced that Incident Response is all done through Endpoint Detection and Response solutions and in 2018 no one drops collection scripts to gather artifacts for analysis. Those people are wrong.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://jon.glass/feed.xml" rel="self" type="application/atom+xml" /><link href="http://jon.glass/" rel="alternate" type="text/html" /><updated>2018-03-09T00:29:40-05:00</updated><id>http://jon.glass/</id><title type="html">Half Full of Security</title><subtitle>Sharpening the ACKs since 2013</subtitle><entry><title type="html">ADFIRWMC - 2. Remote Acquisition of Windows Artifacts</title><link href="http://jon.glass/adfirwmc/Ch2/" rel="alternate" type="text/html" title="ADFIRWMC - 2. Remote Acquisition of Windows Artifacts" /><published>2018-03-03T15:33:28-05:00</published><updated>2018-03-03T15:33:28-05:00</updated><id>http://jon.glass/adfirwmc/Ch2</id><content type="html" xml:base="http://jon.glass/adfirwmc/Ch2/">&lt;p&gt;Some folks reading this are convinced that Incident Response is all done through Endpoint Detection and Response solutions and in 2018 no one drops collection scripts to gather artifacts for analysis. Those people are wrong.&lt;/p&gt;
 
 &lt;p&gt;The first thing you should know is you will run into problems. Even when your collection tool is working perfectly; network connections drop, hard drives run out of room, antivirus and data loss prevention software will freak out… this is going to happen. Embrace it.&lt;/p&gt;
 
@@ -302,7 +302,7 @@ https://www.darkoperator.com/blog/2013/1/31/introduction-to-wmi-basics-with-powe
 &lt;h4 id=&quot;wmi-example&quot;&gt;WMI Example&lt;/h4&gt;
 &lt;p&gt;To get a list of all processes running on a workstation that match a certain name with process IDs, you could use something like this:&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;SELECT processid,name FROM Win32_Process where name='powershell.exe'
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;SELECT processid,name FROM Win32Process where name='powershell.exe'
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
@@ -320,7 +320,7 @@ https://www.darkoperator.com/blog/2013/1/31/introduction-to-wmi-basics-with-powe
     &lt;/tr&gt;
     &lt;tr&gt;
       &lt;td&gt;Class&lt;/td&gt;
-      &lt;td&gt;Win32_Process&lt;/td&gt;
+      &lt;td&gt;Win32Process&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
       &lt;td&gt;Properties&lt;/td&gt;
@@ -340,10 +340,10 @@ https://www.darkoperator.com/blog/2013/1/31/introduction-to-wmi-basics-with-powe
 &lt;p&gt;“WQL looks neat but where do I use it?” Great question!  WMI is accessible in a variety of flavors on modern Windows systems. You can leverage WQL with these handy native Windows solutions:&lt;/p&gt;
 &lt;h4 id=&quot;powershell&quot;&gt;PowerShell&lt;/h4&gt;
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-powershell&quot; data-lang=&quot;powershell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$query&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;SELECT processid,name FROM Win32_Process where name='powershell.exe'&quot;&lt;/span&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-powershell&quot; data-lang=&quot;powershell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$query&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;SELECT processid,name FROM Win32Process where name='powershell.exe'&quot;&lt;/span&gt;
 &lt;span class=&quot;nb&quot;&gt;Get-WmiObject&lt;/span&gt; -query &lt;span class=&quot;nv&quot;&gt;$query&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;p&gt;&lt;img src=&quot;../images/2018-02-21_12_56_53-WindowsPowerShell.png&quot; alt=&quot;PowerShell WMI&quot; /&gt;
+&lt;p&gt;&lt;img src=&quot;../images/2018-02-21125653-WindowsPowerShell.png&quot; alt=&quot;PowerShell WMI&quot; /&gt;
 Reference: https://blogs.technet.microsoft.com/heyscriptingguy/2012/07/10/three-easy-ways-to-use-powershell-and-wql-to-get-wmi-data/&lt;/p&gt;
 &lt;h4 id=&quot;wmic&quot;&gt;WMIC&lt;/h4&gt;
 &lt;p&gt;The WMI command-line (WMIC) utility provides a command-line interface for WMI. WMIC is one of my favorite command line applications because it condenses a lot of the&lt;/p&gt;
@@ -352,7 +352,7 @@ Reference: https://blogs.technet.microsoft.com/heyscriptingguy/2012/07/10/three-
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;&lt;img src=&quot;../images/2018-02-21_13_27_27-Command Prompt.png&quot; alt=&quot;WMIC Example&quot; title=&quot;WMIC&quot; /&gt;
+&lt;p&gt;&lt;img src=&quot;../images/2018-02-21132727-Command Prompt.png&quot; alt=&quot;WMIC Example&quot; title=&quot;WMIC&quot; /&gt;
 References: 
 https://msdn.microsoft.com/en-us/library/aa394531(v=vs.85).aspx
 http://jon.glass/blog/lists-some-wmic-commands/&lt;/p&gt;
@@ -361,7 +361,7 @@ http://jon.glass/blog/lists-some-wmic-commands/&lt;/p&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-vbscript&quot; data-lang=&quot;vbscript&quot;&gt;strComputer = &quot;.&quot;
 Set objWMIService = GetObject(&quot;winmgmts:\\&quot; &amp;amp; strComputer &amp;amp; &quot;\root\CIMV2&quot;)
-Set colItems = objWMIService.ExecQuery( _&quot;SELECT * FROM Win32_Process WHERE name=’cscript.exe’&quot;,,48)
+Set colItems = objWMIService.ExecQuery( &quot;SELECT * FROM Win32Process WHERE name=’cscript.exe’&quot;,,48)
 For Each objItem in colItems
     Wscript.Echo &quot;Name: &quot; &amp;amp; objItem.Name
     Wscript.Echo &quot;ProcessId: &quot; &amp;amp; objItem.ProcessId
@@ -375,7 +375,7 @@ Next&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;wmi&lt;/span&gt;
 &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wmi&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;WMI&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Win32_Process&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Win32Process&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;():&lt;/span&gt;
     &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Name&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;python.exe&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
         &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;Name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;s&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ProcessID&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
@@ -383,7 +383,7 @@ Next&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;You might not have this in your environment but many companies have clients on endpoints that are designed for system administration or patching that can to utilized to perform incident response functions as well. This is especially true in SMBs where the security guy is also the patching and sysadmin team.&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;(selects &quot;processid,name from Win32_Process where name = 'explorer.exe'&quot; of wmi)
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;(selects &quot;processid,name from Win32Process where name = 'explorer.exe'&quot; of wmi)
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
@@ -402,37 +402,37 @@ Next&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
   &lt;/thead&gt;
   &lt;tbody&gt;
     &lt;tr&gt;
-      &lt;td&gt;Win32_Process&lt;/td&gt;
+      &lt;td&gt;Win32Process&lt;/td&gt;
       &lt;td&gt;CommandLine CreationDate Description ExecutablePath Name OSName ParentProcessId ProcessId SessionId&lt;/td&gt;
       &lt;td&gt;AttachDebugger Create GetOwner GetOwnerSid Terminate&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
-      &lt;td&gt;Win32_Service&lt;/td&gt;
+      &lt;td&gt;Win32Service&lt;/td&gt;
       &lt;td&gt;Description DisplayName InstallDate Name PathName ProcessId ServiceType Started StartMode StartName State Status&lt;/td&gt;
       &lt;td&gt;Change ChangeStartMode Create Delete PauseService ResumeService StartService StopService&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
-      &lt;td&gt;Win32_LogonSession&lt;/td&gt;
+      &lt;td&gt;Win32LogonSession&lt;/td&gt;
       &lt;td&gt;AuthenticationPackage Description InstallDate LogonId LogonType Name StartTime Status&lt;/td&gt;
       &lt;td&gt;N/A&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
-      &lt;td&gt;Win32_NetworkLoginProfile&lt;/td&gt;
+      &lt;td&gt;Win32NetworkLoginProfile&lt;/td&gt;
       &lt;td&gt;AccountExpires BadPasswordCount Description FullName LastLogoff LastLogon LogonServer Name NumberOfLogons PasswordAge PasswordExpires PrimaryGroupId Privileges Profile UserId UserType&lt;/td&gt;
       &lt;td&gt;N/A&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
-      &lt;td&gt;Win32_LogicalDisk&lt;/td&gt;
+      &lt;td&gt;Win32LogicalDisk&lt;/td&gt;
       &lt;td&gt;BlockSize Description DeviceID DriveType FileSystem FreeSpace MediaType Name Size VolumeName VolumeSerialNumber&lt;/td&gt;
       &lt;td&gt;Chkdsk Reset SetPowerState&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
-      &lt;td&gt;Win32_StartupCommand&lt;/td&gt;
+      &lt;td&gt;Win32StartupCommand&lt;/td&gt;
       &lt;td&gt;Caption Command Description Location Name SettingID User UserSID&lt;/td&gt;
       &lt;td&gt;N/A&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
-      &lt;td&gt;Win32_OperatingSystem&lt;/td&gt;
+      &lt;td&gt;Win32OperatingSystem&lt;/td&gt;
       &lt;td&gt;BootDevice BuildNumber CurrentTimeZone InstallDate LastBootUpTime LocalDateTime Locale Manufacturer Name NumberOfProcesses NumberOfUsers Organization OSArchitecture OSType SerialNumber ServicePackMajorVersion ServicePackMinorVersion SystemDrive&lt;/td&gt;
       &lt;td&gt;Reboot SetDateTime Shutdown&lt;/td&gt;
     &lt;/tr&gt;
@@ -463,10 +463,10 @@ Next&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 For fun and containment, let’s kill that malicious process using a WMI method:&lt;/p&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;wmic /node:RemoteComputerName process where (name ='Scchost.exe') CALL Terminate
-Executing (\\RemoteComputerName\ROOT\CIMV2:Win32_Process.Handle=&quot;3712&quot;)-&amp;gt;Terminate()
+Executing (\\RemoteComputerName\ROOT\CIMV2:Win32Process.Handle=&quot;3712&quot;)-&amp;gt;Terminate()
 Method execution successful.
 Out Parameters:
-instance of __PARAMETERS
+instance of PARAMETERS
 {
         ReturnValue = 0;
 };
@@ -601,12 +601,12 @@ about remote systems.”&lt;/p&gt;
 
 &lt;h5 id=&quot;example-elevating-to-system-account&quot;&gt;Example: Elevating to System Account:&lt;/h5&gt;
 &lt;p&gt;One of my favorite tricks is to run remote processes as the System account and not a puny User account as seen below:
-&lt;img src=&quot;../images/2018-02-22 11_43_24-_192.168.164.130_cmd.png&quot; alt=&quot;PsExec As System&quot; /&gt;
+&lt;img src=&quot;../images/2018-02-22 114324-192.168.164.130cmd.png&quot; alt=&quot;PsExec As System&quot; /&gt;
 This grants a higher level of privileges and leaves less of a footprint on the remote machine. I rarely want to use my own account for anything on a remote machine unless I have to.&lt;/p&gt;
 
 &lt;p&gt;Pro Tip: If you are copying evidence from a remote machine to a collection share using PsExec to run as the system account, make sure the share is configured to grant Computer account of the target workstation write permission or you will get errors that will run you in circles. Doesn’t matter if your admin account has rights if you are running as the Computer.&lt;/p&gt;
 &lt;h5 id=&quot;example-copying-an-utility-and-then-executing-it-on-a-remote-system-&quot;&gt;Example: Copying an Utility and then Executing it on a Remote System :&lt;/h5&gt;
-&lt;p&gt;&lt;img src=&quot;../images/2018-02-25_13_08_02-Administrator_CommandPrompt.png&quot; alt=&quot;enter image description here&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;../images/2018-02-25130802-AdministratorCommandPrompt.png&quot; alt=&quot;enter image description here&quot; /&gt;&lt;/p&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;PsExec.exe \\192.168.164.130 -c RawCopy.exe /FileNamePath:C:0 /OutputPath:\\ForensicServer\dropbox\ /OutputName:$MFT
 &lt;/code&gt;&lt;/pre&gt;
@@ -624,13 +624,13 @@ This grants a higher level of privileges and leaves less of a footprint on the r
 &lt;h5 id=&quot;example-interacting-with-the-user&quot;&gt;Example: Interacting with the User:&lt;/h5&gt;
 &lt;p&gt;PsExec runs a console session by default but can be configured to interact with the logged on user’s session using the &lt;strong&gt;-i&lt;/strong&gt; option. This is helpful in those rare instances where you need to user to see something you are doing. 99% of the time the user is going to be logged in under the second session or session 1. It’s not often but I have used this a couple times over the years.
 In this example, I use PsExec to create two instances of notepad.exe on my local machine. One is in user session and visible, the other is not. 
-&lt;img src=&quot;../images/2018-02-26_14_04_26-Sessions.png&quot; alt=&quot;enter image description here&quot; /&gt;&lt;/p&gt;
+&lt;img src=&quot;../images/2018-02-26140426-Sessions.png&quot; alt=&quot;enter image description here&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;The &lt;strong&gt;-d&lt;/strong&gt; flag is used to detach the PsExec session from the child process so we don’t have to wait until notepad exits to continue. This is very handy for DFIR collection scripts that might take a while. Detach the process and let it do it’s thing. I like to use &lt;strong&gt;-d&lt;/strong&gt; on targets that are on flakey VPN connections so that if the connection drops, the process is still running on the remote system. The obvious downside is, you can’t interact with the session after it is detached.&lt;/p&gt;
 
 &lt;h5 id=&quot;example-running-commands-on-multiple-machines&quot;&gt;Example: Running commands on multiple machines&lt;/h5&gt;
 &lt;p&gt;PsExec allows you to perform administrative tasks on multiple workstations but you can only interact with one at a time. Here is an example of getting a command shell on two different machines:
-&lt;img src=&quot;../images/2018-02-27_08_23_19-Administrator_Command_Prompt.png&quot; alt=&quot;enter image description here&quot; /&gt;&lt;/p&gt;
+&lt;img src=&quot;../images/2018-02-27082319-AdministratorCommandPrompt.png&quot; alt=&quot;enter image description here&quot; /&gt;&lt;/p&gt;
 
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;PsExec.exe \\DESKTOP-132B1OL,192.168.164.130 cmd
 &lt;/code&gt;&lt;/pre&gt;
@@ -638,11 +638,11 @@ In this example, I use PsExec to create two instances of notepad.exe on my local
 
 &lt;p&gt;I can’t access the second machine until I exit the session with the first one. To speed that process up, using the &lt;strong&gt;-d&lt;/strong&gt; to detach the session from the process will make it much faster.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;../images/2018-02-26_18_38_25-Administrator_Command_Prompt.png&quot; alt=&quot;enter image description here&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;../images/2018-02-26183825-AdministratorCommandPrompt.png&quot; alt=&quot;enter image description here&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;When would you ever need to do this? Let’s say you want to collect artifacts from the two machines involved in an alert you received from your detection team. You could bust out your PsExec skills and do something like this:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;../images/2018-02-27_08_23_19-Administrator_Command_Prompt.png&quot; alt=&quot;Advanced PsExec Copy&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;../images/2018-02-27082319-AdministratorCommandPrompt.png&quot; alt=&quot;Advanced PsExec Copy&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;Breakdown:&lt;/strong&gt;&lt;/p&gt;
 

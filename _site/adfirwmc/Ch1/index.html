@@ -160,7 +160,7 @@ https://www.darkoperator.com/blog/2013/1/31/introduction-to-wmi-basics-with-powe
 <h4 id="wmi-example">WMI Example</h4>
 <p>To get a list of all processes running on a workstation that match a certain name with process IDs, you could use something like this:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>SELECT processid,name FROM Win32_Process where name='powershell.exe'
+<div class="highlighter-rouge"><pre class="highlight"><code>SELECT processid,name FROM Win32Process where name='powershell.exe'
 </code></pre>
 </div>
 
@@ -178,7 +178,7 @@ https://www.darkoperator.com/blog/2013/1/31/introduction-to-wmi-basics-with-powe
     </tr>
     <tr>
       <td>Class</td>
-      <td>Win32_Process</td>
+      <td>Win32Process</td>
     </tr>
     <tr>
       <td>Properties</td>
@@ -198,10 +198,10 @@ https://www.darkoperator.com/blog/2013/1/31/introduction-to-wmi-basics-with-powe
 <p>“WQL looks neat but where do I use it?” Great question!  WMI is accessible in a variety of flavors on modern Windows systems. You can leverage WQL with these handy native Windows solutions:</p>
 <h4 id="powershell">PowerShell</h4>
 
-<figure class="highlight"><pre><code class="language-powershell" data-lang="powershell"><span class="nv">$query</span> <span class="o">=</span> <span class="s2">"SELECT processid,name FROM Win32_Process where name='powershell.exe'"</span>
+<figure class="highlight"><pre><code class="language-powershell" data-lang="powershell"><span class="nv">$query</span> <span class="o">=</span> <span class="s2">"SELECT processid,name FROM Win32Process where name='powershell.exe'"</span>
 <span class="nb">Get-WmiObject</span> -query <span class="nv">$query</span></code></pre></figure>
 
-<p><img src="../images/2018-02-21_12_56_53-WindowsPowerShell.png" alt="PowerShell WMI" />
+<p><img src="../images/2018-02-21125653-WindowsPowerShell.png" alt="PowerShell WMI" />
 Reference: https://blogs.technet.microsoft.com/heyscriptingguy/2012/07/10/three-easy-ways-to-use-powershell-and-wql-to-get-wmi-data/</p>
 <h4 id="wmic">WMIC</h4>
 <p>The WMI command-line (WMIC) utility provides a command-line interface for WMI. WMIC is one of my favorite command line applications because it condenses a lot of the</p>
@@ -210,7 +210,7 @@ Reference: https://blogs.technet.microsoft.com/heyscriptingguy/2012/07/10/three-
 </code></pre>
 </div>
 
-<p><img src="../images/2018-02-21_13_27_27-Command Prompt.png" alt="WMIC Example" title="WMIC" />
+<p><img src="../images/2018-02-21132727-Command Prompt.png" alt="WMIC Example" title="WMIC" />
 References: 
 https://msdn.microsoft.com/en-us/library/aa394531(v=vs.85).aspx
 http://jon.glass/blog/lists-some-wmic-commands/</p>
@@ -219,7 +219,7 @@ http://jon.glass/blog/lists-some-wmic-commands/</p>
 
 <figure class="highlight"><pre><code class="language-vbscript" data-lang="vbscript">strComputer = "."
 Set objWMIService = GetObject("winmgmts:\\" &amp; strComputer &amp; "\root\CIMV2")
-Set colItems = objWMIService.ExecQuery( _"SELECT * FROM Win32_Process WHERE name=’cscript.exe’",,48)
+Set colItems = objWMIService.ExecQuery( "SELECT * FROM Win32Process WHERE name=’cscript.exe’",,48)
 For Each objItem in colItems
     Wscript.Echo "Name: " &amp; objItem.Name
     Wscript.Echo "ProcessId: " &amp; objItem.ProcessId
@@ -233,7 +233,7 @@ Next</code></pre></figure>
 
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">wmi</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span>
-<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_Process</span> <span class="p">():</span>
+<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32Process</span> <span class="p">():</span>
     <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">Name</span> <span class="o">==</span> <span class="s">"python.exe"</span><span class="p">:</span>
         <span class="k">print</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">Name</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">ProcessID</span><span class="p">)</span></code></pre></figure>
 
@@ -241,7 +241,7 @@ Next</code></pre></figure>
 
 <p>You might not have this in your environment but many companies have clients on endpoints that are designed for system administration or patching that can to utilized to perform incident response functions as well. This is especially true in SMBs where the security guy is also the patching and sysadmin team.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>(selects "processid,name from Win32_Process where name = 'explorer.exe'" of wmi)
+<div class="highlighter-rouge"><pre class="highlight"><code>(selects "processid,name from Win32Process where name = 'explorer.exe'" of wmi)
 </code></pre>
 </div>
 
@@ -260,37 +260,37 @@ Next</code></pre></figure>
   </thead>
   <tbody>
     <tr>
-      <td>Win32_Process</td>
+      <td>Win32Process</td>
       <td>CommandLine CreationDate Description ExecutablePath Name OSName ParentProcessId ProcessId SessionId</td>
       <td>AttachDebugger Create GetOwner GetOwnerSid Terminate</td>
     </tr>
     <tr>
-      <td>Win32_Service</td>
+      <td>Win32Service</td>
       <td>Description DisplayName InstallDate Name PathName ProcessId ServiceType Started StartMode StartName State Status</td>
       <td>Change ChangeStartMode Create Delete PauseService ResumeService StartService StopService</td>
     </tr>
     <tr>
-      <td>Win32_LogonSession</td>
+      <td>Win32LogonSession</td>
       <td>AuthenticationPackage Description InstallDate LogonId LogonType Name StartTime Status</td>
       <td>N/A</td>
     </tr>
     <tr>
-      <td>Win32_NetworkLoginProfile</td>
+      <td>Win32NetworkLoginProfile</td>
       <td>AccountExpires BadPasswordCount Description FullName LastLogoff LastLogon LogonServer Name NumberOfLogons PasswordAge PasswordExpires PrimaryGroupId Privileges Profile UserId UserType</td>
       <td>N/A</td>
     </tr>
     <tr>
-      <td>Win32_LogicalDisk</td>
+      <td>Win32LogicalDisk</td>
       <td>BlockSize Description DeviceID DriveType FileSystem FreeSpace MediaType Name Size VolumeName VolumeSerialNumber</td>
       <td>Chkdsk Reset SetPowerState</td>
     </tr>
     <tr>
-      <td>Win32_StartupCommand</td>
+      <td>Win32StartupCommand</td>
       <td>Caption Command Description Location Name SettingID User UserSID</td>
       <td>N/A</td>
     </tr>
     <tr>
-      <td>Win32_OperatingSystem</td>
+      <td>Win32OperatingSystem</td>
       <td>BootDevice BuildNumber CurrentTimeZone InstallDate LastBootUpTime LocalDateTime Locale Manufacturer Name NumberOfProcesses NumberOfUsers Organization OSArchitecture OSType SerialNumber ServicePackMajorVersion ServicePackMinorVersion SystemDrive</td>
       <td>Reboot SetDateTime Shutdown</td>
     </tr>
@@ -321,10 +321,10 @@ Next</code></pre></figure>
 For fun and containment, let’s kill that malicious process using a WMI method:</p>
 
 <div class="highlighter-rouge"><pre class="highlight"><code>wmic /node:RemoteComputerName process where (name ='Scchost.exe') CALL Terminate
-Executing (\\RemoteComputerName\ROOT\CIMV2:Win32_Process.Handle="3712")-&gt;Terminate()
+Executing (\\RemoteComputerName\ROOT\CIMV2:Win32Process.Handle="3712")-&gt;Terminate()
 Method execution successful.
 Out Parameters:
-instance of __PARAMETERS
+instance of PARAMETERS
 {
         ReturnValue = 0;
 };
@@ -459,12 +459,12 @@ about remote systems.”</p>
 
 <h5 id="example-elevating-to-system-account">Example: Elevating to System Account:</h5>
 <p>One of my favorite tricks is to run remote processes as the System account and not a puny User account as seen below:
-<img src="../images/2018-02-22 11_43_24-_192.168.164.130_cmd.png" alt="PsExec As System" />
+<img src="../images/2018-02-22 114324-192.168.164.130cmd.png" alt="PsExec As System" />
 This grants a higher level of privileges and leaves less of a footprint on the remote machine. I rarely want to use my own account for anything on a remote machine unless I have to.</p>
 
 <p>Pro Tip: If you are copying evidence from a remote machine to a collection share using PsExec to run as the system account, make sure the share is configured to grant Computer account of the target workstation write permission or you will get errors that will run you in circles. Doesn’t matter if your admin account has rights if you are running as the Computer.</p>
 <h5 id="example-copying-an-utility-and-then-executing-it-on-a-remote-system-">Example: Copying an Utility and then Executing it on a Remote System :</h5>
-<p><img src="../images/2018-02-25_13_08_02-Administrator_CommandPrompt.png" alt="enter image description here" /></p>
+<p><img src="../images/2018-02-25130802-AdministratorCommandPrompt.png" alt="enter image description here" /></p>
 
 <div class="highlighter-rouge"><pre class="highlight"><code>PsExec.exe \\192.168.164.130 -c RawCopy.exe /FileNamePath:C:0 /OutputPath:\\ForensicServer\dropbox\ /OutputName:$MFT
 </code></pre>
@@ -482,13 +482,13 @@ This grants a higher level of privileges and leaves less of a footprint on the r
 <h5 id="example-interacting-with-the-user">Example: Interacting with the User:</h5>
 <p>PsExec runs a console session by default but can be configured to interact with the logged on user’s session using the <strong>-i</strong> option. This is helpful in those rare instances where you need to user to see something you are doing. 99% of the time the user is going to be logged in under the second session or session 1. It’s not often but I have used this a couple times over the years.
 In this example, I use PsExec to create two instances of notepad.exe on my local machine. One is in user session and visible, the other is not. 
-<img src="../images/2018-02-26_14_04_26-Sessions.png" alt="enter image description here" /></p>
+<img src="../images/2018-02-26140426-Sessions.png" alt="enter image description here" /></p>
 
 <p>The <strong>-d</strong> flag is used to detach the PsExec session from the child process so we don’t have to wait until notepad exits to continue. This is very handy for DFIR collection scripts that might take a while. Detach the process and let it do it’s thing. I like to use <strong>-d</strong> on targets that are on flakey VPN connections so that if the connection drops, the process is still running on the remote system. The obvious downside is, you can’t interact with the session after it is detached.</p>
 
 <h5 id="example-running-commands-on-multiple-machines">Example: Running commands on multiple machines</h5>
 <p>PsExec allows you to perform administrative tasks on multiple workstations but you can only interact with one at a time. Here is an example of getting a command shell on two different machines:
-<img src="../images/2018-02-27_08_23_19-Administrator_Command_Prompt.png" alt="enter image description here" /></p>
+<img src="../images/2018-02-27082319-AdministratorCommandPrompt.png" alt="enter image description here" /></p>
 
 <div class="highlighter-rouge"><pre class="highlight"><code>PsExec.exe \\DESKTOP-132B1OL,192.168.164.130 cmd
 </code></pre>
@@ -496,11 +496,11 @@ In this example, I use PsExec to create two instances of notepad.exe on my local
 
 <p>I can’t access the second machine until I exit the session with the first one. To speed that process up, using the <strong>-d</strong> to detach the session from the process will make it much faster.</p>
 
-<p><img src="../images/2018-02-26_18_38_25-Administrator_Command_Prompt.png" alt="enter image description here" /></p>
+<p><img src="../images/2018-02-26183825-AdministratorCommandPrompt.png" alt="enter image description here" /></p>
 
 <p>When would you ever need to do this? Let’s say you want to collect artifacts from the two machines involved in an alert you received from your detection team. You could bust out your PsExec skills and do something like this:</p>
 
-<p><img src="../images/2018-02-27_08_23_19-Administrator_Command_Prompt.png" alt="Advanced PsExec Copy" /></p>
+<p><img src="../images/2018-02-27082319-AdministratorCommandPrompt.png" alt="Advanced PsExec Copy" /></p>
 
 <p><strong>Breakdown:</strong></p>
 
