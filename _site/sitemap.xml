@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>http://jon.glass/adfirwmc/Ch2/</loc>
+<lastmod>2018-03-03T15:33:28-05:00</lastmod>
+</url>
+<url>
+<loc>http://jon.glass/adfirwmc/Ch1/</loc>
+<lastmod>2018-03-02T15:33:28-05:00</lastmod>
+</url>
+<url>
+<loc>http://jon.glass/adfirwmc/Ch0/</loc>
+<lastmod>2018-03-01T15:33:28-05:00</lastmod>
+</url>
+<url>
 <loc>http://jon.glass/tips/LookForWindowsTimestamps/</loc>
 <lastmod>2018-02-20T15:33:28-05:00</lastmod>
 </url>
@@ -177,7 +189,7 @@
 <lastmod>2013-03-29T15:24:43-04:00</lastmod>
 </url>
 <url>
-<loc>http://jon.glass/ADFIRWMC/Whole%20Course/</loc>
+<loc>http://jon.glass/adfirwmc/Whole%20Course/</loc>
 </url>
 <url>
 <loc>http://jon.glass/</loc>
@@ -186,13 +198,16 @@
 <loc>http://jon.glass/tags/</loc>
 </url>
 <url>
-<loc>http://jon.glass/courses/</loc>
+<loc>http://jon.glass/adfirwmc/</loc>
 </url>
 <url>
 <loc>http://jon.glass/tips/</loc>
 </url>
 <url>
 <loc>http://jon.glass/theme-setup/</loc>
+</url>
+<url>
+<loc>http://jon.glass/courses/</loc>
 </url>
 <url>
 <loc>http://jon.glass/about/</loc>

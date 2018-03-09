@@ -1,0 +1,574 @@
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8" lang="en"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9" lang="en"><![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<title>ADFIRWMC - 1. Windows Remote Administration for Incident Responders &#8211; Half Full of Security</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+
+
+<!-- Twitter Cards -->
+<meta name="twitter:title" content="ADFIRWMC - 1. Windows Remote Administration for Incident Responders">
+<meta name="twitter:description" content="">
+<meta name="twitter:site" content="@GlassDFIR">
+<meta name="twitter:creator" content="@GlassDFIR">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://jon.glass/images/site-logo.png">
+
+<!-- Open Graph -->
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ADFIRWMC - 1. Windows Remote Administration for Incident Responders">
+<meta property="og:description" content="">
+<meta property="og:url" content="http://jon.glass/adfirwmc/Ch1/">
+<meta property="og:site_name" content="Half Full of Security">
+
+
+
+
+
+<link rel="canonical" href="http://jon.glass/adfirwmc/Ch1/">
+<link href="http://jon.glass/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="http://jon.glass/assets/css/main.css">
+<!-- Webfonts -->
+<script src="https://use.edgefonts.net/source-sans-pro:n2,i2,n3,i3,n4,i4,n6,i6,n7,i7,n9,i9;source-code-pro:n4,n7;volkhov.js"></script>
+
+<meta http-equiv="cleartype" content="on">
+
+<!-- HTML5 Shiv and Media Query Support -->
+<!--[if lt IE 9]>
+  <script src="http://jon.glass/assets/js/vendor/html5shiv.min.js"></script>
+  <script src="http://jon.glass/assets/js/vendor/respond.min.js"></script>
+<![endif]-->
+
+<!-- Modernizr -->
+<script src="http://jon.glass/assets/js/vendor/modernizr-2.7.1.custom.min.js"></script>
+
+
+<!-- MathJax -->
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+<!-- Icons -->
+<!-- 16x16 -->
+<link rel="shortcut icon" href="http://jon.glass/favicon.ico">
+<!-- 32x32 -->
+<link rel="shortcut icon" href="http://jon.glass/favicon.png">
+<!-- 57x57 (precomposed) for iPhone 3GS, pre-2011 iPod Touch and older Android devices -->
+<link rel="apple-touch-icon-precomposed" href="http://jon.glass/images/apple-touch-icon-precomposed.png">
+<!-- 72x72 (precomposed) for 1st generation iPad, iPad 2 and iPad mini -->
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://jon.glass/images/apple-touch-icon-72x72-precomposed.png">
+<!-- 114x114 (precomposed) for iPhone 4, 4S, 5 and post-2011 iPod Touch -->
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://jon.glass/images/apple-touch-icon-114x114-precomposed.png">
+<!-- 144x144 (precomposed) for iPad 3rd and 4th generation -->
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://jon.glass/images/apple-touch-icon-144x144-precomposed.png">
+
+</head>
+
+<body id="post">
+
+<div class="navigation-wrapper">
+	<nav role="navigation" id="site-nav" class="animated drop">
+	    <ul>
+      
+		    
+		    <li><a href="http://jon.glass/blog/" >Blog</a></li>
+		  
+		    
+		    <li><a href="http://jon.glass/tips/" >Tips and Tricks</a></li>
+		  
+		    
+		    <li><a href="http://jon.glass/about/" >About</a></li>
+		  
+		    
+		    <li><a href="http://jon.glass/search/" >Search</a></li>
+		  
+	    </ul>
+	</nav>
+</div><!-- /.navigation-wrapper -->
+
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+
+<header class="masthead">
+	<div class="wrap">
+      
+  		<a href="http://jon.glass/" class="site-logo" rel="home" title="Half Full of Security"><img src="http://jon.glass/images/site-logo.png" width="200" height="200" alt="Half Full of Security logo" class="animated fadeInDown"></a>
+      
+      <h1 class="site-title animated fadeIn"><a href="http://jon.glass/">Half Full of Security</a></h1>
+		<h2 class="site-description animated fadeIn" itemprop="description">Sharpening the ACKs since 2013</h2>
+	</div>
+</header><!-- /.masthead -->
+
+<div class="js-menu-screen menu-screen"></div>
+
+
+<div id="main" role="main">
+  <article class="hentry">
+    
+    <div class="entry-wrapper">
+      <header class="entry-header">
+        <ul class="entry-tags">
+          
+        </ul>
+        
+          <h1 class="entry-title">ADFIRWMC - 1. Windows Remote Administration for Incident Responders</h1>
+        
+      </header>
+
+
+        <time datetime="2018-03-02T15:33:28-05:00"><i class="fa fa-calendar-o"></i> March 02, 2018</time>
+        <p>Without a system administration background, many incident responders struggle with basic tasks like remotely starting and stopping processes on target machines. Inversely, Incident Responders with sysadmin experience are often faster and more effective. The more familiar you are with native Windows commands, the faster your can operate.</p>
+
+<p>While this course cannot hope to supplant the experience gained by years at your average help desk, I will try to highlight some of the more helpful techniques that get me from A to B.</p>
+
+<h3 id="topics">Topics</h3>
+
+<ul>
+  <li>Windows Management Instrumentation</li>
+  <li>Microsoft Management Console</li>
+  <li>PsExec</li>
+</ul>
+
+<h3 id="wmi">WMI</h3>
+<p>One of the most practical skills you can have as a Windows Admin is an understanding of WMI. Windows Management Instrumentation (WMI) is the infrastructure for management data and operations on Windows-based operating systems.</p>
+
+<h4 id="wmi-terminology">WMI Terminology</h4>
+
+<p>The four big vocabulary terms we are going to use for the section are:</p>
+
+<ul>
+  <li>Namespaces: A hierarchical structure of WMI objects used to organize Classes</li>
+  <li>Classes: A WMI Object that contains fun stuff like Properties and Methods</li>
+  <li>Property: Information that can be retrieved.</li>
+  <li>Method: Actions that can be taken.</li>
+</ul>
+
+<p>For a much better explanation, I recommend: 
+https://www.darkoperator.com/blog/2013/1/31/introduction-to-wmi-basics-with-powershell-part-1-what-it-is.html</p>
+
+<h4 id="wmi-example">WMI Example</h4>
+<p>To get a list of all processes running on a workstation that match a certain name with process IDs, you could use something like this:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>SELECT processid,name FROM Win32_Process where name='powershell.exe'
+</code></pre>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Term</th>
+      <th>Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Namespace</td>
+      <td>Isn’t defined so the default (root\CIMV2) is assumed</td>
+    </tr>
+    <tr>
+      <td>Class</td>
+      <td>Win32_Process</td>
+    </tr>
+    <tr>
+      <td>Properties</td>
+      <td>processid and name</td>
+    </tr>
+    <tr>
+      <td>Methods</td>
+      <td>Not used because we are just listing process info</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="wql">WQL</h4>
+
+<p>WMI Query Language (WQL) is a bastardized version of SQL used to administer WMI. WQL is a deep dark rabbit hole of COM objects that I refuse to try to document but the main statements you need to know are <strong>SELECT, FROM, and WHERE</strong>.</p>
+
+<p>“WQL looks neat but where do I use it?” Great question!  WMI is accessible in a variety of flavors on modern Windows systems. You can leverage WQL with these handy native Windows solutions:</p>
+<h4 id="powershell">PowerShell</h4>
+
+<figure class="highlight"><pre><code class="language-powershell" data-lang="powershell"><span class="nv">$query</span> <span class="o">=</span> <span class="s2">"SELECT processid,name FROM Win32_Process where name='powershell.exe'"</span>
+<span class="nb">Get-WmiObject</span> -query <span class="nv">$query</span></code></pre></figure>
+
+<p><img src="../Images/2018-02-21 12_56_53-Windows PowerShell.png" alt="PowerShell WMI" />
+Reference: https://blogs.technet.microsoft.com/heyscriptingguy/2012/07/10/three-easy-ways-to-use-powershell-and-wql-to-get-wmi-data/</p>
+<h4 id="wmic">WMIC</h4>
+<p>The WMI command-line (WMIC) utility provides a command-line interface for WMI. WMIC is one of my favorite command line applications because it condenses a lot of the</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code> wmic /node:computername process where (name = "cmd.exe") get processid,name
+</code></pre>
+</div>
+
+<p><img src="../Images/2018-02-21 13_27_27-Command Prompt.png" alt="WMIC Example" title="WMIC" />
+References: 
+https://msdn.microsoft.com/en-us/library/aa394531(v=vs.85).aspx
+http://jon.glass/blog/lists-some-wmic-commands/</p>
+
+<h4 id="visual-basic-scripting-example-more-or-less-deprecated">Visual Basic Scripting Example (more or less deprecated)</h4>
+
+<figure class="highlight"><pre><code class="language-vbscript" data-lang="vbscript">strComputer = "."
+Set objWMIService = GetObject("winmgmts:\\" &amp; strComputer &amp; "\root\CIMV2")
+Set colItems = objWMIService.ExecQuery( _"SELECT * FROM Win32_Process WHERE name=’cscript.exe’",,48)
+For Each objItem in colItems
+    Wscript.Echo "Name: " &amp; objItem.Name
+    Wscript.Echo "ProcessId: " &amp; objItem.ProcessId
+Next</code></pre></figure>
+
+<p>While VBS is not my first choice, it is good to at least be aware of it because it is still very much in use by admins and attackers alike.</p>
+
+<p>Depending on what 3rd party tools you have in your environment you might be able to utilize these:</p>
+<h4 id="python">Python</h4>
+<p>The Python WMI module is a lightweight wrapper on top of the pywin32 extensions.</p>
+
+<figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">wmi</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span>
+<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_Process</span> <span class="p">():</span>
+    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">Name</span> <span class="o">==</span> <span class="s">"python.exe"</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">Name</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">ProcessID</span><span class="p">)</span></code></pre></figure>
+
+<h4 id="bigfix-relevance">BigFix Relevance</h4>
+
+<p>You might not have this in your environment but many companies have clients on endpoints that are designed for system administration or patching that can to utilized to perform incident response functions as well. This is especially true in SMBs where the security guy is also the patching and sysadmin team.</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>(selects "processid,name from Win32_Process where name = 'explorer.exe'" of wmi)
+</code></pre>
+</div>
+
+<p><img src="../Images/bigfix.png" alt="BigFix WMI Relevance" /></p>
+
+<h4 id="wmi-classes-of-dfir-interest">WMI classes of DFIR interest</h4>
+<p>There is a lot of super geeky DFIR information you can pull out of WMI properties and methods that can give you wizard like powers over remote machines. Here are a few of my favorites :</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Class</th>
+      <th>Properties</th>
+      <th>Methods</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Win32_Process</td>
+      <td>CommandLine CreationDate Description ExecutablePath Name OSName ParentProcessId ProcessId SessionId</td>
+      <td>AttachDebugger Create GetOwner GetOwnerSid Terminate</td>
+    </tr>
+    <tr>
+      <td>Win32_Service</td>
+      <td>Description DisplayName InstallDate Name PathName ProcessId ServiceType Started StartMode StartName State Status</td>
+      <td>Change ChangeStartMode Create Delete PauseService ResumeService StartService StopService</td>
+    </tr>
+    <tr>
+      <td>Win32_LogonSession</td>
+      <td>AuthenticationPackage Description InstallDate LogonId LogonType Name StartTime Status</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Win32_NetworkLoginProfile</td>
+      <td>AccountExpires BadPasswordCount Description FullName LastLogoff LastLogon LogonServer Name NumberOfLogons PasswordAge PasswordExpires PrimaryGroupId Privileges Profile UserId UserType</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Win32_LogicalDisk</td>
+      <td>BlockSize Description DeviceID DriveType FileSystem FreeSpace MediaType Name Size VolumeName VolumeSerialNumber</td>
+      <td>Chkdsk Reset SetPowerState</td>
+    </tr>
+    <tr>
+      <td>Win32_StartupCommand</td>
+      <td>Caption Command Description Location Name SettingID User UserSID</td>
+      <td>N/A</td>
+    </tr>
+    <tr>
+      <td>Win32_OperatingSystem</td>
+      <td>BootDevice BuildNumber CurrentTimeZone InstallDate LastBootUpTime LocalDateTime Locale Manufacturer Name NumberOfProcesses NumberOfUsers Organization OSArchitecture OSType SerialNumber ServicePackMajorVersion ServicePackMinorVersion SystemDrive</td>
+      <td>Reboot SetDateTime Shutdown</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="putting-it-to-work">Putting It To Work</h4>
+
+<p>Scenario: Your detection team says a user on RemoteComputerName received a malicious Word document that downloads a Remote Access Trojan that your antivirus doesn’t have a signature for. From your threat intelligence, this malicious Word document uses a macro to drop an EvilFile.exe in the users Temp directory.</p>
+
+<p>Let’s verify the alert..maybe the user didn’t open the Word doc…(yeah right)</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>wmic /node:RemoteComputerName process where (name like '%scchost.exe%') get executablepath,processid,parentprocessid /format:list
+    ExecutablePath=C:\Users\Username\AppData\Local\Temp\Scchost.EXE
+    ParentProcessId=1040
+    ProcessId=3712
+</code></pre>
+</div>
+
+<p>Crap. Looks like the user might have clicked on it. Let’s verify that parent process just to be sure:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>wmic /node:RemoteComputerName process where (ProcessId = 1040) get executablepath /format:list
+    ExecutablePath=C:\Program Files\Microsoft Office\Office16\WINWORD.EXE
+</code></pre>
+</div>
+
+<p>Double crap. Looks like this is a confirmed compromise of a workstation. 
+For fun and containment, let’s kill that malicious process using a WMI method:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>wmic /node:RemoteComputerName process where (name ='Scchost.exe') CALL Terminate
+Executing (\\RemoteComputerName\ROOT\CIMV2:Win32_Process.Handle="3712")-&gt;Terminate()
+Method execution successful.
+Out Parameters:
+instance of __PARAMETERS
+{
+        ReturnValue = 0;
+};
+</code></pre>
+</div>
+
+<p>For even MORE fun, like copy that malicious file to an analysis share so we can get a better look at it:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>wmic /node:RemoteComputerName process call create "xcopy  /Y C:\Users\Username\AppData\Local\Temp\Scchost.EXE \\AnalysisShare\Scchost.exe.bin" 
+</code></pre>
+</div>
+
+<p>For a lot less fun, let’s call the User explain the situation, shut it down remotely, and go get the workstation to determine what this malware did :</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>wmic /node:RemoteComputerName os call Shutdown
+</code></pre>
+</div>
+
+<p><em>Disclaimer: This scenario is largely BS. Malware isn’t usually this easy to kill and as more work becomes remote, it is increasingly rare to physically walk over to the user’s cube and take their workstation.</em></p>
+
+<h3 id="mmc">MMC</h3>
+<p>I imagine I scared some of off you with all that “coding” and “command line stuff”. While there are GUIer options to accomplish Windows administration tasks, they aren’t as efficient or sexy. If you are against coding all together, there is an X at the top right or left of your browser. We can part ways now and no one’s feelings need to get hurt. For the sake of completeness, I will cover MMC which is a GUI and can do Windows admin tasks but it is not my “go to”.
+According to the big M, the Microsoft Management Console (MMC) is an extensible common presentation service for management applications.
+<img src="../Images/2018-02-22-MMC.png" alt="MMC" title="MMC" /></p>
+
+<p>This console gives you access to some a lot of administration tools.</p>
+<ul>
+  <li>Computer Management Snap-In
+    <ul>
+      <li>System Tools
+        <ul>
+          <li>Task Scheduler
+            <ul>
+              <li>Good for running processes remotely, shutting down workstations, and whatnot</li>
+            </ul>
+          </li>
+          <li>Event Viewer
+            <ul>
+              <li>Good for remotely viewing logs but not great</li>
+            </ul>
+          </li>
+          <li>Local Users and Groups
+            <ul>
+              <li>Good for administering local user accounts</li>
+            </ul>
+          </li>
+          <li>Device Manager
+            <ul>
+              <li>Handy when you need to see if a USB is plugged in</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>Storage
+        <ul>
+          <li>Disk Management
+            <ul>
+              <li>Also handy for seeing if external media is plugged in</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>Services and Applications
+        <ul>
+          <li>Services</li>
+          <li>Allows for administration of Windows services. (start, pause, stop)</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<p>I don’t use this much for IR but if you are in an environment where you don’t have any other tools, this is a native GUI solution that might get you where you need to go.</p>
+
+<h3 id="pstools">PsTools</h3>
+
+<p>Way way way back in 1996, Mark Russinovich and Bryce Cogswell created a little company called Winternals Software LP that created a bunch of software to help administer Windows 2000 boxes. Long story short…in 2006 Microsoft bought the company and all their tools now known as <a href="https://docs.microsoft.com/en-us/sysinternals/">Windows Sysinternals</a>. There is a cornucopia of awesome tools that I will mention throughout the duration of this course but for now we are going to focus on some of the PsTools Suite I find most handy. While you can accomplish all of these functions via WMI via PowerShell or WMIC, these tools are helpful for those who prefer tools with a dedicated tasks and help menus. There is absolutely no shame in that but I found, the more comfortable I become with WMI scripting, the less I needed most of this suite.</p>
+
+<h4 id="windows-admin-using-pstools-suite">Windows Admin using PsTools Suite</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>Tool</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><a href="https://docs.microsoft.com/en-us/sysinternals/downloads/psexec/">PsExec</a></td>
+      <td>execute processes remotely</td>
+    </tr>
+    <tr>
+      <td><a href="https://docs.microsoft.com/en-us/sysinternals/downloads/pskill/">PsKill</a></td>
+      <td>kill processes by name or process ID</td>
+    </tr>
+    <tr>
+      <td><a href="https://docs.microsoft.com/en-us/sysinternals/downloads/pslist/">PsList</a></td>
+      <td>list detailed information about processes</td>
+    </tr>
+    <tr>
+      <td><a href="https://docs.microsoft.com/en-us/sysinternals/downloads/psloggedon/">PsLoggedOn</a></td>
+      <td>see who’s logged on locally and via resource sharing</td>
+    </tr>
+    <tr>
+      <td><a href="https://docs.microsoft.com/en-us/sysinternals/downloads/psservice/">PsService</a></td>
+      <td>view and control services</td>
+    </tr>
+    <tr>
+      <td><a href="https://docs.microsoft.com/en-us/sysinternals/downloads/psshutdown/">PsShutdown</a></td>
+      <td>shuts down and optionally reboots a computer</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Most of the PsTools suites are fairly straightforward and require almost no explanation but PsExec is robust enough that it bears covering.</p>
+
+<h4 id="psexec">PsExec</h4>
+<p>From <a href="https://docs.microsoft.com/en-us/sysinternals/downloads/psexec">Microsoft</a></p>
+
+<blockquote>
+  <p>“PsExec is a light-weight application that lets you execute processes
+on other systems, complete with full interactivity for console
+applications, without having to manually install client software.
+PsExec’s most powerful uses include launching interactive
+command-prompts on remote systems and remote-enabling tools like
+IpConfig that otherwise do not have the ability to show information
+about remote systems.”</p>
+</blockquote>
+
+<p>PsExec is to DFIR as a good blaster is to Han Solo.  I can’t tell you how many times PsExec has saved my bacon. Not to mention how many times I have pulled off some nifty DFIRfu with it’s various options. Everytime I read PsExec’s Usage I learn something new that it does.</p>
+
+<h5 id="example-elevating-to-system-account">Example: Elevating to System Account:</h5>
+<p>One of my favorite tricks is to run remote processes as the System account and not a puny User account as seen below:
+<img src="../Images/2018-02-22 11_43_24-__192.168.164.130_ cmd.png" alt="PsExec As System" />
+This grants a higher level of privileges and leaves less of a footprint on the remote machine. I rarely want to use my own account for anything on a remote machine unless I have to.</p>
+
+<p>Pro Tip: If you are copying evidence from a remote machine to a collection share using PsExec to run as the system account, make sure the share is configured to grant Computer account of the target workstation write permission or you will get errors that will run you in circles. Doesn’t matter if your admin account has rights if you are running as the Computer.</p>
+<h5 id="example-copying-an-utility-and-then-executing-it-on-a-remote-system-">Example: Copying an Utility and then Executing it on a Remote System :</h5>
+<p><img src="../Images/2018-02-25 13_08_02-Administrator_ Command Prompt.png" alt="enter image description here" /></p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>PsExec.exe \\192.168.164.130 -c RawCopy.exe /FileNamePath:C:0 /OutputPath:\\ForensicServer\dropbox\ /OutputName:$MFT
+</code></pre>
+</div>
+
+<p>There is a lot going on in this example so let’s break it down…</p>
+
+<ul>
+  <li>I am using PsExec to remotely execute RawCopy on a remote host with an IP of 192.168.164.130.</li>
+  <li>Since the remote host probably doesn’t have RawCopy, a third party tool, laying around, I used the <strong>-c</strong> flag to copy the program over to the remote system. The <strong>-f</strong> flag is used just in case it was already there so we can overwrite it.</li>
+  <li>RawCopy’s options are fairly straightforward. I am copying the Master File Table (record 0) from C:\$MFT on the remote machine to  my \\ForensicServer\dropbox share for analysis</li>
+  <li>After RawCopy finished, I check my dropbox folder to confirm the $MFT landed safely.</li>
+</ul>
+
+<h5 id="example-interacting-with-the-user">Example: Interacting with the User:</h5>
+<p>PsExec runs a console session by default but can be configured to interact with the logged on user’s session using the <strong>-i</strong> option. This is helpful in those rare instances where you need to user to see something you are doing. 99% of the time the user is going to be logged in under the second session or session 1. It’s not often but I have used this a couple times over the years.
+In this example, I use PsExec to create two instances of notepad.exe on my local machine. One is in user session and visible, the other is not. 
+<img src="../Images/2018-02-26 14_04_26-Sessions.png" alt="enter image description here" /></p>
+
+<p>The <strong>-d</strong> flag is used to detach the PsExec session from the child process so we don’t have to wait until notepad exits to continue. This is very handy for DFIR collection scripts that might take a while. Detach the process and let it do it’s thing. I like to use <strong>-d</strong> on targets that are on flakey VPN connections so that if the connection drops, the process is still running on the remote system. The obvious downside is, you can’t interact with the session after it is detached.</p>
+
+<h5 id="example-running-commands-on-multiple-machines">Example: Running commands on multiple machines</h5>
+<p>PsExec allows you to perform administrative tasks on multiple workstations but you can only interact with one at a time. Here is an example of getting a command shell on two different machines:
+<img src="../Images/2018-02-27 08_23_19-Administrator_ Command Prompt.png" alt="enter image description here" /></p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>PsExec.exe \\DESKTOP-132B1OL,192.168.164.130 cmd
+</code></pre>
+</div>
+
+<p>I can’t access the second machine until I exit the session with the first one. To speed that process up, using the <strong>-d</strong> to detach the session from the process will make it much faster.</p>
+
+<p><img src="../Images/2018-02-26 18_38_25-Administrator_ Command Prompt.png" alt="enter image description here" /></p>
+
+<p>When would you ever need to do this? Let’s say you want to collect artifacts from the two machines involved in an alert you received from your detection team. You could bust out your PsExec skills and do something like this:</p>
+
+<p><img src="../Images/2018-02-27 08_23_19-Administrator_ Command Prompt.png" alt="Advanced PsExec Copy" /></p>
+
+<p><strong>Breakdown:</strong></p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>#Bit of a cheat code to copy a file over before using it.
+\tools\PsExec.exe \\DESKTOP-132B1OL,RemoteMachine -d -f -c \Tools\RawCopy.exe
+</code></pre>
+</div>
+
+<p>What does this do? PsExec will copy \Tools\RawCopy.exe to the c:\Windows folder of DESKTOP-132B1OL and try to run it. Same with RemoteMachine. RawCopy needs all sorts of command line options so it will gracefully exit BUT the tool has be in place. Why didn’t i use the <strong>-c</strong> switch? I’ll show you:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>\tools\PsExec.exe \\DESKTOP-132B1OL,RemoteMachine -d cmd /c c:\Windows\RawCopy.exe /FileNamePath:C:0 /OutputPath:"\\vmware-host\Shared Folders\Evidence\" /OutputName:^%computername^%-$MFT
+</code></pre>
+</div>
+
+<p>On my evidence share, I am looking to have one file from each of these workstations. To make sure I can tell the two $MFTs apart, I used the environment variable %COMPUTERNAME% from the remote computer for file name passed to RawCopy.</p>
+
+<p>To access the remote environment variables, I needed to use cmd to launch RawCopy which means I couldn’t use the <strong>-c</strong> to copy it over in one foul swoop. By using the carets to escape the percent signs, like this <code class="highlighter-rouge">^%computername^%-$MFT</code>, you can pass the variable to the next command interpreter. If you don’t, your command prompt will interpret it and save all of the file names as YOUR computer name and overwrite each other. Took me a second to figure that out.</p>
+
+<p>If all this sounds convoluted, you’re paying attention. The point of this course highlight some more complicated methods of approaching the litany of challenges you will encounter during your DFIR day.</p>
+
+
+        
+
+    </div><!-- /.entry-wrapper -->
+    <nav class="pagination" role="navigation">
+      
+        <a href="http://jon.glass/adfirwmc/Ch0/" class="btn" title="ADFIRWMC - 0. Disclaimers">Previous</a>
+      
+      
+        <a href="http://jon.glass/adfirwmc/Ch2/" class="btn" title="ADFIRWMC - 2. Remote Acquisition of Windows Artifacts">Next</a>
+      
+    </nav><!-- /.pagination -->
+  </article>
+</div><!-- /#main -->
+
+<div class="footer-wrapper">
+  <footer role="contentinfo" class="entry-wrapper">
+    
+
+<span>&copy; 2018 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
+<div class="social-icons">
+	<a href="https://twitter.com/GlassDFIR" title="Jon Glass on Twitter" target="_blank"><i class="fa fa-twitter-square fa-2x"></i></a>
+	
+	
+	
+	
+	
+	
+	<a href="https://github.com/GlassDFIR" title="Jon Glass on Github" target="_blank"><i class="fa fa-github-square fa-2x"></i></a>
+	
+  
+	
+  <a href="http://jon.glass/feed.xml" title="Atom/RSS feed"><i class="fa fa-rss-square fa-2x"></i></a>
+</div><!-- /.social-icons -->
+
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+<script type="text/javascript">
+  var BASE_URL = 'http://jon.glass';
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="http://jon.glass/assets/js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script src="http://jon.glass/assets/js/scripts.min.js"></script>
+
+
+
+
+</body>
+</html>

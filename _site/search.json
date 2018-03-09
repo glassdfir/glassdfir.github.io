@@ -2,6 +2,30 @@
 
   
     {
+      "title"			: "ADFIRWMC - 2. Remote Acquisition of Windows Artifacts",
+      "link"			: "http://jon.glass/adfirwmc/Ch2/",
+      "excerpt"		: ""
+    }
+  
+
+  
+    ,{
+      "title"			: "ADFIRWMC - 1. Windows Remote Administration for Incident Responders",
+      "link"			: "http://jon.glass/adfirwmc/Ch1/",
+      "excerpt"		: ""
+    }
+  
+
+  
+    ,{
+      "title"			: "ADFIRWMC - 0. Disclaimers",
+      "link"			: "http://jon.glass/adfirwmc/Ch0/",
+      "excerpt"		: ""
+    }
+  
+
+  
+    ,{
       "title"			: "Find Windows Filetime objects in Binary Data",
       "link"			: "http://jon.glass/tips/LookForWindowsTimestamps/",
       "excerpt"		: ""
@@ -359,7 +383,7 @@
   
     ,{
       "title"			: "Advanced DFIR Wizard Master Class",
-      "link"			: "http://jon.glass/ADFIRWMC/Whole%20Course/",
+      "link"			: "http://jon.glass/adfirwmc/Whole%20Course/",
       "excerpt"		: ""
     }
   
@@ -371,6 +395,12 @@
   
 
   
+    ,{
+      "title"			: "Advanced DFIR Wizard Master Class",
+      "link"			: "http://jon.glass/adfirwmc/",
+      "excerpt"		: ""
+    }
+  
 
   
 
@@ -380,6 +410,8 @@
       "link"			: "http://jon.glass/theme-setup/",
       "excerpt"		: "Instructions on how to install and customize the Jekyll theme So Simple."
     }
+  
+
   
 
   

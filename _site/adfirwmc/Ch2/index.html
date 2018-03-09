@@ -1,0 +1,453 @@
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8" lang="en"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9" lang="en"><![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<title>ADFIRWMC - 2. Remote Acquisition of Windows Artifacts &#8211; Half Full of Security</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+
+
+<!-- Twitter Cards -->
+<meta name="twitter:title" content="ADFIRWMC - 2. Remote Acquisition of Windows Artifacts">
+<meta name="twitter:description" content="">
+<meta name="twitter:site" content="@GlassDFIR">
+<meta name="twitter:creator" content="@GlassDFIR">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://jon.glass/images/site-logo.png">
+
+<!-- Open Graph -->
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ADFIRWMC - 2. Remote Acquisition of Windows Artifacts">
+<meta property="og:description" content="">
+<meta property="og:url" content="http://jon.glass/adfirwmc/Ch2/">
+<meta property="og:site_name" content="Half Full of Security">
+
+
+
+
+
+<link rel="canonical" href="http://jon.glass/adfirwmc/Ch2/">
+<link href="http://jon.glass/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="http://jon.glass/assets/css/main.css">
+<!-- Webfonts -->
+<script src="https://use.edgefonts.net/source-sans-pro:n2,i2,n3,i3,n4,i4,n6,i6,n7,i7,n9,i9;source-code-pro:n4,n7;volkhov.js"></script>
+
+<meta http-equiv="cleartype" content="on">
+
+<!-- HTML5 Shiv and Media Query Support -->
+<!--[if lt IE 9]>
+  <script src="http://jon.glass/assets/js/vendor/html5shiv.min.js"></script>
+  <script src="http://jon.glass/assets/js/vendor/respond.min.js"></script>
+<![endif]-->
+
+<!-- Modernizr -->
+<script src="http://jon.glass/assets/js/vendor/modernizr-2.7.1.custom.min.js"></script>
+
+
+<!-- MathJax -->
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+<!-- Icons -->
+<!-- 16x16 -->
+<link rel="shortcut icon" href="http://jon.glass/favicon.ico">
+<!-- 32x32 -->
+<link rel="shortcut icon" href="http://jon.glass/favicon.png">
+<!-- 57x57 (precomposed) for iPhone 3GS, pre-2011 iPod Touch and older Android devices -->
+<link rel="apple-touch-icon-precomposed" href="http://jon.glass/images/apple-touch-icon-precomposed.png">
+<!-- 72x72 (precomposed) for 1st generation iPad, iPad 2 and iPad mini -->
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://jon.glass/images/apple-touch-icon-72x72-precomposed.png">
+<!-- 114x114 (precomposed) for iPhone 4, 4S, 5 and post-2011 iPod Touch -->
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://jon.glass/images/apple-touch-icon-114x114-precomposed.png">
+<!-- 144x144 (precomposed) for iPad 3rd and 4th generation -->
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://jon.glass/images/apple-touch-icon-144x144-precomposed.png">
+
+</head>
+
+<body id="post">
+
+<div class="navigation-wrapper">
+	<nav role="navigation" id="site-nav" class="animated drop">
+	    <ul>
+      
+		    
+		    <li><a href="http://jon.glass/blog/" >Blog</a></li>
+		  
+		    
+		    <li><a href="http://jon.glass/tips/" >Tips and Tricks</a></li>
+		  
+		    
+		    <li><a href="http://jon.glass/about/" >About</a></li>
+		  
+		    
+		    <li><a href="http://jon.glass/search/" >Search</a></li>
+		  
+	    </ul>
+	</nav>
+</div><!-- /.navigation-wrapper -->
+
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+
+<header class="masthead">
+	<div class="wrap">
+      
+  		<a href="http://jon.glass/" class="site-logo" rel="home" title="Half Full of Security"><img src="http://jon.glass/images/site-logo.png" width="200" height="200" alt="Half Full of Security logo" class="animated fadeInDown"></a>
+      
+      <h1 class="site-title animated fadeIn"><a href="http://jon.glass/">Half Full of Security</a></h1>
+		<h2 class="site-description animated fadeIn" itemprop="description">Sharpening the ACKs since 2013</h2>
+	</div>
+</header><!-- /.masthead -->
+
+<div class="js-menu-screen menu-screen"></div>
+
+
+<div id="main" role="main">
+  <article class="hentry">
+    
+    <div class="entry-wrapper">
+      <header class="entry-header">
+        <ul class="entry-tags">
+          
+        </ul>
+        
+          <h1 class="entry-title">ADFIRWMC - 2. Remote Acquisition of Windows Artifacts</h1>
+        
+      </header>
+
+
+        <time datetime="2018-03-03T15:33:28-05:00"><i class="fa fa-calendar-o"></i> March 03, 2018</time>
+        <p>Some folks reading this are convinced that Incident Response is all done through Endpoint Detection and Response solutions and in 2018 no one drops collection scripts to gather artifacts for analysis. Those people are wrong.</p>
+
+<p>The first thing you should know is you will run into problems. Even when your collection tool is working perfectly; network connections drop, hard drives run out of room, antivirus and data loss prevention software will freak out… this is going to happen. Embrace it.</p>
+
+<p>This chapter is going to cover as many of the lessons learned as I can think of.</p>
+
+<h3 id="issues-with-tools-for-remote-file-acquisition">Issues with Tools for Remote File Acquisition</h3>
+
+<p>This can quickly get religious but I am not a fan of most commercial tools. Many do WAY too much stuff I don’t need or want for my OCD to handle. I am not going to bad mouth any particular vendor but there are a lot of solutions that just don’t work for my exact needs.</p>
+
+<p>Things I have found annoying about collection tools:</p>
+
+<ul>
+  <li>Some tools require special dongles which is often not practical with modern global enterprises.</li>
+  <li>Some use netcat like functionality to talk directly from your workstation to target which triggers NIDS and is blocked by NIPS.</li>
+  <li>Some won’t copy or even find some files on the target because they are locked by the OS or a third party tool like AV or DLP.</li>
+  <li>Some free tools get flagged by AV because they are not signed or what they are written in.</li>
+  <li>Some tools take too long and then produce too little.</li>
+  <li>Some tools are primarily geared for Law Enforcement and don’t cater to the enterprise teams that will probably never testify in court.</li>
+  <li>Most are WAY overpriced for what they offer.</li>
+</ul>
+
+<p>Enough of my complaining. After a little science, I will explain two completely free tools you can use to carve Windows artifacts.</p>
+
+<h4 id="the-underlying-mechanics-of-copying-locked-files-on-windows">The Underlying Mechanics of Copying Locked Files on Windows</h4>
+
+<p>Before we discuss tools and examples, an understanding of the mechanics of the NTFS filesystem is helpful to ensure you can adapt and overcome when various things get in between you and your artifacts. Here is a piece of DFIRfu using completely native windows commands. Admittedly, this is more DF than IR and I know it is a lot of hexadecimal but stick with me…
+<img src="../Images/$MFTdataruns.png" alt="MFT Data Runs" /></p>
+
+<p><strong>Breakdown</strong></p>
+
+<ul>
+  <li><code class="highlighter-rouge">fsutil.exe fsinfo ntfsInfo c:</code>
+    <ul>
+      <li>This command shows us a bunch of useful information for how data is stored on this Volume but all we need for now is the Bytes per Cluster: 4096.</li>
+      <li>We could have used something like this:
+  <code class="highlighter-rouge">wmic volume where (name="c:\\") get blocksize</code></li>
+      <li>This tells us that the file system allocates space to files in chunks of 4096 bytes. Even if the file is smaller, it gets the whole 4K to itself.</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">fsutil.exe file queryextents c:\$MFT</code>
+    <ul>
+      <li>This command shows use the clusters allocated to the $MFT. I pick on the $MFT a lot in my examples for two reasons : it contains almost all of the file system information on the system and it is not directly accessible through the operating system.</li>
+      <li>This command outputs three columns of information:
+        <ul>
+          <li><strong>VCN</strong>: Virtual Cluster Numbers are used to sequence chunks of allocated data kinda like numbered puzzle pieces.</li>
+          <li><strong>Clusters</strong>: This is the number of contiguous Clusters allocated per Data Run.</li>
+          <li><strong>LCN</strong>: Logical Cluster Numbers are basically used as addresses. This run of contiguous data begins at X number of clusters from the beginning of the volume.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">echo Size of $MFT in Bytes: &amp;&amp; set /a (0xC820 + 0x4720) * 4096</code>
+    <ul>
+      <li>This is just an example of how to do math on the Windows command line.</li>
+      <li><code class="highlighter-rouge">set /a</code> can be used for sorts of fun stuff like converting hex to decimal and arithmetic.</li>
+      <li>Here I am adding the number of clusters from the first data run and second data run to determine the total number of clusters allocated to the $MFT. Since we know the clusters are 4096 bytes large, we multiple to determine the number of bytes allocated to the $MFT.</li>
+    </ul>
+  </li>
+  <li><code class="highlighter-rouge">dir "\\vmware-host\Shared Folders\Evidence"</code>
+    <ul>
+      <li>Here I am just showing you that the $MFT we collected from the previous examples using RawCopy is in fact the same size as the crazy math we just did.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Here is another way to look at that information:
+<img src="../Images/$MFTallocatedspace.png" alt="enter image description here" />
+That $MFT only has two but it is common for larger files to have many data runs:
+<img src="../Images/webcachedataruns.png" alt="enter image description here" />
+This WebCacheV01.dat file has 25 runs spread out all over the volume.</p>
+
+<p><strong>The Point</strong></p>
+
+<p>To access locked files on a live Windows system, your acquisition tool needs to:</p>
+
+<ol>
+  <li>Determine what physical clusters have been allocated for that file. This is stored in terms of LCN and number of clusters <em>(inside the $MFT as it just so happens, but we will cover that later)</em>.</li>
+  <li>Open the Volume for direct read access.</li>
+  <li>Seek to the offset of the LCN on disk and read the numbers of clusters specified. Repeat as needed for all Data Runs.</li>
+  <li>Write the collected information to an output file in the sequence specified by the VCNs.</li>
+</ol>
+
+<p>Piece of cake right? Well the first 3 steps can trip up tools for one reason or another.</p>
+
+<h3 id="building-a-toolkit-for-live-file-collection">Building a Toolkit for Live File Collection:</h3>
+
+<p>I wish I could point you to a single perfect free tool that does exactly what you need but sadly, I can’t recommend one that checks all the blocks. So, since this is a course designed to expand your knowledge and experience, let’s just build one from scratch(ish)!</p>
+
+<p>Lets display a variety of PowerShell fucntionality by using fcat from SleuthKit to make a collection script:</p>
+
+<div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="c1">#1. Timestamps are a great way to make unique folder names with context.</span>
+<span class="nv">$timestamp</span> <span class="o">=</span> <span class="o">(</span><span class="nb">get-date</span><span class="o">)</span>.ToString<span class="o">(</span><span class="s1">'yyyy-MM-dd-h-m-s'</span><span class="o">)</span>
+
+<span class="c1">#2. Array of Files to Collect</span>
+<span class="nv">$files_to_collect</span> <span class="o">=</span> @<span class="o">()</span>
+
+<span class="c1">#3. NTFS Files</span>
+<span class="nv">$files_to_collect</span> +<span class="o">=</span> <span class="s1">'c:\$MFT'</span>
+<span class="nv">$files_to_collect</span> +<span class="o">=</span> <span class="s1">'c:\$LogFile'</span>
+<span class="nv">$files_to_collect</span> +<span class="o">=</span> <span class="s1">'c:\$Extend\$USNJrnl:$J'</span>
+
+<span class="c1">#4. Array for Regex Signatures for Files of Interest</span>
+<span class="nv">$filesigs</span> <span class="o">=</span> @<span class="o">()</span>
+
+<span class="c1">#User Registry Files</span>
+<span class="nv">$filesigs</span> +<span class="o">=</span> <span class="s1">'^c:\\Users\\.*\\ntuser.dat$'</span>
+<span class="nv">$filesigs</span> +<span class="o">=</span> <span class="s1">'^c:\\Users\\.*\\usrclass.dat$'</span>
+
+<span class="c1">#System Registry Files</span>
+<span class="nv">$filesigs</span> +<span class="o">=</span> <span class="s1">'^c:\\Windows\\System32\\config\\.*'</span>
+
+<span class="c1">#Event Logs</span>
+<span class="nv">$filesigs</span> +<span class="o">=</span> <span class="s1">'^c:\\Windows\\System32\\winevt\\Logs\\.*.evtx$'</span>
+
+<span class="nv">$files_to_collect</span> +<span class="o">=</span> <span class="nb">gci</span> -Path C:<span class="se">\U</span>sers,C:<span class="se">\W</span>indows -Recurse -Force -File -ErrorAction SilentlyContinue | 
+                     <span class="nb">Where-Object</span> <span class="o">{</span> <span class="nv">$_</span>.FullName -imatch <span class="k">$(</span><span class="nv">$filesigs</span> -join <span class="s2">"|"</span><span class="k">)</span> <span class="o">}</span>| % <span class="o">{</span> <span class="nv">$_</span>.FullName <span class="o">}</span>
+
+<span class="c1">#5. Collect Files of Interest</span>
+<span class="k">foreach</span><span class="o">(</span><span class="nv">$file</span> <span class="k">in</span> <span class="nv">$files_to_collect</span><span class="o">){</span>
+    <span class="c1">#6. Bastardized Multiprocessing. Counts the number of fcats running and sleep if it is more than 10.</span>
+    <span class="k">while</span><span class="o">(</span>@<span class="o">(</span><span class="nb">Get-Process </span>fcat -ErrorAction SilentlyContinue<span class="o">)</span>.Count -ge 10<span class="o">){</span><span class="nb">Start-Sleep</span> -Seconds 5<span class="o">}</span>
+
+    <span class="c1">#7. Manipulating the path to get what we need</span>
+    <span class="nv">$unixname</span> <span class="o">=</span> <span class="nv">$file</span> -replace <span class="s2">"c:"</span>,<span class="s2">""</span> -replace <span class="s2">"</span><span class="se">\\</span><span class="s2">"</span>,<span class="s2">"/"</span>
+    <span class="nv">$outfile</span> <span class="o">=</span> <span class="k">$(</span><span class="s1">'{0}\\{1}'</span> -f <span class="nv">$timestamp</span>,<span class="nv">$file</span> -replace <span class="s1">':'</span>,<span class="s1">''</span><span class="k">)</span>
+    <span class="nv">$outdir</span>  <span class="o">=</span> <span class="nv">$outfile</span>.Substring<span class="o">(</span>0,<span class="nv">$outfile</span>.LastIndexOf<span class="o">(</span><span class="s2">"</span><span class="se">\"</span><span class="s2">))
+    
+    #8. Building the command string
+    </span><span class="nv">$cmdstr</span><span class="s2"> = ""
+    </span><span class="nv">$cmdstr</span><span class="s2"> += "</span>/c mkdir <span class="k">$(</span><span class="s1">'{0}{1}{0}'</span> -f <span class="o">[</span><span class="kt">char</span><span class="o">]</span>34, <span class="nv">$outdir</span><span class="k">)</span> &amp; <span class="s2">"
+    </span><span class="nv">$cmdstr</span><span class="s2"> += "</span><span class="k">$(</span><span class="s1">'{0}\\{1}'</span> -f <span class="nv">$pwd</span>,<span class="s2">"fcat.exe"</span><span class="k">)</span> -h -f ntfs <span class="k">$(</span><span class="s1">'{0}{1}{0}'</span> -f <span class="o">[</span><span class="kt">char</span><span class="o">]</span>34, <span class="nv">$unixname</span><span class="k">)</span> <span class="se">\\</span>.<span class="se">\c</span>:  &gt; <span class="s2">"
+    </span><span class="nv">$cmdstr</span><span class="s2"> += "</span><span class="k">$(</span><span class="s1">'{0}{1}{0}'</span> -f <span class="o">[</span><span class="kt">char</span><span class="o">]</span>34, <span class="nv">$outfile</span><span class="k">)</span> <span class="s2">"
+    
+    #Run
+    Start-Process cmd.exe -ArgumentList </span><span class="nv">$cmdstr</span><span class="s2"> -WindowStyle Hidden
+    Start-Sleep -Seconds 5
+
+}
+
+#9. Wait until all of the fcats are done
+while(@(Get-Process fcat  -ErrorAction SilentlyContinue).Count){
+    write-host "</span>Collectors are still running...<span class="s2">"
+    Start-Sleep -Seconds 30
+}
+write-host "</span>Zipping...<span class="s2">"
+#10. Zip it real good.
+Add-Type -assembly "</span>system.io.compression.filesystem<span class="s2">"
+[io.compression.zipfile]::CreateFromDirectory(</span><span class="k">$(</span><span class="s1">'{0}\\{1}'</span> -f <span class="nv">$pwd</span>,<span class="nv">$timestamp</span><span class="k">)</span><span class="s2">, </span><span class="k">$(</span><span class="s1">'{0}\\{1}.zip'</span> -f <span class="nv">$pwd</span>,<span class="nv">$timestamp</span><span class="k">)</span><span class="s2">)
+write-host "</span>Done<span class="s2">"
+</span></code></pre>
+</div>
+
+<p>This is the platform we will add use and augment throughout the rest of the course. It’s free and it works. Strap in because the breakdown on this is going to be brutal.</p>
+
+<p><strong>Breakdown</strong></p>
+<ul>
+  <li>
+    <div class="language-posh highlighter-rouge"><pre class="highlight"><code><span class="nv">$timestamp</span> <span class="o">=</span> <span class="o">(</span><span class="nb">get-date</span><span class="o">)</span>.ToString<span class="o">(</span><span class="s1">'yyyy-MM-dd-h-m-s'</span><span class="o">)</span>
+</code></pre>
+    </div>
+    <ul>
+      <li>This creates a string of the current time in Year-Month-Day-Hour-Minute-Second format. i.e. “2018-03-08-5-2-12”</li>
+      <li>This is helpful for creating unique folder names that are organized and easy to sort</li>
+    </ul>
+  </li>
+  <li>
+    <div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="nv">$files_to_collect</span> <span class="o">=</span> @<span class="o">()</span>
+</code></pre>
+    </div>
+    <ul>
+      <li><a href="https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_arrays?view=powershell-6">Ref: Arrays in PowerShell</a></li>
+    </ul>
+  </li>
+  <li>
+    <div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="nv">$files_to_collect</span> +<span class="o">=</span> <span class="s1">'c:\$MFT'</span>
+</code></pre>
+    </div>
+    <ul>
+      <li>Some files are a part of the filesystem but not direct accessible via a directory listing so we add their paths manually to $files_to_collect array</li>
+    </ul>
+  </li>
+  <li>
+    <div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="nv">$filesigs</span> <span class="o">=</span> @<span class="o">()</span>
+</code></pre>
+    </div>
+    <ul>
+      <li>This is going to be an array of Regular Expressions “RegEx” that we use to find files of interest on the target system.</li>
+    </ul>
+  </li>
+  <li>
+    <div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="nv">$filesigs</span> +<span class="o">=</span> <span class="s1">'^c:\\Users\\.*\\ntuser.dat$'</span>
+</code></pre>
+    </div>
+    <ul>
+      <li>This RegEx allows us to collect registry files from all of the profiles on a system without having to explictedly know the path for each</li>
+      <li>We are using double back slashes to “escape” the single blackslash. If we didn’t, it would be interpreted as a RegEx operator.</li>
+    </ul>
+  </li>
+  <li>
+    <div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="nv">$files_to_collect</span> +<span class="o">=</span> <span class="nb">gci</span> -Path C:<span class="se">\\</span>Users,C:<span class="se">\\</span>Windows -Recurse -Force -File -ErrorAction SilentlyContinue | <span class="nb">Where-Object</span> <span class="o">{</span> <span class="nv">$_</span>.FullName -imatch <span class="k">$(</span><span class="nv">$filesigs</span> -join <span class="s2">"|"</span><span class="k">)</span> <span class="o">}</span>| % <span class="o">{</span> <span class="nv">$_</span>.FullName <span class="o">}</span> 
+</code></pre>
+    </div>
+    <ul>
+      <li>Here we are using the gci alias for the PowerShell command Get-ChildItem which is a fancy command that can enumerate through a directory listing among other things.</li>
+      <li>We specify 2 directories for the <strong>-Path</strong> argument to define the scope of our search.</li>
+      <li><strong>-Recurse</strong> continues the seach throughout all of the subdirectories.</li>
+      <li><strong>-Force</strong> adds hidden files to the search and levitates rocks.</li>
+      <li><strong>-File</strong> is used to exclude directories from my results. This is actually important to the mechanincs of the rest of the script.</li>
+      <li>I specified SilentlyContinue for <strong>-ErrorAction</strong> because as it tries to get directory for every file in the C:\Windows folder, there are Access Denied Errors on files I didn’t ask for and I don’t want to see them.</li>
+      <li>We redirect the output of the gci command into the Where-Object to filter our results to compare the <strong>FullName</strong> of the file to our array of RegEx $filesigs. $filesigs is an array of strings until use <strong>-Join</strong> to merge each signature together with a pipe which acts as an OR statement in RegEx. “Signature 1 OR Signature 2 OR …”</li>
+      <li>Finally, we redirect THAT output and grab the Fullname of the file that matches one of our signatures and add it to the $files_to_collect array.</li>
+    </ul>
+  </li>
+  <li>
+    <div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="k">foreach</span><span class="o">(</span><span class="nv">$file</span> <span class="k">in</span> <span class="nv">$files_to_collect</span><span class="o">){</span>
+</code></pre>
+    </div>
+    <ul>
+      <li>This is a For loop in PowerShell. We take the array and iterate across each element until we run out.</li>
+    </ul>
+  </li>
+  <li>
+    <div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="k">while</span><span class="o">(</span>@<span class="o">(</span><span class="nb">Get-Process </span>fcat -ErrorAction SilentlyContinue<span class="o">)</span>.Count -ge 10<span class="o">){</span><span class="nb">Start-Sleep</span> -Seconds 5<span class="o">}</span>
+</code></pre>
+    </div>
+    <ul>
+      <li>This is a While loop in PowerShell. This statement will keep going until the condition is not True. This statement is counting the number of processes containing “fcat” and if it is greater than or equal to 10; it will sleep for 5 seconds and check again. This is being used to keep the number of fcat collectors to a reasonable amount. Is this a perfect solution? No. This is more “Tactical” Multiprocessing, meaning I want more than one instance running at a time but I don’t care enough to code true multiprocessing into the script. High yield, low drag. The process count and sleep timer can be adjusted to the desired amount of noise you want the target systems fan to make.</li>
+    </ul>
+  </li>
+  <li>
+    <div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="nv">$unixname</span> <span class="o">=</span> <span class="nv">$file</span> -replace <span class="s2">"c:"</span>,<span class="s2">""</span> -replace <span class="s2">"</span><span class="se">\\</span><span class="s2">"</span>,<span class="s2">"/"</span>
+</code></pre>
+    </div>
+    <ul>
+      <li>So this is a bit kludgy but fcat works with unix file paths so instead of C:\$MFT, we need to feed it /$MFT.</li>
+    </ul>
+  </li>
+  <li>
+    <div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="nv">$outfile</span> <span class="o">=</span> <span class="k">$(</span><span class="s1">'{0}\\{1}'</span> -f <span class="nv">$timestamp</span>,<span class="nv">$file</span> -replace <span class="s1">':'</span>,<span class="s1">''</span><span class="k">)</span>
+</code></pre>
+    </div>
+    <ul>
+      <li>fcat literally just prints a files contents to screen and has no other frills like saving the file to another location so it makes us do a little work.</li>
+      <li>This line of code is responsible for creating the folder structure in the collection folder that represents where the file came from on the target.</li>
+      <li><code class="highlighter-rouge">C:\Users\Username\ntuser.dat</code> gets saved to <code class="highlighter-rouge">2018-03-08-5-2-12\c\Users\Username\ntuser.dat</code></li>
+    </ul>
+  </li>
+  <li>
+    <div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="nv">$outdir</span>  <span class="o">=</span> <span class="nv">$outfile</span>.Substring<span class="o">(</span>0,<span class="nv">$outfile</span>.LastIndexOf<span class="o">(</span><span class="s2">"</span><span class="se">\"</span><span class="s2">))
+</span></code></pre>
+    </div>
+    <ul>
+      <li>In order to store the ntuser.dat file in the <code class="highlighter-rouge">2018-03-08-5-2-12\c\Users\Username</code> folder, we need to create it.</li>
+      <li>This line takes a substring of the $outfile path from index 0 (the begining) to the index of the last backslash argo the parent folder of the file.</li>
+      <li>Are there other commands to get the parent folder of a file? Yes, but they don’t work on files the OS can’t see like c:\$Extend\$USNJrnl:$J and I imagine this is faster anyways.</li>
+    </ul>
+  </li>
+  <li>Building the command string is wonky looking but there are reasons
+    <ul>
+      <li>Example:
+        <div class="highlighter-rouge"><pre class="highlight"><code>mkdir "2018-03-08-5-2-12\c\Users\Username\" &amp; fcat.exe -h -f NTFS "/Users/Username/ntuser.dat" \\.\c: &gt; "2018-03-08-5-2-12\c\Users\Username\ntuser.dat"
+</code></pre>
+        </div>
+      </li>
+      <li>This is pretty simple but gets complicated because all the paths need to be encapsulated with quotes because some paths might have spaces in them.</li>
+      <li><code class="highlighter-rouge">$('{0}{1}{0}' -f [char]34, $outdir)</code> is an example of creating a string from other variables. I am using [char]34 because it is the cleanest method of concatenating quotes I have found. The backtick method didn’t survive accoss the cmd interpreter. This method puts a “ before and after the $outdir.</li>
+      <li>Fun fact: mkdir will make recursive folders if you ask it.</li>
+      <li>For fcat, I used -h to knock down the size of the sparse files we collect. I will cover that later. -f specifies the NTFS file system.</li>
+      <li>We are using the &gt; to redirect the output of fcat into a file.</li>
+    </ul>
+  </li>
+</ul>
+
+
+        
+
+    </div><!-- /.entry-wrapper -->
+    <nav class="pagination" role="navigation">
+      
+        <a href="http://jon.glass/adfirwmc/Ch1/" class="btn" title="ADFIRWMC - 1. Windows Remote Administration for Incident Responders">Previous</a>
+      
+      
+    </nav><!-- /.pagination -->
+  </article>
+</div><!-- /#main -->
+
+<div class="footer-wrapper">
+  <footer role="contentinfo" class="entry-wrapper">
+    
+
+<span>&copy; 2018 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
+<div class="social-icons">
+	<a href="https://twitter.com/GlassDFIR" title="Jon Glass on Twitter" target="_blank"><i class="fa fa-twitter-square fa-2x"></i></a>
+	
+	
+	
+	
+	
+	
+	<a href="https://github.com/GlassDFIR" title="Jon Glass on Github" target="_blank"><i class="fa fa-github-square fa-2x"></i></a>
+	
+  
+	
+  <a href="http://jon.glass/feed.xml" title="Atom/RSS feed"><i class="fa fa-rss-square fa-2x"></i></a>
+</div><!-- /.social-icons -->
+
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+<script type="text/javascript">
+  var BASE_URL = 'http://jon.glass';
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="http://jon.glass/assets/js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script src="http://jon.glass/assets/js/scripts.min.js"></script>
+
+
+
+
+</body>
+</html>

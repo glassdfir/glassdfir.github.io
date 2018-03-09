@@ -24,14 +24,14 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="Advanced DFIR Wizard Master Class">
 
-<meta property="og:url" content="http://jon.glass/ADFIRWMC/Whole%20Course/">
+<meta property="og:url" content="http://jon.glass/adfirwmc/Whole%20Course/">
 <meta property="og:site_name" content="Half Full of Security">
 
 
 
 
 
-<link rel="canonical" href="http://jon.glass/ADFIRWMC/Whole%20Course/">
+<link rel="canonical" href="http://jon.glass/adfirwmc/Whole%20Course/">
 <link href="http://jon.glass/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
 
 <!-- https://t.co/dKP3o1e -->
@@ -689,10 +689,10 @@ This WebCacheV01.dat file has 25 runs spread out all over the volume.</p>
 
 <p>I wish I could point you to a single perfect free tool that does exactly what you need but sadly, I can’t recommend one that checks all the blocks. So, since this is a course designed to expand your knowledge and experience, let’s just build one from scratch(ish)!</p>
 
-<p>Lets make a basic collection script with PowerShell and fcat from SleuthKit:</p>
+<p>Lets display a variety of PowerShell fucntionality by using fcat from SleuthKit to make a collection script:</p>
 
-<figure class="highlight"><pre><code class="language-powershell" data-lang="powershell"><span class="c1">#1. Timestamps are a great way to make unique folder names with context.</span>
-<span class="nv">$timestamp</span> <span class="o">=</span> <span class="o">(</span><span class="nb">get-date</span><span class="o">)</span>.ToString<span class="o">(</span><span class="s1">'y-M-d-h-m-s'</span><span class="o">)</span>
+<div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="c1">#1. Timestamps are a great way to make unique folder names with context.</span>
+<span class="nv">$timestamp</span> <span class="o">=</span> <span class="o">(</span><span class="nb">get-date</span><span class="o">)</span>.ToString<span class="o">(</span><span class="s1">'yyyy-MM-dd-h-m-s'</span><span class="o">)</span>
 
 <span class="c1">#2. Array of Files to Collect</span>
 <span class="nv">$files_to_collect</span> <span class="o">=</span> @<span class="o">()</span>
@@ -721,20 +721,19 @@ This WebCacheV01.dat file has 25 runs spread out all over the volume.</p>
 <span class="c1">#5. Collect Files of Interest</span>
 <span class="k">foreach</span><span class="o">(</span><span class="nv">$file</span> <span class="k">in</span> <span class="nv">$files_to_collect</span><span class="o">){</span>
     <span class="c1">#6. Bastardized Multiprocessing. Counts the number of fcats running and sleep if it is more than 10.</span>
-    <span class="k">while</span><span class="o">(</span>@<span class="o">(</span><span class="nb">Get-Process </span>fcat -ErrorAction SilentlyContinue<span class="o">)</span>.Count -ge 10<span class="o">){</span>
-        <span class="nb">Start-Sleep</span> -Seconds 5
-    <span class="o">}</span>
+    <span class="k">while</span><span class="o">(</span>@<span class="o">(</span><span class="nb">Get-Process </span>fcat -ErrorAction SilentlyContinue<span class="o">)</span>.Count -ge 10<span class="o">){</span><span class="nb">Start-Sleep</span> -Seconds 5<span class="o">}</span>
+
     <span class="c1">#7. Manipulating the path to get what we need</span>
     <span class="nv">$unixname</span> <span class="o">=</span> <span class="nv">$file</span> -replace <span class="s2">"c:"</span>,<span class="s2">""</span> -replace <span class="s2">"</span><span class="se">\\</span><span class="s2">"</span>,<span class="s2">"/"</span>
-    <span class="nv">$dirlocation</span> <span class="o">=</span> <span class="nv">$file</span>.Substring<span class="o">(</span>0,<span class="nv">$file</span>.LastIndexOf<span class="o">(</span><span class="s2">"</span><span class="se">\"</span><span class="s2">)) -replace "</span>:<span class="s2">",""
-    </span><span class="nv">$outdir</span><span class="s2">  = </span><span class="k">$(</span><span class="s1">'{0}{1}{2}'</span> -f <span class="nv">$timestamp</span>,<span class="s1">'\'</span>,<span class="nv">$dirlocation</span><span class="k">)</span><span class="s2">
-    </span><span class="nv">$outfile</span><span class="s2"> = </span><span class="k">$(</span><span class="s1">'{0}{1}{2}'</span> -f <span class="nv">$timestamp</span>,<span class="s1">'\'</span>,<span class="nv">$file</span> -replace <span class="s1">':'</span>,<span class="s1">''</span><span class="k">)</span><span class="s2">
+    <span class="nv">$outfile</span> <span class="o">=</span> <span class="k">$(</span><span class="s1">'{0}\\{1}'</span> -f <span class="nv">$timestamp</span>,<span class="nv">$file</span> -replace <span class="s1">':'</span>,<span class="s1">''</span><span class="k">)</span>
+    <span class="nv">$outdir</span>  <span class="o">=</span> <span class="nv">$outfile</span>.Substring<span class="o">(</span>0,<span class="nv">$outfile</span>.LastIndexOf<span class="o">(</span><span class="s2">"</span><span class="se">\"</span><span class="s2">))
     
     #8. Building the command string
     </span><span class="nv">$cmdstr</span><span class="s2"> = ""
     </span><span class="nv">$cmdstr</span><span class="s2"> += "</span>/c mkdir <span class="k">$(</span><span class="s1">'{0}{1}{0}'</span> -f <span class="o">[</span><span class="kt">char</span><span class="o">]</span>34, <span class="nv">$outdir</span><span class="k">)</span> &amp; <span class="s2">"
-    </span><span class="nv">$cmdstr</span><span class="s2"> += "</span><span class="k">$(</span><span class="s1">'{0}\\{1}'</span> -f <span class="nv">$pwd</span>,<span class="s2">"fcat.exe"</span><span class="k">)</span> -h -f ntfs <span class="k">$(</span><span class="s1">'{0}{1}{0}'</span> -f <span class="o">[</span><span class="kt">char</span><span class="o">]</span>34, <span class="nv">$unixname</span><span class="k">)</span> <span class="se">\\</span>.<span class="se">\c</span>: <span class="s2">"
-    </span><span class="nv">$cmdstr</span><span class="s2"> += "</span> &gt; <span class="k">$(</span><span class="s1">'{0}{1}{0}'</span> -f <span class="o">[</span><span class="kt">char</span><span class="o">]</span>34, <span class="nv">$outfile</span><span class="k">)</span> <span class="s2">"
+    </span><span class="nv">$cmdstr</span><span class="s2"> += "</span><span class="k">$(</span><span class="s1">'{0}\\{1}'</span> -f <span class="nv">$pwd</span>,<span class="s2">"fcat.exe"</span><span class="k">)</span> -h -f ntfs <span class="k">$(</span><span class="s1">'{0}{1}{0}'</span> -f <span class="o">[</span><span class="kt">char</span><span class="o">]</span>34, <span class="nv">$unixname</span><span class="k">)</span> <span class="se">\\</span>.<span class="se">\c</span>:  &gt; <span class="s2">"
+    </span><span class="nv">$cmdstr</span><span class="s2"> += "</span><span class="k">$(</span><span class="s1">'{0}{1}{0}'</span> -f <span class="o">[</span><span class="kt">char</span><span class="o">]</span>34, <span class="nv">$outfile</span><span class="k">)</span> <span class="s2">"
+    
     #Run
     Start-Process cmd.exe -ArgumentList </span><span class="nv">$cmdstr</span><span class="s2"> -WindowStyle Hidden
     Start-Sleep -Seconds 5
@@ -750,40 +749,60 @@ write-host "</span>Zipping...<span class="s2">"
 #10. Zip it real good.
 Add-Type -assembly "</span>system.io.compression.filesystem<span class="s2">"
 [io.compression.zipfile]::CreateFromDirectory(</span><span class="k">$(</span><span class="s1">'{0}\\{1}'</span> -f <span class="nv">$pwd</span>,<span class="nv">$timestamp</span><span class="k">)</span><span class="s2">, </span><span class="k">$(</span><span class="s1">'{0}\\{1}.zip'</span> -f <span class="nv">$pwd</span>,<span class="nv">$timestamp</span><span class="k">)</span><span class="s2">)
-write-host "</span>Done<span class="s2">"</span></code></pre></figure>
+write-host "</span>Done<span class="s2">"
+</span></code></pre>
+</div>
 
 <p>This is the platform we will add use and augment throughout the rest of the course. It’s free and it works. Strap in because the breakdown on this is going to be brutal.</p>
 
 <p><strong>Breakdown</strong></p>
 <ul>
-  <li><code class="highlighter-rouge">$timestamp = (get-date).ToString('y-M-d-h-m-s')</code>
+  <li>
+    <div class="language-posh highlighter-rouge"><pre class="highlight"><code><span class="nv">$timestamp</span> <span class="o">=</span> <span class="o">(</span><span class="nb">get-date</span><span class="o">)</span>.ToString<span class="o">(</span><span class="s1">'yyyy-MM-dd-h-m-s'</span><span class="o">)</span>
+</code></pre>
+    </div>
     <ul>
-      <li>This creates a string of the current time in Year-Month-Day-Hour-Minute-Second format</li>
+      <li>This creates a string of the current time in Year-Month-Day-Hour-Minute-Second format. i.e. “2018-03-08-5-2-12”</li>
       <li>This is helpful for creating unique folder names that are organized and easy to sort</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">$files_to_collect = @()</code>
+  <li>
+    <div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="nv">$files_to_collect</span> <span class="o">=</span> @<span class="o">()</span>
+</code></pre>
+    </div>
     <ul>
       <li><a href="https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_arrays?view=powershell-6">Ref: Arrays in PowerShell</a></li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">$files_to_collect += 'c:\$MFT'</code>
+  <li>
+    <div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="nv">$files_to_collect</span> +<span class="o">=</span> <span class="s1">'c:\$MFT'</span>
+</code></pre>
+    </div>
     <ul>
       <li>Some files are a part of the filesystem but not direct accessible via a directory listing so we add their paths manually to $files_to_collect array</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">$filesigs = @()</code>
+  <li>
+    <div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="nv">$filesigs</span> <span class="o">=</span> @<span class="o">()</span>
+</code></pre>
+    </div>
     <ul>
       <li>This is going to be an array of Regular Expressions “RegEx” that we use to find files of interest on the target system.</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">$filesigs += '^c:\\Users\\.*\\ntuser.dat$'</code>
+  <li>
+    <div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="nv">$filesigs</span> +<span class="o">=</span> <span class="s1">'^c:\\Users\\.*\\ntuser.dat$'</span>
+</code></pre>
+    </div>
     <ul>
       <li>This RegEx allows us to collect registry files from all of the profiles on a system without having to explictedly know the path for each</li>
       <li>We are using double back slashes to “escape” the single blackslash. If we didn’t, it would be interpreted as a RegEx operator.</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">$files_to_collect += gci -Path C:\Users,C:\Windows -Recurse -Force -File -ErrorAction SilentlyContinue | Where-Object { $_.FullName -imatch $($filesigs -join "|") }| % { $_.FullName }</code>
+  <li>
+    <div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="nv">$files_to_collect</span> +<span class="o">=</span> <span class="nb">gci</span> -Path C:<span class="se">\\</span>Users,C:<span class="se">\\</span>Windows -Recurse -Force -File -ErrorAction SilentlyContinue | <span class="nb">Where-Object</span> <span class="o">{</span> <span class="nv">$_</span>.FullName -imatch <span class="k">$(</span><span class="nv">$filesigs</span> -join <span class="s2">"|"</span><span class="k">)</span> <span class="o">}</span>| % <span class="o">{</span> <span class="nv">$_</span>.FullName <span class="o">}</span> 
+</code></pre>
+    </div>
     <ul>
       <li>Here we are using the gci alias for the PowerShell command Get-ChildItem which is a fancy command that can enumerate through a directory listing among other things.</li>
       <li>We specify 2 directories for the <strong>-Path</strong> argument to define the scope of our search.</li>
@@ -795,17 +814,66 @@ write-host "</span>Done<span class="s2">"</span></code></pre></figure>
       <li>Finally, we redirect THAT output and grab the Fullname of the file that matches one of our signatures and add it to the $files_to_collect array.</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">foreach($file in $files_to_collect){</code>
+  <li>
+    <div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="k">foreach</span><span class="o">(</span><span class="nv">$file</span> <span class="k">in</span> <span class="nv">$files_to_collect</span><span class="o">){</span>
+</code></pre>
+    </div>
     <ul>
       <li>This is a For loop in PowerShell. We take the array and iterate across each element until we run out.</li>
     </ul>
   </li>
-  <li><code class="highlighter-rouge">while(@(Get-Process fcat -ErrorAction SilentlyContinue).Count -ge 10){Start-Sleep -Seconds 5}</code>
+  <li>
+    <div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="k">while</span><span class="o">(</span>@<span class="o">(</span><span class="nb">Get-Process </span>fcat -ErrorAction SilentlyContinue<span class="o">)</span>.Count -ge 10<span class="o">){</span><span class="nb">Start-Sleep</span> -Seconds 5<span class="o">}</span>
+</code></pre>
+    </div>
     <ul>
       <li>This is a While loop in PowerShell. This statement will keep going until the condition is not True. This statement is counting the number of processes containing “fcat” and if it is greater than or equal to 10; it will sleep for 5 seconds and check again. This is being used to keep the number of fcat collectors to a reasonable amount. Is this a perfect solution? No. This is more “Tactical” Multiprocessing, meaning I want more than one instance running at a time but I don’t care enough to code true multiprocessing into the script. High yield, low drag. The process count and sleep timer can be adjusted to the desired amount of noise you want the target systems fan to make.</li>
     </ul>
   </li>
+  <li>
+    <div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="nv">$unixname</span> <span class="o">=</span> <span class="nv">$file</span> -replace <span class="s2">"c:"</span>,<span class="s2">""</span> -replace <span class="s2">"</span><span class="se">\\</span><span class="s2">"</span>,<span class="s2">"/"</span>
+</code></pre>
+    </div>
+    <ul>
+      <li>So this is a bit kludgy but fcat works with unix file paths so instead of C:\$MFT, we need to feed it /$MFT.</li>
+    </ul>
+  </li>
+  <li>
+    <div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="nv">$outfile</span> <span class="o">=</span> <span class="k">$(</span><span class="s1">'{0}\\{1}'</span> -f <span class="nv">$timestamp</span>,<span class="nv">$file</span> -replace <span class="s1">':'</span>,<span class="s1">''</span><span class="k">)</span>
+</code></pre>
+    </div>
+    <ul>
+      <li>fcat literally just prints a files contents to screen and has no other frills like saving the file to another location so it makes us do a little work.</li>
+      <li>This line of code is responsible for creating the folder structure in the collection folder that represents where the file came from on the target.</li>
+      <li><code class="highlighter-rouge">C:\Users\Username\ntuser.dat</code> gets saved to <code class="highlighter-rouge">2018-03-08-5-2-12\c\Users\Username\ntuser.dat</code></li>
+    </ul>
+  </li>
+  <li>
+    <div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="nv">$outdir</span>  <span class="o">=</span> <span class="nv">$outfile</span>.Substring<span class="o">(</span>0,<span class="nv">$outfile</span>.LastIndexOf<span class="o">(</span><span class="s2">"</span><span class="se">\"</span><span class="s2">))
+</span></code></pre>
+    </div>
+    <ul>
+      <li>In order to store the ntuser.dat file in the <code class="highlighter-rouge">2018-03-08-5-2-12\c\Users\Username</code> folder, we need to create it.</li>
+      <li>This line takes a substring of the $outfile path from index 0 (the begining) to the index of the last backslash argo the parent folder of the file.</li>
+      <li>Are there other commands to get the parent folder of a file? Yes, but they don’t work on files the OS can’t see like c:\$Extend\$USNJrnl:$J and I imagine this is faster anyways.</li>
+    </ul>
+  </li>
+  <li>Building the command string is wonky looking but there are reasons
+    <ul>
+      <li>Example:
+        <div class="highlighter-rouge"><pre class="highlight"><code>mkdir "2018-03-08-5-2-12\c\Users\Username\" &amp; fcat.exe -h -f NTFS "/Users/Username/ntuser.dat" \\.\c: &gt; "2018-03-08-5-2-12\c\Users\Username\ntuser.dat"
+</code></pre>
+        </div>
+      </li>
+      <li>This is pretty simple but gets complicated because all the paths need to be encapsulated with quotes because some paths might have spaces in them.</li>
+      <li><code class="highlighter-rouge">$('{0}{1}{0}' -f [char]34, $outdir)</code> is an example of creating a string from other variables. I am using [char]34 because it is the cleanest method of concatenating quotes I have found. The backtick method didn’t survive accoss the cmd interpreter. This method puts a “ before and after the $outdir.</li>
+      <li>Fun fact: mkdir will make recursive folders if you ask it.</li>
+      <li>For fcat, I used -h to knock down the size of the sparse files we collect. I will cover that later. -f specifies the NTFS file system.</li>
+      <li>We are using the &gt; to redirect the output of fcat into a file.</li>
+    </ul>
+  </li>
 </ul>
+
 
       </div><!-- /.entry-content -->
     </div><!-- /.entry-wrapper -->
