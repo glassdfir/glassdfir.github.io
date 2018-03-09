@@ -155,7 +155,7 @@
 <h4 id="the-underlying-mechanics-of-copying-locked-files-on-windows">The Underlying Mechanics of Copying Locked Files on Windows</h4>
 
 <p>Before we discuss tools and examples, an understanding of the mechanics of the NTFS filesystem is helpful to ensure you can adapt and overcome when various things get in between you and your artifacts. Here is a piece of DFIRfu using completely native windows commands. Admittedly, this is more DF than IR and I know it is a lot of hexadecimal but stick with me…
-<img src="../Images/$MFTdataruns.png" alt="MFT Data Runs" /></p>
+<img src="../images/MFTdataruns.png" alt="MFT Data Runs" /></p>
 
 <p><strong>Breakdown</strong></p>
 
@@ -195,9 +195,9 @@
 </ul>
 
 <p>Here is another way to look at that information:
-<img src="../Images/$MFTallocatedspace.png" alt="enter image description here" />
+<img src="../images/MFTallocatedspace.png" alt="enter image description here" />
 That $MFT only has two but it is common for larger files to have many data runs:
-<img src="../Images/webcachedataruns.png" alt="enter image description here" />
+<img src="../images/webcachedataruns.png" alt="enter image description here" />
 This WebCacheV01.dat file has 25 runs spread out all over the volume.</p>
 
 <p><strong>The Point</strong></p>

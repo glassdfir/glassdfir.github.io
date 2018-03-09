@@ -201,7 +201,7 @@ https://www.darkoperator.com/blog/2013/1/31/introduction-to-wmi-basics-with-powe
 <figure class="highlight"><pre><code class="language-powershell" data-lang="powershell"><span class="nv">$query</span> <span class="o">=</span> <span class="s2">"SELECT processid,name FROM Win32_Process where name='powershell.exe'"</span>
 <span class="nb">Get-WmiObject</span> -query <span class="nv">$query</span></code></pre></figure>
 
-<p><img src="../Images/2018-02-21 12_56_53-Windows PowerShell.png" alt="PowerShell WMI" />
+<p><img src="../images/2018-02-21 12_56_53-Windows PowerShell.png" alt="PowerShell WMI" />
 Reference: https://blogs.technet.microsoft.com/heyscriptingguy/2012/07/10/three-easy-ways-to-use-powershell-and-wql-to-get-wmi-data/</p>
 <h4 id="wmic">WMIC</h4>
 <p>The WMI command-line (WMIC) utility provides a command-line interface for WMI. WMIC is one of my favorite command line applications because it condenses a lot of the</p>
@@ -210,7 +210,7 @@ Reference: https://blogs.technet.microsoft.com/heyscriptingguy/2012/07/10/three-
 </code></pre>
 </div>
 
-<p><img src="../Images/2018-02-21 13_27_27-Command Prompt.png" alt="WMIC Example" title="WMIC" />
+<p><img src="../images/2018-02-21_13_27_27-Command Prompt.png" alt="WMIC Example" title="WMIC" />
 References: 
 https://msdn.microsoft.com/en-us/library/aa394531(v=vs.85).aspx
 http://jon.glass/blog/lists-some-wmic-commands/</p>
@@ -245,7 +245,7 @@ Next</code></pre></figure>
 </code></pre>
 </div>
 
-<p><img src="../Images/bigfix.png" alt="BigFix WMI Relevance" /></p>
+<p><img src="../images/bigfix.png" alt="BigFix WMI Relevance" /></p>
 
 <h4 id="wmi-classes-of-dfir-interest">WMI classes of DFIR interest</h4>
 <p>There is a lot of super geeky DFIR information you can pull out of WMI properties and methods that can give you wizard like powers over remote machines. Here are a few of my favorites :</p>
@@ -348,7 +348,7 @@ instance of __PARAMETERS
 <h3 id="mmc">MMC</h3>
 <p>I imagine I scared some of off you with all that “coding” and “command line stuff”. While there are GUIer options to accomplish Windows administration tasks, they aren’t as efficient or sexy. If you are against coding all together, there is an X at the top right or left of your browser. We can part ways now and no one’s feelings need to get hurt. For the sake of completeness, I will cover MMC which is a GUI and can do Windows admin tasks but it is not my “go to”.
 According to the big M, the Microsoft Management Console (MMC) is an extensible common presentation service for management applications.
-<img src="../Images/2018-02-22-MMC.png" alt="MMC" title="MMC" /></p>
+<img src="../images/2018-02-22-MMC.png" alt="MMC" title="MMC" /></p>
 
 <p>This console gives you access to some a lot of administration tools.</p>
 <ul>
@@ -459,12 +459,12 @@ about remote systems.”</p>
 
 <h5 id="example-elevating-to-system-account">Example: Elevating to System Account:</h5>
 <p>One of my favorite tricks is to run remote processes as the System account and not a puny User account as seen below:
-<img src="../Images/2018-02-22 11_43_24-__192.168.164.130_ cmd.png" alt="PsExec As System" />
+<img src="../images/2018-02-22 11_43_24-_192.168.164.130_cmd.png" alt="PsExec As System" />
 This grants a higher level of privileges and leaves less of a footprint on the remote machine. I rarely want to use my own account for anything on a remote machine unless I have to.</p>
 
 <p>Pro Tip: If you are copying evidence from a remote machine to a collection share using PsExec to run as the system account, make sure the share is configured to grant Computer account of the target workstation write permission or you will get errors that will run you in circles. Doesn’t matter if your admin account has rights if you are running as the Computer.</p>
 <h5 id="example-copying-an-utility-and-then-executing-it-on-a-remote-system-">Example: Copying an Utility and then Executing it on a Remote System :</h5>
-<p><img src="../Images/2018-02-25 13_08_02-Administrator_ Command Prompt.png" alt="enter image description here" /></p>
+<p><img src="../images/2018-02-25_13_08_02-Administrator_CommandPrompt.png" alt="enter image description here" /></p>
 
 <div class="highlighter-rouge"><pre class="highlight"><code>PsExec.exe \\192.168.164.130 -c RawCopy.exe /FileNamePath:C:0 /OutputPath:\\ForensicServer\dropbox\ /OutputName:$MFT
 </code></pre>
@@ -482,13 +482,13 @@ This grants a higher level of privileges and leaves less of a footprint on the r
 <h5 id="example-interacting-with-the-user">Example: Interacting with the User:</h5>
 <p>PsExec runs a console session by default but can be configured to interact with the logged on user’s session using the <strong>-i</strong> option. This is helpful in those rare instances where you need to user to see something you are doing. 99% of the time the user is going to be logged in under the second session or session 1. It’s not often but I have used this a couple times over the years.
 In this example, I use PsExec to create two instances of notepad.exe on my local machine. One is in user session and visible, the other is not. 
-<img src="../Images/2018-02-26 14_04_26-Sessions.png" alt="enter image description here" /></p>
+<img src="../images/2018-02-26_14_04_26-Sessions.png" alt="enter image description here" /></p>
 
 <p>The <strong>-d</strong> flag is used to detach the PsExec session from the child process so we don’t have to wait until notepad exits to continue. This is very handy for DFIR collection scripts that might take a while. Detach the process and let it do it’s thing. I like to use <strong>-d</strong> on targets that are on flakey VPN connections so that if the connection drops, the process is still running on the remote system. The obvious downside is, you can’t interact with the session after it is detached.</p>
 
 <h5 id="example-running-commands-on-multiple-machines">Example: Running commands on multiple machines</h5>
 <p>PsExec allows you to perform administrative tasks on multiple workstations but you can only interact with one at a time. Here is an example of getting a command shell on two different machines:
-<img src="../Images/2018-02-27 08_23_19-Administrator_ Command Prompt.png" alt="enter image description here" /></p>
+<img src="../images/2018-02-27_08_23_19-Administrator_Command_Prompt.png" alt="enter image description here" /></p>
 
 <div class="highlighter-rouge"><pre class="highlight"><code>PsExec.exe \\DESKTOP-132B1OL,192.168.164.130 cmd
 </code></pre>
@@ -496,11 +496,11 @@ In this example, I use PsExec to create two instances of notepad.exe on my local
 
 <p>I can’t access the second machine until I exit the session with the first one. To speed that process up, using the <strong>-d</strong> to detach the session from the process will make it much faster.</p>
 
-<p><img src="../Images/2018-02-26 18_38_25-Administrator_ Command Prompt.png" alt="enter image description here" /></p>
+<p><img src="../images/2018-02-26_18_38_25-Administrator_Command_Prompt.png" alt="enter image description here" /></p>
 
 <p>When would you ever need to do this? Let’s say you want to collect artifacts from the two machines involved in an alert you received from your detection team. You could bust out your PsExec skills and do something like this:</p>
 
-<p><img src="../Images/2018-02-27 08_23_19-Administrator_ Command Prompt.png" alt="Advanced PsExec Copy" /></p>
+<p><img src="../images/2018-02-27_08_23_19-Administrator_Command_Prompt.png" alt="Advanced PsExec Copy" /></p>
 
 <p><strong>Breakdown:</strong></p>
 
