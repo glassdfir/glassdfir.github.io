@@ -223,12 +223,12 @@ This WebCacheV01.dat file has 25 runs spread out all over the volume.</p>
 <span class="nv">$timestamp</span> <span class="o">=</span> <span class="o">(</span><span class="nb">get-date</span><span class="o">)</span>.ToString<span class="o">(</span><span class="s1">'yyyy-MM-dd-h-m-s'</span><span class="o">)</span>
 
 <span class="c1">#2. Array of Files to Collect</span>
-<span class="nv">$files_to_collect</span> <span class="o">=</span> @<span class="o">()</span>
+<span class="nv">$filestocollect</span> <span class="o">=</span> @<span class="o">()</span>
 
 <span class="c1">#3. NTFS Files</span>
-<span class="nv">$files_to_collect</span> +<span class="o">=</span> <span class="s1">'c:\$MFT'</span>
-<span class="nv">$files_to_collect</span> +<span class="o">=</span> <span class="s1">'c:\$LogFile'</span>
-<span class="nv">$files_to_collect</span> +<span class="o">=</span> <span class="s1">'c:\$Extend\$USNJrnl:$J'</span>
+<span class="nv">$filestocollect</span> +<span class="o">=</span> <span class="s1">'c:\$MFT'</span>
+<span class="nv">$filestocollect</span> +<span class="o">=</span> <span class="s1">'c:\$LogFile'</span>
+<span class="nv">$filestocollect</span> +<span class="o">=</span> <span class="s1">'c:\$Extend\$USNJrnl:$J'</span>
 
 <span class="c1">#4. Array for Regex Signatures for Files of Interest</span>
 <span class="nv">$filesigs</span> <span class="o">=</span> @<span class="o">()</span>
@@ -243,11 +243,11 @@ This WebCacheV01.dat file has 25 runs spread out all over the volume.</p>
 <span class="c1">#Event Logs</span>
 <span class="nv">$filesigs</span> +<span class="o">=</span> <span class="s1">'^c:\\Windows\\System32\\winevt\\Logs\\.*.evtx$'</span>
 
-<span class="nv">$files_to_collect</span> +<span class="o">=</span> <span class="nb">gci</span> -Path C:<span class="se">\U</span>sers,C:<span class="se">\W</span>indows -Recurse -Force -File -ErrorAction SilentlyContinue | 
-                     <span class="nb">Where-Object</span> <span class="o">{</span> <span class="nv">$_</span>.FullName -imatch <span class="k">$(</span><span class="nv">$filesigs</span> -join <span class="s2">"|"</span><span class="k">)</span> <span class="o">}</span>| % <span class="o">{</span> <span class="nv">$_</span>.FullName <span class="o">}</span>
+<span class="nv">$filestocollect</span> +<span class="o">=</span> <span class="nb">gci</span> -Path C:<span class="se">\U</span>sers,C:<span class="se">\W</span>indows -Recurse -Force -File -ErrorAction SilentlyContinue | 
+                     <span class="nb">Where-Object</span> <span class="o">{</span> <span class="nv">$.</span>FullName -imatch <span class="k">$(</span><span class="nv">$filesigs</span> -join <span class="s2">"|"</span><span class="k">)</span> <span class="o">}</span>| % <span class="o">{</span> <span class="nv">$.</span>FullName <span class="o">}</span>
 
 <span class="c1">#5. Collect Files of Interest</span>
-<span class="k">foreach</span><span class="o">(</span><span class="nv">$file</span> <span class="k">in</span> <span class="nv">$files_to_collect</span><span class="o">){</span>
+<span class="k">foreach</span><span class="o">(</span><span class="nv">$file</span> <span class="k">in</span> <span class="nv">$filestocollect</span><span class="o">){</span>
     <span class="c1">#6. Bastardized Multiprocessing. Counts the number of fcats running and sleep if it is more than 10.</span>
     <span class="k">while</span><span class="o">(</span>@<span class="o">(</span><span class="nb">Get-Process </span>fcat -ErrorAction SilentlyContinue<span class="o">)</span>.Count -ge 10<span class="o">){</span><span class="nb">Start-Sleep</span> -Seconds 5<span class="o">}</span>
 
@@ -295,19 +295,19 @@ write-host "</span>Done<span class="s2">"
     </ul>
   </li>
   <li>
-    <div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="nv">$files_to_collect</span> <span class="o">=</span> @<span class="o">()</span>
+    <div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="nv">$filestocollect</span> <span class="o">=</span> @<span class="o">()</span>
 </code></pre>
     </div>
     <ul>
-      <li><a href="https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_arrays?view=powershell-6">Ref: Arrays in PowerShell</a></li>
+      <li><a href="https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/aboutarrays?view=powershell-6">Ref: Arrays in PowerShell</a></li>
     </ul>
   </li>
   <li>
-    <div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="nv">$files_to_collect</span> +<span class="o">=</span> <span class="s1">'c:\$MFT'</span>
+    <div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="nv">$filestocollect</span> +<span class="o">=</span> <span class="s1">'c:\$MFT'</span>
 </code></pre>
     </div>
     <ul>
-      <li>Some files are a part of the filesystem but not direct accessible via a directory listing so we add their paths manually to $files_to_collect array</li>
+      <li>Some files are a part of the filesystem but not direct accessible via a directory listing so we add their paths manually to $filestocollect array</li>
     </ul>
   </li>
   <li>
@@ -328,7 +328,7 @@ write-host "</span>Done<span class="s2">"
     </ul>
   </li>
   <li>
-    <div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="nv">$files_to_collect</span> +<span class="o">=</span> <span class="nb">gci</span> -Path C:<span class="se">\\</span>Users,C:<span class="se">\\</span>Windows -Recurse -Force -File -ErrorAction SilentlyContinue | <span class="nb">Where-Object</span> <span class="o">{</span> <span class="nv">$_</span>.FullName -imatch <span class="k">$(</span><span class="nv">$filesigs</span> -join <span class="s2">"|"</span><span class="k">)</span> <span class="o">}</span>| % <span class="o">{</span> <span class="nv">$_</span>.FullName <span class="o">}</span> 
+    <div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="nv">$filestocollect</span> +<span class="o">=</span> <span class="nb">gci</span> -Path C:<span class="se">\\</span>Users,C:<span class="se">\\</span>Windows -Recurse -Force -File -ErrorAction SilentlyContinue | <span class="nb">Where-Object</span> <span class="o">{</span> <span class="nv">$.</span>FullName -imatch <span class="k">$(</span><span class="nv">$filesigs</span> -join <span class="s2">"|"</span><span class="k">)</span> <span class="o">}</span>| % <span class="o">{</span> <span class="nv">$.</span>FullName <span class="o">}</span> 
 </code></pre>
     </div>
     <ul>
@@ -339,11 +339,11 @@ write-host "</span>Done<span class="s2">"
       <li><strong>-File</strong> is used to exclude directories from my results. This is actually important to the mechanincs of the rest of the script.</li>
       <li>I specified SilentlyContinue for <strong>-ErrorAction</strong> because as it tries to get directory for every file in the C:\Windows folder, there are Access Denied Errors on files I didn’t ask for and I don’t want to see them.</li>
       <li>We redirect the output of the gci command into the Where-Object to filter our results to compare the <strong>FullName</strong> of the file to our array of RegEx $filesigs. $filesigs is an array of strings until use <strong>-Join</strong> to merge each signature together with a pipe which acts as an OR statement in RegEx. “Signature 1 OR Signature 2 OR …”</li>
-      <li>Finally, we redirect THAT output and grab the Fullname of the file that matches one of our signatures and add it to the $files_to_collect array.</li>
+      <li>Finally, we redirect THAT output and grab the Fullname of the file that matches one of our signatures and add it to the $filestocollect array.</li>
     </ul>
   </li>
   <li>
-    <div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="k">foreach</span><span class="o">(</span><span class="nv">$file</span> <span class="k">in</span> <span class="nv">$files_to_collect</span><span class="o">){</span>
+    <div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="k">foreach</span><span class="o">(</span><span class="nv">$file</span> <span class="k">in</span> <span class="nv">$filestocollect</span><span class="o">){</span>
 </code></pre>
     </div>
     <ul>

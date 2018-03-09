@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://jon.glass/feed.xml" rel="self" type="application/atom+xml" /><link href="http://jon.glass/" rel="alternate" type="text/html" /><updated>2018-03-09T00:29:40-05:00</updated><id>http://jon.glass/</id><title type="html">Half Full of Security</title><subtitle>Sharpening the ACKs since 2013</subtitle><entry><title type="html">ADFIRWMC - 2. Remote Acquisition of Windows Artifacts</title><link href="http://jon.glass/adfirwmc/Ch2/" rel="alternate" type="text/html" title="ADFIRWMC - 2. Remote Acquisition of Windows Artifacts" /><published>2018-03-03T15:33:28-05:00</published><updated>2018-03-03T15:33:28-05:00</updated><id>http://jon.glass/adfirwmc/Ch2</id><content type="html" xml:base="http://jon.glass/adfirwmc/Ch2/">&lt;p&gt;Some folks reading this are convinced that Incident Response is all done through Endpoint Detection and Response solutions and in 2018 no one drops collection scripts to gather artifacts for analysis. Those people are wrong.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://jon.glass/feed.xml" rel="self" type="application/atom+xml" /><link href="http://jon.glass/" rel="alternate" type="text/html" /><updated>2018-03-09T11:39:53-05:00</updated><id>http://jon.glass/</id><title type="html">Half Full of Security</title><subtitle>Sharpening the ACKs since 2013</subtitle><entry><title type="html">ADFIRWMC - 2. Remote Acquisition of Windows Artifacts</title><link href="http://jon.glass/adfirwmc/Ch2/" rel="alternate" type="text/html" title="ADFIRWMC - 2. Remote Acquisition of Windows Artifacts" /><published>2018-03-03T15:33:28-05:00</published><updated>2018-03-03T15:33:28-05:00</updated><id>http://jon.glass/adfirwmc/Ch2</id><content type="html" xml:base="http://jon.glass/adfirwmc/Ch2/">&lt;p&gt;Some folks reading this are convinced that Incident Response is all done through Endpoint Detection and Response solutions and in 2018 no one drops collection scripts to gather artifacts for analysis. Those people are wrong.&lt;/p&gt;
 
 &lt;p&gt;The first thing you should know is you will run into problems. Even when your collection tool is working perfectly; network connections drop, hard drives run out of room, antivirus and data loss prevention software will freak out… this is going to happen. Embrace it.&lt;/p&gt;
 
@@ -93,12 +93,12 @@ This WebCacheV01.dat file has 25 runs spread out all over the volume.&lt;/p&gt;
 &lt;span class=&quot;nv&quot;&gt;$timestamp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;get-date&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;.ToString&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'yyyy-MM-dd-h-m-s'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
 
 &lt;span class=&quot;c1&quot;&gt;#2. Array of Files to Collect&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$files_to_collect&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; @&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$filestocollect&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; @&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt;
 
 &lt;span class=&quot;c1&quot;&gt;#3. NTFS Files&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$files_to_collect&lt;/span&gt; +&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'c:\$MFT'&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$files_to_collect&lt;/span&gt; +&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'c:\$LogFile'&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$files_to_collect&lt;/span&gt; +&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'c:\$Extend\$USNJrnl:$J'&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$filestocollect&lt;/span&gt; +&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'c:\$MFT'&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$filestocollect&lt;/span&gt; +&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'c:\$LogFile'&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$filestocollect&lt;/span&gt; +&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'c:\$Extend\$USNJrnl:$J'&lt;/span&gt;
 
 &lt;span class=&quot;c1&quot;&gt;#4. Array for Regex Signatures for Files of Interest&lt;/span&gt;
 &lt;span class=&quot;nv&quot;&gt;$filesigs&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; @&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt;
@@ -113,11 +113,11 @@ This WebCacheV01.dat file has 25 runs spread out all over the volume.&lt;/p&gt;
 &lt;span class=&quot;c1&quot;&gt;#Event Logs&lt;/span&gt;
 &lt;span class=&quot;nv&quot;&gt;$filesigs&lt;/span&gt; +&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'^c:\\Windows\\System32\\winevt\\Logs\\.*.evtx$'&lt;/span&gt;
 
-&lt;span class=&quot;nv&quot;&gt;$files_to_collect&lt;/span&gt; +&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;gci&lt;/span&gt; -Path C:&lt;span class=&quot;se&quot;&gt;\U&lt;/span&gt;sers,C:&lt;span class=&quot;se&quot;&gt;\W&lt;/span&gt;indows -Recurse -Force -File -ErrorAction SilentlyContinue | 
-                     &lt;span class=&quot;nb&quot;&gt;Where-Object&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_&lt;/span&gt;.FullName -imatch &lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$filesigs&lt;/span&gt; -join &lt;span class=&quot;s2&quot;&gt;&quot;|&quot;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;| % &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_&lt;/span&gt;.FullName &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$filestocollect&lt;/span&gt; +&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;gci&lt;/span&gt; -Path C:&lt;span class=&quot;se&quot;&gt;\U&lt;/span&gt;sers,C:&lt;span class=&quot;se&quot;&gt;\W&lt;/span&gt;indows -Recurse -Force -File -ErrorAction SilentlyContinue | 
+                     &lt;span class=&quot;nb&quot;&gt;Where-Object&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$.&lt;/span&gt;FullName -imatch &lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$filesigs&lt;/span&gt; -join &lt;span class=&quot;s2&quot;&gt;&quot;|&quot;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;| % &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$.&lt;/span&gt;FullName &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 
 &lt;span class=&quot;c1&quot;&gt;#5. Collect Files of Interest&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;foreach&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$file&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$files_to_collect&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;){&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;foreach&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$file&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$filestocollect&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;){&lt;/span&gt;
     &lt;span class=&quot;c1&quot;&gt;#6. Bastardized Multiprocessing. Counts the number of fcats running and sleep if it is more than 10.&lt;/span&gt;
     &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;@&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;Get-Process &lt;/span&gt;fcat -ErrorAction SilentlyContinue&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;.Count -ge 10&lt;span class=&quot;o&quot;&gt;){&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;Start-Sleep&lt;/span&gt; -Seconds 5&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 
@@ -165,19 +165,19 @@ write-host &quot;&lt;/span&gt;Done&lt;span class=&quot;s2&quot;&gt;&quot;
     &lt;/ul&gt;
   &lt;/li&gt;
   &lt;li&gt;
-    &lt;div class=&quot;language-powershell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$files_to_collect&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; @&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt;
+    &lt;div class=&quot;language-powershell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$filestocollect&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; @&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;
     &lt;/div&gt;
     &lt;ul&gt;
-      &lt;li&gt;&lt;a href=&quot;https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_arrays?view=powershell-6&quot;&gt;Ref: Arrays in PowerShell&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/aboutarrays?view=powershell-6&quot;&gt;Ref: Arrays in PowerShell&lt;/a&gt;&lt;/li&gt;
     &lt;/ul&gt;
   &lt;/li&gt;
   &lt;li&gt;
-    &lt;div class=&quot;language-powershell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$files_to_collect&lt;/span&gt; +&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'c:\$MFT'&lt;/span&gt;
+    &lt;div class=&quot;language-powershell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$filestocollect&lt;/span&gt; +&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'c:\$MFT'&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;
     &lt;/div&gt;
     &lt;ul&gt;
-      &lt;li&gt;Some files are a part of the filesystem but not direct accessible via a directory listing so we add their paths manually to $files_to_collect array&lt;/li&gt;
+      &lt;li&gt;Some files are a part of the filesystem but not direct accessible via a directory listing so we add their paths manually to $filestocollect array&lt;/li&gt;
     &lt;/ul&gt;
   &lt;/li&gt;
   &lt;li&gt;
@@ -198,7 +198,7 @@ write-host &quot;&lt;/span&gt;Done&lt;span class=&quot;s2&quot;&gt;&quot;
     &lt;/ul&gt;
   &lt;/li&gt;
   &lt;li&gt;
-    &lt;div class=&quot;language-powershell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$files_to_collect&lt;/span&gt; +&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;gci&lt;/span&gt; -Path C:&lt;span class=&quot;se&quot;&gt;\\&lt;/span&gt;Users,C:&lt;span class=&quot;se&quot;&gt;\\&lt;/span&gt;Windows -Recurse -Force -File -ErrorAction SilentlyContinue | &lt;span class=&quot;nb&quot;&gt;Where-Object&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_&lt;/span&gt;.FullName -imatch &lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$filesigs&lt;/span&gt; -join &lt;span class=&quot;s2&quot;&gt;&quot;|&quot;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;| % &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_&lt;/span&gt;.FullName &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; 
+    &lt;div class=&quot;language-powershell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$filestocollect&lt;/span&gt; +&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;gci&lt;/span&gt; -Path C:&lt;span class=&quot;se&quot;&gt;\\&lt;/span&gt;Users,C:&lt;span class=&quot;se&quot;&gt;\\&lt;/span&gt;Windows -Recurse -Force -File -ErrorAction SilentlyContinue | &lt;span class=&quot;nb&quot;&gt;Where-Object&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$.&lt;/span&gt;FullName -imatch &lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$filesigs&lt;/span&gt; -join &lt;span class=&quot;s2&quot;&gt;&quot;|&quot;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;| % &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$.&lt;/span&gt;FullName &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; 
 &lt;/code&gt;&lt;/pre&gt;
     &lt;/div&gt;
     &lt;ul&gt;
@@ -209,11 +209,11 @@ write-host &quot;&lt;/span&gt;Done&lt;span class=&quot;s2&quot;&gt;&quot;
       &lt;li&gt;&lt;strong&gt;-File&lt;/strong&gt; is used to exclude directories from my results. This is actually important to the mechanincs of the rest of the script.&lt;/li&gt;
       &lt;li&gt;I specified SilentlyContinue for &lt;strong&gt;-ErrorAction&lt;/strong&gt; because as it tries to get directory for every file in the C:\Windows folder, there are Access Denied Errors on files I didn’t ask for and I don’t want to see them.&lt;/li&gt;
       &lt;li&gt;We redirect the output of the gci command into the Where-Object to filter our results to compare the &lt;strong&gt;FullName&lt;/strong&gt; of the file to our array of RegEx $filesigs. $filesigs is an array of strings until use &lt;strong&gt;-Join&lt;/strong&gt; to merge each signature together with a pipe which acts as an OR statement in RegEx. “Signature 1 OR Signature 2 OR …”&lt;/li&gt;
-      &lt;li&gt;Finally, we redirect THAT output and grab the Fullname of the file that matches one of our signatures and add it to the $files_to_collect array.&lt;/li&gt;
+      &lt;li&gt;Finally, we redirect THAT output and grab the Fullname of the file that matches one of our signatures and add it to the $filestocollect array.&lt;/li&gt;
     &lt;/ul&gt;
   &lt;/li&gt;
   &lt;li&gt;
-    &lt;div class=&quot;language-powershell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;foreach&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$file&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$files_to_collect&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;){&lt;/span&gt;
+    &lt;div class=&quot;language-powershell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;foreach&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$file&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$filestocollect&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;){&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;
     &lt;/div&gt;
     &lt;ul&gt;
@@ -352,7 +352,7 @@ Reference: https://blogs.technet.microsoft.com/heyscriptingguy/2012/07/10/three-
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;&lt;img src=&quot;../images/2018-02-21132727-Command Prompt.png&quot; alt=&quot;WMIC Example&quot; title=&quot;WMIC&quot; /&gt;
+&lt;p&gt;&lt;img src=&quot;../images/2018-02-21132727-CommandPrompt.png&quot; alt=&quot;WMIC Example&quot; title=&quot;WMIC&quot; /&gt;
 References: 
 https://msdn.microsoft.com/en-us/library/aa394531(v=vs.85).aspx
 http://jon.glass/blog/lists-some-wmic-commands/&lt;/p&gt;
