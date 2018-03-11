@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://jon.glass/feed.xml" rel="self" type="application/atom+xml" /><link href="http://jon.glass/" rel="alternate" type="text/html" /><updated>2018-03-09T11:49:46-05:00</updated><id>http://jon.glass/</id><title type="html">Half Full of Security</title><subtitle>Sharpening the ACKs since 2013</subtitle><entry><title type="html">ADFIRWMC - 2. Remote Acquisition of Windows Artifacts</title><link href="http://jon.glass/adfirwmc/Ch2/" rel="alternate" type="text/html" title="ADFIRWMC - 2. Remote Acquisition of Windows Artifacts" /><published>2018-03-03T15:33:28-05:00</published><updated>2018-03-03T15:33:28-05:00</updated><id>http://jon.glass/adfirwmc/Ch2</id><content type="html" xml:base="http://jon.glass/adfirwmc/Ch2/">&lt;p&gt;Some folks reading this are convinced that Incident Response is all done through Endpoint Detection and Response solutions and in 2018 no one drops collection scripts to gather artifacts for analysis. Those people are wrong.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://jon.glass/feed.xml" rel="self" type="application/atom+xml" /><link href="http://jon.glass/" rel="alternate" type="text/html" /><updated>2018-03-11T10:00:42-04:00</updated><id>http://jon.glass/</id><title type="html">Half Full of Security</title><subtitle>Sharpening the ACKs since 2013</subtitle><entry><title type="html">ADFIRWMC - 2. Remote Acquisition of Windows Artifacts</title><link href="http://jon.glass/adfirwmc/Ch2/" rel="alternate" type="text/html" title="ADFIRWMC - 2. Remote Acquisition of Windows Artifacts" /><published>2018-03-03T15:33:28-05:00</published><updated>2018-03-03T15:33:28-05:00</updated><id>http://jon.glass/adfirwmc/Ch2</id><content type="html" xml:base="http://jon.glass/adfirwmc/Ch2/">&lt;p&gt;Some folks reading this are convinced that Incident Response is all done through Endpoint Detection and Response solutions and in 2018 no one drops collection scripts to gather artifacts for analysis. Those people are wrong.&lt;/p&gt;
 
 &lt;p&gt;The first thing you should know is you will run into problems. Even when your collection tool is working perfectly; network connections drop, hard drives run out of room, antivirus and data loss prevention software will freak out… this is going to happen. Embrace it.&lt;/p&gt;
 
@@ -64,11 +64,15 @@
   &lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;Here is another way to look at that information:
-&lt;img src=&quot;../images/MFTallocatedspace.png&quot; alt=&quot;enter image description here&quot; /&gt;
-That $MFT only has two but it is common for larger files to have many data runs:
-&lt;img src=&quot;../images/webcachedataruns.png&quot; alt=&quot;enter image description here&quot; /&gt;
-This WebCacheV01.dat file has 25 runs spread out all over the volume.&lt;/p&gt;
+&lt;p&gt;Here is another way to look at that information:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/MFTallocatedspace.png&quot; alt=&quot;enter image description here&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;That $MFT only has two but it is common for larger files to have many data runs:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/webcachedataruns.png&quot; alt=&quot;enter image description here&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;This WebCacheV01.dat file has 25 runs spread out all over the volume.&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;The Point&lt;/strong&gt;&lt;/p&gt;
 
@@ -270,7 +274,49 @@ write-host &quot;&lt;/span&gt;Done&lt;span class=&quot;s2&quot;&gt;&quot;
       &lt;li&gt;We are using the &amp;gt; to redirect the output of fcat into a file.&lt;/li&gt;
     &lt;/ul&gt;
   &lt;/li&gt;
-&lt;/ul&gt;</content></entry><entry><title type="html">ADFIRWMC - 1. Windows Remote Administration for Incident Responders</title><link href="http://jon.glass/adfirwmc/Ch1/" rel="alternate" type="text/html" title="ADFIRWMC - 1. Windows Remote Administration for Incident Responders" /><published>2018-03-02T15:33:28-05:00</published><updated>2018-03-02T15:33:28-05:00</updated><id>http://jon.glass/adfirwmc/Ch1</id><content type="html" xml:base="http://jon.glass/adfirwmc/Ch1/">&lt;p&gt;Without a system administration background, many incident responders struggle with basic tasks like remotely starting and stopping processes on target machines. Inversely, Incident Responders with sysadmin experience are often faster and more effective. The more familiar you are with native Windows commands, the faster your can operate.&lt;/p&gt;
+  &lt;li&gt;
+    &lt;div class=&quot;language-powershell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;Start&lt;/span&gt;-Process cmd.exe -ArgumentList &lt;span class=&quot;nv&quot;&gt;$cmdstr&lt;/span&gt; -WindowStyle Hidden
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+    &lt;ul&gt;
+      &lt;li&gt;Fire off the procress in a hidden window.&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;div class=&quot;language-posh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;while&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;@&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;Get-Process &lt;/span&gt;fcat  -ErrorAction SilentlyContinue&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;.Count&lt;span class=&quot;o&quot;&gt;){&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;Start-Sleep&lt;/span&gt; -Seconds 30&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+    &lt;p&gt;Since we have a few collectors going at a the same time, we need to want until they are all finished before zipping up the collection. I wrote it to check and then wait 30 secs which seems to work pretty well but ymmv.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;The rest of the code just makes a zip file by compressing the 2018-03-08-5-2-12 folder and saving to 2018-03-08-5-2-12.zip&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The folder structure ends up looking like this:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../images/tree.png&quot; alt=&quot;Folder Structure&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;##Securely Copying Files
+We will dive more into this later but the title of this chapter is REMOTE file aquisition right? Since this zip file was created locally, we need a secure way to copy it from the remote machine. This is a bit of a cheat code BUT all of PsExec’s network communications are encrypted to prevent admin credentials being sniffed over the network traffic. We can use this to send files over a secure channel with something like this:&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;PsExec \\RemoteMachine cmd /c type C:\temp\2018-03-08-5-2-12.zip 2&amp;gt;nul 1&amp;gt; 2018-03-08-5-2-12-RemoteMachine.zip
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;This is a cheap method of secure transport without having to set up network shares or netcat like direct TCP communication.
+I normally use PsExec on systems with my existing token but in the rare instances that I need to use a Username and Password it will add extra crap to the file. 
+At the top of the file:
+&lt;img src=&quot;../images/topbottom.png&quot; alt=&quot;top&quot; /&gt;
+and the bottom:
+&lt;img src=&quot;../images/topbottom2.png&quot; alt=&quot;bottom&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;You can clip that off in PowerShell like this:&lt;/p&gt;
+&lt;div class=&quot;language-posh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$PATH&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;2018-03-08-5-2-12.zip&quot;&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$top&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; 10
+&lt;span class=&quot;nv&quot;&gt;$bottom&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; 2
+&lt;span class=&quot;nv&quot;&gt;$file&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;dir&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$PATH&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$byteEncodedContent&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;System.IO.File]::ReadAllBytes&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$file&lt;/span&gt;.FullName&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$truncatedByteEncodedContent&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$byteEncodedContent&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$top&lt;/span&gt;..&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$byteEncodedContent&lt;/span&gt;.Length - &lt;span class=&quot;nv&quot;&gt;$bottom&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)]&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;Set-Content&lt;/span&gt; -value &lt;span class=&quot;nv&quot;&gt;$truncatedByteEncodedContent&lt;/span&gt; -encoding &lt;span class=&quot;kt&quot;&gt;byte&lt;/span&gt; -path &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$file&lt;/span&gt;.FullName&lt;span class=&quot;k&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;</content></entry><entry><title type="html">ADFIRWMC - 1. Windows Remote Administration for Incident Responders</title><link href="http://jon.glass/adfirwmc/Ch1/" rel="alternate" type="text/html" title="ADFIRWMC - 1. Windows Remote Administration for Incident Responders" /><published>2018-03-02T15:33:28-05:00</published><updated>2018-03-02T15:33:28-05:00</updated><id>http://jon.glass/adfirwmc/Ch1</id><content type="html" xml:base="http://jon.glass/adfirwmc/Ch1/">&lt;p&gt;Without a system administration background, many incident responders struggle with basic tasks like remotely starting and stopping processes on target machines. Inversely, Incident Responders with sysadmin experience are often faster and more effective. The more familiar you are with native Windows commands, the faster your can operate.&lt;/p&gt;
 
 &lt;p&gt;While this course cannot hope to supplant the experience gained by years at your average help desk, I will try to highlight some of the more helpful techniques that get me from A to B.&lt;/p&gt;
 
