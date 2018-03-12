@@ -2,6 +2,14 @@
 
   
     {
+      "title"			: "Ch3",
+      "link"			: "http://jon.glass/Ch3/",
+      "excerpt"		: ""
+    }
+  
+
+  
+    ,{
       "title"			: "ADFIRWMC - 2. Remote Acquisition of Windows Artifacts",
       "link"			: "http://jon.glass/adfirwmc/Ch2/",
       "excerpt"		: ""

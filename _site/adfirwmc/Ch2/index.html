@@ -203,7 +203,7 @@
 
 <p>That $MFT only has two but it is common for larger files to have many data runs:</p>
 
-<p><img src="../images/webcachedataruns.png" alt="enter image description here" /></p>
+<p><img src="../images/2018-Webcachedataruns.png" alt="webcache data runs" /></p>
 
 <p>This WebCacheV01.dat file has 25 runs spread out all over the volume.</p>
 
@@ -428,8 +428,8 @@ write-host "</span>Done<span class="s2">"
 
 <p><img src="../images/tree.png" alt="Folder Structure" /></p>
 
-<p>##Securely Copying Files
-We will dive more into this later but the title of this chapter is REMOTE file aquisition right? Since this zip file was created locally, we need a secure way to copy it from the remote machine. This is a bit of a cheat code BUT all of PsExec’s network communications are encrypted to prevent admin credentials being sniffed over the network traffic. We can use this to send files over a secure channel with something like this:</p>
+<h2 id="securely-copying-files">Securely Copying Files</h2>
+<p>We will dive more into this later but the title of this chapter is REMOTE file aquisition right? Since this zip file was created locally, we need a secure way to copy it from the remote machine. This is a bit of a cheat code BUT all of PsExec’s network communications are encrypted to prevent admin credentials being sniffed over the network traffic. We can use this to send files over a secure channel with something like this:</p>
 <div class="highlighter-rouge"><pre class="highlight"><code>PsExec \\RemoteMachine cmd /c type C:\temp\2018-03-08-5-2-12.zip 2&gt;nul 1&gt; 2018-03-08-5-2-12-RemoteMachine.zip
 </code></pre>
 </div>
@@ -458,6 +458,8 @@ and the bottom:
       
         <a href="http://jon.glass/adfirwmc/Ch1/" class="btn" title="ADFIRWMC - 1. Windows Remote Administration for Incident Responders">Previous</a>
       
+      
+        <a href="http://jon.glass/Ch3/" class="btn" title="Ch3">Next</a>
       
     </nav><!-- /.pagination -->
   </article>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://jon.glass/feed.xml" rel="self" type="application/atom+xml" /><link href="http://jon.glass/" rel="alternate" type="text/html" /><updated>2018-03-11T10:00:42-04:00</updated><id>http://jon.glass/</id><title type="html">Half Full of Security</title><subtitle>Sharpening the ACKs since 2013</subtitle><entry><title type="html">ADFIRWMC - 2. Remote Acquisition of Windows Artifacts</title><link href="http://jon.glass/adfirwmc/Ch2/" rel="alternate" type="text/html" title="ADFIRWMC - 2. Remote Acquisition of Windows Artifacts" /><published>2018-03-03T15:33:28-05:00</published><updated>2018-03-03T15:33:28-05:00</updated><id>http://jon.glass/adfirwmc/Ch2</id><content type="html" xml:base="http://jon.glass/adfirwmc/Ch2/">&lt;p&gt;Some folks reading this are convinced that Incident Response is all done through Endpoint Detection and Response solutions and in 2018 no one drops collection scripts to gather artifacts for analysis. Those people are wrong.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://jon.glass/feed.xml" rel="self" type="application/atom+xml" /><link href="http://jon.glass/" rel="alternate" type="text/html" /><updated>2018-03-12T09:13:13-04:00</updated><id>http://jon.glass/</id><title type="html">Half Full of Security</title><subtitle>Sharpening the ACKs since 2013</subtitle><entry><title type="html">Ch3</title><link href="http://jon.glass/Ch3/" rel="alternate" type="text/html" title="Ch3" /><published>2018-03-04T00:00:00-05:00</published><updated>2018-03-04T00:00:00-05:00</updated><id>http://jon.glass/Ch3</id><content type="html" xml:base="http://jon.glass/Ch3/"></content></entry><entry><title type="html">ADFIRWMC - 2. Remote Acquisition of Windows Artifacts</title><link href="http://jon.glass/adfirwmc/Ch2/" rel="alternate" type="text/html" title="ADFIRWMC - 2. Remote Acquisition of Windows Artifacts" /><published>2018-03-03T15:33:28-05:00</published><updated>2018-03-03T15:33:28-05:00</updated><id>http://jon.glass/adfirwmc/Ch2</id><content type="html" xml:base="http://jon.glass/adfirwmc/Ch2/">&lt;p&gt;Some folks reading this are convinced that Incident Response is all done through Endpoint Detection and Response solutions and in 2018 no one drops collection scripts to gather artifacts for analysis. Those people are wrong.&lt;/p&gt;
 
 &lt;p&gt;The first thing you should know is you will run into problems. Even when your collection tool is working perfectly; network connections drop, hard drives run out of room, antivirus and data loss prevention software will freak out… this is going to happen. Embrace it.&lt;/p&gt;
 
@@ -70,7 +70,7 @@
 
 &lt;p&gt;That $MFT only has two but it is common for larger files to have many data runs:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;../images/webcachedataruns.png&quot; alt=&quot;enter image description here&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;../images/2018-Webcachedataruns.png&quot; alt=&quot;webcache data runs&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;This WebCacheV01.dat file has 25 runs spread out all over the volume.&lt;/p&gt;
 
@@ -295,8 +295,8 @@ write-host &quot;&lt;/span&gt;Done&lt;span class=&quot;s2&quot;&gt;&quot;
 
 &lt;p&gt;&lt;img src=&quot;../images/tree.png&quot; alt=&quot;Folder Structure&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;##Securely Copying Files
-We will dive more into this later but the title of this chapter is REMOTE file aquisition right? Since this zip file was created locally, we need a secure way to copy it from the remote machine. This is a bit of a cheat code BUT all of PsExec’s network communications are encrypted to prevent admin credentials being sniffed over the network traffic. We can use this to send files over a secure channel with something like this:&lt;/p&gt;
+&lt;h2 id=&quot;securely-copying-files&quot;&gt;Securely Copying Files&lt;/h2&gt;
+&lt;p&gt;We will dive more into this later but the title of this chapter is REMOTE file aquisition right? Since this zip file was created locally, we need a secure way to copy it from the remote machine. This is a bit of a cheat code BUT all of PsExec’s network communications are encrypted to prevent admin credentials being sniffed over the network traffic. We can use this to send files over a secure channel with something like this:&lt;/p&gt;
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;PsExec \\RemoteMachine cmd /c type C:\temp\2018-03-08-5-2-12.zip 2&amp;gt;nul 1&amp;gt; 2018-03-08-5-2-12-RemoteMachine.zip
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
@@ -487,11 +487,11 @@ Next&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;h4 id=&quot;putting-it-to-work&quot;&gt;Putting It To Work&lt;/h4&gt;
 
-&lt;p&gt;Scenario: Your detection team says a user on RemoteComputerName received a malicious Word document that downloads a Remote Access Trojan that your antivirus doesn’t have a signature for. From your threat intelligence, this malicious Word document uses a macro to drop an EvilFile.exe in the users Temp directory.&lt;/p&gt;
+&lt;p&gt;Scenario: Your detection team says a user on RemoteMachine received a malicious Word document that downloads a Remote Access Trojan that your antivirus doesn’t have a signature for. From your threat intelligence, this malicious Word document uses a macro to drop an EvilFile.exe in the users Temp directory.&lt;/p&gt;
 
 &lt;p&gt;Let’s verify the alert..maybe the user didn’t open the Word doc…(yeah right)&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;wmic /node:RemoteComputerName process where (name like '%scchost.exe%') get executablepath,processid,parentprocessid /format:list
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;wmic /node:RemoteMachine process where (name like '%scchost.exe%') get executablepath,processid,parentprocessid /format:list
     ExecutablePath=C:\Users\Username\AppData\Local\Temp\Scchost.EXE
     ParentProcessId=1040
     ProcessId=3712
@@ -500,7 +500,7 @@ Next&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;Crap. Looks like the user might have clicked on it. Let’s verify that parent process just to be sure:&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;wmic /node:RemoteComputerName process where (ProcessId = 1040) get executablepath /format:list
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;wmic /node:RemoteMachine process where (ProcessId = 1040) get executablepath /format:list
     ExecutablePath=C:\Program Files\Microsoft Office\Office16\WINWORD.EXE
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
@@ -508,8 +508,8 @@ Next&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 &lt;p&gt;Double crap. Looks like this is a confirmed compromise of a workstation. 
 For fun and containment, let’s kill that malicious process using a WMI method:&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;wmic /node:RemoteComputerName process where (name ='Scchost.exe') CALL Terminate
-Executing (\\RemoteComputerName\ROOT\CIMV2:Win32Process.Handle=&quot;3712&quot;)-&amp;gt;Terminate()
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;wmic /node:RemoteMachine process where (name ='Scchost.exe') CALL Terminate
+Executing (\\RemoteMachine\ROOT\CIMV2:Win32Process.Handle=&quot;3712&quot;)-&amp;gt;Terminate()
 Method execution successful.
 Out Parameters:
 instance of PARAMETERS
@@ -521,13 +521,13 @@ instance of PARAMETERS
 
 &lt;p&gt;For even MORE fun, like copy that malicious file to an analysis share so we can get a better look at it:&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;wmic /node:RemoteComputerName process call create &quot;xcopy  /Y C:\Users\Username\AppData\Local\Temp\Scchost.EXE \\AnalysisShare\Scchost.exe.bin&quot; 
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;wmic /node:RemoteMachine process call create &quot;xcopy  /Y C:\Users\Username\AppData\Local\Temp\Scchost.EXE \\AnalysisShare\Scchost.exe.bin&quot; 
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
 &lt;p&gt;For a lot less fun, let’s call the User explain the situation, shut it down remotely, and go get the workstation to determine what this malware did :&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;wmic /node:RemoteComputerName os call Shutdown
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;wmic /node:RemoteMachine os call Shutdown
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
@@ -1108,43 +1108,4 @@ and unzipped it in my ~/ELK directory.&lt;/p&gt;
 So, for those ELK stack nerds out there: “You’re right. My first time running Kibana did not look exactly like this because I have installed some plugins.” You caught me not taking screenshots in a timely manner. Feel free to file a complaint and I will refund your subscription fee to this blog. The point is there at the bottom: green means good.
  Fire up a browser (I like chrome) and navigate to http://localhost:5601 and should look like this:
  &lt;img src=&quot;/images/kibanainchrome.png&quot; alt=&quot;Kibana Running&quot; /&gt;
- You will notice that it is immediately complaining about not having an index pattern. That is normal. So far we are good. In my next post, I will cover how I am sending logs into Elasticsearch from my VMs using WinLogBeat and PacketBeat.&lt;/p&gt;</content></entry><entry><title type="html">Dealing with users gone bad…</title><link href="http://jon.glass/blog/RogueUsers/" rel="alternate" type="text/html" title="Dealing with users gone bad…" /><published>2017-02-03T14:52:28-05:00</published><updated>2017-02-03T14:52:28-05:00</updated><id>http://jon.glass/blog/RogueUsers</id><content type="html" xml:base="http://jon.glass/blog/RogueUsers/">&lt;p&gt;We have all been there when someone that gets paid more than you do runs in and says “We need to remove User X from the network and lock them out of their PC to preserve evidence!!!”. If not, you will be.&lt;/p&gt;
-
-&lt;p&gt;So…aside from any 3rd party endpoint software you might have in that environment…what do you do? I have a list of steps, native Windows functions, that I have found helps eliminate avenues for User X’s continued use of ComputerX.&lt;/p&gt;
-
-&lt;h3 id=&quot;disable-user-xs-active-directory-account&quot;&gt;1. Disable User X’s Active Directory Account&lt;/h3&gt;
-&lt;p&gt;This can be done in a number of ways but this post has a PowerShell tag so I recommend downloading Remote Server Administration Tools for your flavor of Windows if you don’t have it already. Then it is a simple matter of …&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-powershell&quot; data-lang=&quot;powershell&quot;&gt; Disable-ADAccount -Identity &lt;span class=&quot;s2&quot;&gt;&quot;UserX&quot;&lt;/span&gt; &lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;h3 id=&quot;delete-all-cached-credentials&quot;&gt;2. Delete All Cached Credentials&lt;/h3&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-powershell&quot; data-lang=&quot;powershell&quot;&gt;&lt;span class=&quot;nv&quot;&gt;$credential&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;Get-Credential&lt;/span&gt; -Credential &lt;span class=&quot;s2&quot;&gt;&quot;DOMAIN&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\a&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;dminacct&quot;&lt;/span&gt;
-Enter-PSSessio n -ComputerName ComputerX -Credential &lt;span class=&quot;nv&quot;&gt;$credential&lt;/span&gt;
-&lt;span class=&quot;nb&quot;&gt;Set-ItemProperty&lt;/span&gt; -Path &lt;span class=&quot;s2&quot;&gt;&quot;HKLM:&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\S&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;oftware&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\M&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;icrosoft&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\W&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;indows NT&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\C&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;urrentVersion&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\W&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;inlogon&quot;&lt;/span&gt; -Name CachedLogonsCount -Value 0&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;This will set the number of cached creds Windows is storing to 0 and erase the previous creds.&lt;/p&gt;
-&lt;h3 id=&quot;change-their-bitlocker-key-remotely&quot;&gt;3. Change their BitLocker Key Remotely&lt;/h3&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-powershell&quot; data-lang=&quot;powershell&quot;&gt;&lt;span class=&quot;c1&quot;&gt;#Delete existing protections&lt;/span&gt;
-manage-bde.exe -protectors -delete c: -Type TPMAndPIN
-manage-bde.exe -protectors -delete c: -Type RecoveryPassword
-&lt;span class=&quot;c1&quot;&gt;#Now that all of the previous Protectors are gone, let's add our own.&lt;/span&gt;
-&lt;span class=&quot;c1&quot;&gt;#Let's add a new password that only the security team will need to know.&lt;/span&gt;
-manage-bde.exe -protectors -add c: -TPMandPIN SuperDuperPassword
-&lt;span class=&quot;c1&quot;&gt;#As a backup, let's also add a couple of recovery keys just in case noone can find the sticky note with the password.&lt;/span&gt;
-manage-bde.exe -protectors -add c: -RecoveryPassword 111111-111111-111111-111111-111111-111111-111111-111111 
-manage-bde.exe -protectors -add c: -RecoveryPassword 222222-222222-222222-222222-222222-222222-222222-222222 
-manage-bde.exe -on c:&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;This is a fun one. This will delete the user’s BitLocker key and save a new one that the user doesn’t know so they can’t unlock the drive after a reboot.&lt;/p&gt;
-&lt;h3 id=&quot;shut-down-the-remote-system-using-any-number-of-methods&quot;&gt;4. Shut down the remote system using any number of methods.&lt;/h3&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-powershell&quot; data-lang=&quot;powershell&quot;&gt;&lt;span class=&quot;c1&quot;&gt;#The nice way&lt;/span&gt;
-Stop-Computer -computerName ComputerX -force
-&lt;span class=&quot;c1&quot;&gt;#Old school&lt;/span&gt;
-shutdown -s -f -t 0 -m ComputerX
-&lt;span class=&quot;c1&quot;&gt;#The BSOD way&lt;/span&gt;
-&lt;span class=&quot;nb&quot;&gt;get-process&lt;/span&gt; -computername ComputerX| &lt;span class=&quot;nb&quot;&gt;stop-process&lt;/span&gt; -force&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;This is not meant to be an exhaustive list but rather a collection of practical considerations. Lemme know if this helps or you have other suggestions.&lt;/p&gt;</content></entry></feed>
+ You will notice that it is immediately complaining about not having an index pattern. That is normal. So far we are good. In my next post, I will cover how I am sending logs into Elasticsearch from my VMs using WinLogBeat and PacketBeat.&lt;/p&gt;</content></entry></feed>

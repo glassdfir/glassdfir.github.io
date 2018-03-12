@@ -302,11 +302,11 @@ Next</code></pre></figure>
 
 <h4 id="putting-it-to-work">Putting It To Work</h4>
 
-<p>Scenario: Your detection team says a user on RemoteComputerName received a malicious Word document that downloads a Remote Access Trojan that your antivirus doesn’t have a signature for. From your threat intelligence, this malicious Word document uses a macro to drop an EvilFile.exe in the users Temp directory.</p>
+<p>Scenario: Your detection team says a user on RemoteMachine received a malicious Word document that downloads a Remote Access Trojan that your antivirus doesn’t have a signature for. From your threat intelligence, this malicious Word document uses a macro to drop an EvilFile.exe in the users Temp directory.</p>
 
 <p>Let’s verify the alert..maybe the user didn’t open the Word doc…(yeah right)</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>wmic /node:RemoteComputerName process where (name like '%scchost.exe%') get executablepath,processid,parentprocessid /format:list
+<div class="highlighter-rouge"><pre class="highlight"><code>wmic /node:RemoteMachine process where (name like '%scchost.exe%') get executablepath,processid,parentprocessid /format:list
     ExecutablePath=C:\Users\Username\AppData\Local\Temp\Scchost.EXE
     ParentProcessId=1040
     ProcessId=3712
@@ -315,7 +315,7 @@ Next</code></pre></figure>
 
 <p>Crap. Looks like the user might have clicked on it. Let’s verify that parent process just to be sure:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>wmic /node:RemoteComputerName process where (ProcessId = 1040) get executablepath /format:list
+<div class="highlighter-rouge"><pre class="highlight"><code>wmic /node:RemoteMachine process where (ProcessId = 1040) get executablepath /format:list
     ExecutablePath=C:\Program Files\Microsoft Office\Office16\WINWORD.EXE
 </code></pre>
 </div>
@@ -323,8 +323,8 @@ Next</code></pre></figure>
 <p>Double crap. Looks like this is a confirmed compromise of a workstation. 
 For fun and containment, let’s kill that malicious process using a WMI method:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>wmic /node:RemoteComputerName process where (name ='Scchost.exe') CALL Terminate
-Executing (\\RemoteComputerName\ROOT\CIMV2:Win32Process.Handle="3712")-&gt;Terminate()
+<div class="highlighter-rouge"><pre class="highlight"><code>wmic /node:RemoteMachine process where (name ='Scchost.exe') CALL Terminate
+Executing (\\RemoteMachine\ROOT\CIMV2:Win32Process.Handle="3712")-&gt;Terminate()
 Method execution successful.
 Out Parameters:
 instance of PARAMETERS
@@ -336,13 +336,13 @@ instance of PARAMETERS
 
 <p>For even MORE fun, like copy that malicious file to an analysis share so we can get a better look at it:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>wmic /node:RemoteComputerName process call create "xcopy  /Y C:\Users\Username\AppData\Local\Temp\Scchost.EXE \\AnalysisShare\Scchost.exe.bin" 
+<div class="highlighter-rouge"><pre class="highlight"><code>wmic /node:RemoteMachine process call create "xcopy  /Y C:\Users\Username\AppData\Local\Temp\Scchost.EXE \\AnalysisShare\Scchost.exe.bin" 
 </code></pre>
 </div>
 
 <p>For a lot less fun, let’s call the User explain the situation, shut it down remotely, and go get the workstation to determine what this malware did :</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>wmic /node:RemoteComputerName os call Shutdown
+<div class="highlighter-rouge"><pre class="highlight"><code>wmic /node:RemoteMachine os call Shutdown
 </code></pre>
 </div>
 
