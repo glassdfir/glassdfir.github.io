@@ -5,14 +5,14 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
 <head>
 <meta charset="utf-8">
-<title>Advanced DFIR Wizard Master Class &#8211; Half Full of Security</title>
-
-
+<title>ADFIRWMC - 3. The Value of Unstructured Analysis &#8211; Half Full of Security</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
 
 
 <!-- Twitter Cards -->
-<meta name="twitter:title" content="Advanced DFIR Wizard Master Class">
-
+<meta name="twitter:title" content="ADFIRWMC - 3. The Value of Unstructured Analysis">
+<meta name="twitter:description" content="">
 <meta name="twitter:site" content="@GlassDFIR">
 <meta name="twitter:creator" content="@GlassDFIR">
 
@@ -22,16 +22,16 @@
 <!-- Open Graph -->
 <meta property="og:locale" content="en_US">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Advanced DFIR Wizard Master Class">
-
-<meta property="og:url" content="http://jon.glass/adfirwmc/">
+<meta property="og:title" content="ADFIRWMC - 3. The Value of Unstructured Analysis">
+<meta property="og:description" content="">
+<meta property="og:url" content="http://jon.glass/adfirwmc/Ch3/">
 <meta property="og:site_name" content="Half Full of Security">
 
 
 
 
 
-<link rel="canonical" href="http://jon.glass/adfirwmc/">
+<link rel="canonical" href="http://jon.glass/adfirwmc/Ch3/">
 <link href="http://jon.glass/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
 
 <!-- https://t.co/dKP3o1e -->
@@ -76,7 +76,7 @@
 
 </head>
 
-<body id="page">
+<body id="post">
 
 <div class="navigation-wrapper">
 	<nav role="navigation" id="site-nav" class="animated drop">
@@ -117,28 +117,77 @@
 
 
 <div id="main" role="main">
-  <article class="entry">
+  <article class="hentry">
     
     <div class="entry-wrapper">
       <header class="entry-header">
-        <h1 class="entry-title">Advanced DFIR Wizard Master Class</h1>
+        <ul class="entry-tags">
+          
+        </ul>
+        
+          <h1 class="entry-title">ADFIRWMC - 3. The Value of Unstructured Analysis</h1>
+        
       </header>
-      <div class="entry-content">
-        <ul class="post-list">
- 
-  <li><article><a href="http://jon.glass/adfirwmc/Ch0/">ADFIRWMC - 0. Disclaimers  <span class="excerpt"></span></a></article></li>
- 
-  <li><article><a href="http://jon.glass/adfirwmc/Ch1/">ADFIRWMC - 1. Windows Remote Administration for Incident Responders  <span class="excerpt"></span></a></article></li>
- 
-  <li><article><a href="http://jon.glass/adfirwmc/Ch2/">ADFIRWMC - 2. Remote Acquisition of Windows Artifacts  <span class="excerpt"></span></a></article></li>
- 
-  <li><article><a href="http://jon.glass/adfirwmc/Ch3/">ADFIRWMC - 3. The Value of Unstructured Analysis  <span class="excerpt"></span></a></article></li>
 
+
+        <time datetime="2018-03-04T15:33:28-05:00"><i class="fa fa-calendar-o"></i> March 04, 2018</time>
+        <p>For me, I find performing unstructured analysis upfront to be critical part of my work flow because it tells me massive amount of contextual data upfront and it focuses the structured analysis I need to accomplish.</p>
+
+<p>When I say unstructed analysis, I am referring mostly to searching through the strings inside of the artifacts I have collected for keyword matches. Where do these keywords come from? Unless you are on a complete witch hunt, which unfortunately happens, there is a set of circumstances that led you to investigate this system. It could be an alert from weird proxy traffic or an antivirus hit on a file found in a User’s Temp folder.</p>
+
+<p>Whatever it is, these events typically have fun details that you can search for. (90% of the time it ends up being some part of a file path or part of a URL.) Let’s look at a little bit of science before we get into DFIRness of it all. This topic can get hopeless deep and veer of course quickly so I am only covering the meat and potatoes.</p>
+
+<h2 id="strings">Strings</h2>
+
+<p>A string is a data type used in programming, such as an integer and floating point unit, but is used to represent text rather than numbers. Most of the words you read on a computer are stored as a string on disk or in memory. For instance, by visiting this site, your browser has probably stored a cached version of this page to a temp folder somewhere in your profile. On top of that, your browser also needs this page’s content in its process memory in order to render it. Strings get thrown all over the place by doing even the most mundane tasks. Knowing the significance of where strings are found can make your life a lot easier.</p>
+
+<h3 id="ascii">ASCII</h3>
+<ul>
+  <li>Stands for American Standard Code for Information Interchange but you will never need to know that.</li>
+  <li>Even though ASCII predates epoch and maybe even time itself, it is the basis for most modern character-encoding schemes.</li>
+  <li>Ascii is a code for representing English characters as numbers, with each letter assigned a number from 0 to 127</li>
+  <li>Not all ASCII characters are visible text.
+    <ul>
+      <li>Some are used to control how text is displayed like 0x0A New Line or 0x09 Tab.</li>
+      <li>Some are strictly for commands like Escape 0x1B or Delete 0x7F.</li>
+    </ul>
+  </li>
+  <li>Reference: https://www.asciitable.com/</li>
 </ul>
 
+<h4 id="example">Example:</h4>
+<p><img src="../images/AsciiStrings.png" alt="Example of ASCII" /></p>
+<h4 id="example-displayed">Example displayed:</h4>
+<p><img src="../images/DisplayedAscii.png" alt="Example of ASCII" /></p>
 
-      </div><!-- /.entry-content -->
+<p>Fun ASCII DFIR stuff you might find:</p>
+<ul>
+  <li>Browser History, Cookies, etc. are stored in ASCII in Chrome, FireFox, Internet Explorer, and Edge.(Probably others too.)
+<img src="../images/ChromeASCII.png" alt="Example of ASCII in Chrome History" /></li>
+</ul>
+
+<h3 id="unicode">Unicode</h3>
+<ul>
+  <li>Like ASCII but bigger</li>
+  <li>Unicode is a standard which defines the internal text coding system in almost all operating systems used in computers at present.</li>
+  <li>Version 1 started out with 65536 code points, commonly encoded in 16 bits or 2 bytes.</li>
+  <li>The current version is 6.3, using 110,187 of the available 1.1 million code points.</li>
+</ul>
+
+<h4 id="example-1">Example:</h4>
+<p><img src="../images/Unicode.png" alt="Example of Unicode" /></p>
+<h4 id="example-displayed-1">Example Displayed:</h4>
+<p><img src="../images/UnicodeDisplayed.png" alt="Example of Unicode" /></p>
+
+        
+
     </div><!-- /.entry-wrapper -->
+    <nav class="pagination" role="navigation">
+      
+        <a href="http://jon.glass/adfirwmc/Ch2/" class="btn" title="ADFIRWMC - 2. Remote Acquisition of Windows Artifacts">Previous</a>
+      
+      
+    </nav><!-- /.pagination -->
   </article>
 </div><!-- /#main -->
 

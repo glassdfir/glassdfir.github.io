@@ -1,4 +1,50 @@
-<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://jon.glass/feed.xml" rel="self" type="application/atom+xml" /><link href="http://jon.glass/" rel="alternate" type="text/html" /><updated>2018-03-12T09:13:13-04:00</updated><id>http://jon.glass/</id><title type="html">Half Full of Security</title><subtitle>Sharpening the ACKs since 2013</subtitle><entry><title type="html">Ch3</title><link href="http://jon.glass/Ch3/" rel="alternate" type="text/html" title="Ch3" /><published>2018-03-04T00:00:00-05:00</published><updated>2018-03-04T00:00:00-05:00</updated><id>http://jon.glass/Ch3</id><content type="html" xml:base="http://jon.glass/Ch3/"></content></entry><entry><title type="html">ADFIRWMC - 2. Remote Acquisition of Windows Artifacts</title><link href="http://jon.glass/adfirwmc/Ch2/" rel="alternate" type="text/html" title="ADFIRWMC - 2. Remote Acquisition of Windows Artifacts" /><published>2018-03-03T15:33:28-05:00</published><updated>2018-03-03T15:33:28-05:00</updated><id>http://jon.glass/adfirwmc/Ch2</id><content type="html" xml:base="http://jon.glass/adfirwmc/Ch2/">&lt;p&gt;Some folks reading this are convinced that Incident Response is all done through Endpoint Detection and Response solutions and in 2018 no one drops collection scripts to gather artifacts for analysis. Those people are wrong.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://jon.glass/feed.xml" rel="self" type="application/atom+xml" /><link href="http://jon.glass/" rel="alternate" type="text/html" /><updated>2018-03-14T22:19:25-04:00</updated><id>http://jon.glass/</id><title type="html">Half Full of Security</title><subtitle>Sharpening the ACKs since 2013</subtitle><entry><title type="html">ADFIRWMC - 3. The Value of Unstructured Analysis</title><link href="http://jon.glass/adfirwmc/Ch3/" rel="alternate" type="text/html" title="ADFIRWMC - 3. The Value of Unstructured Analysis" /><published>2018-03-04T15:33:28-05:00</published><updated>2018-03-04T15:33:28-05:00</updated><id>http://jon.glass/adfirwmc/Ch3</id><content type="html" xml:base="http://jon.glass/adfirwmc/Ch3/">&lt;p&gt;For me, I find performing unstructured analysis upfront to be critical part of my work flow because it tells me massive amount of contextual data upfront and it focuses the structured analysis I need to accomplish.&lt;/p&gt;
+
+&lt;p&gt;When I say unstructed analysis, I am referring mostly to searching through the strings inside of the artifacts I have collected for keyword matches. Where do these keywords come from? Unless you are on a complete witch hunt, which unfortunately happens, there is a set of circumstances that led you to investigate this system. It could be an alert from weird proxy traffic or an antivirus hit on a file found in a User’s Temp folder.&lt;/p&gt;
+
+&lt;p&gt;Whatever it is, these events typically have fun details that you can search for. (90% of the time it ends up being some part of a file path or part of a URL.) Let’s look at a little bit of science before we get into DFIRness of it all. This topic can get hopeless deep and veer of course quickly so I am only covering the meat and potatoes.&lt;/p&gt;
+
+&lt;h2 id=&quot;strings&quot;&gt;Strings&lt;/h2&gt;
+
+&lt;p&gt;A string is a data type used in programming, such as an integer and floating point unit, but is used to represent text rather than numbers. Most of the words you read on a computer are stored as a string on disk or in memory. For instance, by visiting this site, your browser has probably stored a cached version of this page to a temp folder somewhere in your profile. On top of that, your browser also needs this page’s content in its process memory in order to render it. Strings get thrown all over the place by doing even the most mundane tasks. Knowing the significance of where strings are found can make your life a lot easier.&lt;/p&gt;
+
+&lt;h3 id=&quot;ascii&quot;&gt;ASCII&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;Stands for American Standard Code for Information Interchange but you will never need to know that.&lt;/li&gt;
+  &lt;li&gt;Even though ASCII predates epoch and maybe even time itself, it is the basis for most modern character-encoding schemes.&lt;/li&gt;
+  &lt;li&gt;Ascii is a code for representing English characters as numbers, with each letter assigned a number from 0 to 127&lt;/li&gt;
+  &lt;li&gt;Not all ASCII characters are visible text.
+    &lt;ul&gt;
+      &lt;li&gt;Some are used to control how text is displayed like 0x0A New Line or 0x09 Tab.&lt;/li&gt;
+      &lt;li&gt;Some are strictly for commands like Escape 0x1B or Delete 0x7F.&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Reference: https://www.asciitable.com/&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;example&quot;&gt;Example:&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&quot;../images/AsciiStrings.png&quot; alt=&quot;Example of ASCII&quot; /&gt;&lt;/p&gt;
+&lt;h4 id=&quot;example-displayed&quot;&gt;Example displayed:&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&quot;../images/DisplayedAscii.png&quot; alt=&quot;Example of ASCII&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Fun ASCII DFIR stuff you might find:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Browser History, Cookies, etc. are stored in ASCII in Chrome, FireFox, Internet Explorer, and Edge.(Probably others too.)
+&lt;img src=&quot;../images/ChromeASCII.png&quot; alt=&quot;Example of ASCII in Chrome History&quot; /&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;unicode&quot;&gt;Unicode&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;Like ASCII but bigger&lt;/li&gt;
+  &lt;li&gt;Unicode is a standard which defines the internal text coding system in almost all operating systems used in computers at present.&lt;/li&gt;
+  &lt;li&gt;Version 1 started out with 65536 code points, commonly encoded in 16 bits or 2 bytes.&lt;/li&gt;
+  &lt;li&gt;The current version is 6.3, using 110,187 of the available 1.1 million code points.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;example-1&quot;&gt;Example:&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&quot;../images/Unicode.png&quot; alt=&quot;Example of Unicode&quot; /&gt;&lt;/p&gt;
+&lt;h4 id=&quot;example-displayed-1&quot;&gt;Example Displayed:&lt;/h4&gt;
+&lt;p&gt;&lt;img src=&quot;../images/UnicodeDisplayed.png&quot; alt=&quot;Example of Unicode&quot; /&gt;&lt;/p&gt;</content></entry><entry><title type="html">ADFIRWMC - 2. Remote Acquisition of Windows Artifacts</title><link href="http://jon.glass/adfirwmc/Ch2/" rel="alternate" type="text/html" title="ADFIRWMC - 2. Remote Acquisition of Windows Artifacts" /><published>2018-03-03T15:33:28-05:00</published><updated>2018-03-03T15:33:28-05:00</updated><id>http://jon.glass/adfirwmc/Ch2</id><content type="html" xml:base="http://jon.glass/adfirwmc/Ch2/">&lt;p&gt;Some folks reading this are convinced that Incident Response is all done through Endpoint Detection and Response solutions and in 2018 no one drops collection scripts to gather artifacts for analysis. Those people are wrong.&lt;/p&gt;
 
 &lt;p&gt;The first thing you should know is you will run into problems. Even when your collection tool is working perfectly; network connections drop, hard drives run out of room, antivirus and data loss prevention software will freak out… this is going to happen. Embrace it.&lt;/p&gt;
 
