@@ -251,7 +251,7 @@
 <span class="nv">$filesigs</span> +<span class="o">=</span> <span class="s1">'^c:\\Windows\\System32\\winevt\\Logs\\.*.evtx$'</span>
 
 <span class="nv">$filestocollect</span> +<span class="o">=</span> <span class="nb">gci</span> -Path C:<span class="se">\U</span>sers,C:<span class="se">\W</span>indows -Recurse -Force -File -ErrorAction SilentlyContinue | 
-                     <span class="nb">Where-Object</span> <span class="o">{</span> <span class="nv">$.</span>FullName -imatch <span class="k">$(</span><span class="nv">$filesigs</span> -join <span class="s2">"|"</span><span class="k">)</span> <span class="o">}</span>| % <span class="o">{</span> <span class="nv">$.</span>FullName <span class="o">}</span>
+                     <span class="nb">Where-Object</span> <span class="o">{</span> <span class="nv">$_</span>.FullName -imatch <span class="k">$(</span><span class="nv">$filesigs</span> -join <span class="s2">"|"</span><span class="k">)</span> <span class="o">}</span>| % <span class="o">{</span> <span class="nv">$_</span>.FullName <span class="o">}</span>
 
 <span class="c1">#5. Collect Files of Interest</span>
 <span class="k">foreach</span><span class="o">(</span><span class="nv">$file</span> <span class="k">in</span> <span class="nv">$filestocollect</span><span class="o">){</span>
