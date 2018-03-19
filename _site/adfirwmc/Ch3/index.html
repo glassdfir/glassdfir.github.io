@@ -137,6 +137,14 @@
 
 <p>Whatever it is, these events typically have fun details that you can search for. (90% of the time it ends up being some part of a file path or part of a URL.) Let’s look at a little bit of science before we get into DFIRness of it all. This topic can get hopeless deep and veer of course quickly so I am only covering the meat and potatoes.</p>
 
+<h2 id="tools-used">Tools Used</h2>
+<ul>
+  <li><a href="https://docs.microsoft.com/en-us/sysinternals/downloads/strings">Sysinternals Strings</a></li>
+  <li><a href="http://gnuwin32.sourceforge.net/packages/grep.htm">Grep For Windows</a></li>
+  <li><a href="https://ericzimmerman.github.io/">Eric Zimmerman’s Registry Explorer</a></li>
+  <li>PowerShell</li>
+</ul>
+
 <h2 id="strings">Strings</h2>
 
 <p>A string is a data type used in programming, such as an integer and floating point unit, but is used to represent text rather than numbers. Most of the words you read on a computer are stored as a string on disk or in memory. For instance, by visiting this site, your browser has probably stored a cached version of this page to a temp folder somewhere in your profile. On top of that, your browser also needs this page’s content in its process memory in order to render it. Strings get thrown all over the place by doing even the most mundane tasks. Knowing the significance of where strings are found can make your life a lot easier.</p>
@@ -189,6 +197,7 @@
   <li>File Paths in Recycle Bin metadata files</li>
   <li>File Paths in Shortcuts</li>
   <li>Sticky Notes left on the Desktop</li>
+  <li>Literally almost anything with text.</li>
 </ul>
 
 <h3 id="why-do-you-care">Why Do You Care?</h3>
@@ -224,6 +233,90 @@ While not perfect, unstructured analysis can provide the following details immed
   </li>
 </ul>
 
+<h2 id="real-world-example">Real World Example</h2>
+
+<p>Here is an interesting “crook” I found on <a href="https://www.hybrid-analysis.com/sample/4231f020816eebfa0b51e252477f2769838abeb83728072185060253372a4dd0?environmentId=120">Hybrid Analysis</a>. This sample has been linked to APT33 and drops the TURNEDUP backdoor. For funsies, I 7zipped it up, named it “Paul_resume.7z” and sent it to myself in an email to simulate how these things go down.</p>
+
+<p>High level things we can look for from this sample as discovered from our detection team and/or OSINT:</p>
+<ul>
+  <li>Filenames
+    <ul>
+      <li>stikynote.exe, codexgigas_f09bb42e6c39a9714ed8a4d4191cf19e40d1919b.exe, Paul_resume.7z</li>
+    </ul>
+  </li>
+  <li>URLs
+    <ul>
+      <li>googlmail.net</li>
+    </ul>
+  </li>
+</ul>
+
+<p>THIS IS A JOB FOR POWERSHELL!!!</p>
+
+<div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="nb">start</span>-process C:<span class="se">\T</span>ools<span class="se">\s</span>trings.exe -ArgumentList <span class="s2">"-nobanner -accepteula -s 2018-03-18-10-16-4</span><span class="se">\*</span><span class="s2">"</span> -RedirectStandardOutput ..<span class="se">\s</span>trings.txt
+<span class="nb">gc</span> .<span class="se">\s</span>trings.txt| <span class="nb">Where-Object</span> <span class="o">{</span> <span class="nv">$_</span> -imatch <span class="s2">"Paul_resume|codexgigas|stikynote"</span> <span class="o">}</span> | <span class="nb">sort</span> | unique
+</code></pre>
+</div>
+<p>###Example:
+<img src="../images/strings.png" alt="reviewing strings in Powershell" /></p>
+
+<p>This output speaks so much about what has transpired on this machine that I don’t need to wait for structured analysis to make a containment decision. Here are the highlights that I can see in roughly 30 secs:</p>
+
+<ul>
+  <li>The $MFT, $LogFile, and $USNJrnl:$J show evidence of the download attempt, successful download of the zip file, unzipping, and execution:
+    <ul>
+      <li>Download Attempt:
+        <ul>
+          <li><code class="highlighter-rouge">C:\Scripts\2018-03-18-10-16-4\c\$Extend\$USNJrnl$J: &lt;&lt;Paul_Resume.7z.2hvceui.partial</code></li>
+          <li>The suffix .parital is affixed to files that are in the process of being downloaded by IE and Edge.</li>
+        </ul>
+      </li>
+      <li>Successful Download:
+        <ul>
+          <li><code class="highlighter-rouge">C:\Scripts\2018-03-18-10-16-4\c\$Extend\$USNJrnl$J: &lt;Paul_Resume.7z</code></li>
+          <li>Here we see just the Paul_Resume.7z meaning it finished downloading</li>
+        </ul>
+      </li>
+      <li>Unzipping
+        <ul>
+          <li><code class="highlighter-rouge">C:\Scripts\2018-03-18-10-16-4\c\$Extend\$USNJrnl$J: $&lt;Paul_Resume.7z.lnk</code></li>
+          <li>I don’t know the exact filepath of this Shortcut file but the majority of shortcuts are created for recently accessed files.</li>
+          <li><code class="highlighter-rouge">C:\Scripts\2018-03-18-10-16-4\c\$Extend\$USNJrnl$J: r&lt;codexgigas_f09bb42e6c39a9714ed8a4d4191cf19e40d1919b-1.exe</code></li>
+          <li>Since this is the file inside the 7z file, we can see that it was successfully unzipped.</li>
+          <li><code class="highlighter-rouge">C:\Scripts\2018-03-18-10-16-4\c\Users\Username\NTUSER.DAT: C:\Users\Username\Desktop\Paul_Resume\codexgigas_f09bb42e6c39a9714ed8a4d4191cf19e40d1919b-1.exe</code></li>
+          <li>This line from the NTUSER.DAT file of from the Username profile clearly shows this was extracted to the users desktop. What stored this string in the user’s registry? Right now…it doesn’t matter. We are not parsing anything. Only triaging.</li>
+        </ul>
+      </li>
+      <li>Execution:
+        <ul>
+          <li><code class="highlighter-rouge">C:\Scripts\2018-03-18-10-16-4\c\$Extend\$USNJrnl$J: R&lt;CODEXGIGAS_F09BB42E6C39A9714E-F57CC974.pf</code></li>
+          <li>Files ending in .pf are typically associated with Windows Prefetch. This is a file that is autmagically generated when you run an execuatable to make a Windows machine more efficient. This is strong evidence of execution. We will dig into Prefetch later in this course.</li>
+          <li>This machine does not have StikyNotes install from Microsoft so references to <strong>StikyNote.exe</strong>, <strong>StikyNote.tmp</strong>,  and <strong>STIKYNOTE.EXE-EC3D9C6B.pf</strong> seen in $UsnJrnl:$J, $LogFile, and $MFT tell us that the TURNEDUP backdoor was successfully ran on this machine.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>Persistence:
+    <ul>
+      <li>This was less science and more eductated guesswork but it is rare to see a complete file path in a registry value unless it is going to be used to execute something Windows wouldn’t naturally know where to find ergo… persistence.
+  A quick peek with <a href="https://ericzimmerman.github.io/Software/RegistryExplorer_RECmd.zip">Eric Zimmerman’s Registry Explorer</a> revealed my hunch was right.</li>
+    </ul>
+    <pre>
+      Registry file: C:\Scripts\2018-03-18-10-16-4\c\Users\Username\NTUSER.DAT
+      Key: Software\Microsoft\Windows\CurrentVersion\Run
+      Last write: 2018-03-18 17:03:14
+      Value: RESTART_STICKY_NOTESS (RegSz)
+      Data: C:\Users\Username\AppData\Local\Temp\StikyNote.exe 
+  </pre>
+    <ul>
+      <li>Good ol’ HKCU\Software\Microsoft\Windows\CurrentVersion\Run is one of the easiest methods of making sure an executable starts when a user logs in. Makes for a good IoC to test the rest of your environment against.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>We have found all the evidence we need to determine that this machine needs to be removed from the network and further analysis needs be taken to determine what took place after infection. While fairly typical, this example does not represent all malware or reasons you might need to DFIR a system so your milage may vary BUT I found performing this step first almost always helps eliminate or focus structured analysis.</p>
+
+<p>Still not a believer? <a href="http://jon.glass/blog/TwasTheGrepBeforeXmas/">I wrote up a similar case a while ago</a> that saved my buns before the holidays.</p>
 
         
 

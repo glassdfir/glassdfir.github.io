@@ -1,8 +1,16 @@
-<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://jon.glass/feed.xml" rel="self" type="application/atom+xml" /><link href="http://jon.glass/" rel="alternate" type="text/html" /><updated>2018-03-18T20:32:02-04:00</updated><id>http://jon.glass/</id><title type="html">Half Full of Security</title><subtitle>Sharpening the ACKs since 2013</subtitle><entry><title type="html">ADFIRWMC - 3. The Value of Unstructured Analysis</title><link href="http://jon.glass/adfirwmc/Ch3/" rel="alternate" type="text/html" title="ADFIRWMC - 3. The Value of Unstructured Analysis" /><published>2018-03-04T15:33:28-05:00</published><updated>2018-03-04T15:33:28-05:00</updated><id>http://jon.glass/adfirwmc/Ch3</id><content type="html" xml:base="http://jon.glass/adfirwmc/Ch3/">&lt;p&gt;I find performing unstructured analysis upfront to be critical part of my work flow because it tells me massive amount of contextual data upfront and it focuses the structured analysis I need to accomplish.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://jon.glass/feed.xml" rel="self" type="application/atom+xml" /><link href="http://jon.glass/" rel="alternate" type="text/html" /><updated>2018-03-19T09:18:21-04:00</updated><id>http://jon.glass/</id><title type="html">Half Full of Security</title><subtitle>Sharpening the ACKs since 2013</subtitle><entry><title type="html">ADFIRWMC - 3. The Value of Unstructured Analysis</title><link href="http://jon.glass/adfirwmc/Ch3/" rel="alternate" type="text/html" title="ADFIRWMC - 3. The Value of Unstructured Analysis" /><published>2018-03-04T15:33:28-05:00</published><updated>2018-03-04T15:33:28-05:00</updated><id>http://jon.glass/adfirwmc/Ch3</id><content type="html" xml:base="http://jon.glass/adfirwmc/Ch3/">&lt;p&gt;I find performing unstructured analysis upfront to be critical part of my work flow because it tells me massive amount of contextual data upfront and it focuses the structured analysis I need to accomplish.&lt;/p&gt;
 
 &lt;p&gt;When I say unstructed analysis, I am referring mostly to searching through the strings inside of the artifacts I have collected for keyword matches. Where do these keywords come from? Unless you are on a complete witch hunt, which unfortunately happens, there is a set of circumstances that led you to investigate this system. It could be an alert from weird proxy traffic or an antivirus hit on a file found in a User’s Temp folder.&lt;/p&gt;
 
 &lt;p&gt;Whatever it is, these events typically have fun details that you can search for. (90% of the time it ends up being some part of a file path or part of a URL.) Let’s look at a little bit of science before we get into DFIRness of it all. This topic can get hopeless deep and veer of course quickly so I am only covering the meat and potatoes.&lt;/p&gt;
+
+&lt;h2 id=&quot;tools-used&quot;&gt;Tools Used&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://docs.microsoft.com/en-us/sysinternals/downloads/strings&quot;&gt;Sysinternals Strings&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;http://gnuwin32.sourceforge.net/packages/grep.htm&quot;&gt;Grep For Windows&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://ericzimmerman.github.io/&quot;&gt;Eric Zimmerman’s Registry Explorer&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;PowerShell&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;h2 id=&quot;strings&quot;&gt;Strings&lt;/h2&gt;
 
@@ -56,6 +64,7 @@
   &lt;li&gt;File Paths in Recycle Bin metadata files&lt;/li&gt;
   &lt;li&gt;File Paths in Shortcuts&lt;/li&gt;
   &lt;li&gt;Sticky Notes left on the Desktop&lt;/li&gt;
+  &lt;li&gt;Literally almost anything with text.&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h3 id=&quot;why-do-you-care&quot;&gt;Why Do You Care?&lt;/h3&gt;
@@ -89,7 +98,92 @@ While not perfect, unstructured analysis can provide the following details immed
       &lt;li&gt;Yes? Well…you have been successfully robbed. Time to start dusting for prints…&lt;/li&gt;
     &lt;/ul&gt;
   &lt;/li&gt;
-&lt;/ul&gt;</content></entry><entry><title type="html">ADFIRWMC - 2. Remote Acquisition of Windows Artifacts</title><link href="http://jon.glass/adfirwmc/Ch2/" rel="alternate" type="text/html" title="ADFIRWMC - 2. Remote Acquisition of Windows Artifacts" /><published>2018-03-03T15:33:28-05:00</published><updated>2018-03-03T15:33:28-05:00</updated><id>http://jon.glass/adfirwmc/Ch2</id><content type="html" xml:base="http://jon.glass/adfirwmc/Ch2/">&lt;p&gt;Some folks reading this are convinced that Incident Response is all done through Endpoint Detection and Response solutions and in 2018 no one drops collection scripts to gather artifacts for analysis. Those people are wrong.&lt;/p&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;real-world-example&quot;&gt;Real World Example&lt;/h2&gt;
+
+&lt;p&gt;Here is an interesting “crook” I found on &lt;a href=&quot;https://www.hybrid-analysis.com/sample/4231f020816eebfa0b51e252477f2769838abeb83728072185060253372a4dd0?environmentId=120&quot;&gt;Hybrid Analysis&lt;/a&gt;. This sample has been linked to APT33 and drops the TURNEDUP backdoor. For funsies, I 7zipped it up, named it “Paul_resume.7z” and sent it to myself in an email to simulate how these things go down.&lt;/p&gt;
+
+&lt;p&gt;High level things we can look for from this sample as discovered from our detection team and/or OSINT:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Filenames
+    &lt;ul&gt;
+      &lt;li&gt;stikynote.exe, codexgigas_f09bb42e6c39a9714ed8a4d4191cf19e40d1919b.exe, Paul_resume.7z&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;URLs
+    &lt;ul&gt;
+      &lt;li&gt;googlmail.net&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;THIS IS A JOB FOR POWERSHELL!!!&lt;/p&gt;
+
+&lt;div class=&quot;language-powershell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;start&lt;/span&gt;-process C:&lt;span class=&quot;se&quot;&gt;\T&lt;/span&gt;ools&lt;span class=&quot;se&quot;&gt;\s&lt;/span&gt;trings.exe -ArgumentList &lt;span class=&quot;s2&quot;&gt;&quot;-nobanner -accepteula -s 2018-03-18-10-16-4&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\*&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; -RedirectStandardOutput ..&lt;span class=&quot;se&quot;&gt;\s&lt;/span&gt;trings.txt
+&lt;span class=&quot;nb&quot;&gt;gc&lt;/span&gt; .&lt;span class=&quot;se&quot;&gt;\s&lt;/span&gt;trings.txt| &lt;span class=&quot;nb&quot;&gt;Where-Object&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$_&lt;/span&gt; -imatch &lt;span class=&quot;s2&quot;&gt;&quot;Paul_resume|codexgigas|stikynote&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; | &lt;span class=&quot;nb&quot;&gt;sort&lt;/span&gt; | unique
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;###Example:
+&lt;img src=&quot;../images/strings.png&quot; alt=&quot;reviewing strings in Powershell&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;This output speaks so much about what has transpired on this machine that I don’t need to wait for structured analysis to make a containment decision. Here are the highlights that I can see in roughly 30 secs:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;The $MFT, $LogFile, and $USNJrnl:$J show evidence of the download attempt, successful download of the zip file, unzipping, and execution:
+    &lt;ul&gt;
+      &lt;li&gt;Download Attempt:
+        &lt;ul&gt;
+          &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;C:\Scripts\2018-03-18-10-16-4\c\$Extend\$USNJrnl$J: &amp;lt;&amp;lt;Paul_Resume.7z.2hvceui.partial&lt;/code&gt;&lt;/li&gt;
+          &lt;li&gt;The suffix .parital is affixed to files that are in the process of being downloaded by IE and Edge.&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;Successful Download:
+        &lt;ul&gt;
+          &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;C:\Scripts\2018-03-18-10-16-4\c\$Extend\$USNJrnl$J: &amp;lt;Paul_Resume.7z&lt;/code&gt;&lt;/li&gt;
+          &lt;li&gt;Here we see just the Paul_Resume.7z meaning it finished downloading&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;Unzipping
+        &lt;ul&gt;
+          &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;C:\Scripts\2018-03-18-10-16-4\c\$Extend\$USNJrnl$J: $&amp;lt;Paul_Resume.7z.lnk&lt;/code&gt;&lt;/li&gt;
+          &lt;li&gt;I don’t know the exact filepath of this Shortcut file but the majority of shortcuts are created for recently accessed files.&lt;/li&gt;
+          &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;C:\Scripts\2018-03-18-10-16-4\c\$Extend\$USNJrnl$J: r&amp;lt;codexgigas_f09bb42e6c39a9714ed8a4d4191cf19e40d1919b-1.exe&lt;/code&gt;&lt;/li&gt;
+          &lt;li&gt;Since this is the file inside the 7z file, we can see that it was successfully unzipped.&lt;/li&gt;
+          &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;C:\Scripts\2018-03-18-10-16-4\c\Users\Username\NTUSER.DAT: C:\Users\Username\Desktop\Paul_Resume\codexgigas_f09bb42e6c39a9714ed8a4d4191cf19e40d1919b-1.exe&lt;/code&gt;&lt;/li&gt;
+          &lt;li&gt;This line from the NTUSER.DAT file of from the Username profile clearly shows this was extracted to the users desktop. What stored this string in the user’s registry? Right now…it doesn’t matter. We are not parsing anything. Only triaging.&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;Execution:
+        &lt;ul&gt;
+          &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;C:\Scripts\2018-03-18-10-16-4\c\$Extend\$USNJrnl$J: R&amp;lt;CODEXGIGAS_F09BB42E6C39A9714E-F57CC974.pf&lt;/code&gt;&lt;/li&gt;
+          &lt;li&gt;Files ending in .pf are typically associated with Windows Prefetch. This is a file that is autmagically generated when you run an execuatable to make a Windows machine more efficient. This is strong evidence of execution. We will dig into Prefetch later in this course.&lt;/li&gt;
+          &lt;li&gt;This machine does not have StikyNotes install from Microsoft so references to &lt;strong&gt;StikyNote.exe&lt;/strong&gt;, &lt;strong&gt;StikyNote.tmp&lt;/strong&gt;,  and &lt;strong&gt;STIKYNOTE.EXE-EC3D9C6B.pf&lt;/strong&gt; seen in $UsnJrnl:$J, $LogFile, and $MFT tell us that the TURNEDUP backdoor was successfully ran on this machine.&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Persistence:
+    &lt;ul&gt;
+      &lt;li&gt;This was less science and more eductated guesswork but it is rare to see a complete file path in a registry value unless it is going to be used to execute something Windows wouldn’t naturally know where to find ergo… persistence.
+  A quick peek with &lt;a href=&quot;https://ericzimmerman.github.io/Software/RegistryExplorer_RECmd.zip&quot;&gt;Eric Zimmerman’s Registry Explorer&lt;/a&gt; revealed my hunch was right.&lt;/li&gt;
+    &lt;/ul&gt;
+    &lt;pre&gt;
+      Registry file: C:\Scripts\2018-03-18-10-16-4\c\Users\Username\NTUSER.DAT
+      Key: Software\Microsoft\Windows\CurrentVersion\Run
+      Last write: 2018-03-18 17:03:14
+      Value: RESTART_STICKY_NOTESS (RegSz)
+      Data: C:\Users\Username\AppData\Local\Temp\StikyNote.exe 
+  &lt;/pre&gt;
+    &lt;ul&gt;
+      &lt;li&gt;Good ol’ HKCU\Software\Microsoft\Windows\CurrentVersion\Run is one of the easiest methods of making sure an executable starts when a user logs in. Makes for a good IoC to test the rest of your environment against.&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;We have found all the evidence we need to determine that this machine needs to be removed from the network and further analysis needs be taken to determine what took place after infection. While fairly typical, this example does not represent all malware or reasons you might need to DFIR a system so your milage may vary BUT I found performing this step first almost always helps eliminate or focus structured analysis.&lt;/p&gt;
+
+&lt;p&gt;Still not a believer? &lt;a href=&quot;http://jon.glass/blog/TwasTheGrepBeforeXmas/&quot;&gt;I wrote up a similar case a while ago&lt;/a&gt; that saved my buns before the holidays.&lt;/p&gt;</content></entry><entry><title type="html">ADFIRWMC - 2. Remote Acquisition of Windows Artifacts</title><link href="http://jon.glass/adfirwmc/Ch2/" rel="alternate" type="text/html" title="ADFIRWMC - 2. Remote Acquisition of Windows Artifacts" /><published>2018-03-03T15:33:28-05:00</published><updated>2018-03-03T15:33:28-05:00</updated><id>http://jon.glass/adfirwmc/Ch2</id><content type="html" xml:base="http://jon.glass/adfirwmc/Ch2/">&lt;p&gt;Some folks reading this are convinced that Incident Response is all done through Endpoint Detection and Response solutions and in 2018 no one drops collection scripts to gather artifacts for analysis. Those people are wrong.&lt;/p&gt;
 
 &lt;p&gt;The first thing you should know is you will run into problems. Even when your collection tool is working perfectly; network connections drop, hard drives run out of room, antivirus and data loss prevention software will freak out… this is going to happen. Embrace it.&lt;/p&gt;
 
