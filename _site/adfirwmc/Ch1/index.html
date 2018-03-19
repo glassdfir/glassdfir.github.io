@@ -163,7 +163,7 @@ https://www.darkoperator.com/blog/2013/1/31/introduction-to-wmi-basics-with-powe
 <h4 id="wmi-example">WMI Example</h4>
 <p>To get a list of all processes running on a workstation that match a certain name with process IDs, you could use something like this:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>SELECT processid,name FROM Win32Process where name='powershell.exe'
+<div class="highlighter-rouge"><pre class="highlight"><code>SELECT processid,name FROM Win32_Process where name='powershell.exe'
 </code></pre>
 </div>
 
@@ -181,7 +181,7 @@ https://www.darkoperator.com/blog/2013/1/31/introduction-to-wmi-basics-with-powe
     </tr>
     <tr>
       <td>Class</td>
-      <td>Win32Process</td>
+      <td>Win32_Process</td>
     </tr>
     <tr>
       <td>Properties</td>
@@ -201,7 +201,7 @@ https://www.darkoperator.com/blog/2013/1/31/introduction-to-wmi-basics-with-powe
 <p>“WQL looks neat but where do I use it?” Great question!  WMI is accessible in a variety of flavors on modern Windows systems. You can leverage WQL with these handy native Windows solutions:</p>
 <h4 id="powershell">PowerShell</h4>
 
-<figure class="highlight"><pre><code class="language-powershell" data-lang="powershell"><span class="nv">$query</span> <span class="o">=</span> <span class="s2">"SELECT processid,name FROM Win32Process where name='powershell.exe'"</span>
+<figure class="highlight"><pre><code class="language-powershell" data-lang="powershell"><span class="nv">$query</span> <span class="o">=</span> <span class="s2">"SELECT processid,name FROM Win32_Process where name='powershell.exe'"</span>
 <span class="nb">Get-WmiObject</span> -query <span class="nv">$query</span></code></pre></figure>
 
 <p><img src="../images/2018-02-21125653-WindowsPowerShell.png" alt="PowerShell WMI" />
@@ -222,7 +222,7 @@ http://jon.glass/blog/lists-some-wmic-commands/</p>
 
 <figure class="highlight"><pre><code class="language-vbscript" data-lang="vbscript">strComputer = "."
 Set objWMIService = GetObject("winmgmts:\\" &amp; strComputer &amp; "\root\CIMV2")
-Set colItems = objWMIService.ExecQuery( "SELECT * FROM Win32Process WHERE name=’cscript.exe’",,48)
+Set colItems = objWMIService.ExecQuery( "SELECT * FROM Win32_Process WHERE name=’cscript.exe’",,48)
 For Each objItem in colItems
     Wscript.Echo "Name: " &amp; objItem.Name
     Wscript.Echo "ProcessId: " &amp; objItem.ProcessId
@@ -236,7 +236,7 @@ Next</code></pre></figure>
 
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">wmi</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span>
-<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32Process</span> <span class="p">():</span>
+<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">c</span><span class="o">.</span><span class="n">Win32_Process</span> <span class="p">():</span>
     <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">Name</span> <span class="o">==</span> <span class="s">"python.exe"</span><span class="p">:</span>
         <span class="k">print</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">Name</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">ProcessID</span><span class="p">)</span></code></pre></figure>
 
@@ -244,7 +244,7 @@ Next</code></pre></figure>
 
 <p>You might not have this in your environment but many companies have clients on endpoints that are designed for system administration or patching that can to utilized to perform incident response functions as well. This is especially true in SMBs where the security guy is also the patching and sysadmin team.</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>(selects "processid,name from Win32Process where name = 'explorer.exe'" of wmi)
+<div class="highlighter-rouge"><pre class="highlight"><code>(selects "processid,name from Win32_Process where name = 'explorer.exe'" of wmi)
 </code></pre>
 </div>
 
@@ -263,7 +263,7 @@ Next</code></pre></figure>
   </thead>
   <tbody>
     <tr>
-      <td>Win32Process</td>
+      <td>Win32_Process</td>
       <td>CommandLine CreationDate Description ExecutablePath Name OSName ParentProcessId ProcessId SessionId</td>
       <td>AttachDebugger Create GetOwner GetOwnerSid Terminate</td>
     </tr>
@@ -324,7 +324,7 @@ Next</code></pre></figure>
 For fun and containment, let’s kill that malicious process using a WMI method:</p>
 
 <div class="highlighter-rouge"><pre class="highlight"><code>wmic /node:RemoteMachine process where (name ='Scchost.exe') CALL Terminate
-Executing (\\RemoteMachine\ROOT\CIMV2:Win32Process.Handle="3712")-&gt;Terminate()
+Executing (\\RemoteMachine\ROOT\CIMV2:Win32_Process.Handle="3712")-&gt;Terminate()
 Method execution successful.
 Out Parameters:
 instance of PARAMETERS
