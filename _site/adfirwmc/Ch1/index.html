@@ -232,7 +232,7 @@ Next</code></pre></figure>
 
 <p>Depending on what 3rd party tools you have in your environment you might be able to utilize these:</p>
 <h4 id="python">Python</h4>
-<p>The Python WMI module is a lightweight wrapper on top of the pywin32 extensions.</p>
+<p>The Python WMI module is a lightweight wrapper on top of the pyWin32_ extensions.</p>
 
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="nn">wmi</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="o">.</span><span class="n">WMI</span> <span class="p">()</span>
@@ -268,32 +268,32 @@ Next</code></pre></figure>
       <td>AttachDebugger Create GetOwner GetOwnerSid Terminate</td>
     </tr>
     <tr>
-      <td>Win32Service</td>
+      <td>Win32_Service</td>
       <td>Description DisplayName InstallDate Name PathName ProcessId ServiceType Started StartMode StartName State Status</td>
       <td>Change ChangeStartMode Create Delete PauseService ResumeService StartService StopService</td>
     </tr>
     <tr>
-      <td>Win32LogonSession</td>
+      <td>Win32_LogonSession</td>
       <td>AuthenticationPackage Description InstallDate LogonId LogonType Name StartTime Status</td>
       <td>N/A</td>
     </tr>
     <tr>
-      <td>Win32NetworkLoginProfile</td>
+      <td>Win32_NetworkLoginProfile</td>
       <td>AccountExpires BadPasswordCount Description FullName LastLogoff LastLogon LogonServer Name NumberOfLogons PasswordAge PasswordExpires PrimaryGroupId Privileges Profile UserId UserType</td>
       <td>N/A</td>
     </tr>
     <tr>
-      <td>Win32LogicalDisk</td>
+      <td>Win32_LogicalDisk</td>
       <td>BlockSize Description DeviceID DriveType FileSystem FreeSpace MediaType Name Size VolumeName VolumeSerialNumber</td>
       <td>Chkdsk Reset SetPowerState</td>
     </tr>
     <tr>
-      <td>Win32StartupCommand</td>
+      <td>Win32_StartupCommand</td>
       <td>Caption Command Description Location Name SettingID User UserSID</td>
       <td>N/A</td>
     </tr>
     <tr>
-      <td>Win32OperatingSystem</td>
+      <td>Win32_OperatingSystem</td>
       <td>BootDevice BuildNumber CurrentTimeZone InstallDate LastBootUpTime LocalDateTime Locale Manufacturer Name NumberOfProcesses NumberOfUsers Organization OSArchitecture OSType SerialNumber ServicePackMajorVersion ServicePackMinorVersion SystemDrive</td>
       <td>Reboot SetDateTime Shutdown</td>
     </tr>

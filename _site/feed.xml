@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://jon.glass/feed.xml" rel="self" type="application/atom+xml" /><link href="http://jon.glass/" rel="alternate" type="text/html" /><updated>2018-03-19T09:27:44-04:00</updated><id>http://jon.glass/</id><title type="html">Half Full of Security</title><subtitle>Sharpening the ACKs since 2013</subtitle><entry><title type="html">ADFIRWMC - 3. The Value of Unstructured Analysis</title><link href="http://jon.glass/adfirwmc/Ch3/" rel="alternate" type="text/html" title="ADFIRWMC - 3. The Value of Unstructured Analysis" /><published>2018-03-04T15:33:28-05:00</published><updated>2018-03-04T15:33:28-05:00</updated><id>http://jon.glass/adfirwmc/Ch3</id><content type="html" xml:base="http://jon.glass/adfirwmc/Ch3/">&lt;p&gt;I find performing unstructured analysis upfront to be critical part of my work flow because it tells me massive amount of contextual data upfront and it focuses the structured analysis I need to accomplish.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://jon.glass/feed.xml" rel="self" type="application/atom+xml" /><link href="http://jon.glass/" rel="alternate" type="text/html" /><updated>2018-03-19T10:41:04-04:00</updated><id>http://jon.glass/</id><title type="html">Half Full of Security</title><subtitle>Sharpening the ACKs since 2013</subtitle><entry><title type="html">ADFIRWMC - 3. The Value of Unstructured Analysis</title><link href="http://jon.glass/adfirwmc/Ch3/" rel="alternate" type="text/html" title="ADFIRWMC - 3. The Value of Unstructured Analysis" /><published>2018-03-04T15:33:28-05:00</published><updated>2018-03-04T15:33:28-05:00</updated><id>http://jon.glass/adfirwmc/Ch3</id><content type="html" xml:base="http://jon.glass/adfirwmc/Ch3/">&lt;p&gt;I find performing unstructured analysis upfront to be critical part of my work flow because it tells me massive amount of contextual data upfront and it focuses the structured analysis I need to accomplish.&lt;/p&gt;
 
 &lt;p&gt;When I say unstructed analysis, I am referring mostly to searching through the strings inside of the artifacts I have collected for keyword matches. Where do these keywords come from? Unless you are on a complete witch hunt, which unfortunately happens, there is a set of circumstances that led you to investigate this system. It could be an alert from weird proxy traffic or an antivirus hit on a file found in a User’s Temp folder.&lt;/p&gt;
 
@@ -323,7 +323,7 @@ While not perfect, unstructured analysis can provide the following details immed
     
     #Run
     Start-Process cmd.exe -ArgumentList &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$cmdstr&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt; -WindowStyle Hidden
-    Start-Sleep -Seconds 5
+    Start-Sleep -Seconds 1
 
 }
 
@@ -602,7 +602,7 @@ Next&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;Depending on what 3rd party tools you have in your environment you might be able to utilize these:&lt;/p&gt;
 &lt;h4 id=&quot;python&quot;&gt;Python&lt;/h4&gt;
-&lt;p&gt;The Python WMI module is a lightweight wrapper on top of the pywin32 extensions.&lt;/p&gt;
+&lt;p&gt;The Python WMI module is a lightweight wrapper on top of the pyWin32_ extensions.&lt;/p&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-python&quot; data-lang=&quot;python&quot;&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;wmi&lt;/span&gt;
 &lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wmi&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;WMI&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
@@ -638,32 +638,32 @@ Next&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
       &lt;td&gt;AttachDebugger Create GetOwner GetOwnerSid Terminate&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
-      &lt;td&gt;Win32Service&lt;/td&gt;
+      &lt;td&gt;Win32_Service&lt;/td&gt;
       &lt;td&gt;Description DisplayName InstallDate Name PathName ProcessId ServiceType Started StartMode StartName State Status&lt;/td&gt;
       &lt;td&gt;Change ChangeStartMode Create Delete PauseService ResumeService StartService StopService&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
-      &lt;td&gt;Win32LogonSession&lt;/td&gt;
+      &lt;td&gt;Win32_LogonSession&lt;/td&gt;
       &lt;td&gt;AuthenticationPackage Description InstallDate LogonId LogonType Name StartTime Status&lt;/td&gt;
       &lt;td&gt;N/A&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
-      &lt;td&gt;Win32NetworkLoginProfile&lt;/td&gt;
+      &lt;td&gt;Win32_NetworkLoginProfile&lt;/td&gt;
       &lt;td&gt;AccountExpires BadPasswordCount Description FullName LastLogoff LastLogon LogonServer Name NumberOfLogons PasswordAge PasswordExpires PrimaryGroupId Privileges Profile UserId UserType&lt;/td&gt;
       &lt;td&gt;N/A&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
-      &lt;td&gt;Win32LogicalDisk&lt;/td&gt;
+      &lt;td&gt;Win32_LogicalDisk&lt;/td&gt;
       &lt;td&gt;BlockSize Description DeviceID DriveType FileSystem FreeSpace MediaType Name Size VolumeName VolumeSerialNumber&lt;/td&gt;
       &lt;td&gt;Chkdsk Reset SetPowerState&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
-      &lt;td&gt;Win32StartupCommand&lt;/td&gt;
+      &lt;td&gt;Win32_StartupCommand&lt;/td&gt;
       &lt;td&gt;Caption Command Description Location Name SettingID User UserSID&lt;/td&gt;
       &lt;td&gt;N/A&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
-      &lt;td&gt;Win32OperatingSystem&lt;/td&gt;
+      &lt;td&gt;Win32_OperatingSystem&lt;/td&gt;
       &lt;td&gt;BootDevice BuildNumber CurrentTimeZone InstallDate LastBootUpTime LocalDateTime Locale Manufacturer Name NumberOfProcesses NumberOfUsers Organization OSArchitecture OSType SerialNumber ServicePackMajorVersion ServicePackMinorVersion SystemDrive&lt;/td&gt;
       &lt;td&gt;Reboot SetDateTime Shutdown&lt;/td&gt;
     &lt;/tr&gt;
