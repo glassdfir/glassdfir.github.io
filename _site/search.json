@@ -90,6 +90,14 @@
 
   
     ,{
+      "title"			: "Twas the Grep before Christmas",
+      "link"			: "http://jon.glass/blog/TwasTheGrepBeforeXmas/",
+      "excerpt"		: ""
+    }
+  
+
+  
+    ,{
       "title"			: "UnXORing a RAT",
       "link"			: "http://jon.glass/blog/Unxoring-a-rat/",
       "excerpt"		: ""

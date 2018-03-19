@@ -1,0 +1,351 @@
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8" lang="en"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9" lang="en"><![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<title>Twas the Grep before Christmas &#8211; Half Full of Security</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+
+
+<!-- Twitter Cards -->
+<meta name="twitter:title" content="Twas the Grep before Christmas">
+<meta name="twitter:description" content="">
+<meta name="twitter:site" content="@GlassDFIR">
+<meta name="twitter:creator" content="@GlassDFIR">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://jon.glass/images/site-logo.png">
+
+<!-- Open Graph -->
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Twas the Grep before Christmas">
+<meta property="og:description" content="">
+<meta property="og:url" content="http://jon.glass/blog/TwasTheGrepBeforeXmas/">
+<meta property="og:site_name" content="Half Full of Security">
+
+
+
+
+
+<link rel="canonical" href="http://jon.glass/blog/TwasTheGrepBeforeXmas/">
+<link href="http://jon.glass/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="http://jon.glass/assets/css/main.css">
+<!-- Webfonts -->
+<script src="https://use.edgefonts.net/source-sans-pro:n2,i2,n3,i3,n4,i4,n6,i6,n7,i7,n9,i9;source-code-pro:n4,n7;volkhov.js"></script>
+
+<meta http-equiv="cleartype" content="on">
+
+<!-- HTML5 Shiv and Media Query Support -->
+<!--[if lt IE 9]>
+  <script src="http://jon.glass/assets/js/vendor/html5shiv.min.js"></script>
+  <script src="http://jon.glass/assets/js/vendor/respond.min.js"></script>
+<![endif]-->
+
+<!-- Modernizr -->
+<script src="http://jon.glass/assets/js/vendor/modernizr-2.7.1.custom.min.js"></script>
+
+
+<!-- MathJax -->
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+<!-- Icons -->
+<!-- 16x16 -->
+<link rel="shortcut icon" href="http://jon.glass/favicon.ico">
+<!-- 32x32 -->
+<link rel="shortcut icon" href="http://jon.glass/favicon.png">
+<!-- 57x57 (precomposed) for iPhone 3GS, pre-2011 iPod Touch and older Android devices -->
+<link rel="apple-touch-icon-precomposed" href="http://jon.glass/images/apple-touch-icon-precomposed.png">
+<!-- 72x72 (precomposed) for 1st generation iPad, iPad 2 and iPad mini -->
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://jon.glass/images/apple-touch-icon-72x72-precomposed.png">
+<!-- 114x114 (precomposed) for iPhone 4, 4S, 5 and post-2011 iPod Touch -->
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://jon.glass/images/apple-touch-icon-114x114-precomposed.png">
+<!-- 144x144 (precomposed) for iPad 3rd and 4th generation -->
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://jon.glass/images/apple-touch-icon-144x144-precomposed.png">
+
+</head>
+
+<body id="post">
+
+<div class="navigation-wrapper">
+	<nav role="navigation" id="site-nav" class="animated drop">
+	    <ul>
+      
+		    
+		    <li><a href="http://jon.glass/blog/" >Blog</a></li>
+		  
+		    
+		    <li><a href="http://jon.glass/adfirwmc/" >ADFIRWMC</a></li>
+		  
+		    
+		    <li><a href="http://jon.glass/tips/" >Tips and Tricks</a></li>
+		  
+		    
+		    <li><a href="http://jon.glass/about/" >About</a></li>
+		  
+		    
+		    <li><a href="http://jon.glass/search/" >Search</a></li>
+		  
+	    </ul>
+	</nav>
+</div><!-- /.navigation-wrapper -->
+
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+
+<header class="masthead">
+	<div class="wrap">
+      
+  		<a href="http://jon.glass/" class="site-logo" rel="home" title="Half Full of Security"><img src="http://jon.glass/images/site-logo.png" width="200" height="200" alt="Half Full of Security logo" class="animated fadeInDown"></a>
+      
+      <h1 class="site-title animated fadeIn"><a href="http://jon.glass/">Half Full of Security</a></h1>
+		<h2 class="site-description animated fadeIn" itemprop="description">Sharpening the ACKs since 2013</h2>
+	</div>
+</header><!-- /.masthead -->
+
+<div class="js-menu-screen menu-screen"></div>
+
+
+<div id="main" role="main">
+  <article class="hentry">
+    
+    <div class="entry-wrapper">
+      <header class="entry-header">
+        <ul class="entry-tags">
+          
+        </ul>
+        
+          <h1 class="entry-title">Twas the Grep before Christmas</h1>
+        
+      </header>
+
+
+        <time datetime="2016-12-27T15:33:28-05:00"><i class="fa fa-calendar-o"></i> December 27, 2016</time>
+        <p>Sometimes when it rains, it pours. It was 3pm on Christmas Eve and I was mentally out the door and half way home already when proxy alerts came in for a known malicious file (for the sake of this blog will be referred to as “malicious.exe”) hitting a handful of endpoints. Here are a couple of tricks I used to get out of the door by 4:15pm.</p>
+
+<p>I use a tool that pulls back a targeted logical disk image from remote machines for my triage effort. So as you read this it is probably easier to think in terms of forensic disk analysis rather than incident response.</p>
+
+<p>I saw numerous requests for malicious.exe from each machine in the proxy logs. From the surrounding traffic it was more consistent with drive by redirect to a watering hole than anything a user clicked on.</p>
+
+<p>So I mounted the disk images from the 4 machines to C:\Cases and here is how I quickly triaged the extent of compromise:
+<strong>C:\Cases&gt; strings -s | grep malicious.exe</strong> 
+Here is what I got back:</p>
+<h2 id="machine-one">Machine One</h2>
+<div class="highlighter-rouge"><pre class="highlight"><code>C:\Cases\Machine1\C\Users\User1\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine1\C\Users\User1\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: malicious.exe
+C:\Cases\Machine1\C\Users\User1\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine1\C\Users\User1\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: malicious.exe
+C:\Cases\Machine1\C\Users\User1\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: http://static.evilsite.com/malicious.exe
+</code></pre>
+</div>
+
+<p>So for this first machine the only mention of malicious.exe was found in the Internet Explorer 11 history. Upon further investigation, it turns out that the user cancelled all of the download attempts and the malware never hit the filesystem. NEXT!</p>
+
+<h2 id="machine-2">Machine 2</h2>
+<div class="highlighter-rouge"><pre class="highlight"><code>C:\Cases\Machine2\C\$MFT: malicious.exe
+C:\Cases\Machine2\C\$MFT: http://static.evilsite.com/malicious.exe');
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: N&lt;malicious.exe.3l98fuk.partial
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: N&lt;malicious.exe.3l98fuk.partial
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: N&lt;malicious.exe.3l98fuk.partial
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: N&lt;malicious.exe.3l98fuk.partial
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: N&lt;malicious.exe.3l98fuk.partial
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: N&lt;malicious.exe.3l98fuk.partial
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: N&lt;malicious.exe.3l98fuk.partial
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: N&lt;malicious.exe.3l98fuk.partial
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: N&lt;malicious.exe.3l98fuk.partial
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: N&lt;malicious.exe.3l98fuk.partial
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: .&lt;malicious.exe
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: .&lt;malicious.exe
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: .&lt;malicious.exe
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: .&lt;malicious.exe
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: N&lt;malicious.exe.sx2afu8.partial
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: N&lt;malicious.exe.sx2afu8.partial
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: N&lt;malicious.exe.sx2afu8.partial
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: N&lt;malicious.exe.sx2afu8.partial
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: N&lt;malicious.exe.sx2afu8.partial
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: N&lt;malicious.exe.sx2afu8.partial
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: N&lt;malicious.exe.sx2afu8.partial
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: N&lt;malicious.exe.sx2afu8.partial
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: N&lt;malicious.exe.sx2afu8.partial
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: .&lt;malicious.exe
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: .&lt;malicious.exe
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: .&lt;malicious.exe
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: .&lt;malicious.exe
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: .&lt;malicious.exe
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: N&lt;malicious.exe.trtsnvz.partial
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: N&lt;malicious.exe.trtsnvz.partial
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: N&lt;malicious.exe.trtsnvz.partial
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: N&lt;malicious.exe.trtsnvz.partial
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: N&lt;malicious.exe.trtsnvz.partial
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: N&lt;malicious.exe.trtsnvz.partial
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: N&lt;malicious.exe.trtsnvz.partial
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: N&lt;malicious.exe.trtsnvz.partial
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: N&lt;malicious.exe.trtsnvz.partial
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: .&lt;malicious.exe
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: .&lt;malicious.exe
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: .&lt;malicious.exe
+C:\Cases\Machine2\C\$Extend\$UsnJrnl-$J: .&lt;malicious.exe
+C:\Cases\Machine2\C\Users\User2\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine2\C\Users\User2\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: malicious.exe
+C:\Cases\Machine2\C\Users\User2\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine2\C\Users\User2\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: malicious.exe
+C:\Cases\Machine2\C\Users\User2\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine2\C\Users\User2\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: malicious.exe
+C:\Cases\Machine2\C\Users\User2\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine2\C\Users\User2\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: C:\Users\User2\AppData\Local\Microsoft\Windows\Temporary Internet Files\Content.IE5\LV4JKIUX\malicious.exe.3l98fuk.partial
+C:\Cases\Machine2\C\Users\User2\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine2\C\Users\User2\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: C:\Users\User2\AppData\Local\Microsoft\Windows\Temporary Internet Files\Content.IE5\LV4JKIUX\malicious.exe
+C:\Cases\Machine2\C\Users\User2\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine2\C\Users\User2\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: C:\Users\User2\AppData\Local\Microsoft\Windows\Temporary Internet Files\Content.IE5\B5LEVBSY\malicious.exe.sx2afu8.partial
+C:\Cases\Machine2\C\Users\User2\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine2\C\Users\User2\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: C:\Users\User2\AppData\Local\Microsoft\Windows\Temporary Internet Files\Content.IE5\B5LEVBSY\malicious.exe
+C:\Cases\Machine2\C\Users\User2\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine2\C\Users\User2\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine2\C\Users\User2\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine2\C\Users\User2\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: C:\Users\User2\AppData\Local\Microsoft\Windows\Temporary Internet Files\Content.IE5\LV4JKIUX\malicious.exe.trtsnvz.partial
+C:\Cases\Machine2\C\Users\User2\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine2\C\Users\User2\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: C:\Users\User2\AppData\Local\Microsoft\Windows\Temporary Internet Files\Content.IE5\LV4JKIUX\malicious.exe
+C:\Cases\Machine2\C\Users\User2\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine2\C\Users\User2\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine2\C\Users\User2\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: malicious.exe
+C:\Cases\Machine2\C\Users\User2\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine2\C\Users\User2\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine2\C\Users\User2\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: http://static.evilsite.com/malicious.exe
+</code></pre>
+</div>
+
+<p>Looks like Machine2 was not so lucky. My 30 second analysis on this data tells me:</p>
+<ol>
+  <li>There is an $MFT record for malicious.exe. This means it successfully downloaded and found a home in the FS. Also it looks like there is a small file in the $MFT that contains that filename. Looking at the tail end of the string it looks like javascript. This makes for a great IOC.</li>
+  <li>I see numerous records in the $UsnJrnl-$J that can most likely be attributed to Internet Explorer attempting to download the malware 3 times before the user said “Ok” and allowed the download. IE creates a “filename.randomstring.partial” file for downloading files. Once the download is complete and everything checks out it renames the file to filename.exe. Here I see malicious.exe.3l98fuk.partial, malicious.exe.sx2afu8.partial, malicious.exe.trtsnvz.partial. There are also a number of USNJrnl-$J records for just malicious.exe. While most of these could be associated with the changes in file size during download and/or the file rename, it is enough of a red flag to pull this box from the network and move on.</li>
+  <li>While I pulled the box off the network, it was mostly to err on the side of caution. I really only see the malicious.exe in the IE WebhistoryV01.dat but no files that screams “execution”. No prefetch, no user or system registry hits, no shortcut files, and no hits in event logs. Again, this is my 30 second analysis (I still had presents to wrap).</li>
+  <li>This machine validated what my findings from the first machine. This exhibits signs of hitting the file system; Machine1 did not.
+NEXT!</li>
+</ol>
+
+<h2 id="machine-3">Machine 3</h2>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>C:\Cases\Machine3\C\$MFT: http://static.evilsite.com/malicious.exe');
+C:\Cases\Machine3\C\Users\User3\AppData\Local\Microsoft\Windows\WebCache\V01001B0.log: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine3\C\Users\User3\AppData\Local\Microsoft\Windows\WebCache\V01001B0.log: malicious.exe
+C:\Cases\Machine3\C\Users\User3\AppData\Local\Microsoft\Windows\WebCache\V01001B0.log: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine3\C\Users\User3\AppData\Local\Microsoft\Windows\WebCache\V01001B0.log: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine3\C\Users\User3\AppData\Local\Microsoft\Windows\WebCache\V01001B0.log: malicious.exe
+C:\Cases\Machine3\C\Users\User3\AppData\Local\Microsoft\Windows\WebCache\V01001B0.log: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine3\C\Users\User3\AppData\Local\Microsoft\Windows\WebCache\V01001B0.log: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine3\C\Users\User3\AppData\Local\Microsoft\Windows\WebCache\V01001B0.log: malicious.exe
+C:\Cases\Machine3\C\Users\User3\AppData\Local\Microsoft\Windows\WebCache\V01001B0.log: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine3\C\Users\User3\AppData\Local\Microsoft\Windows\WebCache\V01001B0.log: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine3\C\Users\User3\AppData\Local\Microsoft\Windows\WebCache\V01001B0.log: malicious.exe
+C:\Cases\Machine3\C\Users\User3\AppData\Local\Microsoft\Windows\WebCache\V01001B0.log: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine3\C\Users\User3\AppData\Local\Microsoft\Windows\WebCache\V01001B3.log: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine3\C\Users\User3\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine3\C\Users\User3\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: malicious.exe
+C:\Cases\Machine3\C\Users\User3\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine3\C\Users\User3\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: malicious.exe
+C:\Cases\Machine3\C\Users\User3\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine3\C\Users\User3\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: malicious.exe
+C:\Cases\Machine3\C\Users\User3\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine3\C\Users\User3\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: malicious.exe
+C:\Cases\Machine3\C\Users\User3\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: http://static.evilsite.com/malicious.exe
+C:\Cases\Machine3\C\Users\User3\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat: http://static.evilsite.com/malicious.exe
+</code></pre>
+</div>
+
+<p>Much like Machine1, Machine3 shows very little filesystem activity. The only files that contain the “malicious.exe” file name are:</p>
+<ul>
+  <li>C:\Cases\Machine3\C\Users\User3\AppData\Local\Microsoft\Windows\WebCache\V01001B0.log</li>
+  <li>C:\Cases\Machine3\C\Users\User3\AppData\Local\Microsoft\Windows\WebCache\WebCacheV01.dat</li>
+</ul>
+
+<p>NEXT!</p>
+
+<h2 id="machine-4">Machine 4</h2>
+<div class="highlighter-rouge"><pre class="highlight"><code>C:\Cases\Machine4\C\Users\User4\AppData\Roaming\Google\Chrome\User Data\Default\History: malicious.exe
+C:\Cases\Machine4\C\Users\User4\AppData\Roaming\Google\Chrome\User Data\Default\History: malicious.exe
+C:\Cases\Machine4\C\Users\User4\AppData\Roaming\Google\Chrome\User Data\Default\History: malicious.exe
+C:\Cases\Machine4\C\Users\User4\AppData\Roaming\Google\Chrome\User Data\Default\History: malicious.exe
+</code></pre>
+</div>
+
+<p>This user had Chrome setup as the default browser and the only place in the collected evidence that we see the malware’s filename is in the Chrome History file. I decided to crack it open and get some better definition on what happened.</p>
+
+<p><img src="http://jon.glass/images/Screen-Shot-2016-01-02-at-7.01.48-PM-1024x165.png" alt="Chome Error Code" /></p>
+
+<ol>
+  <li>First things first…Chrome didn’t log current or target path for the malware. This means the download wasn’t written to disk. Great but how?</li>
+  <li>The interrupt_reason is populated with code 40. A quick look at a copy of the Chromium source code reveals what happened:
+    <div class="highlighter-rouge"><pre class="highlight"><code>// The user canceled the download.
+// "Canceled".
+INTERRUPT_REASON(USER_CANCELED, 40)
+</code></pre>
+    </div>
+  </li>
+  <li>No end time for the download because the user cancelled it.</li>
+  <li>Finally, the malware wasn’t opened because because the user cancelled it.</li>
+</ol>
+
+<p>Now before I catch a lot of flack for not being thorough enough, this malware has well established behavior patterns that are easy to check for. Using the SysInternals version of strings checks for unicode and ascii strings at the same time which offers the best avenue of finding evidence of the filename on disk. Even from this small sample of workstations, we can quickly see how far a malicious file has penetrated a file system and determine the extent of compromise.</p>
+
+<p>Does this technique work for all malware? No but it is a great start.</p>
+
+        
+
+    </div><!-- /.entry-wrapper -->
+    <nav class="pagination" role="navigation">
+      
+        <a href="http://jon.glass/blog/Unxoring-a-rat/" class="btn" title="UnXORing a RAT">Previous</a>
+      
+      
+        <a href="http://jon.glass/blog/RogueUsers/" class="btn" title="Dealing with users gone bad…">Next</a>
+      
+    </nav><!-- /.pagination -->
+  </article>
+</div><!-- /#main -->
+
+<div class="footer-wrapper">
+  <footer role="contentinfo" class="entry-wrapper">
+    
+
+<span>&copy; 2018 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
+<div class="social-icons">
+	<a href="https://twitter.com/GlassDFIR" title="Jon Glass on Twitter" target="_blank"><i class="fa fa-twitter-square fa-2x"></i></a>
+	
+	
+	
+	
+	
+	
+	<a href="https://github.com/GlassDFIR" title="Jon Glass on Github" target="_blank"><i class="fa fa-github-square fa-2x"></i></a>
+	
+  
+	
+  <a href="http://jon.glass/feed.xml" title="Atom/RSS feed"><i class="fa fa-rss-square fa-2x"></i></a>
+</div><!-- /.social-icons -->
+
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+<script type="text/javascript">
+  var BASE_URL = 'http://jon.glass';
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="http://jon.glass/assets/js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script src="http://jon.glass/assets/js/scripts.min.js"></script>
+
+
+
+
+</body>
+</html>

@@ -160,10 +160,12 @@
 <h4 id="example-displayed">Example displayed:</h4>
 <p><img src="../images/DisplayedAscii.png" alt="Example of ASCII" /></p>
 
-<p>Fun ASCII DFIR stuff you might find:</p>
+<h4 id="fun-ascii-dfir-stuff-you-might-find">Fun ASCII DFIR stuff you might find:</h4>
 <ul>
-  <li>Browser History, Cookies, etc. are stored in ASCII in Chrome, FireFox, Internet Explorer, and Edge.(Probably others too.)
+  <li>Browser History, Cookies, etc. are stored in ASCII in Chrome, FireFox (Probably others too.)
 <img src="../images/ChromeASCII.png" alt="Example of ASCII in Chrome History" /></li>
+  <li>File Paths in Shortcuts</li>
+  <li>Antivirus Logs</li>
 </ul>
 
 <h3 id="unicode">Unicode</h3>
@@ -178,6 +180,50 @@
 <p><img src="../images/unicode.png" alt="Example of Unicode" /></p>
 <h4 id="example-displayed-1">Example Displayed:</h4>
 <p><img src="../images/UnicodeDisplayed.png" alt="Example of Unicode" /></p>
+
+<h4 id="fun-unicode-dfir-stuff-you-might-find">Fun Unicode DFIR stuff you might find:</h4>
+<ul>
+  <li>Names of Files and Folders in $MFT, $LogFile, $UsnJrnl</li>
+  <li>Stuff in Windows Event Logs</li>
+  <li>Stuff in Windows Registry Keys</li>
+  <li>File Paths in Recycle Bin metadata files</li>
+  <li>File Paths in Shortcuts</li>
+  <li>Sticky Notes left on the Desktop</li>
+</ul>
+
+<h3 id="why-do-you-care">Why Do You Care?</h3>
+
+<p>Imagine you are a salty beat cop 4 days from retirement. Just do it. No, really.</p>
+
+<p>You get a call on a tip line saying an elaborate bank heist could have been committed. The caller says the they normally use a specific kind of fake id, knock out the guards with a tranq gun, put a bunch of money in a blue bag, and fly off the roof of the bank in a fancy helicopter. 
+While not perfect, unstructured analysis can provide the following details immediately:</p>
+<ul>
+  <li>Has there been a fake ID in the bank?
+    <ul>
+      <li>No? The crooks either haven’t struck or got lost on the way. It happens.</li>
+      <li>Yes? The crooks have been here!</li>
+    </ul>
+  </li>
+  <li>Has there been a tranq gun in the bank?
+    <ul>
+      <li>No? The guards must have spotted the fake ID and disabled the crooks before they got the gun out. NICE!</li>
+      <li>Yes? Well crap. The guards may or may not have had to deal with tranq darts. Gettting serious now…</li>
+    </ul>
+  </li>
+  <li>Was there a blue bag full of money in the bank?
+    <ul>
+      <li>No? Guards took out the crooks or the crooks were looking for Rubles instead of Dollars and just left.</li>
+      <li>Yes? Well then we can assume that the guards are subdued and the crooks are running around in the bank unchecked.</li>
+    </ul>
+  </li>
+  <li>Has anyone seen a fancy helicopter recently?
+    <ul>
+      <li>No? Helicopter might have been ceased or ran out of gas. Happens all the time.</li>
+      <li>Yes? Well…you have been successfully robbed. Time to start dusting for prints…</li>
+    </ul>
+  </li>
+</ul>
+
 
         
 

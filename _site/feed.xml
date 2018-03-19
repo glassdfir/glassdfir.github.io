@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://jon.glass/feed.xml" rel="self" type="application/atom+xml" /><link href="http://jon.glass/" rel="alternate" type="text/html" /><updated>2018-03-14T22:28:09-04:00</updated><id>http://jon.glass/</id><title type="html">Half Full of Security</title><subtitle>Sharpening the ACKs since 2013</subtitle><entry><title type="html">ADFIRWMC - 3. The Value of Unstructured Analysis</title><link href="http://jon.glass/adfirwmc/Ch3/" rel="alternate" type="text/html" title="ADFIRWMC - 3. The Value of Unstructured Analysis" /><published>2018-03-04T15:33:28-05:00</published><updated>2018-03-04T15:33:28-05:00</updated><id>http://jon.glass/adfirwmc/Ch3</id><content type="html" xml:base="http://jon.glass/adfirwmc/Ch3/">&lt;p&gt;I find performing unstructured analysis upfront to be critical part of my work flow because it tells me massive amount of contextual data upfront and it focuses the structured analysis I need to accomplish.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://jon.glass/feed.xml" rel="self" type="application/atom+xml" /><link href="http://jon.glass/" rel="alternate" type="text/html" /><updated>2018-03-18T20:32:02-04:00</updated><id>http://jon.glass/</id><title type="html">Half Full of Security</title><subtitle>Sharpening the ACKs since 2013</subtitle><entry><title type="html">ADFIRWMC - 3. The Value of Unstructured Analysis</title><link href="http://jon.glass/adfirwmc/Ch3/" rel="alternate" type="text/html" title="ADFIRWMC - 3. The Value of Unstructured Analysis" /><published>2018-03-04T15:33:28-05:00</published><updated>2018-03-04T15:33:28-05:00</updated><id>http://jon.glass/adfirwmc/Ch3</id><content type="html" xml:base="http://jon.glass/adfirwmc/Ch3/">&lt;p&gt;I find performing unstructured analysis upfront to be critical part of my work flow because it tells me massive amount of contextual data upfront and it focuses the structured analysis I need to accomplish.&lt;/p&gt;
 
 &lt;p&gt;When I say unstructed analysis, I am referring mostly to searching through the strings inside of the artifacts I have collected for keyword matches. Where do these keywords come from? Unless you are on a complete witch hunt, which unfortunately happens, there is a set of circumstances that led you to investigate this system. It could be an alert from weird proxy traffic or an antivirus hit on a file found in a User’s Temp folder.&lt;/p&gt;
 
@@ -27,10 +27,12 @@
 &lt;h4 id=&quot;example-displayed&quot;&gt;Example displayed:&lt;/h4&gt;
 &lt;p&gt;&lt;img src=&quot;../images/DisplayedAscii.png&quot; alt=&quot;Example of ASCII&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;Fun ASCII DFIR stuff you might find:&lt;/p&gt;
+&lt;h4 id=&quot;fun-ascii-dfir-stuff-you-might-find&quot;&gt;Fun ASCII DFIR stuff you might find:&lt;/h4&gt;
 &lt;ul&gt;
-  &lt;li&gt;Browser History, Cookies, etc. are stored in ASCII in Chrome, FireFox, Internet Explorer, and Edge.(Probably others too.)
+  &lt;li&gt;Browser History, Cookies, etc. are stored in ASCII in Chrome, FireFox (Probably others too.)
 &lt;img src=&quot;../images/ChromeASCII.png&quot; alt=&quot;Example of ASCII in Chrome History&quot; /&gt;&lt;/li&gt;
+  &lt;li&gt;File Paths in Shortcuts&lt;/li&gt;
+  &lt;li&gt;Antivirus Logs&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h3 id=&quot;unicode&quot;&gt;Unicode&lt;/h3&gt;
@@ -44,7 +46,50 @@
 &lt;h4 id=&quot;example-1&quot;&gt;Example:&lt;/h4&gt;
 &lt;p&gt;&lt;img src=&quot;../images/unicode.png&quot; alt=&quot;Example of Unicode&quot; /&gt;&lt;/p&gt;
 &lt;h4 id=&quot;example-displayed-1&quot;&gt;Example Displayed:&lt;/h4&gt;
-&lt;p&gt;&lt;img src=&quot;../images/UnicodeDisplayed.png&quot; alt=&quot;Example of Unicode&quot; /&gt;&lt;/p&gt;</content></entry><entry><title type="html">ADFIRWMC - 2. Remote Acquisition of Windows Artifacts</title><link href="http://jon.glass/adfirwmc/Ch2/" rel="alternate" type="text/html" title="ADFIRWMC - 2. Remote Acquisition of Windows Artifacts" /><published>2018-03-03T15:33:28-05:00</published><updated>2018-03-03T15:33:28-05:00</updated><id>http://jon.glass/adfirwmc/Ch2</id><content type="html" xml:base="http://jon.glass/adfirwmc/Ch2/">&lt;p&gt;Some folks reading this are convinced that Incident Response is all done through Endpoint Detection and Response solutions and in 2018 no one drops collection scripts to gather artifacts for analysis. Those people are wrong.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;../images/UnicodeDisplayed.png&quot; alt=&quot;Example of Unicode&quot; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;fun-unicode-dfir-stuff-you-might-find&quot;&gt;Fun Unicode DFIR stuff you might find:&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;Names of Files and Folders in $MFT, $LogFile, $UsnJrnl&lt;/li&gt;
+  &lt;li&gt;Stuff in Windows Event Logs&lt;/li&gt;
+  &lt;li&gt;Stuff in Windows Registry Keys&lt;/li&gt;
+  &lt;li&gt;File Paths in Recycle Bin metadata files&lt;/li&gt;
+  &lt;li&gt;File Paths in Shortcuts&lt;/li&gt;
+  &lt;li&gt;Sticky Notes left on the Desktop&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;why-do-you-care&quot;&gt;Why Do You Care?&lt;/h3&gt;
+
+&lt;p&gt;Imagine you are a salty beat cop 4 days from retirement. Just do it. No, really.&lt;/p&gt;
+
+&lt;p&gt;You get a call on a tip line saying an elaborate bank heist could have been committed. The caller says the they normally use a specific kind of fake id, knock out the guards with a tranq gun, put a bunch of money in a blue bag, and fly off the roof of the bank in a fancy helicopter. 
+While not perfect, unstructured analysis can provide the following details immediately:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Has there been a fake ID in the bank?
+    &lt;ul&gt;
+      &lt;li&gt;No? The crooks either haven’t struck or got lost on the way. It happens.&lt;/li&gt;
+      &lt;li&gt;Yes? The crooks have been here!&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Has there been a tranq gun in the bank?
+    &lt;ul&gt;
+      &lt;li&gt;No? The guards must have spotted the fake ID and disabled the crooks before they got the gun out. NICE!&lt;/li&gt;
+      &lt;li&gt;Yes? Well crap. The guards may or may not have had to deal with tranq darts. Gettting serious now…&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Was there a blue bag full of money in the bank?
+    &lt;ul&gt;
+      &lt;li&gt;No? Guards took out the crooks or the crooks were looking for Rubles instead of Dollars and just left.&lt;/li&gt;
+      &lt;li&gt;Yes? Well then we can assume that the guards are subdued and the crooks are running around in the bank unchecked.&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;Has anyone seen a fancy helicopter recently?
+    &lt;ul&gt;
+      &lt;li&gt;No? Helicopter might have been ceased or ran out of gas. Happens all the time.&lt;/li&gt;
+      &lt;li&gt;Yes? Well…you have been successfully robbed. Time to start dusting for prints…&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;</content></entry><entry><title type="html">ADFIRWMC - 2. Remote Acquisition of Windows Artifacts</title><link href="http://jon.glass/adfirwmc/Ch2/" rel="alternate" type="text/html" title="ADFIRWMC - 2. Remote Acquisition of Windows Artifacts" /><published>2018-03-03T15:33:28-05:00</published><updated>2018-03-03T15:33:28-05:00</updated><id>http://jon.glass/adfirwmc/Ch2</id><content type="html" xml:base="http://jon.glass/adfirwmc/Ch2/">&lt;p&gt;Some folks reading this are convinced that Incident Response is all done through Endpoint Detection and Response solutions and in 2018 no one drops collection scripts to gather artifacts for analysis. Those people are wrong.&lt;/p&gt;
 
 &lt;p&gt;The first thing you should know is you will run into problems. Even when your collection tool is working perfectly; network connections drop, hard drives run out of room, antivirus and data loss prevention software will freak out… this is going to happen. Embrace it.&lt;/p&gt;
 
