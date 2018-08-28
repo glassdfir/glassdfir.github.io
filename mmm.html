@@ -89,7 +89,7 @@
       function load() {
         var nextmovie = startofmarathon;
         var now = new Date();
-        savings = 8
+        savings = 8 + 30
         var minsfromstart = diff_minutes(now, startofmarathon)
         console.log("mins from start = " + minsfromstart);
         if (minsfromstart < movies[0][1]) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[0][1] - savings);refreshdisplay(nextmovie, 0);} else
