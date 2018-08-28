@@ -92,8 +92,8 @@
         savings = 8 + 30
         var minsfromstart = diff_minutes(now, startofmarathon)
         console.log("mins from start = " + minsfromstart);
-        if (minsfromstart < movies[0][1]) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[0][1] - savings);refreshdisplay(nextmovie, 0);} else
-        if (minsfromstart < movies[1][1]) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[1][1] - savings);refreshdisplay(nextmovie, 1);} else
+        if (minsfromstart < movies[0][1] - 8) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[0][1] - 8);refreshdisplay(nextmovie, 0);} else
+        if (minsfromstart < movies[1][1] - 30 ) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[1][1] - 30);refreshdisplay(nextmovie, 1);} else
         if (minsfromstart < movies[2][1]) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[2][1] - savings);refreshdisplay(nextmovie, 2);} else
         if (minsfromstart < movies[3][1]) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[3][1] - savings);refreshdisplay(nextmovie, 3);} else
         if (minsfromstart < movies[4][1]) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[4][1] - savings);refreshdisplay(nextmovie, 4);} else
