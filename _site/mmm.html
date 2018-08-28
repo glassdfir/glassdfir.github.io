@@ -17,7 +17,7 @@
 
     <script>
       var startofmarathon = new Date("Aug 28, 2018 08:00");
-      var savings = 8 + 30 + 4 + 15;
+      var savings = 8 + 30 + 4 + 15 + 20;
       var movies = new Array();
       movies[0] = new Array('Iron Man', 118, 'https://m.media-amazon.com/images/M/MV5BMTczNTI2ODUwOF5BMl5BanBnXkFtZTcwMTU0NTIzMw@@._V1_SY1000_CR0,0,674,1000_AL_.jpg');
       movies[1] = new Array('The Incredible Hulk', 261, 'https://m.media-amazon.com/images/M/MV5BMTUyNzk3MjA1OF5BMl5BanBnXkFtZTcwMTE1Njg2MQ@@._V1_SY1000_CR0,0,674,1000_AL_.jpg');
@@ -96,8 +96,8 @@
         if (minsfromstart < movies[1][1] - 30) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[1][1] - 30);refreshdisplay(nextmovie, 1);} else
         if (minsfromstart < movies[2][1] - 14) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[2][1] - 14);refreshdisplay(nextmovie, 2);} else
         if (minsfromstart < movies[3][1] - 50) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[3][1] - 10);refreshdisplay(nextmovie, 3);} else
-        if (minsfromstart < movies[4][1] - savings) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[4][1] - savings);refreshdisplay(nextmovie, 4);} else
-        if (minsfromstart < movies[5][1]) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[5][1]);refreshdisplay(nextmovie, 5);} else
+        if (minsfromstart < movies[4][1] - 56) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[4][1] - 56);refreshdisplay(nextmovie, 4);} else
+        if (minsfromstart < movies[5][1] - savings) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[5][1]-savings);refreshdisplay(nextmovie, 5);} else
         if (minsfromstart < movies[6][1]) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[6][1] - savings);refreshdisplay(nextmovie, 6);} else
         if (minsfromstart < movies[7][1]) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[7][1] - savings);refreshdisplay(nextmovie, 7);} else
         if (minsfromstart < movies[8][1]) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[8][1] - savings);refreshdisplay(nextmovie, 8);} else
