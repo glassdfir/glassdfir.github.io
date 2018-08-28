@@ -89,12 +89,12 @@
       function load() {
         var nextmovie = startofmarathon;
         var now = new Date();
-        savings = 8 + 30
+        savings = 8 + 30 + 4
         var minsfromstart = diff_minutes(now, startofmarathon)
         console.log("mins from start = " + minsfromstart);
         if (minsfromstart < movies[0][1] - 8) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[0][1] - 8);refreshdisplay(nextmovie, 0);} else
         if (minsfromstart < movies[1][1] - 30) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[1][1] - 30);refreshdisplay(nextmovie, 1);} else
-        if (minsfromstart < movies[2][1]) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[2][1] - savings);refreshdisplay(nextmovie, 2);} else
+        if (minsfromstart < movies[2][1] - savings  ) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[2][1] - savings);refreshdisplay(nextmovie, 2);} else
         if (minsfromstart < movies[3][1]) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[3][1] - savings);refreshdisplay(nextmovie, 3);} else
         if (minsfromstart < movies[4][1]) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[4][1] - savings);refreshdisplay(nextmovie, 4);} else
         if (minsfromstart < movies[5][1]) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[5][1] - savings);refreshdisplay(nextmovie, 5);} else
