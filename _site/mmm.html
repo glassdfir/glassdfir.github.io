@@ -17,28 +17,28 @@
 
     <script>
       var startofmarathon = new Date("Aug 28, 2018 08:00");
-
+      var savings = 8 + 30 + 4 + 15;
       var movies = new Array();
       movies[0] = new Array('Iron Man', 118, 'https://m.media-amazon.com/images/M/MV5BMTczNTI2ODUwOF5BMl5BanBnXkFtZTcwMTU0NTIzMw@@._V1_SY1000_CR0,0,674,1000_AL_.jpg');
       movies[1] = new Array('The Incredible Hulk', 261, 'https://m.media-amazon.com/images/M/MV5BMTUyNzk3MjA1OF5BMl5BanBnXkFtZTcwMTE1Njg2MQ@@._V1_SY1000_CR0,0,674,1000_AL_.jpg');
       movies[2] = new Array('Iron Man 2', 385, 'https://m.media-amazon.com/images/M/MV5BMTM0MDgwNjMyMl5BMl5BanBnXkFtZTcwNTg3NzAzMw@@._V1_.jpg');
       movies[3] = new Array('Thor', 500, 'https://m.media-amazon.com/images/M/MV5BOGE4NzU1YTAtNzA3Mi00ZTA2LTg2YmYtMDJmMThiMjlkYjg2XkEyXkFqcGdeQXVyNTgzMDMzMTg@._V1_SY1000_CR0,0,674,1000_AL_.jpg');
-      movies[4] = new Array('Captain America: The First Avenger', 625, 'https://m.media-amazon.com/images/M/MV5BMTYzOTc2NzU3N15BMl5BanBnXkFtZTcwNjY3MDE3NQ@@._V1_SY1000_CR0,0,640,1000_AL_.jpg');
-      movies[6] = new Array('The Avengers', 768, 'https://m.media-amazon.com/images/M/MV5BNDYxNjQyMjAtNTdiOS00NGYwLWFmNTAtNThmYjU5ZGI2YTI1XkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_SY1000_CR0,0,675,1000_AL_.jpg');
-      movies[7] = new Array('Iron Man 3', 903, 'https://m.media-amazon.com/images/M/MV5BMjE5MzcyNjk1M15BMl5BanBnXkFtZTcwMjQ4MjcxOQ@@._V1_SY1000_SX700_AL_.jpg');
-      movies[8] = new Array('Thor: The Dark World', 1015, 'https://m.media-amazon.com/images/M/MV5BMTQyNzAwOTUxOF5BMl5BanBnXkFtZTcwMTE0OTc5OQ@@._V1_SY1000_SX700_AL_.jpg');
-      movies[9] = new Array('Captain America: The Winter Soldier', 1151, 'https://m.media-amazon.com/images/M/MV5BMzA2NDkwODAwM15BMl5BanBnXkFtZTgwODk5MTgzMTE@._V1_SY1000_CR0,0,685,1000_AL_.jpg');
-      movies[10] = new Array('Guardians of the Galaxy', 1276, 'https://m.media-amazon.com/images/M/MV5BMTAwMjU5OTgxNjZeQTJeQWpwZ15BbWU4MDUxNDYxODEx._V1_SY1000_CR0,0,674,1000_AL_.jpg');
-      movies[11] = new Array('Avengers: Age of Ultron', 1418, 'https://m.media-amazon.com/images/M/MV5BMTM4OGJmNWMtOTM4Ni00NTE3LTg3MDItZmQxYjc4N2JhNmUxXkEyXkFqcGdeQXVyNTgzMDMzMTg@._V1_SY1000_SX675_AL_.jpg');
-      movies[12] = new Array('Ant-Man', 1536, 'https://m.media-amazon.com/images/M/MV5BMjM2NTQ5Mzc2M15BMl5BanBnXkFtZTgwNTcxMDI2NTE@._V1_.jpg');
-      movies[13] = new Array('Captain America: Civil War', 1684, 'https://m.media-amazon.com/images/M/MV5BMjQ0MTgyNjAxMV5BMl5BanBnXkFtZTgwNjUzMDkyODE@._V1_SY1000_CR0,0,674,1000_AL_.jpg');
-      movies[14] = new Array('Doctor Strange', 1799, 'https://m.media-amazon.com/images/M/MV5BNjgwNzAzNjk1Nl5BMl5BanBnXkFtZTgwMzQ2NjI1OTE@._V1_SY1000_CR0,0,674,1000_AL_.jpg');
-      movies[15] = new Array('Guardians of the Galaxy Vol.2', 1937, 'https://m.media-amazon.com/images/M/MV5BMTg2MzI1MTg3OF5BMl5BanBnXkFtZTgwNTU3NDA2MTI@._V1_SY1000_CR0,0,674,1000_AL_.jpg');
-      movies[16] = new Array('Spider-Man: Homecoming', 2070, 'https://m.media-amazon.com/images/M/MV5BNTk4ODQ1MzgzNl5BMl5BanBnXkFtZTgwMTMyMzM4MTI@._V1_SY1000_CR0,0,658,1000_AL_.jpg');
-      movies[17] = new Array('Thor: Ragnarok', 2200, 'https://m.media-amazon.com/images/M/MV5BMjMyNDkzMzI1OF5BMl5BanBnXkFtZTgwODcxODg5MjI@._V1_SY1000_CR0,0,674,1000_AL_.jpg');
-      movies[18] = new Array('Black Panther', 2335, 'https://m.media-amazon.com/images/M/MV5BMTg1MTY2MjYzNV5BMl5BanBnXkFtZTgwMTc4NTMwNDI@._V1_SY1000_CR0,0,674,1000_AL_.jpg');
-      movies[19] = new Array('Avengers : Infinity War', 2495, 'https://m.media-amazon.com/images/M/MV5BMjMxNjY2MDU1OV5BMl5BanBnXkFtZTgwNzY1MTUwNTM@._V1_SY1000_CR0,0,674,1000_AL_.jpg');
-      movies[20] = new Array('Sleep', 0, "https://www.kayhealdhr.co.uk/wp-content/uploads/2017/03/sleep2.png");
+      movies[4] = new Array('Captain America The First Avenger', 625, 'https://m.media-amazon.com/images/M/MV5BMTYzOTc2NzU3N15BMl5BanBnXkFtZTcwNjY3MDE3NQ@@._V1_SY1000_CR0,0,640,1000_AL_.jpg');
+      movies[5] = new Array('The Avengers', 768, 'https://m.media-amazon.com/images/M/MV5BNDYxNjQyMjAtNTdiOS00NGYwLWFmNTAtNThmYjU5ZGI2YTI1XkEyXkFqcGdeQXVyMTMxODk2OTU@._V1_SY1000_CR0,0,675,1000_AL_.jpg');
+      movies[6] = new Array('Iron Man 3', 903, 'https://m.media-amazon.com/images/M/MV5BMjE5MzcyNjk1M15BMl5BanBnXkFtZTcwMjQ4MjcxOQ@@._V1_SY1000_SX700_AL_.jpg');
+      movies[7] = new Array('Thor: The Dark World', 1015, 'https://m.media-amazon.com/images/M/MV5BMTQyNzAwOTUxOF5BMl5BanBnXkFtZTcwMTE0OTc5OQ@@._V1_SY1000_SX700_AL_.jpg');
+      movies[8] = new Array('Captain America: The Winter Soldier', 1151, 'https://m.media-amazon.com/images/M/MV5BMzA2NDkwODAwM15BMl5BanBnXkFtZTgwODk5MTgzMTE@._V1_SY1000_CR0,0,685,1000_AL_.jpg');
+      movies[9] = new Array('Guardians of the Galaxy', 1276, 'https://m.media-amazon.com/images/M/MV5BMTAwMjU5OTgxNjZeQTJeQWpwZ15BbWU4MDUxNDYxODEx._V1_SY1000_CR0,0,674,1000_AL_.jpg');
+      movies[10] = new Array('Avengers: Age of Ultron', 1418, 'https://m.media-amazon.com/images/M/MV5BMTM4OGJmNWMtOTM4Ni00NTE3LTg3MDItZmQxYjc4N2JhNmUxXkEyXkFqcGdeQXVyNTgzMDMzMTg@._V1_SY1000_SX675_AL_.jpg');
+      movies[11] = new Array('Ant-Man', 1536, 'https://m.media-amazon.com/images/M/MV5BMjM2NTQ5Mzc2M15BMl5BanBnXkFtZTgwNTcxMDI2NTE@._V1_.jpg');
+      movies[12] = new Array('Captain America: Civil War', 1684, 'https://m.media-amazon.com/images/M/MV5BMjQ0MTgyNjAxMV5BMl5BanBnXkFtZTgwNjUzMDkyODE@._V1_SY1000_CR0,0,674,1000_AL_.jpg');
+      movies[13] = new Array('Doctor Strange', 1799, 'https://m.media-amazon.com/images/M/MV5BNjgwNzAzNjk1Nl5BMl5BanBnXkFtZTgwMzQ2NjI1OTE@._V1_SY1000_CR0,0,674,1000_AL_.jpg');
+      movies[14] = new Array('Guardians of the Galaxy Vol.2', 1937, 'https://m.media-amazon.com/images/M/MV5BMTg2MzI1MTg3OF5BMl5BanBnXkFtZTgwNTU3NDA2MTI@._V1_SY1000_CR0,0,674,1000_AL_.jpg');
+      movies[15] = new Array('Spider-Man: Homecoming', 2070, 'https://m.media-amazon.com/images/M/MV5BNTk4ODQ1MzgzNl5BMl5BanBnXkFtZTgwMTMyMzM4MTI@._V1_SY1000_CR0,0,658,1000_AL_.jpg');
+      movies[16] = new Array('Thor: Ragnarok', 2200, 'https://m.media-amazon.com/images/M/MV5BMjMyNDkzMzI1OF5BMl5BanBnXkFtZTgwODcxODg5MjI@._V1_SY1000_CR0,0,674,1000_AL_.jpg');
+      movies[17] = new Array('Black Panther', 2335, 'https://m.media-amazon.com/images/M/MV5BMTg1MTY2MjYzNV5BMl5BanBnXkFtZTgwMTc4NTMwNDI@._V1_SY1000_CR0,0,674,1000_AL_.jpg');
+      movies[18] = new Array('Avengers : Infinity War', 2495, 'https://m.media-amazon.com/images/M/MV5BMjMxNjY2MDU1OV5BMl5BanBnXkFtZTgwNzY1MTUwNTM@._V1_SY1000_CR0,0,674,1000_AL_.jpg');
+      movies[19] = new Array('Sleep', 0, "https://www.kayhealdhr.co.uk/wp-content/uploads/2017/03/sleep2.png");
 
       // Set the date we're counting down to
       function diff_minutes(dt2, dt1) {
@@ -89,15 +89,15 @@
       function load() {
         var nextmovie = startofmarathon;
         var now = new Date();
-        savings = 8 + 30 + 4
+        
         var minsfromstart = diff_minutes(now, startofmarathon)
         console.log("mins from start = " + minsfromstart);
         if (minsfromstart < movies[0][1] - 8) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[0][1] - 8);refreshdisplay(nextmovie, 0);} else
         if (minsfromstart < movies[1][1] - 30) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[1][1] - 30);refreshdisplay(nextmovie, 1);} else
-        if (minsfromstart < movies[2][1] - savings  ) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[2][1] - savings);refreshdisplay(nextmovie, 2);} else
-        if (minsfromstart < movies[3][1]) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[3][1] - savings);refreshdisplay(nextmovie, 3);} else
-        if (minsfromstart < movies[4][1]) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[4][1] - savings);refreshdisplay(nextmovie, 4);} else
-        if (minsfromstart < movies[5][1]) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[5][1] - savings);refreshdisplay(nextmovie, 5);} else
+        if (minsfromstart < movies[2][1] - 14) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[2][1] - 14);refreshdisplay(nextmovie, 2);} else
+        if (minsfromstart < movies[3][1] - 50) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[3][1] - 10);refreshdisplay(nextmovie, 3);} else
+        if (minsfromstart < movies[4][1] - savings) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[4][1] - savings);refreshdisplay(nextmovie, 4);} else
+        if (minsfromstart < movies[5][1]) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[5][1]);refreshdisplay(nextmovie, 5);} else
         if (minsfromstart < movies[6][1]) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[6][1] - savings);refreshdisplay(nextmovie, 6);} else
         if (minsfromstart < movies[7][1]) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[7][1] - savings);refreshdisplay(nextmovie, 7);} else
         if (minsfromstart < movies[8][1]) {nextmovie.setMinutes(startofmarathon.getMinutes() + movies[8][1] - savings);refreshdisplay(nextmovie, 8);} else
