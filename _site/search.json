@@ -2,7 +2,23 @@
 
   
     {
-      "title"			: "ADFIRWMC - 3. The Value of Unstructured Analysis",
+      "title"			: "Hacking BRBBot",
+      "link"			: "http://jon.glass/blog/dissecting-brbbot/",
+      "excerpt"		: ""
+    }
+  
+
+  
+    ,{
+      "title"			: "ADFIRWMC - 4. The Value of Unstructured Analysis",
+      "link"			: "http://jon.glass/adfirwmc/Ch4/",
+      "excerpt"		: ""
+    }
+  
+
+  
+    ,{
+      "title"			: "ADFIRWMC - 3. Files of Forensic Interest",
       "link"			: "http://jon.glass/adfirwmc/Ch3/",
       "excerpt"		: ""
     }

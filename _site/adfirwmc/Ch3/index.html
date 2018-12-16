@@ -5,13 +5,13 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
 <head>
 <meta charset="utf-8">
-<title>ADFIRWMC - 3. The Value of Unstructured Analysis &#8211; Half Full of Security</title>
+<title>ADFIRWMC - 3. Files of Forensic Interest &#8211; Half Full of Security</title>
 <meta name="description" content="">
 <meta name="keywords" content="">
 
 
 <!-- Twitter Cards -->
-<meta name="twitter:title" content="ADFIRWMC - 3. The Value of Unstructured Analysis">
+<meta name="twitter:title" content="ADFIRWMC - 3. Files of Forensic Interest">
 <meta name="twitter:description" content="">
 <meta name="twitter:site" content="@GlassDFIR">
 <meta name="twitter:creator" content="@GlassDFIR">
@@ -22,7 +22,7 @@
 <!-- Open Graph -->
 <meta property="og:locale" content="en_US">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ADFIRWMC - 3. The Value of Unstructured Analysis">
+<meta property="og:title" content="ADFIRWMC - 3. Files of Forensic Interest">
 <meta property="og:description" content="">
 <meta property="og:url" content="http://jon.glass/adfirwmc/Ch3/">
 <meta property="og:site_name" content="Half Full of Security">
@@ -125,198 +125,177 @@
           
         </ul>
         
-          <h1 class="entry-title">ADFIRWMC - 3. The Value of Unstructured Analysis</h1>
+          <h1 class="entry-title">ADFIRWMC - 3. Files of Forensic Interest</h1>
         
       </header>
 
 
         <time datetime="2018-03-04T15:33:28-05:00"><i class="fa fa-calendar-o"></i> March 04, 2018</time>
-        <p>I find performing unstructured analysis upfront to be critical part of my work flow because it tells me massive amount of contextual data upfront and it focuses the structured analysis I need to accomplish.</p>
-
-<p>When I say unstructed analysis, I am referring mostly to searching through the strings inside of the artifacts I have collected for keyword matches. Where do these keywords come from? Unless you are on a complete witch hunt, which unfortunately happens, there is a set of circumstances that led you to investigate this system. It could be an alert from weird proxy traffic or an antivirus hit on a file found in a User’s Temp folder.</p>
-
-<p>Whatever it is, these events typically have fun details that you can search for. (90% of the time it ends up being some part of a file path or part of a URL.) Let’s look at a little bit of science before we get into DFIRness of it all. This topic can get hopeless deep and veer of course quickly so I am only covering the meat and potatoes.</p>
-
-<h2 id="tools-used">Tools Used</h2>
-<ul>
-  <li><a href="https://docs.microsoft.com/en-us/sysinternals/downloads/strings">Sysinternals Strings</a></li>
-  <li><a href="http://gnuwin32.sourceforge.net/packages/grep.htm">Grep For Windows</a></li>
-  <li><a href="https://ericzimmerman.github.io/">Eric Zimmerman’s Registry Explorer</a></li>
-  <li>PowerShell</li>
-</ul>
-
-<h2 id="strings">Strings</h2>
-
-<p>A string is a data type used in programming, such as an integer and floating point unit, but is used to represent text rather than numbers. Most of the words you read on a computer are stored as a string on disk or in memory. For instance, by visiting this site, your browser has probably stored a cached version of this page to a temp folder somewhere in your profile. On top of that, your browser also needs this page’s content in its process memory in order to render it. Strings get thrown all over the place by doing even the most mundane tasks. Knowing the significance of where strings are found can make your life a lot easier.</p>
-
-<h3 id="ascii">ASCII</h3>
-<ul>
-  <li>Stands for American Standard Code for Information Interchange but you will never need to know that.</li>
-  <li>Even though ASCII predates epoch and maybe even time itself, it is the basis for most modern character-encoding schemes.</li>
-  <li>Ascii is a code for representing English characters as numbers, with each letter assigned a number from 0 to 127</li>
-  <li>Not all ASCII characters are visible text.
-    <ul>
-      <li>Some are used to control how text is displayed like 0x0A New Line or 0x09 Tab.</li>
-      <li>Some are strictly for commands like Escape 0x1B or Delete 0x7F.</li>
-    </ul>
-  </li>
-  <li>Reference: https://www.asciitable.com/</li>
-</ul>
-
-<h4 id="example">Example:</h4>
-<p><img src="../images/AsciiStrings.png" alt="Example of ASCII" /></p>
-<h4 id="example-displayed">Example displayed:</h4>
-<p><img src="../images/DisplayedAscii.png" alt="Example of ASCII" /></p>
-
-<h4 id="fun-ascii-dfir-stuff-you-might-find">Fun ASCII DFIR stuff you might find:</h4>
-<ul>
-  <li>Browser History, Cookies, etc. are stored in ASCII in Chrome, FireFox (Probably others too.)
-<img src="../images/ChromeASCII.png" alt="Example of ASCII in Chrome History" /></li>
-  <li>File Paths in Shortcuts</li>
-  <li>Antivirus Logs</li>
-</ul>
-
-<h3 id="unicode">Unicode</h3>
-<ul>
-  <li>Like ASCII but bigger</li>
-  <li>Unicode is a standard which defines the internal text coding system in almost all operating systems used in computers at present.</li>
-  <li>Version 1 started out with 65536 code points, commonly encoded in 16 bits or 2 bytes.</li>
-  <li>The current version is 6.3, using 110,187 of the available 1.1 million code points.</li>
-</ul>
-
-<h4 id="example-1">Example:</h4>
-<p><img src="../images/unicode.png" alt="Example of Unicode" /></p>
-<h4 id="example-displayed-1">Example Displayed:</h4>
-<p><img src="../images/UnicodeDisplayed.png" alt="Example of Unicode" /></p>
-
-<h4 id="fun-unicode-dfir-stuff-you-might-find">Fun Unicode DFIR stuff you might find:</h4>
-<ul>
-  <li>Names of Files and Folders in $MFT, $LogFile, $UsnJrnl</li>
-  <li>Stuff in Windows Event Logs</li>
-  <li>Stuff in Windows Registry Keys</li>
-  <li>File Paths in Recycle Bin metadata files</li>
-  <li>File Paths in Shortcuts</li>
-  <li>Sticky Notes left on the Desktop</li>
-  <li>Literally almost anything with text.</li>
-</ul>
-
-<h3 id="why-do-you-care">Why Do You Care?</h3>
-
-<p>Imagine you are a salty beat cop 4 days from retirement. Just do it. No, really.</p>
-
-<p>You get a call on a tip line saying an elaborate bank heist could have been committed. The caller says the they normally use a specific kind of fake id, knock out the guards with a tranq gun, put a bunch of money in a blue bag, and fly off the roof of the bank in a fancy helicopter. 
-While not perfect, unstructured analysis can provide the following details immediately:</p>
-<ul>
-  <li>Has there been a fake ID in the bank?
-    <ul>
-      <li>No? The crooks either haven’t struck or got lost on the way. It happens.</li>
-      <li>Yes? The crooks have been here!</li>
-    </ul>
-  </li>
-  <li>Has there been a tranq gun in the bank?
-    <ul>
-      <li>No? The guards must have spotted the fake ID and disabled the crooks before they got the gun out. NICE!</li>
-      <li>Yes? Well crap. The guards may or may not have had to deal with tranq darts. Gettting serious now…</li>
-    </ul>
-  </li>
-  <li>Was there a blue bag full of money in the bank?
-    <ul>
-      <li>No? Guards took out the crooks or the crooks were looking for Rubles instead of Dollars and just left.</li>
-      <li>Yes? Well then we can assume that the guards are subdued and the crooks are running around in the bank unchecked.</li>
-    </ul>
-  </li>
-  <li>Has anyone seen a fancy helicopter recently?
-    <ul>
-      <li>No? Helicopter might have been ceased or ran out of gas. Happens all the time.</li>
-      <li>Yes? Well…you have been successfully robbed. Time to start dusting for prints…</li>
-    </ul>
-  </li>
-</ul>
-
-<h2 id="real-world-example">Real World Example</h2>
-
-<p>Here is an interesting “crook” I found on <a href="https://www.hybrid-analysis.com/sample/4231f020816eebfa0b51e252477f2769838abeb83728072185060253372a4dd0?environmentId=120">Hybrid Analysis</a>. This sample has been linked to APT33 and drops the TURNEDUP backdoor. For funsies, I 7zipped it up, named it “Paul_resume.7z” and sent it to myself in an email to simulate how these things go down.</p>
-
-<p>High level things we can look for from this sample as discovered from our detection team and/or OSINT:</p>
-<ul>
-  <li>Filenames
-    <ul>
-      <li>stikynote.exe, codexgigas_f09bb42e6c39a9714ed8a4d4191cf19e40d1919b.exe, Paul_resume.7z</li>
-    </ul>
-  </li>
-  <li>URLs
-    <ul>
-      <li>googlmail.net</li>
-    </ul>
-  </li>
-</ul>
-
-<p>THIS IS A JOB FOR POWERSHELL!!!</p>
-
-<div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="nb">start</span>-process C:<span class="se">\T</span>ools<span class="se">\s</span>trings.exe -ArgumentList <span class="s2">"-nobanner -accepteula -s 2018-03-18-10-16-4</span><span class="se">\*</span><span class="s2">"</span> -RedirectStandardOutput ..<span class="se">\s</span>trings.txt
-<span class="nb">gc</span> .<span class="se">\s</span>trings.txt| <span class="nb">Where-Object</span> <span class="o">{</span> <span class="nv">$_</span> -imatch <span class="s2">"Paul_resume|codexgigas|stikynote"</span> <span class="o">}</span> | <span class="nb">sort</span> | unique
-</code></pre>
-</div>
-<p>###Example:
-<img src="../images/strings.png" alt="reviewing strings in Powershell" /></p>
-
-<p>This output speaks so much about what has transpired on this machine that I don’t need to wait for structured analysis to make a containment decision. Here are the highlights that I can see in roughly 30 secs:</p>
+        <p>Each and every one of these artifacts are a deep world of details all to themselves but I tried to boil them down for this list. We will cover most of these in greater detail further in this course.</p>
 
 <ul>
-  <li>The $MFT, $LogFile, and $USNJrnl:$J show evidence of the download attempt, successful download of the zip file, unzipping, and execution:
+  <li>NTFS Master File Table ($MFT)
     <ul>
-      <li>Download Attempt:
+      <li>Description: Each file on an NTFS volume is represented by a record in a special file called the master file table (MFT).</li>
+      <li>Importance: ★★★★★
         <ul>
-          <li><code class="highlighter-rouge">C:\Scripts\2018-03-18-10-16-4\c\$Extend\$USNJrnl$J: &lt;&lt;Paul_Resume.7z.2hvceui.partial</code></li>
-          <li>The suffix .parital is affixed to files that are in the process of being downloaded by IE and Edge.</li>
+          <li>This contains the vast majority of the filesystem information for an NTFS volume.</li>
+          <li>Once parsed, you can establish file paths and variety of timestamps that make timelining events easier.</li>
+          <li>So much info can be derived from the MFT that I refuse to try to explain it here.</li>
         </ul>
       </li>
-      <li>Successful Download:
+      <li>Line to add to collection script: <code class="highlighter-rouge">$filestocollect += 'c:\$MFT'</code></li>
+    </ul>
+  </li>
+  <li>NTFS Transaction Log ($LogFile)
+    <ul>
+      <li>Description: NTFS is designed to be recoverable in case something borks. To do that, every file operation is logged so in case of unexpected system shutdown due to power error or critical system failure, the operating system can recover the status of file system to the previous status with saved information in $LogFile file.</li>
+      <li>Importance: ★★★☆☆
         <ul>
-          <li><code class="highlighter-rouge">C:\Scripts\2018-03-18-10-16-4\c\$Extend\$USNJrnl$J: &lt;Paul_Resume.7z</code></li>
-          <li>Here we see just the Paul_Resume.7z meaning it finished downloading</li>
+          <li>While you can pull off some geeky cool stuff from the data in the $LogFile, I usually don’t need to dig into it much because the MFT is largely full of the relevant info.</li>
         </ul>
       </li>
-      <li>Unzipping
+      <li>Line to add to collection script: <code class="highlighter-rouge">$filestocollect += 'c:\$LogFile'</code></li>
+    </ul>
+  </li>
+  <li>NTFS Change Journal ($Usnjrnl:$J)
+    <ul>
+      <li>Description: Update Sequence Number Journal is a feature of NTFS which maintains a record of changes made to the volume. Whenever a change is made to the volume, a record is added to the file. Each record is identified by a 64-bit Update Sequence Number or USN. (For this reason Change Journals are sometimes called USN Journals.) Each record in the Change Journal contains the USN, the name of the file, and information about what the change was.</li>
+      <li>Importance: ★★★☆☆
         <ul>
-          <li><code class="highlighter-rouge">C:\Scripts\2018-03-18-10-16-4\c\$Extend\$USNJrnl$J: $&lt;Paul_Resume.7z.lnk</code></li>
-          <li>I don’t know the exact filepath of this Shortcut file but the majority of shortcuts are created for recently accessed files.</li>
-          <li><code class="highlighter-rouge">C:\Scripts\2018-03-18-10-16-4\c\$Extend\$USNJrnl$J: r&lt;codexgigas_f09bb42e6c39a9714ed8a4d4191cf19e40d1919b-1.exe</code></li>
-          <li>Since this is the file inside the 7z file, we can see that it was successfully unzipped.</li>
-          <li><code class="highlighter-rouge">C:\Scripts\2018-03-18-10-16-4\c\Users\Username\NTUSER.DAT: C:\Users\Username\Desktop\Paul_Resume\codexgigas_f09bb42e6c39a9714ed8a4d4191cf19e40d1919b-1.exe</code></li>
-          <li>This line from the NTUSER.DAT file of from the Username profile clearly shows this was extracted to the users desktop. What stored this string in the user’s registry? Right now…it doesn’t matter. We are not parsing anything. Only triaging.</li>
+          <li>This is another one of those files you don’t need on a day to day basis, mostly for the deep forensic dives where you need to know exactly what changes took place at the volume level during a period of time.</li>
+          <li>Using the $MFT, $LogFile, and $USNJrnl:$J in concert can paint a very high fidelity picture of file system events. Using them together can help shed light on things like timestomping.</li>
         </ul>
       </li>
-      <li>Execution:
+      <li>Line to add to collection script
         <ul>
-          <li><code class="highlighter-rouge">C:\Scripts\2018-03-18-10-16-4\c\$Extend\$USNJrnl$J: R&lt;CODEXGIGAS_F09BB42E6C39A9714E-F57CC974.pf</code></li>
-          <li>Files ending in .pf are typically associated with Windows Prefetch. This is a file that is autmagically generated when you run an execuatable to make a Windows machine more efficient. This is strong evidence of execution. We will dig into Prefetch later in this course.</li>
-          <li>This machine does not have StikyNotes install from Microsoft so references to <strong>StikyNote.exe</strong>, <strong>StikyNote.tmp</strong>,  and <strong>STIKYNOTE.EXE-EC3D9C6B.pf</strong> seen in $UsnJrnl:$J, $LogFile, and $MFT tell us that the TURNEDUP backdoor was successfully ran on this machine.</li>
+          <li><code class="highlighter-rouge">$filestocollect += 'c:\$Extend\USNjrnl:$J'</code></li>
         </ul>
       </li>
     </ul>
   </li>
-  <li>Persistence:
+  <li>System Registry Hives
     <ul>
-      <li>This was less science and more eductated guesswork but it is rare to see a complete file path in a registry value unless it is going to be used to execute something Windows wouldn’t naturally know where to find ergo… persistence.
-  A quick peek with <a href="https://ericzimmerman.github.io/Software/RegistryExplorer_RECmd.zip">Eric Zimmerman’s Registry Explorer</a> revealed my hunch was right.</li>
+      <li>Description:</li>
+      <li>Importance:</li>
+      <li>Line to add to collection script:
+        <ul>
+          <li><code class="highlighter-rouge">$filesigs += '^c:\\Windows\\System32\\config\\.*'</code></li>
+        </ul>
+      </li>
     </ul>
-    <pre>
-      Registry file: C:\Scripts\2018-03-18-10-16-4\c\Users\Username\NTUSER.DAT
-      Key: Software\Microsoft\Windows\CurrentVersion\Run
-      Last write: 2018-03-18 17:03:14
-      Value: RESTART_STICKY_NOTESS (RegSz)
-      Data: C:\Users\Username\AppData\Local\Temp\StikyNote.exe 
-  </pre>
+  </li>
+  <li>User Registry Hives
     <ul>
-      <li>Good ol’ HKCU\Software\Microsoft\Windows\CurrentVersion\Run is one of the easiest methods of making sure an executable starts when a user logs in. Makes for a good IoC to test the rest of your environment against.</li>
+      <li>Description:</li>
+      <li>Importance:</li>
+      <li>Lines to add to collection script:
+        <ul>
+          <li><code class="highlighter-rouge">$filesigs += '^c:\\Users\\.*\\ntuser.dat$'</code></li>
+          <li><code class="highlighter-rouge">$filesigs += '^c:\\Users\\.*\\AppData\\Local\\Microsoft\\Windows\\usrclass.dat$'</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>Windows Event Logs
+    <ul>
+      <li>Description:</li>
+      <li>Importance:</li>
+      <li>Line to add to collection script:
+        <ul>
+          <li><code class="highlighter-rouge">$filesigs += '^c:\\Windows\\System32\\winevt\\Logs\\.*.evtx$'</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>Prefetch Files
+    <ul>
+      <li>Description:</li>
+      <li>Importance:</li>
+      <li>Line to add to collection script:
+        <ul>
+          <li><code class="highlighter-rouge">$filesigs += '^c:\\Windows\\Prefetch\\.*\.pf$'</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>Application Experience Service Artifacts
+    <ul>
+      <li>Description:</li>
+      <li>Importance:</li>
+      <li>Line to add to collection script:
+        <ul>
+          <li><code class="highlighter-rouge">$filesigs += '^c:\\Windows\\AppCompat\\Programs\\Amcache.hve$'</code></li>
+          <li><code class="highlighter-rouge">$filesigs += '^C:\\Windows\\AppCompat\\Programs\\RecentFilecache.bcf$'</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>Jump Lists
+    <ul>
+      <li>Description:</li>
+      <li>Importance:</li>
+      <li>Line to add to collection script:
+        <ul>
+          <li><code class="highlighter-rouge">$filesigs += '^c:\\Users\\.*\\AppData\\Roaming\\Microsoft\\Windows\\Recent\\AutomaticDestinations\\.*$'</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>Shortcuts
+    <ul>
+      <li>Description:</li>
+      <li>Importance:</li>
+      <li>Line to add to collection script:
+        <ul>
+          <li><code class="highlighter-rouge">$filesigs += '^c:\\Users\\.*\\AppData\\Roaming\\Microsoft\\(Windows|Office)\\Recent\\.*\.lnk$'</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>USB First and Last times used
+    <ul>
+      <li>Description:</li>
+      <li>Importance:</li>
+      <li>Line to add to collection script:
+        <ul>
+          <li><code class="highlighter-rouge">$filesigs += '^C:\\Windows\\inf\\setupapi.dev.log$'</code></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>Browser Artifacts
+    <ul>
+      <li>Description: Turns out the internet works faster if people don’t download things they have already downloaded before. To keep track of all the places you have been and the files you have locally cached already, browsers store a ton of info in a variety of databases.</li>
+      <li>Importance: ★★★★★
+        <ul>
+          <li>This is a pretty important item to grab because it collects information on Windows Explorer in addition to Internet Explorer.</li>
+        </ul>
+      </li>
+      <li>Lines to add to collection script:
+        <ul>
+          <li>IE
+            <ul>
+              <li><code class="highlighter-rouge">$filesigs += '^c:\\Users\\.*\\AppData\\.*\\Microsoft\\Windows\\WebCache\\.*'</code></li>
+            </ul>
+          </li>
+          <li>FireFox
+            <ul>
+              <li><code class="highlighter-rouge">$filesigs += '^c:\\Users\\.*\\%\AppData\\.*\\Mozilla\\Firefox\\Profiles\\.*.default\\.*'</code></li>
+            </ul>
+          </li>
+          <li>Chrome
+            <ul>
+              <li><code class="highlighter-rouge">$filesigs += '^c:\\Users\\.*\\AppData\\.*\\Google\\Chrome\\User\ Data\\Default\\.*'</code></li>
+            </ul>
+          </li>
+          <li>This will grab all of the associated files from all of the profiles</li>
+        </ul>
+      </li>
     </ul>
   </li>
 </ul>
 
-<p>We have found all the evidence we need to determine that this machine needs to be removed from the network and further analysis needs be taken to determine what took place after infection. While fairly typical, this example does not represent all malware or reasons you might need to DFIR a system so your milage may vary BUT I found performing this step first almost always helps eliminate or focus structured analysis.</p>
-
-<p>Still not a believer? <a href="http://jon.glass/blog/TwasTheGrepBeforeXmas/">I wrote up a similar case a while ago</a> that saved my buns before the holidays.</p>
 
         
 
@@ -325,6 +304,8 @@ While not perfect, unstructured analysis can provide the following details immed
       
         <a href="http://jon.glass/adfirwmc/Ch2/" class="btn" title="ADFIRWMC - 2. Remote Acquisition of Windows Artifacts">Previous</a>
       
+      
+        <a href="http://jon.glass/adfirwmc/Ch4/" class="btn" title="ADFIRWMC - 4. The Value of Unstructured Analysis">Next</a>
       
     </nav><!-- /.pagination -->
   </article>

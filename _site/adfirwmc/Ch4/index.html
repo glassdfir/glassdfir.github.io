@@ -1,0 +1,370 @@
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8" lang="en"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9" lang="en"><![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<title>ADFIRWMC - 4. The Value of Unstructured Analysis &#8211; Half Full of Security</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+
+
+<!-- Twitter Cards -->
+<meta name="twitter:title" content="ADFIRWMC - 4. The Value of Unstructured Analysis">
+<meta name="twitter:description" content="">
+<meta name="twitter:site" content="@GlassDFIR">
+<meta name="twitter:creator" content="@GlassDFIR">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://jon.glass/images/site-logo.png">
+
+<!-- Open Graph -->
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ADFIRWMC - 4. The Value of Unstructured Analysis">
+<meta property="og:description" content="">
+<meta property="og:url" content="http://jon.glass/adfirwmc/Ch4/">
+<meta property="og:site_name" content="Half Full of Security">
+
+
+
+
+
+<link rel="canonical" href="http://jon.glass/adfirwmc/Ch4/">
+<link href="http://jon.glass/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="http://jon.glass/assets/css/main.css">
+<!-- Webfonts -->
+<script src="https://use.edgefonts.net/source-sans-pro:n2,i2,n3,i3,n4,i4,n6,i6,n7,i7,n9,i9;source-code-pro:n4,n7;volkhov.js"></script>
+
+<meta http-equiv="cleartype" content="on">
+
+<!-- HTML5 Shiv and Media Query Support -->
+<!--[if lt IE 9]>
+  <script src="http://jon.glass/assets/js/vendor/html5shiv.min.js"></script>
+  <script src="http://jon.glass/assets/js/vendor/respond.min.js"></script>
+<![endif]-->
+
+<!-- Modernizr -->
+<script src="http://jon.glass/assets/js/vendor/modernizr-2.7.1.custom.min.js"></script>
+
+
+<!-- MathJax -->
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+<!-- Icons -->
+<!-- 16x16 -->
+<link rel="shortcut icon" href="http://jon.glass/favicon.ico">
+<!-- 32x32 -->
+<link rel="shortcut icon" href="http://jon.glass/favicon.png">
+<!-- 57x57 (precomposed) for iPhone 3GS, pre-2011 iPod Touch and older Android devices -->
+<link rel="apple-touch-icon-precomposed" href="http://jon.glass/images/apple-touch-icon-precomposed.png">
+<!-- 72x72 (precomposed) for 1st generation iPad, iPad 2 and iPad mini -->
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://jon.glass/images/apple-touch-icon-72x72-precomposed.png">
+<!-- 114x114 (precomposed) for iPhone 4, 4S, 5 and post-2011 iPod Touch -->
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://jon.glass/images/apple-touch-icon-114x114-precomposed.png">
+<!-- 144x144 (precomposed) for iPad 3rd and 4th generation -->
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://jon.glass/images/apple-touch-icon-144x144-precomposed.png">
+
+</head>
+
+<body id="post">
+
+<div class="navigation-wrapper">
+	<nav role="navigation" id="site-nav" class="animated drop">
+	    <ul>
+      
+		    
+		    <li><a href="http://jon.glass/blog/" >Blog</a></li>
+		  
+		    
+		    <li><a href="http://jon.glass/adfirwmc/" >ADFIRWMC</a></li>
+		  
+		    
+		    <li><a href="http://jon.glass/tips/" >Tips and Tricks</a></li>
+		  
+		    
+		    <li><a href="http://jon.glass/about/" >About</a></li>
+		  
+		    
+		    <li><a href="http://jon.glass/search/" >Search</a></li>
+		  
+	    </ul>
+	</nav>
+</div><!-- /.navigation-wrapper -->
+
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+
+<header class="masthead">
+	<div class="wrap">
+      
+  		<a href="http://jon.glass/" class="site-logo" rel="home" title="Half Full of Security"><img src="http://jon.glass/images/site-logo.png" width="200" height="200" alt="Half Full of Security logo" class="animated fadeInDown"></a>
+      
+      <h1 class="site-title animated fadeIn"><a href="http://jon.glass/">Half Full of Security</a></h1>
+		<h2 class="site-description animated fadeIn" itemprop="description">Sharpening the ACKs since 2013</h2>
+	</div>
+</header><!-- /.masthead -->
+
+<div class="js-menu-screen menu-screen"></div>
+
+
+<div id="main" role="main">
+  <article class="hentry">
+    
+    <div class="entry-wrapper">
+      <header class="entry-header">
+        <ul class="entry-tags">
+          
+        </ul>
+        
+          <h1 class="entry-title">ADFIRWMC - 4. The Value of Unstructured Analysis</h1>
+        
+      </header>
+
+
+        <time datetime="2018-03-05T15:33:28-05:00"><i class="fa fa-calendar-o"></i> March 05, 2018</time>
+        <p>I find performing unstructured analysis upfront to be critical part of my work flow because it tells me massive amount of contextual data upfront and it focuses the structured analysis I need to accomplish.</p>
+
+<p>When I say unstructed analysis, I am referring mostly to searching through the strings inside of the artifacts I have collected for keyword matches. Where do these keywords come from? Unless you are on a complete witch hunt, which unfortunately happens, there is a set of circumstances that led you to investigate this system. It could be an alert from weird proxy traffic or an antivirus hit on a file found in a User’s Temp folder.</p>
+
+<p>Whatever it is, these events typically have fun details that you can search for. (90% of the time it ends up being some part of a file path or part of a URL.) Let’s look at a little bit of science before we get into DFIRness of it all. This topic can get hopeless deep and veer of course quickly so I am only covering the meat and potatoes.</p>
+
+<h2 id="tools-used">Tools Used</h2>
+<ul>
+  <li><a href="https://docs.microsoft.com/en-us/sysinternals/downloads/strings">Sysinternals Strings</a></li>
+  <li><a href="http://gnuwin32.sourceforge.net/packages/grep.htm">Grep For Windows</a></li>
+  <li><a href="https://ericzimmerman.github.io/">Eric Zimmerman’s Registry Explorer</a></li>
+  <li>PowerShell</li>
+</ul>
+
+<h2 id="strings">Strings</h2>
+
+<p>A string is a data type used in programming, such as an integer and floating point unit, but is used to represent text rather than numbers. Most of the words you read on a computer are stored as a string on disk or in memory. For instance, by visiting this site, your browser has probably stored a cached version of this page to a temp folder somewhere in your profile. On top of that, your browser also needs this page’s content in its process memory in order to render it. Strings get thrown all over the place by doing even the most mundane tasks. Knowing the significance of where strings are found can make your life a lot easier.</p>
+
+<h3 id="ascii">ASCII</h3>
+<ul>
+  <li>Stands for American Standard Code for Information Interchange but you will never need to know that.</li>
+  <li>Even though ASCII predates epoch and maybe even time itself, it is the basis for most modern character-encoding schemes.</li>
+  <li>Ascii is a code for representing English characters as numbers, with each letter assigned a number from 0 to 127</li>
+  <li>Not all ASCII characters are visible text.
+    <ul>
+      <li>Some are used to control how text is displayed like 0x0A New Line or 0x09 Tab.</li>
+      <li>Some are strictly for commands like Escape 0x1B or Delete 0x7F.</li>
+    </ul>
+  </li>
+  <li>Reference: https://www.asciitable.com/</li>
+</ul>
+
+<h4 id="example">Example:</h4>
+<p><img src="../images/AsciiStrings.png" alt="Example of ASCII" /></p>
+<h4 id="example-displayed">Example displayed:</h4>
+<p><img src="../images/DisplayedAscii.png" alt="Example of ASCII" /></p>
+
+<h4 id="fun-ascii-dfir-stuff-you-might-find">Fun ASCII DFIR stuff you might find:</h4>
+<ul>
+  <li>Browser History, Cookies, etc. are stored in ASCII in Chrome, FireFox (Probably others too.)
+<img src="../images/ChromeASCII.png" alt="Example of ASCII in Chrome History" /></li>
+  <li>File Paths in Shortcuts</li>
+  <li>Antivirus Logs</li>
+</ul>
+
+<h3 id="unicode">Unicode</h3>
+<ul>
+  <li>Like ASCII but bigger</li>
+  <li>Unicode is a standard which defines the internal text coding system in almost all operating systems used in computers at present.</li>
+  <li>Version 1 started out with 65536 code points, commonly encoded in 16 bits or 2 bytes.</li>
+  <li>The current version is 6.3, using 110,187 of the available 1.1 million code points.</li>
+</ul>
+
+<h4 id="example-1">Example:</h4>
+<p><img src="../images/unicode.png" alt="Example of Unicode" /></p>
+<h4 id="example-displayed-1">Example Displayed:</h4>
+<p><img src="../images/UnicodeDisplayed.png" alt="Example of Unicode" /></p>
+
+<h4 id="fun-unicode-dfir-stuff-you-might-find">Fun Unicode DFIR stuff you might find:</h4>
+<ul>
+  <li>Names of Files and Folders in $MFT, $LogFile, $UsnJrnl</li>
+  <li>Stuff in Windows Event Logs</li>
+  <li>Stuff in Windows Registry Keys</li>
+  <li>File Paths in Recycle Bin metadata files</li>
+  <li>File Paths in Shortcuts</li>
+  <li>Sticky Notes left on the Desktop</li>
+  <li>Literally almost anything with text.</li>
+</ul>
+
+<h3 id="why-do-you-care">Why Do You Care?</h3>
+
+<p>Imagine you are a salty beat cop 4 days from retirement. Just do it. No, really.</p>
+
+<p>You get a call on a tip line saying an elaborate bank heist could have been committed. The caller says the they normally use a specific kind of fake id, knock out the guards with a tranq gun, put a bunch of money in a blue bag, and fly off the roof of the bank in a fancy helicopter. 
+While not perfect, unstructured analysis can provide the following details immediately:</p>
+<ul>
+  <li>Has there been a fake ID in the bank?
+    <ul>
+      <li>No? The crooks either haven’t struck or got lost on the way. It happens.</li>
+      <li>Yes? The crooks have been here!</li>
+    </ul>
+  </li>
+  <li>Has there been a tranq gun in the bank?
+    <ul>
+      <li>No? The guards must have spotted the fake ID and disabled the crooks before they got the gun out. NICE!</li>
+      <li>Yes? Well crap. The guards may or may not have had to deal with tranq darts. Gettting serious now…</li>
+    </ul>
+  </li>
+  <li>Was there a blue bag full of money in the bank?
+    <ul>
+      <li>No? Guards took out the crooks or the crooks were looking for Rubles instead of Dollars and just left.</li>
+      <li>Yes? Well then we can assume that the guards are subdued and the crooks are running around in the bank unchecked.</li>
+    </ul>
+  </li>
+  <li>Has anyone seen a fancy helicopter recently?
+    <ul>
+      <li>No? Helicopter might have been ceased or ran out of gas. Happens all the time.</li>
+      <li>Yes? Well…you have been successfully robbed. Time to start dusting for prints…</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="real-world-example">Real World Example</h2>
+
+<p>Here is an interesting “crook” I found on <a href="https://www.hybrid-analysis.com/sample/4231f020816eebfa0b51e252477f2769838abeb83728072185060253372a4dd0?environmentId=120">Hybrid Analysis</a>. This sample has been linked to APT33 and drops the TURNEDUP backdoor. For funsies, I 7zipped it up, named it “Paul_resume.7z” and sent it to myself in an email to simulate how these things go down.</p>
+
+<p>High level things we can look for from this sample as discovered from our detection team and/or OSINT:</p>
+<ul>
+  <li>Filenames
+    <ul>
+      <li>stikynote.exe, codexgigas_f09bb42e6c39a9714ed8a4d4191cf19e40d1919b.exe, Paul_resume.7z</li>
+    </ul>
+  </li>
+  <li>URLs
+    <ul>
+      <li>googlmail.net</li>
+    </ul>
+  </li>
+</ul>
+
+<p>THIS IS A JOB FOR POWERSHELL!!!</p>
+
+<div class="language-powershell highlighter-rouge"><pre class="highlight"><code><span class="nb">start</span>-process C:<span class="se">\T</span>ools<span class="se">\s</span>trings.exe -ArgumentList <span class="s2">"-nobanner -accepteula -s 2018-03-18-10-16-4</span><span class="se">\*</span><span class="s2">"</span> -RedirectStandardOutput ..<span class="se">\s</span>trings.txt
+<span class="nb">gc</span> .<span class="se">\s</span>trings.txt| <span class="nb">Where-Object</span> <span class="o">{</span> <span class="nv">$_</span> -imatch <span class="s2">"Paul_resume|codexgigas|stikynote"</span> <span class="o">}</span> | <span class="nb">sort</span> | unique
+</code></pre>
+</div>
+<p>###Example:
+<img src="../images/strings.png" alt="reviewing strings in Powershell" /></p>
+
+<p>This output speaks so much about what has transpired on this machine that I don’t need to wait for structured analysis to make a containment decision. Here are the highlights that I can see in roughly 30 secs:</p>
+
+<ul>
+  <li>The $MFT, $LogFile, and $USNJrnl:$J show evidence of the download attempt, successful download of the zip file, unzipping, and execution:
+    <ul>
+      <li>Download Attempt:
+        <ul>
+          <li><code class="highlighter-rouge">C:\Scripts\2018-03-18-10-16-4\c\$Extend\$USNJrnl$J: &lt;&lt;Paul_Resume.7z.2hvceui.partial</code></li>
+          <li>The suffix .parital is affixed to files that are in the process of being downloaded by IE and Edge.</li>
+        </ul>
+      </li>
+      <li>Successful Download:
+        <ul>
+          <li><code class="highlighter-rouge">C:\Scripts\2018-03-18-10-16-4\c\$Extend\$USNJrnl$J: &lt;Paul_Resume.7z</code></li>
+          <li>Here we see just the Paul_Resume.7z meaning it finished downloading</li>
+        </ul>
+      </li>
+      <li>Unzipping
+        <ul>
+          <li><code class="highlighter-rouge">C:\Scripts\2018-03-18-10-16-4\c\$Extend\$USNJrnl$J: $&lt;Paul_Resume.7z.lnk</code></li>
+          <li>I don’t know the exact filepath of this Shortcut file but the majority of shortcuts are created for recently accessed files.</li>
+          <li><code class="highlighter-rouge">C:\Scripts\2018-03-18-10-16-4\c\$Extend\$USNJrnl$J: r&lt;codexgigas_f09bb42e6c39a9714ed8a4d4191cf19e40d1919b-1.exe</code></li>
+          <li>Since this is the file inside the 7z file, we can see that it was successfully unzipped.</li>
+          <li><code class="highlighter-rouge">C:\Scripts\2018-03-18-10-16-4\c\Users\Username\NTUSER.DAT: C:\Users\Username\Desktop\Paul_Resume\codexgigas_f09bb42e6c39a9714ed8a4d4191cf19e40d1919b-1.exe</code></li>
+          <li>This line from the NTUSER.DAT file of from the Username profile clearly shows this was extracted to the users desktop. What stored this string in the user’s registry? Right now…it doesn’t matter. We are not parsing anything. Only triaging.</li>
+        </ul>
+      </li>
+      <li>Execution:
+        <ul>
+          <li><code class="highlighter-rouge">C:\Scripts\2018-03-18-10-16-4\c\$Extend\$USNJrnl$J: R&lt;CODEXGIGAS_F09BB42E6C39A9714E-F57CC974.pf</code></li>
+          <li>Files ending in .pf are typically associated with Windows Prefetch. This is a file that is autmagically generated when you run an execuatable to make a Windows machine more efficient. This is strong evidence of execution. We will dig into Prefetch later in this course.</li>
+          <li>This machine does not have StikyNotes install from Microsoft so references to <strong>StikyNote.exe</strong>, <strong>StikyNote.tmp</strong>,  and <strong>STIKYNOTE.EXE-EC3D9C6B.pf</strong> seen in $UsnJrnl:$J, $LogFile, and $MFT tell us that the TURNEDUP backdoor was successfully ran on this machine.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>Persistence:
+    <ul>
+      <li>This was less science and more eductated guesswork but it is rare to see a complete file path in a registry value unless it is going to be used to execute something Windows wouldn’t naturally know where to find ergo… persistence.
+  A quick peek with <a href="https://ericzimmerman.github.io/Software/RegistryExplorer_RECmd.zip">Eric Zimmerman’s Registry Explorer</a> revealed my hunch was right.</li>
+    </ul>
+    <pre>
+      Registry file: C:\Scripts\2018-03-18-10-16-4\c\Users\Username\NTUSER.DAT
+      Key: Software\Microsoft\Windows\CurrentVersion\Run
+      Last write: 2018-03-18 17:03:14
+      Value: RESTART_STICKY_NOTESS (RegSz)
+      Data: C:\Users\Username\AppData\Local\Temp\StikyNote.exe 
+  </pre>
+    <ul>
+      <li>Good ol’ HKCU\Software\Microsoft\Windows\CurrentVersion\Run is one of the easiest methods of making sure an executable starts when a user logs in. Makes for a good IoC to test the rest of your environment against.</li>
+    </ul>
+  </li>
+</ul>
+
+<p>We have found all the evidence we need to determine that this machine needs to be removed from the network and further analysis needs be taken to determine what took place after infection. While fairly typical, this example does not represent all malware or reasons you might need to DFIR a system so your milage may vary BUT I found performing this step first almost always helps eliminate or focus structured analysis.</p>
+
+<p>Still not a believer? <a href="http://jon.glass/blog/TwasTheGrepBeforeXmas/">I wrote up a similar case a while ago</a> that saved my buns before the holidays.</p>
+
+        
+
+    </div><!-- /.entry-wrapper -->
+    <nav class="pagination" role="navigation">
+      
+        <a href="http://jon.glass/adfirwmc/Ch3/" class="btn" title="ADFIRWMC - 3. Files of Forensic Interest">Previous</a>
+      
+      
+        <a href="http://jon.glass/blog/dissecting-brbbot/" class="btn" title="Hacking BRBBot">Next</a>
+      
+    </nav><!-- /.pagination -->
+  </article>
+</div><!-- /#main -->
+
+<div class="footer-wrapper">
+  <footer role="contentinfo" class="entry-wrapper">
+    
+
+<span>&copy; 2018 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
+<div class="social-icons">
+	<a href="https://twitter.com/GlassDFIR" title="Jon Glass on Twitter" target="_blank"><i class="fa fa-twitter-square fa-2x"></i></a>
+	
+	
+	
+	
+	
+	
+	<a href="https://github.com/GlassDFIR" title="Jon Glass on Github" target="_blank"><i class="fa fa-github-square fa-2x"></i></a>
+	
+  
+	
+  <a href="http://jon.glass/feed.xml" title="Atom/RSS feed"><i class="fa fa-rss-square fa-2x"></i></a>
+</div><!-- /.social-icons -->
+
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+<script type="text/javascript">
+  var BASE_URL = 'http://jon.glass';
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="http://jon.glass/assets/js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script src="http://jon.glass/assets/js/scripts.min.js"></script>
+
+
+
+
+</body>
+</html>

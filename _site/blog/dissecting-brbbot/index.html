@@ -1,0 +1,239 @@
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8" lang="en"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9" lang="en"><![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<title>Hacking BRBBot &#8211; Half Full of Security</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+
+
+<!-- Twitter Cards -->
+<meta name="twitter:title" content="Hacking BRBBot">
+<meta name="twitter:description" content="">
+<meta name="twitter:site" content="@GlassDFIR">
+<meta name="twitter:creator" content="@GlassDFIR">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://jon.glass/images/site-logo.png">
+
+<!-- Open Graph -->
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hacking BRBBot">
+<meta property="og:description" content="">
+<meta property="og:url" content="http://jon.glass/blog/dissecting-brbbot/">
+<meta property="og:site_name" content="Half Full of Security">
+
+
+
+
+
+<link rel="canonical" href="http://jon.glass/blog/dissecting-brbbot/">
+<link href="http://jon.glass/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="http://jon.glass/assets/css/main.css">
+<!-- Webfonts -->
+<script src="https://use.edgefonts.net/source-sans-pro:n2,i2,n3,i3,n4,i4,n6,i6,n7,i7,n9,i9;source-code-pro:n4,n7;volkhov.js"></script>
+
+<meta http-equiv="cleartype" content="on">
+
+<!-- HTML5 Shiv and Media Query Support -->
+<!--[if lt IE 9]>
+  <script src="http://jon.glass/assets/js/vendor/html5shiv.min.js"></script>
+  <script src="http://jon.glass/assets/js/vendor/respond.min.js"></script>
+<![endif]-->
+
+<!-- Modernizr -->
+<script src="http://jon.glass/assets/js/vendor/modernizr-2.7.1.custom.min.js"></script>
+
+
+<!-- MathJax -->
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+<!-- Icons -->
+<!-- 16x16 -->
+<link rel="shortcut icon" href="http://jon.glass/favicon.ico">
+<!-- 32x32 -->
+<link rel="shortcut icon" href="http://jon.glass/favicon.png">
+<!-- 57x57 (precomposed) for iPhone 3GS, pre-2011 iPod Touch and older Android devices -->
+<link rel="apple-touch-icon-precomposed" href="http://jon.glass/images/apple-touch-icon-precomposed.png">
+<!-- 72x72 (precomposed) for 1st generation iPad, iPad 2 and iPad mini -->
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://jon.glass/images/apple-touch-icon-72x72-precomposed.png">
+<!-- 114x114 (precomposed) for iPhone 4, 4S, 5 and post-2011 iPod Touch -->
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://jon.glass/images/apple-touch-icon-114x114-precomposed.png">
+<!-- 144x144 (precomposed) for iPad 3rd and 4th generation -->
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://jon.glass/images/apple-touch-icon-144x144-precomposed.png">
+
+</head>
+
+<body id="post">
+
+<div class="navigation-wrapper">
+	<nav role="navigation" id="site-nav" class="animated drop">
+	    <ul>
+      
+		    
+		    <li><a href="http://jon.glass/blog/" >Blog</a></li>
+		  
+		    
+		    <li><a href="http://jon.glass/adfirwmc/" >ADFIRWMC</a></li>
+		  
+		    
+		    <li><a href="http://jon.glass/tips/" >Tips and Tricks</a></li>
+		  
+		    
+		    <li><a href="http://jon.glass/about/" >About</a></li>
+		  
+		    
+		    <li><a href="http://jon.glass/search/" >Search</a></li>
+		  
+	    </ul>
+	</nav>
+</div><!-- /.navigation-wrapper -->
+
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+
+<header class="masthead">
+	<div class="wrap">
+      
+  		<a href="http://jon.glass/" class="site-logo" rel="home" title="Half Full of Security"><img src="http://jon.glass/images/site-logo.png" width="200" height="200" alt="Half Full of Security logo" class="animated fadeInDown"></a>
+      
+      <h1 class="site-title animated fadeIn"><a href="http://jon.glass/">Half Full of Security</a></h1>
+		<h2 class="site-description animated fadeIn" itemprop="description">Sharpening the ACKs since 2013</h2>
+	</div>
+</header><!-- /.masthead -->
+
+<div class="js-menu-screen menu-screen"></div>
+
+
+<div id="main" role="main">
+  <article class="hentry">
+    
+    <div class="entry-wrapper">
+      <header class="entry-header">
+        <ul class="entry-tags">
+          
+        </ul>
+        
+          <h1 class="entry-title">Hacking BRBBot</h1>
+        
+      </header>
+
+
+        <time datetime="2018-12-08T15:33:28-05:00"><i class="fa fa-calendar-o"></i> December 08, 2018</time>
+        <p>Recently, in a scramble to find a final exam for my malware course that wasn’t multiple choice, I decided to revisit a sample from my youth: BRBBot.</p>
+
+<p>This sample can be found here:
+<a href="https://www.reverse.it/sample/b9cfd5f89bd282452f82cc8d323f39c6932e55cab98065bb3c2cf97bb585dc2d?environmentId=1">https://www.reverse.it/sample/b9cfd5f89bd282452f82cc8d323f39c6932e55cab98065bb3c2cf97bb585dc2d?environmentId=1</a></p>
+
+<p>I enjoyed my initial analysis of this sample because there were a couple of victories to be found from decoding the encrypted config file dropped to disk which leads to decrypting the C2 traffic. The problem I had with using this with my students is that BRBBot has been blogged about several times in the six years since it first came out. So, naturally, the only thing left to do reverse engineer the sample a smidge further and make my own flavor.</p>
+
+<h3 id="config-file">Config File</h3>
+
+<p>Hacking BRBBot largely boils down to hacking the embedding configuration file.
+Upon execution, BRBBot looks in the current directory for an encrypted file called “brbconfig.tmp”.  It looks like this:
+<img src="/images/brbconfig.tmp.png" alt="brbconfig.tmp" /></p>
+
+<p>If this file isn’t present, BRBBot will drop it in the current directory. The encrypted data is found 112 bytes into the .rsrc portion of the exe.
+<img src="/images/brbconfig.tmp.embedded.png" alt="Embedded File" /></p>
+
+<p>This file is read early in the execution and during my initial analysis, I was able to review the plaintext content of the file by simply setting a breakpoint for the return of the advapi32.dll.CryptDecrypt function as seen below.
+<img src="/images/CryptDecryptBreakpoint.png" alt="CryptDecrypt" /></p>
+
+<p>This is all well and good but just knowing the cleartext content doesn’t give me enough information to make my own file. To me this highlights the difference between Malware Analysis and Reverse Engineering. So find out more about how the encrypted file was made, I had to do a bit of digging into the advapi32.dll.CryptDecrypt function itself.</p>
+
+<p><a href="https://docs.microsoft.com/en-us/windows/desktop/api/wincrypt/nf-wincrypt-cryptdecrypt">Wincrypt.hCryptDecrypt function</a></p>
+
+<p>This was a bit of a long journey into the bowels of Microsoft’s wincrypt libraries. I will save you the entire saga and cut to the highlights.
+So to decrypt the data read from the file, a handful of things need to be provided to the CryptDecrypt function:</p>
+<ul>
+  <li>hKey - A handle to the encryption key to use for the decryption. This key specifies the decryption algorithm to be used.</li>
+  <li>hHash - A handle to a hash object.</li>
+  <li>Other junk</li>
+  <li>pbData - A pointer to a buffer that contains the data to be decrypted. After the decryption has been performed, the plaintext is placed back into this same buffer.</li>
+</ul>
+
+<p>So if I scroll back up the stack I can see a few of the other Crypt functions. The first one I notice is the CryptCreateHash function accompanied by a suspiciously helpful string “YnJiYm90”.<br />
+<img src="/images/CryptCreateHash.png" alt="CryptDecrypt" /></p>
+
+<p>So after reading the <a href="https://docs.microsoft.com/en-us/windows/desktop/api/wincrypt/nf-wincrypt-cryptdecrypt">Wincrypt.hCryptCreateHash function</a> and looking up the <a href="https://docs.microsoft.com/en-us/windows/desktop/SecCrypto/alg-id">ALG_ID</a> up, I determined that this function is creating an MD5 hash object of the “YnJiYm90” string.</p>
+
+<p>For those lost… this is how you could write this same functionality in Python:</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>import hashlib
+m = hashlib.md5()
+m.update("YnJiYm90")
+</code></pre>
+</div>
+<p>Scrolling a bit further down we see the CryptDeriveKey function which generates cryptographic session keys derived from the base data value. So jumping back to the <a href="https://docs.microsoft.com/en-us/windows/desktop/SecCrypto/alg-id">ALG_ID</a> table, I can see that 6801 translates to the RC4 stream encryption algorithm.
+<img src="/images/RC4.png" alt="rc4" /></p>
+
+<p>SO…LONG STORY SHORT…</p>
+
+<p>This code creates an MD5 hash of the YnJiYm90 password and uses it as an RC4 decryption key. Proof you demand? Fine. I threw the encrypted file into CyberChef and used the MD5 hash of YnJiYm90 to decrypt the payload using the RC4 operation.</p>
+
+<p><img src="/images/brbcyberchef.png" alt="CyberChef RC4" /></p>
+
+<p>Now that I knew this file was RC4ed with this specific password, I could create my own configuration for my students and embed it into the executable. Easy peasy.</p>
+
+<p><img src="/images/brbcyberchef2.png" alt="Custom Config" /></p>
+
+<p>I had to do a hand full of other things to make this usable for my needs but I found this to be the most educational part of that journey.</p>
+
+        
+
+    </div><!-- /.entry-wrapper -->
+    <nav class="pagination" role="navigation">
+      
+        <a href="http://jon.glass/adfirwmc/Ch4/" class="btn" title="ADFIRWMC - 4. The Value of Unstructured Analysis">Previous</a>
+      
+      
+    </nav><!-- /.pagination -->
+  </article>
+</div><!-- /#main -->
+
+<div class="footer-wrapper">
+  <footer role="contentinfo" class="entry-wrapper">
+    
+
+<span>&copy; 2018 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
+<div class="social-icons">
+	<a href="https://twitter.com/GlassDFIR" title="Jon Glass on Twitter" target="_blank"><i class="fa fa-twitter-square fa-2x"></i></a>
+	
+	
+	
+	
+	
+	
+	<a href="https://github.com/GlassDFIR" title="Jon Glass on Github" target="_blank"><i class="fa fa-github-square fa-2x"></i></a>
+	
+  
+	
+  <a href="http://jon.glass/feed.xml" title="Atom/RSS feed"><i class="fa fa-rss-square fa-2x"></i></a>
+</div><!-- /.social-icons -->
+
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+<script type="text/javascript">
+  var BASE_URL = 'http://jon.glass';
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="http://jon.glass/assets/js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script src="http://jon.glass/assets/js/scripts.min.js"></script>
+
+
+
+
+</body>
+</html>

@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
+<loc>http://jon.glass/blog/dissecting-brbbot/</loc>
+<lastmod>2018-12-08T15:33:28-05:00</lastmod>
+</url>
+<url>
+<loc>http://jon.glass/adfirwmc/Ch4/</loc>
+<lastmod>2018-03-05T15:33:28-05:00</lastmod>
+</url>
+<url>
 <loc>http://jon.glass/adfirwmc/Ch3/</loc>
 <lastmod>2018-03-04T15:33:28-05:00</lastmod>
 </url>
