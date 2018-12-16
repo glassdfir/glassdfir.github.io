@@ -59,4 +59,4 @@ Now that I knew this file was RC4ed with this specific password, I could create 
 
 ![Custom Config]({{ site.baseurl }}/images/brbcyberchef2.png)
 
-I had to do a hand full of other things to make this usable for my needs but I found this to be the most educational part of that journey.
+I had to do a hand full of other things to make this usable for my needs but I thought others might find value in this.
