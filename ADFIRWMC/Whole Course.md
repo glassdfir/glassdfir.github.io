@@ -536,3 +536,6 @@ mkdir "2018-03-08-5-2-12\c\Users\Username\" & fcat.exe -h -f NTFS "/Users/Userna
     - For fcat, I used -h to knock down the size of the sparse files we collect. I will cover that later. -f specifies the NTFS file system. 
     - We are using the > to redirect the output of fcat into a file.
 
+<!--stackedit_data:
+eyJoaXN0b3J5IjpbOTE1ODQwOTAwXX0=
+-->
