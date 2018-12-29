@@ -10,6 +10,7 @@ For funsies, snagged a Traffic Analysis Exercise from Malware-Traffic-Analysis.n
 
 
 A review of the network packet capture (PCAP) revealed that 192.168.204.137 was the source or destination for all of the network traffic. NetBIOS queries identify this host as "38NTRGDFQKR-PC".
+![Hostname]({{ site.baseurl }}/images/fiestaEKnbns.png)
 
 Network artifacts within this PCAP are consistent with 5 stages of the Fiesta Exploit Kit:
 
