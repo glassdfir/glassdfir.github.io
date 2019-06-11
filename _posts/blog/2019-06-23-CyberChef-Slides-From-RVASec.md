@@ -7,4 +7,4 @@ categories: blog
 
 Here are the slides from my RVASec this year.
 
-[Cybersecurity Zero to Hero with CyberChef]({{ site.baseurl }}/assets/CyberChef.pptx)
+[Cybersecurity Zero to Hero with CyberChef]({{ site.baseurl }}/assets/files/CyberChef.pptx)
