@@ -2,8 +2,16 @@
 
   
     {
-      "title"			: "Analysis of Fiesta EK",
-      "link"			: "http://jon.glass/blog/DissectingEmotet/",
+      "title"			: "Decoding AutoIT XOR Encryption Obfuscation",
+      "link"			: "http://jon.glass/blog/AutoITXOR/",
+      "excerpt"		: ""
+    }
+  
+
+  
+    ,{
+      "title"			: "Cybersecurity Zero to Hero with CyberChef",
+      "link"			: "http://jon.glass/blog/CyberChef-Slides-From-RVASec/",
       "excerpt"		: ""
     }
   
