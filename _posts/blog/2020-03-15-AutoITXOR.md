@@ -183,13 +183,14 @@ Else
 From performing the same steps we can see that poe, e, fcoupewxiogl performs the same way so lets update our signature to capture others:
 
 ```
-signature = '\$poe\(\$(v1|e|gfbvo|rfo|fooi4e|ergsduf|erzgf|ayudergfv|sdvfi|zeyc|grfeus|ufd)\((fcoupewxiogl|hsbduoekdcbl)\("([0-9A-F]+)", "(\d+)"\)\)\)'
+signature  = '\$poe\(\$(v1|e|gfbvo|rfo|fooi4e|ergsduf|erzgf|ayudergfv|sdvfi|zeyc|grfeus|ufd)'
+signature += '\((fcoupewxiogl|hsbduoekdcbl)\("([0-9A-F]+)", "(\d+)"\)\)\)'
 ```
 
 Here is an updated script with all of the redundant variables that perform the same actions on the encrypted strings: 
 
 ```python
-### import re
+import re
 
 with open('autoit.txt', 'r') as autoitfile:
     data = autoitfile.read()

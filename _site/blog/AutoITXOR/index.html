@@ -304,13 +304,14 @@ Else
 
 <p>From performing the same steps we can see that poe, e, fcoupewxiogl performs the same way so lets update our signature to capture others:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>signature = '\$poe\(\$(v1|e|gfbvo|rfo|fooi4e|ergsduf|erzgf|ayudergfv|sdvfi|zeyc|grfeus|ufd)\((fcoupewxiogl|hsbduoekdcbl)\("([0-9A-F]+)", "(\d+)"\)\)\)'
+<div class="highlighter-rouge"><pre class="highlight"><code>signature  = '\$poe\(\$(v1|e|gfbvo|rfo|fooi4e|ergsduf|erzgf|ayudergfv|sdvfi|zeyc|grfeus|ufd)'
+signature += '\((fcoupewxiogl|hsbduoekdcbl)\("([0-9A-F]+)", "(\d+)"\)\)\)'
 </code></pre>
 </div>
 
 <p>Here is an updated script with all of the redundant variables that perform the same actions on the encrypted strings:</p>
 
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="c">### import re</span>
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">re</span>
 
 <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">'autoit.txt'</span><span class="p">,</span> <span class="s">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">autoitfile</span><span class="p">:</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">autoitfile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>

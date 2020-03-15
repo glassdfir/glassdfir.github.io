@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://jon.glass/feed.xml" rel="self" type="application/atom+xml" /><link href="http://jon.glass/" rel="alternate" type="text/html" /><updated>2020-03-15T16:45:50-04:00</updated><id>http://jon.glass/</id><title type="html">Half Full of Security</title><subtitle>Sharpening the ACKs since 2013</subtitle><entry><title type="html">Decoding AutoIT XOR Encryption Obfuscation</title><link href="http://jon.glass/blog/AutoITXOR/" rel="alternate" type="text/html" title="Decoding AutoIT XOR Encryption Obfuscation" /><published>2020-03-15T13:33:28-04:00</published><updated>2020-03-15T13:33:28-04:00</updated><id>http://jon.glass/blog/AutoITXOR</id><content type="html" xml:base="http://jon.glass/blog/AutoITXOR/">&lt;h1 id=&quot;autoit-reversing-xor-encryption&quot;&gt;AutoIT Reversing XOR encryption&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://jon.glass/feed.xml" rel="self" type="application/atom+xml" /><link href="http://jon.glass/" rel="alternate" type="text/html" /><updated>2020-03-15T17:26:07-04:00</updated><id>http://jon.glass/</id><title type="html">Half Full of Security</title><subtitle>Sharpening the ACKs since 2013</subtitle><entry><title type="html">Decoding AutoIT XOR Encryption Obfuscation</title><link href="http://jon.glass/blog/AutoITXOR/" rel="alternate" type="text/html" title="Decoding AutoIT XOR Encryption Obfuscation" /><published>2020-03-15T13:33:28-04:00</published><updated>2020-03-15T13:33:28-04:00</updated><id>http://jon.glass/blog/AutoITXOR</id><content type="html" xml:base="http://jon.glass/blog/AutoITXOR/">&lt;h1 id=&quot;autoit-reversing-xor-encryption&quot;&gt;AutoIT Reversing XOR encryption&lt;/h1&gt;
 
 &lt;p&gt;Recently, I started looking at an AutoIt sample that contained some heavy obfuscation. After I ran the compiled binary through Exe2Aut, I was able to review the underlying script and I saw a lot of this stuff:&lt;/p&gt;
 
@@ -171,13 +171,14 @@ Else
 
 &lt;p&gt;From performing the same steps we can see that poe, e, fcoupewxiogl performs the same way so lets update our signature to capture others:&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;signature = '\$poe\(\$(v1|e|gfbvo|rfo|fooi4e|ergsduf|erzgf|ayudergfv|sdvfi|zeyc|grfeus|ufd)\((fcoupewxiogl|hsbduoekdcbl)\(&quot;([0-9A-F]+)&quot;, &quot;(\d+)&quot;\)\)\)'
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;signature  = '\$poe\(\$(v1|e|gfbvo|rfo|fooi4e|ergsduf|erzgf|ayudergfv|sdvfi|zeyc|grfeus|ufd)'
+signature += '\((fcoupewxiogl|hsbduoekdcbl)\(&quot;([0-9A-F]+)&quot;, &quot;(\d+)&quot;\)\)\)'
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
 &lt;p&gt;Here is an updated script with all of the redundant variables that perform the same actions on the encrypted strings:&lt;/p&gt;
 
-&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;### import re&lt;/span&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;re&lt;/span&gt;
 
 &lt;span class=&quot;k&quot;&gt;with&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;open&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'autoit.txt'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'r'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;autoitfile&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
     &lt;span class=&quot;n&quot;&gt;data&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;autoitfile&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
