@@ -309,6 +309,6 @@ with open('newautoit.txt','w') as newautoitfile:
 There we go 390 lines we didn't need to decode by hand.  
 Plus with minor tweaks, hopefully this could be used for the next sample and maximize my ROI.  
 
-While I will be the first to admit, this decryption could perhaps be tackled in a more efficient manner by ignoring all of the v1|e|gfbvo|rfo|fooi4e|ergsduf|erzgf|ayudergfv|sdvfi|zeyc|grfeus|ufd gibberish...I wanted to make the output as clean as possible for readability and highlight the techniques you can use to solve these sort of problems in the future.   
+While I will be the first to admit, this decryption could perhaps be tackled in a more efficient manner by ignoring all of the names of the functions, I wanted to make the output as clean as possible for readability and highlight the techniques you can use to solve these sort of problems in the future.   
 
 Well, that is it. thanks for reading!  

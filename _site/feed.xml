@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://jon.glass/feed.xml" rel="self" type="application/atom+xml" /><link href="http://jon.glass/" rel="alternate" type="text/html" /><updated>2020-03-15T17:26:07-04:00</updated><id>http://jon.glass/</id><title type="html">Half Full of Security</title><subtitle>Sharpening the ACKs since 2013</subtitle><entry><title type="html">Decoding AutoIT XOR Encryption Obfuscation</title><link href="http://jon.glass/blog/AutoITXOR/" rel="alternate" type="text/html" title="Decoding AutoIT XOR Encryption Obfuscation" /><published>2020-03-15T13:33:28-04:00</published><updated>2020-03-15T13:33:28-04:00</updated><id>http://jon.glass/blog/AutoITXOR</id><content type="html" xml:base="http://jon.glass/blog/AutoITXOR/">&lt;h1 id=&quot;autoit-reversing-xor-encryption&quot;&gt;AutoIT Reversing XOR encryption&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://jon.glass/feed.xml" rel="self" type="application/atom+xml" /><link href="http://jon.glass/" rel="alternate" type="text/html" /><updated>2020-03-15T17:36:06-04:00</updated><id>http://jon.glass/</id><title type="html">Half Full of Security</title><subtitle>Sharpening the ACKs since 2013</subtitle><entry><title type="html">Decoding AutoIT XOR Encryption Obfuscation</title><link href="http://jon.glass/blog/AutoITXOR/" rel="alternate" type="text/html" title="Decoding AutoIT XOR Encryption Obfuscation" /><published>2020-03-15T13:33:28-04:00</published><updated>2020-03-15T13:33:28-04:00</updated><id>http://jon.glass/blog/AutoITXOR</id><content type="html" xml:base="http://jon.glass/blog/AutoITXOR/">&lt;h1 id=&quot;autoit-reversing-xor-encryption&quot;&gt;AutoIT Reversing XOR encryption&lt;/h1&gt;
 
 &lt;p&gt;Recently, I started looking at an AutoIt sample that contained some heavy obfuscation. After I ran the compiled binary through Exe2Aut, I was able to review the underlying script and I saw a lot of this stuff:&lt;/p&gt;
 
@@ -295,24 +295,7 @@ Since when we XOR anything with itself, we will get 0 for these. So this equates
 &lt;p&gt;There we go 390 lines we didn’t need to decode by hand.&lt;br /&gt;
 Plus with minor tweaks, hopefully this could be used for the next sample and maximize my ROI.&lt;/p&gt;
 
-&lt;table&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td&gt;While I will be the first to admit, this decryption could perhaps be tackled in a more efficient manner by ignoring all of the v1&lt;/td&gt;
-      &lt;td&gt;e&lt;/td&gt;
-      &lt;td&gt;gfbvo&lt;/td&gt;
-      &lt;td&gt;rfo&lt;/td&gt;
-      &lt;td&gt;fooi4e&lt;/td&gt;
-      &lt;td&gt;ergsduf&lt;/td&gt;
-      &lt;td&gt;erzgf&lt;/td&gt;
-      &lt;td&gt;ayudergfv&lt;/td&gt;
-      &lt;td&gt;sdvfi&lt;/td&gt;
-      &lt;td&gt;zeyc&lt;/td&gt;
-      &lt;td&gt;grfeus&lt;/td&gt;
-      &lt;td&gt;ufd gibberish…I wanted to make the output as clean as possible for readability and highlight the techniques you can use to solve these sort of problems in the future.&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
+&lt;p&gt;While I will be the first to admit, this decryption could perhaps be tackled in a more efficient manner by ignoring all of the names of the functions, I wanted to make the output as clean as possible for readability and highlight the techniques you can use to solve these sort of problems in the future.&lt;/p&gt;
 
 &lt;p&gt;Well, that is it. thanks for reading!&lt;/p&gt;</content></entry><entry><title type="html">Cybersecurity Zero to Hero with CyberChef</title><link href="http://jon.glass/blog/CyberChef-Slides-From-RVASec/" rel="alternate" type="text/html" title="Cybersecurity Zero to Hero with CyberChef" /><published>2019-06-23T16:33:28-04:00</published><updated>2019-06-23T16:33:28-04:00</updated><id>http://jon.glass/blog/CyberChef-Slides-From-RVASec</id><content type="html" xml:base="http://jon.glass/blog/CyberChef-Slides-From-RVASec/">&lt;p&gt;Here are the slides from my RVASec this year.&lt;/p&gt;
 
