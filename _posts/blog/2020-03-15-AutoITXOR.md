@@ -76,7 +76,7 @@ print("The second collects the XOR key:",matches[0][1])
 
 We will use ([0-9A-F]+) to capture the Hex and (\d+) to capture the XOR key:  
 
-```signature = '\$poe\(\$ergsduf\(hsbduoekdcbl\("([0-9A-F]+)", "(\d+)"\)\)\)'```
+'\$poe\(\$ergsduf\(hsbduoekdcbl\("([0-9A-F]+)", "(\d+)"\)\)\)'
 
 This returns:
 
