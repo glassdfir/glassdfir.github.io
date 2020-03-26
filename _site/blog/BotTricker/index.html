@@ -1,0 +1,323 @@
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8" lang="en"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9" lang="en"><![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<title>BotTricker &#8211; Half Full of Security</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+
+
+<!-- Twitter Cards -->
+<meta name="twitter:title" content="BotTricker">
+<meta name="twitter:description" content="">
+<meta name="twitter:site" content="@GlassDFIR">
+<meta name="twitter:creator" content="@GlassDFIR">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://jon.glass/images/site-logo.png">
+
+<!-- Open Graph -->
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BotTricker">
+<meta property="og:description" content="">
+<meta property="og:url" content="http://jon.glass/blog/BotTricker/">
+<meta property="og:site_name" content="Half Full of Security">
+
+
+
+
+
+<link rel="canonical" href="http://jon.glass/blog/BotTricker/">
+<link href="http://jon.glass/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="http://jon.glass/assets/css/main.css">
+<!-- Webfonts -->
+<script src="https://use.edgefonts.net/source-sans-pro:n2,i2,n3,i3,n4,i4,n6,i6,n7,i7,n9,i9;source-code-pro:n4,n7;volkhov.js"></script>
+
+<meta http-equiv="cleartype" content="on">
+
+<!-- HTML5 Shiv and Media Query Support -->
+<!--[if lt IE 9]>
+  <script src="http://jon.glass/assets/js/vendor/html5shiv.min.js"></script>
+  <script src="http://jon.glass/assets/js/vendor/respond.min.js"></script>
+<![endif]-->
+
+<!-- Modernizr -->
+<script src="http://jon.glass/assets/js/vendor/modernizr-2.7.1.custom.min.js"></script>
+
+
+<!-- MathJax -->
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+<!-- Icons -->
+<!-- 16x16 -->
+<link rel="shortcut icon" href="http://jon.glass/favicon.ico">
+<!-- 32x32 -->
+<link rel="shortcut icon" href="http://jon.glass/favicon.png">
+<!-- 57x57 (precomposed) for iPhone 3GS, pre-2011 iPod Touch and older Android devices -->
+<link rel="apple-touch-icon-precomposed" href="http://jon.glass/images/apple-touch-icon-precomposed.png">
+<!-- 72x72 (precomposed) for 1st generation iPad, iPad 2 and iPad mini -->
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://jon.glass/images/apple-touch-icon-72x72-precomposed.png">
+<!-- 114x114 (precomposed) for iPhone 4, 4S, 5 and post-2011 iPod Touch -->
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://jon.glass/images/apple-touch-icon-114x114-precomposed.png">
+<!-- 144x144 (precomposed) for iPad 3rd and 4th generation -->
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://jon.glass/images/apple-touch-icon-144x144-precomposed.png">
+
+</head>
+
+<body id="post">
+
+<div class="navigation-wrapper">
+	<nav role="navigation" id="site-nav" class="animated drop">
+	    <ul>
+      
+		    
+		    <li><a href="http://jon.glass/blog/" >Blog</a></li>
+		  
+		    
+		    <li><a href="http://jon.glass/adfirwmc/" >ADFIRWMC</a></li>
+		  
+		    
+		    <li><a href="http://jon.glass/tips/" >Tips and Tricks</a></li>
+		  
+		    
+		    <li><a href="http://jon.glass/about/" >About</a></li>
+		  
+		    
+		    <li><a href="http://jon.glass/search/" >Search</a></li>
+		  
+	    </ul>
+	</nav>
+</div><!-- /.navigation-wrapper -->
+
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+
+<header class="masthead">
+	<div class="wrap">
+      
+  		<a href="http://jon.glass/" class="site-logo" rel="home" title="Half Full of Security"><img src="http://jon.glass/images/site-logo.png" width="200" height="200" alt="Half Full of Security logo" class="animated fadeInDown"></a>
+      
+      <h1 class="site-title animated fadeIn"><a href="http://jon.glass/">Half Full of Security</a></h1>
+		<h2 class="site-description animated fadeIn" itemprop="description">Sharpening the ACKs since 2013</h2>
+	</div>
+</header><!-- /.masthead -->
+
+<div class="js-menu-screen menu-screen"></div>
+
+
+<div id="main" role="main">
+  <article class="hentry">
+    
+    <div class="entry-wrapper">
+      <header class="entry-header">
+        <ul class="entry-tags">
+          
+        </ul>
+        
+          <h1 class="entry-title">BotTricker</h1>
+        
+      </header>
+
+
+        <time datetime="2020-03-24T13:33:28-04:00"><i class="fa fa-calendar-o"></i> March 24, 2020</time>
+        <p>When I spent some time getting to know TrickBot, I found it was helpful to decrypt the modules it injects manually in Python instead of spending the time to debug each one.
+The following is a rudimentary script designed to find custom base64 character sets inside of raw data. 
+Overall steps:</p>
+<h2 id="finding-b64-charsets">Finding b64 charsets:</h2>
+<div class="highlighter-rouge"><pre class="highlight"><code>- Find potential base64 character sets by using Regex to look for all 64 character strings containing A-Za-z0-9+/
+- Take each match and sort the string to put the characters in order
+- Compare to a sorted list of standard b64 characters.
+- If there is a match, then we know the string has 1 of each character in the base64 character set, just in a different order.
+</code></pre>
+</div>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">base64</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="n">std_base64chars</span> <span class="o">=</span> <span class="s">"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"</span>
+
+<span class="k">def</span> <span class="nf">append_padding</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+    <span class="n">mod</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">%</span> <span class="mi">3</span>
+    <span class="k">while</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">+=</span> <span class="s">"="</span>
+    <span class="k">return</span> <span class="n">val</span>    
+
+<span class="k">def</span> <span class="nf">findcustomb64keys</span><span class="p">(</span><span class="n">filedata</span><span class="p">):</span>
+    <span class="n">base64keys</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">potentialbase64keys</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">b</span><span class="s">"[A-Za-z0-9+/]{64}"</span><span class="p">,</span><span class="n">filedata</span><span class="p">)</span>
+    <span class="n">sorteddict</span> <span class="o">=</span> <span class="s">''</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">std_base64chars</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">keystr</span> <span class="ow">in</span> <span class="n">potentialbase64keys</span><span class="p">:</span>
+        <span class="n">attempt</span> <span class="o">=</span> <span class="n">keystr</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">)</span>
+        <span class="n">sorted_attempt</span> <span class="o">=</span> <span class="s">''</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">attempt</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">sorted_attempt</span> <span class="o">==</span> <span class="n">sorteddict</span><span class="p">:</span>
+            <span class="n">base64keys</span> <span class="o">+=</span> <span class="p">[</span><span class="n">attempt</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">base64keys</span>
+    
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s">'module2.bin'</span><span class="p">,</span><span class="s">'rb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">inputfile</span><span class="p">:</span>
+    <span class="n">rawdata</span> <span class="o">=</span> <span class="n">inputfile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    
+<span class="n">keys</span> <span class="o">=</span> <span class="n">findcustomb64keys</span><span class="p">(</span><span class="n">rawdata</span><span class="p">)</span>
+<span class="n">keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">keys</span><span class="p">))</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"Base64 character sets found in Raw Data:</span><span class="se">\n</span><span class="s">"</span><span class="o">+</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">keys</span><span class="p">))</span>
+
+</code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Base64 character sets found in Raw Data:
+yocxm6hkRzWB70tqQLnvfaujIpN3F8Aw1/KUPS5deVEMD2G9O+ZCg4TYbJHsrXli
+HJIA/CB+FGKLNOP3RSlUVWXYZfbcdeaghi5kmn0pqrstuvwx89o12467MEDyzQjT
+</code></pre>
+</div>
+
+<h2 id="decoding-potential-b64-strings">Decoding potential B64 strings</h2>
+<div class="highlighter-rouge"><pre class="highlight"><code>- RegEx rawdata for any string that contains b64 chars and is between 5 and 4000 bytes in length
+- For each key found:
+    - Translate the characters in the string from the custom character set to the regular set
+    - Base64 decode as usual.
+    - To cutdown the noise, I am checking to see if the decoded data contains any any string from 5 - 6000 chars long.
+        - Not prefect
+</code></pre>
+</div>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">potentialbase64strings</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">b</span><span class="s">"[A-Za-z0-9+/]{5,6000}"</span><span class="p">,</span><span class="n">rawdata</span><span class="p">)</span>
+<span class="n">decodedstrings</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">key</span> <span class="o">!=</span> <span class="s">"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">encodedstring</span> <span class="ow">in</span> <span class="n">potentialbase64strings</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">append_padding</span><span class="p">(</span><span class="n">encodedstring</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">))</span>
+                <span class="n">translation</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">maketrans</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">std_base64chars</span><span class="p">)</span>
+                <span class="n">translatedstr</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">translation</span><span class="p">)</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64decode</span><span class="p">(</span><span class="n">translatedstr</span><span class="p">)</span>
+                
+                <span class="c">#lets just look for ascii strings</span>
+                <span class="n">justascii</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">b</span><span class="s">"[</span><span class="se">\x00</span><span class="s">-</span><span class="se">\x7F</span><span class="s">]{5,6000}"</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">justascii</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">decodedstrings</span> <span class="o">+=</span> <span class="p">[</span><span class="n">justascii</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">)]</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="n">decodedstrings</span> <span class="o">+=</span> <span class="p">[</span><span class="n">justascii</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)]</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+</code></pre>
+</div>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="k">for</span> <span class="n">decoded</span> <span class="ow">in</span> <span class="n">decodedstrings</span><span class="p">[:</span><span class="mi">30</span><span class="p">]:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">decoded</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>AA	
+checkip.amazonaws.com
+ipecho.net
+ipinfo.io
+api.ipify.org
+icanhazip.com
+myexternalip.com
+wtfismyip.com
+ip.anysrc.net
+api.ipify.org
+api.ip.sb
+ident.me
+www.myexternalip.com
+/plain
+/text
+/?format=text
+zen.spamhaus.org
+cbl.abuseat.org
+b.barracudacentral.org
+dnsbl-1.uceprotect.net
+spam.dnsbl.sorbs.net
+CSName
+Caption
+CSDVersion
+OSArchitecture
+ProductType
+BuildType
+WindowsDirectory
+SystemDirectory
+BootDevice
+</code></pre>
+</div>
+
+<h2 id="determining-which-module-is-which">Determining Which Module is Which</h2>
+
+<p>This is an example of how to categorize the decoded strings based on observation.</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">signatures</span> <span class="o">=</span> <span class="p">{</span><span class="s">"[Main Bot]"</span><span class="p">:</span><span class="s">"&lt;ipconf&gt;"</span><span class="p">,</span>
+             <span class="s">"[UAC Bypass]"</span><span class="p">:</span><span class="s">"Software</span><span class="err">\</span><span class="s">Classes</span><span class="err">\</span><span class="s">AppX82a6gwre4fdg3bt635tn5ctqjf8msdd2"</span><span class="p">}</span>
+
+<span class="k">for</span> <span class="n">sig</span> <span class="ow">in</span> <span class="n">signatures</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">signatures</span><span class="p">[</span><span class="n">sig</span><span class="p">]</span> <span class="ow">in</span> <span class="n">decodedstrings</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"**** This appears to be"</span><span class="p">,</span> <span class="n">sig</span><span class="p">,</span> <span class="s">"****</span><span class="se">\n\n</span><span class="s">"</span><span class="p">)</span>
+
+
+</code></pre>
+</div>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>**** This appears to be [Main Bot] ****
+</code></pre>
+</div>
+
+
+        
+
+    </div><!-- /.entry-wrapper -->
+    <nav class="pagination" role="navigation">
+      
+        <a href="http://jon.glass/blog/AutoITXOR/" class="btn" title="Decoding AutoIT XOR Encryption Obfuscation">Previous</a>
+      
+      
+    </nav><!-- /.pagination -->
+  </article>
+</div><!-- /#main -->
+
+<div class="footer-wrapper">
+  <footer role="contentinfo" class="entry-wrapper">
+    
+
+<span>&copy; 2020 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
+<div class="social-icons">
+	<a href="https://twitter.com/GlassDFIR" title="Jon Glass on Twitter" target="_blank"><i class="fa fa-twitter-square fa-2x"></i></a>
+	
+	
+	
+	
+	
+	
+	<a href="https://github.com/GlassDFIR" title="Jon Glass on Github" target="_blank"><i class="fa fa-github-square fa-2x"></i></a>
+	
+  
+	
+  <a href="http://jon.glass/feed.xml" title="Atom/RSS feed"><i class="fa fa-rss-square fa-2x"></i></a>
+</div><!-- /.social-icons -->
+
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+<script type="text/javascript">
+  var BASE_URL = 'http://jon.glass';
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="http://jon.glass/assets/js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script src="http://jon.glass/assets/js/scripts.min.js"></script>
+
+
+
+
+</body>
+</html>
