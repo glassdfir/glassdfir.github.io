@@ -135,12 +135,12 @@
 The following is a rudimentary script designed to find custom base64 character sets inside of raw data. 
 Overall steps:</p>
 <h2 id="finding-b64-charsets">Finding b64 charsets:</h2>
-<div class="highlighter-rouge"><pre class="highlight"><code>- Find potential base64 character sets by using Regex to look for all 64 character strings containing A-Za-z0-9+/
-- Take each match and sort the string to put the characters in order
-- Compare to a sorted list of standard b64 characters.
-- If there is a match, then we know the string has 1 of each character in the base64 character set, just in a different order.
-</code></pre>
-</div>
+<ul>
+  <li>Find potential base64 character sets by using Regex to look for all 64 character strings containing A-Za-z0-9+/</li>
+  <li>Take each match and sort the string to put the characters in order</li>
+  <li>Compare to a sorted list of standard b64 characters.</li>
+  <li>If there is a match, then we know the string has 1 of each character in the base64 character set, just in a different order.</li>
+</ul>
 
 <div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">base64</span>
 <span class="kn">import</span> <span class="nn">re</span>

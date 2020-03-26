@@ -9,10 +9,10 @@ When I spent some time getting to know TrickBot, I found it was helpful to decry
 The following is a rudimentary script designed to find custom base64 character sets inside of raw data. 
 Overall steps:
 ## Finding b64 charsets:
-    - Find potential base64 character sets by using Regex to look for all 64 character strings containing A-Za-z0-9+/
-    - Take each match and sort the string to put the characters in order
-    - Compare to a sorted list of standard b64 characters.
-    - If there is a match, then we know the string has 1 of each character in the base64 character set, just in a different order.
+- Find potential base64 character sets by using Regex to look for all 64 character strings containing A-Za-z0-9+/
+- Take each match and sort the string to put the characters in order
+- Compare to a sorted list of standard b64 characters.
+- If there is a match, then we know the string has 1 of each character in the base64 character set, just in a different order.
 
 
 

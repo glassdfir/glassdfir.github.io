@@ -1,13 +1,13 @@
-<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://jon.glass/feed.xml" rel="self" type="application/atom+xml" /><link href="http://jon.glass/" rel="alternate" type="text/html" /><updated>2020-03-25T21:41:20-04:00</updated><id>http://jon.glass/</id><title type="html">Half Full of Security</title><subtitle>Sharpening the ACKs since 2013</subtitle><entry><title type="html">BotTricker</title><link href="http://jon.glass/blog/BotTricker/" rel="alternate" type="text/html" title="BotTricker" /><published>2020-03-24T13:33:28-04:00</published><updated>2020-03-24T13:33:28-04:00</updated><id>http://jon.glass/blog/BotTricker</id><content type="html" xml:base="http://jon.glass/blog/BotTricker/">&lt;p&gt;When I spent some time getting to know TrickBot, I found it was helpful to decrypt the modules it injects manually in Python instead of spending the time to debug each one.
+<?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xml" href="/feed.xslt.xml"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.2.1">Jekyll</generator><link href="http://jon.glass/feed.xml" rel="self" type="application/atom+xml" /><link href="http://jon.glass/" rel="alternate" type="text/html" /><updated>2020-03-25T21:41:56-04:00</updated><id>http://jon.glass/</id><title type="html">Half Full of Security</title><subtitle>Sharpening the ACKs since 2013</subtitle><entry><title type="html">BotTricker</title><link href="http://jon.glass/blog/BotTricker/" rel="alternate" type="text/html" title="BotTricker" /><published>2020-03-24T13:33:28-04:00</published><updated>2020-03-24T13:33:28-04:00</updated><id>http://jon.glass/blog/BotTricker</id><content type="html" xml:base="http://jon.glass/blog/BotTricker/">&lt;p&gt;When I spent some time getting to know TrickBot, I found it was helpful to decrypt the modules it injects manually in Python instead of spending the time to debug each one.
 The following is a rudimentary script designed to find custom base64 character sets inside of raw data. 
 Overall steps:&lt;/p&gt;
 &lt;h2 id=&quot;finding-b64-charsets&quot;&gt;Finding b64 charsets:&lt;/h2&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;- Find potential base64 character sets by using Regex to look for all 64 character strings containing A-Za-z0-9+/
-- Take each match and sort the string to put the characters in order
-- Compare to a sorted list of standard b64 characters.
-- If there is a match, then we know the string has 1 of each character in the base64 character set, just in a different order.
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
+&lt;ul&gt;
+  &lt;li&gt;Find potential base64 character sets by using Regex to look for all 64 character strings containing A-Za-z0-9+/&lt;/li&gt;
+  &lt;li&gt;Take each match and sort the string to put the characters in order&lt;/li&gt;
+  &lt;li&gt;Compare to a sorted list of standard b64 characters.&lt;/li&gt;
+  &lt;li&gt;If there is a match, then we know the string has 1 of each character in the base64 character set, just in a different order.&lt;/li&gt;
+&lt;/ul&gt;
 
 &lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;base64&lt;/span&gt;
 &lt;span class=&quot;kn&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;re&lt;/span&gt;
