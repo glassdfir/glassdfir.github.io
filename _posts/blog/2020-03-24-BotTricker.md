@@ -55,12 +55,12 @@ print("Base64 character sets found in Raw Data:\n"+"\n".join(keys))
 
 
 ## Decoding potential B64 strings
-    - RegEx rawdata for any string that contains b64 chars and is between 5 and 4000 bytes in length
-    - For each key found:
-        - Translate the characters in the string from the custom character set to the regular set
-        - Base64 decode as usual.
-        - To cutdown the noise, I am checking to see if the decoded data contains any any string from 5 - 6000 chars long.
-            - Not prefect
+- RegEx rawdata for any string that contains b64 chars and is between 5 and 4000 bytes in length
+- For each key found:
+    - Translate the characters in the string from the custom character set to the regular set
+    - Base64 decode as usual.
+    - To cutdown the noise, I am checking to see if the decoded data contains any any string from 5 - 6000 chars long.
+        - Not prefect
 
 
 ```python
@@ -144,5 +144,6 @@ for sig in signatures:
 
     **** This appears to be [Main Bot] ****
     
-    
+
+That's it. I hope you found this helpful.
 
