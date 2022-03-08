@@ -29,7 +29,7 @@ I have decided to dust off the ol' blog to start documenting some of my more rec
 Those are the rough strokes. Is it more complicated than that? Yes. I encourage everyone to RTFMs from Microsoft on spinning up a new M365. 
 
 ## Getting an Auth Token
-To talk to the API, we will be leveraging the msal module to query Graph while changing the scope to Microsoft Defender for Endpoint's API. This is the product of a lot of trial and error BUT the benefit of this is to multifactor the  
+To talk to the API, we will be leveraging the msal module to query Graph while changing the scope to Microsoft Defender for Endpoint's API. This is the product of a lot of trial and error BUT the benefit of this is to multifactor the API so we can leverage the API via Jupyter Notebooks without having secret keys laying around everywhere.
 
 
 ```python
@@ -134,7 +134,6 @@ A couple of JSON objects and some binary crap at the end. Decoded the main part 
     "ver": "1.0"
 }
 ```
-22222222-2222-2222-2222-222222222222
 
 ## Using the Token to Run Advanced Threat Hunting Queries
 
@@ -157,8 +156,6 @@ response = requests.post(url, json=data, headers=headers, verify=False)
 jsonResponse = response.json()
 jsonResponse
 ```
-
-
 
 
     {'Stats': {'ExecutionTime': 0.0157135,
