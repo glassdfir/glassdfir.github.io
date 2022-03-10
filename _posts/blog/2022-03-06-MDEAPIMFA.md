@@ -81,7 +81,7 @@ if result["access_token"]:
 ### What is in this token?
 
 This authentication request returns a [JSON Web Token](https://en.wikipedia.org/wiki/JSON_Web_Token).
-A couple of JSON objects and some binary crap at the end. Decoded the main part looks like this
+A couple of JSON objects and a binary signature at the end. Decoded the main part looks like this
 ```json
 {
     "aud": "https://api.securitycenter.microsoft.com",
