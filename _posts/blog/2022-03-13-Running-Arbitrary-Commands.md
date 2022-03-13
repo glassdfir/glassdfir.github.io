@@ -107,8 +107,11 @@ liveResponseCommands
 
 
 
+## Running the Live Response Machine Action 
+To run this against a specific endpoint, grab the machine id and do something like this...
 
 ```python
+machineID = "796f7520617265207375706572206c616d652121"
 cmdRequest = MDErequest("machines/%s/runliveresponse" % (machineID),liveResponseCommands)
 cmdRequest
 ```
