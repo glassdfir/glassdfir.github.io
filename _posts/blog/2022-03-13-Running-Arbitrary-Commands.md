@@ -35,9 +35,7 @@ postFileToLiveResponseLibrary(
     override = True
     )
 ```
-
-
-
+Output:
 
     {'@odata.context': 'https://api.securitycenter.windows.com/api/$metadata#LibraryFiles/$entity',
      'fileName': 'cmd.ps1',
@@ -94,15 +92,14 @@ liveResponseCommands['Comment'] = "Collecting DNS cache"
 
 liveResponseCommands
 ```
+Output:
 
-```json
-{'Commands': [{'type': 'RunScript',
-    'params': [{'key': 'ScriptName', 'value': 'cmd.ps1'},
-    {'key': 'Args', 'value': 'ipconfig /displaydns > c:\\dnscache.txt'}]},
-    {'type': 'GetFile',
-    'params': [{'key': 'Path', 'value': 'c:\\dnscache.txt'}]}],
-    'Comment': 'Collecting DNS cache'}
-```
+    {'Commands': [{'type': 'RunScript',
+        'params': [{'key': 'ScriptName', 'value': 'cmd.ps1'},
+        {'key': 'Args', 'value': 'ipconfig /displaydns > c:\\dnscache.txt'}]},
+        {'type': 'GetFile',
+        'params': [{'key': 'Path', 'value': 'c:\\dnscache.txt'}]}],
+        'Comment': 'Collecting DNS cache'}
 
 
 
@@ -114,44 +111,43 @@ machineID = "796f7520617265207375706572206c616d652121"
 cmdRequest = MDErequest("machines/%s/runliveresponse" % (machineID),liveResponseCommands)
 cmdRequest
 ```
+Output:
 
-```json
-{'@odata.context': 'https://api.securitycenter.windows.com/api/$metadata#MachineActions/$entity',
-    'id': '944850f6-8043-4ca4-a65f-b50d0a1ea6c8',
-    'type': 'LiveResponse',
-    'title': None,
-    'requestor': 'JonathanGlass@HalfFullofSecurity.onmicrosoft.com',
-    'requestorComment': 'Collecting DNS cache',
-    'status': 'Pending',
-    'machineId': '796f7520617265207375706572206c616d652121',
-    'computerDnsName': 'desktop-l3mnbj9',
-    'creationDateTimeUtc': '2022-03-13T17:06:03.5759458Z',
-    'lastUpdateDateTimeUtc': '2022-03-13T17:06:03.5759458Z',
-    'cancellationRequestor': None,
-    'cancellationComment': None,
-    'cancellationDateTimeUtc': None,
-    'errorHResult': 0,
-    'scope': None,
-    'externalId': None,
-    'requestSource': 'PublicApi',
-    'relatedFileInfo': None,
-    'commands': [{'index': 0,
-    'startTime': None,
-    'endTime': None,
-    'commandStatus': 'Created',
-    'errors': [],
-    'command': {'type': 'RunScript',
-    'params': [{'key': 'ScriptName', 'value': 'cmd.ps1'},
-        {'key': 'Args', 'value': 'ipconfig /displaydns > c:\\dnscache.txt'}]}},
-    {'index': 1,
-    'startTime': None,
-    'endTime': None,
-    'commandStatus': 'Created',
-    'errors': [],
-    'command': {'type': 'GetFile',
-    'params': [{'key': 'Path', 'value': 'c:\\dnscache.txt'}]}}],
-    'troubleshootInfo': None}
-```
+    {'@odata.context': 'https://api.securitycenter.windows.com/api/$metadata#MachineActions/$entity',
+        'id': '944850f6-8043-4ca4-a65f-b50d0a1ea6c8',
+        'type': 'LiveResponse',
+        'title': None,
+        'requestor': 'JonathanGlass@HalfFullofSecurity.onmicrosoft.com',
+        'requestorComment': 'Collecting DNS cache',
+        'status': 'Pending',
+        'machineId': '796f7520617265207375706572206c616d652121',
+        'computerDnsName': 'desktop-l3mnbj9',
+        'creationDateTimeUtc': '2022-03-13T17:06:03.5759458Z',
+        'lastUpdateDateTimeUtc': '2022-03-13T17:06:03.5759458Z',
+        'cancellationRequestor': None,
+        'cancellationComment': None,
+        'cancellationDateTimeUtc': None,
+        'errorHResult': 0,
+        'scope': None,
+        'externalId': None,
+        'requestSource': 'PublicApi',
+        'relatedFileInfo': None,
+        'commands': [{'index': 0,
+        'startTime': None,
+        'endTime': None,
+        'commandStatus': 'Created',
+        'errors': [],
+        'command': {'type': 'RunScript',
+        'params': [{'key': 'ScriptName', 'value': 'cmd.ps1'},
+            {'key': 'Args', 'value': 'ipconfig /displaydns > c:\\dnscache.txt'}]}},
+        {'index': 1,
+        'startTime': None,
+        'endTime': None,
+        'commandStatus': 'Created',
+        'errors': [],
+        'command': {'type': 'GetFile',
+        'params': [{'key': 'Path', 'value': 'c:\\dnscache.txt'}]}}],
+        'troubleshootInfo': None}
 
 
 
@@ -164,9 +160,7 @@ This one is pretty straightforward. Submit the ID you received from generating t
 cmdStatus = MDErequest("machineactions/%s" % (cmdRequest['id']))
 cmdStatus
 ```
-
-
-
+Output:
 
     {'@odata.context': 'https://api.securitycenter.windows.com/api/$metadata#MachineActions/$entity',
      'id': '944850f6-8043-4ca4-a65f-b50d0a1ea6c8',
@@ -214,10 +208,8 @@ Possible values are: "Pending", "InProgress", "Succeeded", "Failed", "TimeOut", 
 cmdStatus = MDErequest("machineactions/%s" % (cmdRequest['id']))
 cmdStatus
 ```
+Output:
 
-
-
-    ```json
     {'@odata.context': 'https://api.securitycenter.windows.com/api/$metadata#MachineActions/$entity',
      'id': '944850f6-8043-4ca4-a65f-b50d0a1ea6c8',
      'type': 'LiveResponse',
@@ -253,7 +245,7 @@ cmdStatus
        'command': {'type': 'GetFile',
         'params': [{'key': 'Path', 'value': 'c:\\dnscache.txt'}]}}],
      'troubleshootInfo': None}
-     ```
+     
 
 
 
@@ -266,6 +258,7 @@ When we leverage the **GetLiveResponseResultDownloadLink** endpoint, we can get 
 liveResponseResult = MDErequest("machineactions/%s/GetLiveResponseResultDownloadLink(index=1)" % (cmdStatus['id']))
 liveResponseResult
 ```
+Output:
 
     {'@odata.context': 'https://api.securitycenter.windows.com/api/$metadata#Edm.String',
      'value': 'https://ssus1westprod7.blob.core.windows.net/67e/78/sha256/767e78ee71556652fbdfa602a93645265ea0d6de583f38e047dac26367b1a3f2.zip?sv=2015-12-11&sr=b&sig=C1TdPqqYBLHpyoRM9Il1UMCewLjW9AuINMZnXitq6F4%3D&spr=https&st=2022-03-13T17%3A05%3A20Z&se=2022-03-13T17%3A40%3A20Z&sp=r&rscd=attachment%3B%20filename%3D%22dnscache.txt.gz%22'}
@@ -290,6 +283,7 @@ Since we know this is a file is going to be a unicode text file, we can view the
 ```python
 print(decompressedFile.read().decode('utf-16').encode('utf-8').decode('ascii'))
 ```
+Output:
 
     
     Windows IP Configuration
