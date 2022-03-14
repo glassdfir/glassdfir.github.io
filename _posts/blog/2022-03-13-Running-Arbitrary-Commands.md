@@ -341,3 +341,6 @@ SUCCESS!!!
 6. If the machine that you are trying to run this API call is in an RBAC device group that does not have an automated remediation level assigned to it, you'll need to at least enable the minimum Remediation Level for a given Device Group.
 7. Multiple live response commands can be run on a single API call. However, when a live response command fails all the subsequent actions will not be executed.
 8. Parameters are a pain in the ass to encode across PowerShell and Batch it is probably best to stick with Powershell
+
+## References
+* [https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/run-live-response?view=o365-worldwide](https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/run-live-response?view=o365-worldwide)
