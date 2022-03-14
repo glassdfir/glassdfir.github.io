@@ -91,15 +91,37 @@ liveResponseCommands['Commands'].append(command)
 liveResponseCommands['Comment'] = "Collecting DNS cache"
 
 liveResponseCommands
+
 ```
 Output:
 
-    {'Commands': [{'type': 'RunScript',
-        'params': [{'key': 'ScriptName', 'value': 'cmd.ps1'},
-        {'key': 'Args', 'value': 'ipconfig /displaydns > c:\\dnscache.txt'}]},
-        {'type': 'GetFile',
-        'params': [{'key': 'Path', 'value': 'c:\\dnscache.txt'}]}],
-        'Comment': 'Collecting DNS cache'}
+    {
+    "Commands": [
+        {
+            "type": "RunScript",
+            "params": [
+                {
+                    "key": "ScriptName",
+                    "value": "cmd.ps1"
+                },
+                {
+                    "key": "Args",
+                    "value": "ipconfig /displaydns > c:\\dnscache.txt"
+                }
+            ]
+        },
+        {
+            "type": "GetFile",
+            "params": [
+                {
+                    "key": "Path",
+                    "value": "c:\\dnscache.txt"
+                }
+            ]
+        }
+    ],
+    "Comment": "Collecting DNS cache"
+    }
 
 
 
@@ -311,11 +333,11 @@ Output:
 SUCCESS!!!
 
 ## Limitations of the Machine Action API
-    1. Rate limitations for this API are 10 calls per minute (additional requests are responded with HTTP 429).
-    2. 25 concurrently running sessions (requests exceeding the throttling limit will receive a "429 - Too many requests" response).
-    3. If the machine is not available, the session will be queued for up to 3 days.
-    4. RunScript command timeouts after 10 minutes.
-    5. Live response commands cannot be queued up and can only be executed one at a time.
-    6. If the machine that you are trying to run this API call is in an RBAC device group that does not have an automated remediation level assigned to it, you'll need to at least enable the minimum Remediation Level for a given Device Group.
-    7. Multiple live response commands can be run on a single API call. However, when a live response command fails all the subsequent actions will not be executed.
-    8. Parameters are a pain in the ass to encode across PowerShell and Batch it is probably best to stick with Powershell
+1. Rate limitations for this API are 10 calls per minute (additional requests are responded with HTTP 429).
+2. 25 concurrently running sessions (requests exceeding the throttling limit will receive a "429 - Too many requests" response).
+3. If the machine is not available, the session will be queued for up to 3 days.
+4. RunScript command timeouts after 10 minutes.
+5. Live response commands cannot be queued up and can only be executed one at a time.
+6. If the machine that you are trying to run this API call is in an RBAC device group that does not have an automated remediation level assigned to it, you'll need to at least enable the minimum Remediation Level for a given Device Group.
+7. Multiple live response commands can be run on a single API call. However, when a live response command fails all the subsequent actions will not be executed.
+8. Parameters are a pain in the ass to encode across PowerShell and Batch it is probably best to stick with Powershell
