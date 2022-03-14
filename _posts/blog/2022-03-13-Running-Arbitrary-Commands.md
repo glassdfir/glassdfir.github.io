@@ -96,8 +96,6 @@ liveResponseCommands
 ```
 
 
-
-
     {'Commands': [{'type': 'RunScript',
        'params': [{'key': 'ScriptName', 'value': 'cmd.ps1'},
         {'key': 'Args', 'value': 'ipconfig /displaydns > c:\\dnscache.txt'}]},
@@ -108,15 +106,13 @@ liveResponseCommands
 
 
 ## Running the Live Response Machine Action 
-To run this against a specific endpoint, grab the machine id and do something like this...
+To run this against a specific endpoint, grab the machine id and do something like this... 
 
 ```python
 machineID = "796f7520617265207375706572206c616d652121"
 cmdRequest = MDErequest("machines/%s/runliveresponse" % (machineID),liveResponseCommands)
 cmdRequest
 ```
-
-
 
 
     {'@odata.context': 'https://api.securitycenter.windows.com/api/$metadata#MachineActions/$entity',
