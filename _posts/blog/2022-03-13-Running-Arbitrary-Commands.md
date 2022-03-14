@@ -95,13 +95,14 @@ liveResponseCommands['Comment'] = "Collecting DNS cache"
 liveResponseCommands
 ```
 
-
+    ```json
     {'Commands': [{'type': 'RunScript',
        'params': [{'key': 'ScriptName', 'value': 'cmd.ps1'},
         {'key': 'Args', 'value': 'ipconfig /displaydns > c:\\dnscache.txt'}]},
       {'type': 'GetFile',
        'params': [{'key': 'Path', 'value': 'c:\\dnscache.txt'}]}],
      'Comment': 'Collecting DNS cache'}
+     ```
 
 
 
@@ -114,7 +115,7 @@ cmdRequest = MDErequest("machines/%s/runliveresponse" % (machineID),liveResponse
 cmdRequest
 ```
 
-
+    ```json
     {'@odata.context': 'https://api.securitycenter.windows.com/api/$metadata#MachineActions/$entity',
      'id': '944850f6-8043-4ca4-a65f-b50d0a1ea6c8',
      'type': 'LiveResponse',
@@ -150,6 +151,7 @@ cmdRequest
        'command': {'type': 'GetFile',
         'params': [{'key': 'Path', 'value': 'c:\\dnscache.txt'}]}}],
      'troubleshootInfo': None}
+     ```
 
 
 
@@ -215,7 +217,7 @@ cmdStatus
 
 
 
-
+    ```json
     {'@odata.context': 'https://api.securitycenter.windows.com/api/$metadata#MachineActions/$entity',
      'id': '944850f6-8043-4ca4-a65f-b50d0a1ea6c8',
      'type': 'LiveResponse',
@@ -251,21 +253,19 @@ cmdStatus
        'command': {'type': 'GetFile',
         'params': [{'key': 'Path', 'value': 'c:\\dnscache.txt'}]}}],
      'troubleshootInfo': None}
+     ```
 
 
 
 ## Retrieving the Contents of a GetFile Request
 
-When we leverage the GetLiveResponseResultDownloadLink, we can get the results of the commands we executed. Each command has an index. Since the GetFile command is index 1, we have to specify that in the result request.
+When we leverage the **GetLiveResponseResultDownloadLink** endpoint, we can get the results of the commands we executed. Each command has an index. Since the GetFile command is index 1, we have to specify that in the result request.
 
 
 ```python
 liveResponseResult = MDErequest("machineactions/%s/GetLiveResponseResultDownloadLink(index=1)" % (cmdStatus['id']))
 liveResponseResult
 ```
-
-
-
 
     {'@odata.context': 'https://api.securitycenter.windows.com/api/$metadata#Edm.String',
      'value': 'https://ssus1westprod7.blob.core.windows.net/67e/78/sha256/767e78ee71556652fbdfa602a93645265ea0d6de583f38e047dac26367b1a3f2.zip?sv=2015-12-11&sr=b&sig=C1TdPqqYBLHpyoRM9Il1UMCewLjW9AuINMZnXitq6F4%3D&spr=https&st=2022-03-13T17%3A05%3A20Z&se=2022-03-13T17%3A40%3A20Z&sp=r&rscd=attachment%3B%20filename%3D%22dnscache.txt.gz%22'}
@@ -324,3 +324,4 @@ SUCCESS!!!
     5. Live response commands cannot be queued up and can only be executed one at a time.
     6. If the machine that you are trying to run this API call is in an RBAC device group that does not have an automated remediation level assigned to it, you'll need to at least enable the minimum Remediation Level for a given Device Group.
     7. Multiple live response commands can be run on a single API call. However, when a live response command fails all the subsequent actions will not be executed.
+    8. Parameters are a pain in the ass to encode across PowerShell and Batch it is probably best to stick with Powershell
