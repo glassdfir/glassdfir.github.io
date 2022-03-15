@@ -2,7 +2,7 @@
 layout: post
 title:  "Microsoft 365 Security: Kernel Level Access with Live Response"
 date:   2022-03-13 12:33:28 -0500
-categories: blog
+categories: [blog, M365]
 ---
 
 There are times when security is annoying. As an example, when the Administrator account or even the SYSTEM account can access a file due to restrictions against accessing volume artifacts.

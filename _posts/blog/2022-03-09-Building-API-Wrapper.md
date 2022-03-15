@@ -2,7 +2,7 @@
 layout: post
 title:  "Microsoft 365 Security: Building a quick API wrapper"
 date:   2022-03-09 12:33:28 -0500
-categories: blog
+categories: [blog, M365]
 ---
 
 ## Building a Wrapper for MDE interactions

@@ -2,7 +2,7 @@
 layout: post
 title:  "Microsoft 365 Security: Multifactor API Access"
 date:   2022-03-06 12:33:28 -0500
-categories: blog
+categories: [blog, M365]
 ---
 
 I have decided to dust off the ol' blog to start documenting some of my more recent endeavors leveraging the Microsoft 365 Security suite to perform Incident Response. Since I prefer to talk to APIs more than people, this seemed like a good opportunity to explore the different components of the ecosystem through the language of Python. Generic instructions are being provided to get you started but there are a lot of nuances with the environment and I can't bring myself to document them all. 
