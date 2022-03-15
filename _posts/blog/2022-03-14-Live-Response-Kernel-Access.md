@@ -21,21 +21,6 @@ liveResponseCommands['Commands'].append(command)
 # ALL LIVE RESPONSE REQUESTS MUST HAVE A COMMENT
 liveResponseCommands['Comment'] = "Looking at the LogFile clusters"
 
-liveResponseCommands
-```
-
-
-
-
-    {'Commands': [{'type': 'RunScript',
-       'params': [{'key': 'ScriptName', 'value': 'cmd.ps1'},
-        {'key': 'Args', 'value': 'fsutil file queryextents \\$LogFile'}]}],
-     'Comment': 'Looking at the LogFile clusters'}
-
-
-
-
-```python
 machineID  = "c6993a6c004946bf52d2d59237c18e6db4db7e5e"
 cmdRequest = MDErequest("machines/%s/runliveresponse" % (machineID),liveResponseCommands)
 cmdStatus = MDErequest("machineactions/%s" % (cmdRequest['id']))
