@@ -330,7 +330,11 @@ Output:
     
     
 
-SUCCESS!!!
+SUCCESS!!! I will show in the next post how to just read the STDOUT of a command from the Transcript but there maybe scenarios where you need to pipe the output of a command to file instead of STDOUT. Off the top of my head...
+    * Maybe your command takes longer that 10 minutes to run.
+    * Maybe your output is too large for the buffer Live Response is using to pull back STDOUT.
+
+I am sure there are other reasons to send to a file instead of just reading the STDOUT manually.
 
 ## Limitations of the Machine Action API
 1. Rate limitations for this API are 10 calls per minute (additional requests are responded with HTTP 429).
