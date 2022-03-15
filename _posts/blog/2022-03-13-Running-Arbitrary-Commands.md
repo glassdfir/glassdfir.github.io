@@ -2,7 +2,7 @@
 layout: post
 title:  "Microsoft 365 Security: Running Arbitrary Commands via the API"
 date:   2022-03-13 12:33:28 -0500
-categories: [blog, M365]
+categories: blog
 ---
 
 ## Running Arbitrary Commands on an Endpoint via the API
