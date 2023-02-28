@@ -2,6 +2,14 @@
 
   
     {
+      "title"			: "ChatGPT wrote this blog post ",
+      "link"			: "http://localhost:4000/blog/chatgpt-writes-the-blog/",
+      "excerpt"		: ""
+    }
+  
+
+  
+    ,{
       "title"			: "Microsoft 365 Security: Kernel Level Access with Live Response",
       "link"			: "http://localhost:4000/blog/Live-Response-Kernel-Access/",
       "excerpt"		: ""

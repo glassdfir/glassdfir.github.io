@@ -1,12 +1,12 @@
 ---
 layout: post
-title:  "ChatGPT wrote this blog post"
-date:   2023-02-28 12:33:28 -0500
+title:  "ChatGPT wrote this blog post "
+date:   2023-02-27 12:33:28 -0500
 categories: blog
 ---
 
 This is what I got from ChatGPT when I provided the following prompt:
-
+ 
 ```
 Write a 500 word technical blog post about the Microsoft Defender for Endpoint API to perform Incident Response with Python examples
 
