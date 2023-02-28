@@ -17,22 +17,22 @@
 <meta name="twitter:creator" content="@GlassDFIR">
 
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://jon.glass/images/site-logo.png">
+<meta name="twitter:image" content="http://localhost:4000/images/site-logo.png">
 
 <!-- Open Graph -->
 <meta property="og:locale" content="en_US">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Setting up ELK on my MacBook (Part 1)">
 <meta property="og:description" content="">
-<meta property="og:url" content="https://jon.glass/blog/My_ELK_Stack/">
+<meta property="og:url" content="http://localhost:4000/blog/My_ELK_Stack/">
 <meta property="og:site_name" content="Half Full of Security">
 
 
 
 
 
-<link rel="canonical" href="https://jon.glass/blog/My_ELK_Stack/">
-<link href="https://jon.glass/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
+<link rel="canonical" href="http://localhost:4000/blog/My_ELK_Stack/">
+<link href="http://localhost:4000/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
 
 <!-- https://t.co/dKP3o1e -->
 <meta name="HandheldFriendly" content="True">
@@ -40,7 +40,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- For all browsers -->
-<link rel="stylesheet" href="https://jon.glass/assets/css/main.css">
+<link rel="stylesheet" href="http://localhost:4000/assets/css/main.css">
 <!-- Webfonts -->
 <script src="https://use.edgefonts.net/source-sans-pro:n2,i2,n3,i3,n4,i4,n6,i6,n7,i7,n9,i9;source-code-pro:n4,n7;volkhov.js"></script>
 
@@ -48,12 +48,12 @@
 
 <!-- HTML5 Shiv and Media Query Support -->
 <!--[if lt IE 9]>
-  <script src="https://jon.glass/assets/js/vendor/html5shiv.min.js"></script>
-  <script src="https://jon.glass/assets/js/vendor/respond.min.js"></script>
+  <script src="http://localhost:4000/assets/js/vendor/html5shiv.min.js"></script>
+  <script src="http://localhost:4000/assets/js/vendor/respond.min.js"></script>
 <![endif]-->
 
 <!-- Modernizr -->
-<script src="https://jon.glass/assets/js/vendor/modernizr-2.7.1.custom.min.js"></script>
+<script src="http://localhost:4000/assets/js/vendor/modernizr-2.7.1.custom.min.js"></script>
 
 
 <!-- MathJax -->
@@ -62,17 +62,17 @@
 
 <!-- Icons -->
 <!-- 16x16 -->
-<link rel="shortcut icon" href="https://jon.glass/favicon.ico">
+<link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
 <!-- 32x32 -->
-<link rel="shortcut icon" href="https://jon.glass/favicon.png">
+<link rel="shortcut icon" href="http://localhost:4000/favicon.png">
 <!-- 57x57 (precomposed) for iPhone 3GS, pre-2011 iPod Touch and older Android devices -->
-<link rel="apple-touch-icon-precomposed" href="https://jon.glass/images/apple-touch-icon-precomposed.png">
+<link rel="apple-touch-icon-precomposed" href="http://localhost:4000/images/apple-touch-icon-precomposed.png">
 <!-- 72x72 (precomposed) for 1st generation iPad, iPad 2 and iPad mini -->
-<link rel="apple-touch-icon-precomposed" sizes="72x72" href="https://jon.glass/images/apple-touch-icon-72x72-precomposed.png">
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://localhost:4000/images/apple-touch-icon-72x72-precomposed.png">
 <!-- 114x114 (precomposed) for iPhone 4, 4S, 5 and post-2011 iPod Touch -->
-<link rel="apple-touch-icon-precomposed" sizes="114x114" href="https://jon.glass/images/apple-touch-icon-114x114-precomposed.png">
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://localhost:4000/images/apple-touch-icon-114x114-precomposed.png">
 <!-- 144x144 (precomposed) for iPad 3rd and 4th generation -->
-<link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://jon.glass/images/apple-touch-icon-144x144-precomposed.png">
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://localhost:4000/images/apple-touch-icon-144x144-precomposed.png">
 
 </head>
 
@@ -83,19 +83,19 @@
 	    <ul>
       
 		    
-		    <li><a href="https://jon.glass/blog/" >Blog</a></li>
+		    <li><a href="http://localhost:4000/blog/" >Blog</a></li>
 		  
 		    
-		    <li><a href="https://jon.glass/adfirwmc/" >ADFIRWMC</a></li>
+		    <li><a href="http://localhost:4000/adfirwmc/" >ADFIRWMC</a></li>
 		  
 		    
-		    <li><a href="https://jon.glass/tips/" >Tips and Tricks</a></li>
+		    <li><a href="http://localhost:4000/tips/" >Tips and Tricks</a></li>
 		  
 		    
-		    <li><a href="https://jon.glass/about/" >About</a></li>
+		    <li><a href="http://localhost:4000/about/" >About</a></li>
 		  
 		    
-		    <li><a href="https://jon.glass/search/" >Search</a></li>
+		    <li><a href="http://localhost:4000/search/" >Search</a></li>
 		  
 	    </ul>
 	</nav>
@@ -106,9 +106,9 @@
 <header class="masthead">
 	<div class="wrap">
       
-  		<a href="https://jon.glass/" class="site-logo" rel="home" title="Half Full of Security"><img src="https://jon.glass/images/site-logo.png" width="200" height="200" alt="Half Full of Security logo" class="animated fadeInDown"></a>
+  		<a href="http://localhost:4000/" class="site-logo" rel="home" title="Half Full of Security"><img src="http://localhost:4000/images/site-logo.png" width="200" height="200" alt="Half Full of Security logo" class="animated fadeInDown"></a>
       
-      <h1 class="site-title animated fadeIn"><a href="https://jon.glass/">Half Full of Security</a></h1>
+      <h1 class="site-title animated fadeIn"><a href="http://localhost:4000/">Half Full of Security</a></h1>
 		<h2 class="site-description animated fadeIn" itemprop="description">Sharpening the ACKs since 2013</h2>
 	</div>
 </header><!-- /.masthead -->
@@ -130,10 +130,10 @@
       </header>
 
 
-        <time datetime="2017-03-06T19:52:28-05:00"><i class="fa fa-calendar-o"></i> March 06, 2017</time>
+        <time datetime="2017-03-07T00:52:28+00:00"><i class="fa fa-calendar-o"></i> March 07, 2017</time>
         <p>I am starting up a new run of blog posts to document some malware analysis work I have been doing lately. Since I got my new MacBook, I have used the new hardware to as an opportunity to rebuild my setup from scratch. I am using Elasticsearch, Logstash, and Kibana on my MacBook and WinLogBeat and PacketBeat on my Windows 10 VM. This is post is meant to help me rebuild my ELK stack on MacBook the next time I dork it up. I tried running installing the stack in a few different ways but these are the steps I took that were ultimately successful.</p>
 
-<h3 id="create-some-folders">1. Create some folders:</h3>
+<h3 id="1-create-some-folders">1. Create some folders:</h3>
 
 <figure class="highlight"><pre><code class="language-raw" data-lang="raw">mkdir ~/Applications/ELK
 cd ~/Applications/ELK
@@ -141,7 +141,7 @@ mkdir Data Logs</code></pre></figure>
 
 <p>I put this off of my profile because as soon as I start burying it off in some directory off of root like a proper admin I can’t remember where I put it.</p>
 
-<h3 id="download-elasticsearch">2. Download Elasticsearch:</h3>
+<h3 id="2-download-elasticsearch">2. Download Elasticsearch:</h3>
 <p>Elasticsearch is a highly scalable open-source full-text search and analytics engine. It allows you to store, search, and analyze big volumes of data quickly and in near real time.
 Download your copy from here: <a href="https://www.elastic.co/downloads/elasticsearch">https://www.elastic.co/downloads/elasticsearch</a>
 Specifically I downloaded the <a href="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.2.2.tar.gz">elasticsearch-5.2.2.tar.gz</a>
@@ -149,7 +149,7 @@ and extracted it to the ELK folder.</p>
 
 <figure class="highlight"><pre><code class="language-raw" data-lang="raw">tar -xvzf elasticsearch-5.2.2.tar.gz</code></pre></figure>
 
-<h3 id="configure-elasticsearch">3. Configure Elasticsearch:</h3>
+<h3 id="3-configure-elasticsearch">3. Configure Elasticsearch:</h3>
 <p>One of the things I ended up doing in my setup was changing the configuration from localhost to 0.0.0.0. I did this because, in addition to Malware Analysis VMs on my MacBook, I also have other boxes around my lab that I wanted logs from as well.</p>
 
 <p>To do this crack open ~/ELK/elasticsearch-5.2.2/config/elasticsearch.yml in your favorite text editor and change:</p>
@@ -166,7 +166,7 @@ and extracted it to the ELK folder.</p>
 <span class="c1">#</span>
 <span class="c1"># Set the bind address to a specific IP (IPv4 or IPv6):</span>
 <span class="c1">#</span>
-<span class="s">network.host</span><span class="pi">:</span> <span class="s">0.0.0.0</span></code></pre></figure>
+<span class="na">network.host</span><span class="pi">:</span> <span class="s">0.0.0.0</span></code></pre></figure>
 
 <p>If you are just doing this for local logging, the default configuration is fine.</p>
 
@@ -189,13 +189,13 @@ Also in ~/ELK/elasticsearch-5.2.2/config/elasticsearch.yml, change:</p>
 <span class="c1">#</span>
 <span class="c1"># Path to directory where to store the data (separate multiple locations by comma):</span>
 <span class="c1">#</span>
-<span class="s">path.data</span><span class="pi">:</span> <span class="s">/Users/glass/ELK/Data</span>
+<span class="na">path.data</span><span class="pi">:</span> <span class="s">/Users/glass/ELK/Data</span>
 <span class="c1">#</span>
 <span class="c1"># Path to log files:</span>
 <span class="c1">#</span>
-<span class="s">path.logs</span><span class="pi">:</span> <span class="s">/Users/glass/ELK/Logs</span></code></pre></figure>
+<span class="na">path.logs</span><span class="pi">:</span> <span class="s">/Users/glass/ELK/Logs</span></code></pre></figure>
 
-<h3 id="run-elasticsearch-to-make-sure-it-works">4. Run Elasticsearch to make sure it works:</h3>
+<h3 id="4-run-elasticsearch-to-make-sure-it-works">4. Run Elasticsearch to make sure it works:</h3>
 
 <figure class="highlight"><pre><code class="language-raw" data-lang="raw">./elasticsearch-5.2.2/bin/elasticsearch</code></pre></figure>
 
@@ -206,20 +206,20 @@ Also in ~/ELK/elasticsearch-5.2.2/config/elasticsearch.yml, change:</p>
 <p>and you should see something like this:</p>
 
 <figure class="highlight"><pre><code class="language-json" data-lang="json"><span class="p">{</span><span class="w">
-  </span><span class="nt">"name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"D4i86Xk"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"cluster_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"elasticsearch"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"cluster_uuid"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"YNTg9_EpQ46-TDcfKqdgRw"</span><span class="p">,</span><span class="w">
-  </span><span class="nt">"version"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-    </span><span class="nt">"number"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"5.2.2"</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"build_hash"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"f9d9b74"</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"build_date"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"2017-02-24T17:26:45.835Z"</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"build_snapshot"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
-    </span><span class="nt">"lucene_version"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"6.4.1"</span><span class="w">
+  </span><span class="nl">"name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"D4i86Xk"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"cluster_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"elasticsearch"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"cluster_uuid"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"YNTg9_EpQ46-TDcfKqdgRw"</span><span class="p">,</span><span class="w">
+  </span><span class="nl">"version"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"number"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"5.2.2"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"build_hash"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"f9d9b74"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"build_date"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"2017-02-24T17:26:45.835Z"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"build_snapshot"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"lucene_version"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"6.4.1"</span><span class="w">
   </span><span class="p">},</span><span class="w">
-  </span><span class="nt">"tagline"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"You Know, for Search"</span><span class="w">
+  </span><span class="nl">"tagline"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"You Know, for Search"</span><span class="w">
 </span><span class="p">}</span></code></pre></figure>
 
-<h3 id="download-kibana">3. Download Kibana:</h3>
+<h3 id="3-download-kibana">3. Download Kibana:</h3>
 <p>Kibana is an open source (Apache Licensed), browser based analytics and search dashboard for Elasticsearch.
 I grabbed <a href="https://artifacts.elastic.co/downloads/kibana/kibana-5.2.2-linux-x86_64.tar.gz">kibana-5.2.2-linux-x86_64.tar.gz</a>
 and unzipped it in my ~/ELK directory.</p>
@@ -228,7 +228,7 @@ and unzipped it in my ~/ELK directory.</p>
 
 <p>I left the default configuration alone because I didn’t need to change anything.</p>
 
-<h3 id="run-kibana">4. Run Kibana:</h3>
+<h3 id="4-run-kibana">4. Run Kibana:</h3>
 
 <figure class="highlight"><pre><code class="language-raw" data-lang="raw">~/ELK/kibana-5.2.2-darwin-x86_64/bin/kibana</code></pre></figure>
 
@@ -244,10 +244,10 @@ So, for those ELK stack nerds out there: “You’re right. My first time runnin
     </div><!-- /.entry-wrapper -->
     <nav class="pagination" role="navigation">
       
-        <a href="https://jon.glass/blog/RogueUsers/" class="btn" title="Dealing with users gone bad…">Previous</a>
+        <a href="http://localhost:4000/blog/RogueUsers/" class="btn" title="Dealing with users gone bad…">Previous</a>
       
       
-        <a href="https://jon.glass/blog/My_ELK_Stack2/" class="btn" title="Setting up ELK on my MacBook (Part 2)">Next</a>
+        <a href="http://localhost:4000/blog/My_ELK_Stack2/" class="btn" title="Setting up ELK on my MacBook (Part 2)">Next</a>
       
     </nav><!-- /.pagination -->
   </article>
@@ -257,7 +257,7 @@ So, for those ELK stack nerds out there: “You’re right. My first time runnin
   <footer role="contentinfo" class="entry-wrapper">
     
 
-<span>&copy; 2020 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
+<span>&copy; 2023 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
 <div class="social-icons">
 	<a href="https://twitter.com/GlassDFIR" title="Jon Glass on Twitter" target="_blank"><i class="fa fa-twitter-square fa-2x"></i></a>
 	
@@ -270,19 +270,19 @@ So, for those ELK stack nerds out there: “You’re right. My first time runnin
 	
   
 	
-  <a href="https://jon.glass/feed.xml" title="Atom/RSS feed"><i class="fa fa-rss-square fa-2x"></i></a>
+  <a href="http://localhost:4000/feed.xml" title="Atom/RSS feed"><i class="fa fa-rss-square fa-2x"></i></a>
 </div><!-- /.social-icons -->
 
   </footer>
 </div><!-- /.footer-wrapper -->
 
 <script type="text/javascript">
-  var BASE_URL = 'https://jon.glass';
+  var BASE_URL = 'http://localhost:4000';
 </script>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="https://jon.glass/assets/js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
-<script src="https://jon.glass/assets/js/scripts.min.js"></script>
+<script>window.jQuery || document.write('<script src="http://localhost:4000/assets/js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script src="http://localhost:4000/assets/js/scripts.min.js"></script>
 
 
 

@@ -17,22 +17,22 @@
 <meta name="twitter:creator" content="@GlassDFIR">
 
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://jon.glass/images/site-logo.png">
+<meta name="twitter:image" content="http://localhost:4000/images/site-logo.png">
 
 <!-- Open Graph -->
 <meta property="og:locale" content="en_US">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Setting up ELK on my MacBook (Part 2)">
 <meta property="og:description" content="">
-<meta property="og:url" content="https://jon.glass/blog/My_ELK_Stack2/">
+<meta property="og:url" content="http://localhost:4000/blog/My_ELK_Stack2/">
 <meta property="og:site_name" content="Half Full of Security">
 
 
 
 
 
-<link rel="canonical" href="https://jon.glass/blog/My_ELK_Stack2/">
-<link href="https://jon.glass/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
+<link rel="canonical" href="http://localhost:4000/blog/My_ELK_Stack2/">
+<link href="http://localhost:4000/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
 
 <!-- https://t.co/dKP3o1e -->
 <meta name="HandheldFriendly" content="True">
@@ -40,7 +40,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <!-- For all browsers -->
-<link rel="stylesheet" href="https://jon.glass/assets/css/main.css">
+<link rel="stylesheet" href="http://localhost:4000/assets/css/main.css">
 <!-- Webfonts -->
 <script src="https://use.edgefonts.net/source-sans-pro:n2,i2,n3,i3,n4,i4,n6,i6,n7,i7,n9,i9;source-code-pro:n4,n7;volkhov.js"></script>
 
@@ -48,12 +48,12 @@
 
 <!-- HTML5 Shiv and Media Query Support -->
 <!--[if lt IE 9]>
-  <script src="https://jon.glass/assets/js/vendor/html5shiv.min.js"></script>
-  <script src="https://jon.glass/assets/js/vendor/respond.min.js"></script>
+  <script src="http://localhost:4000/assets/js/vendor/html5shiv.min.js"></script>
+  <script src="http://localhost:4000/assets/js/vendor/respond.min.js"></script>
 <![endif]-->
 
 <!-- Modernizr -->
-<script src="https://jon.glass/assets/js/vendor/modernizr-2.7.1.custom.min.js"></script>
+<script src="http://localhost:4000/assets/js/vendor/modernizr-2.7.1.custom.min.js"></script>
 
 
 <!-- MathJax -->
@@ -62,17 +62,17 @@
 
 <!-- Icons -->
 <!-- 16x16 -->
-<link rel="shortcut icon" href="https://jon.glass/favicon.ico">
+<link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
 <!-- 32x32 -->
-<link rel="shortcut icon" href="https://jon.glass/favicon.png">
+<link rel="shortcut icon" href="http://localhost:4000/favicon.png">
 <!-- 57x57 (precomposed) for iPhone 3GS, pre-2011 iPod Touch and older Android devices -->
-<link rel="apple-touch-icon-precomposed" href="https://jon.glass/images/apple-touch-icon-precomposed.png">
+<link rel="apple-touch-icon-precomposed" href="http://localhost:4000/images/apple-touch-icon-precomposed.png">
 <!-- 72x72 (precomposed) for 1st generation iPad, iPad 2 and iPad mini -->
-<link rel="apple-touch-icon-precomposed" sizes="72x72" href="https://jon.glass/images/apple-touch-icon-72x72-precomposed.png">
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://localhost:4000/images/apple-touch-icon-72x72-precomposed.png">
 <!-- 114x114 (precomposed) for iPhone 4, 4S, 5 and post-2011 iPod Touch -->
-<link rel="apple-touch-icon-precomposed" sizes="114x114" href="https://jon.glass/images/apple-touch-icon-114x114-precomposed.png">
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://localhost:4000/images/apple-touch-icon-114x114-precomposed.png">
 <!-- 144x144 (precomposed) for iPad 3rd and 4th generation -->
-<link rel="apple-touch-icon-precomposed" sizes="144x144" href="https://jon.glass/images/apple-touch-icon-144x144-precomposed.png">
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://localhost:4000/images/apple-touch-icon-144x144-precomposed.png">
 
 </head>
 
@@ -83,19 +83,19 @@
 	    <ul>
       
 		    
-		    <li><a href="https://jon.glass/blog/" >Blog</a></li>
+		    <li><a href="http://localhost:4000/blog/" >Blog</a></li>
 		  
 		    
-		    <li><a href="https://jon.glass/adfirwmc/" >ADFIRWMC</a></li>
+		    <li><a href="http://localhost:4000/adfirwmc/" >ADFIRWMC</a></li>
 		  
 		    
-		    <li><a href="https://jon.glass/tips/" >Tips and Tricks</a></li>
+		    <li><a href="http://localhost:4000/tips/" >Tips and Tricks</a></li>
 		  
 		    
-		    <li><a href="https://jon.glass/about/" >About</a></li>
+		    <li><a href="http://localhost:4000/about/" >About</a></li>
 		  
 		    
-		    <li><a href="https://jon.glass/search/" >Search</a></li>
+		    <li><a href="http://localhost:4000/search/" >Search</a></li>
 		  
 	    </ul>
 	</nav>
@@ -106,9 +106,9 @@
 <header class="masthead">
 	<div class="wrap">
       
-  		<a href="https://jon.glass/" class="site-logo" rel="home" title="Half Full of Security"><img src="https://jon.glass/images/site-logo.png" width="200" height="200" alt="Half Full of Security logo" class="animated fadeInDown"></a>
+  		<a href="http://localhost:4000/" class="site-logo" rel="home" title="Half Full of Security"><img src="http://localhost:4000/images/site-logo.png" width="200" height="200" alt="Half Full of Security logo" class="animated fadeInDown"></a>
       
-      <h1 class="site-title animated fadeIn"><a href="https://jon.glass/">Half Full of Security</a></h1>
+      <h1 class="site-title animated fadeIn"><a href="http://localhost:4000/">Half Full of Security</a></h1>
 		<h2 class="site-description animated fadeIn" itemprop="description">Sharpening the ACKs since 2013</h2>
 	</div>
 </header><!-- /.masthead -->
@@ -130,10 +130,10 @@
       </header>
 
 
-        <time datetime="2017-03-11T15:33:28-05:00"><i class="fa fa-calendar-o"></i> March 11, 2017</time>
+        <time datetime="2017-03-11T20:33:28+00:00"><i class="fa fa-calendar-o"></i> March 11, 2017</time>
         <p>Now that I have Elasticsearch and Kibana up and running, I need to start feeding in those sweet, sweet logs.
 Normally, one would setup LogStash to import these logs into Elasticsearch but those clever cats at Elastic have created Beats to help. <a href="https://www.elastic.co/products/beats/winlogbeat">Beats</a> is the platform for single-purpose data shippers. They install as lightweight agents and send data from hundreds or thousands of machines to Logstash or Elasticsearch. In this post I am going to cover installing winlogbeat and packetbeat on my Windows 10 VM and configuring them to talk to my Elasticsearch running on my MacBook.</p>
-<h3 id="virtual-machine-setup">0. Virtual Machine Setup</h3>
+<h3 id="0-virtual-machine-setup">0. Virtual Machine Setup</h3>
 <p>Although not extremely important to the process below, here is the high level notes about the VM:</p>
 <ul>
   <li>OS Name:                   Microsoft Windows 10</li>
@@ -152,36 +152,36 @@ Normally, one would setup LogStash to import these logs into Elasticsearch but t
   </li>
 </ul>
 
-<h3 id="download-winlogbeat">1. Download WinLogBeat</h3>
+<h3 id="1-download-winlogbeat">1. Download WinLogBeat</h3>
 <p>I grabbed my copy (5.2.2) from <a href="https://www.elastic.co/downloads/beats/winlogbeat">https://www.elastic.co/downloads/beats/winlogbeat</a></p>
 
-<h3 id="unzip-and-configure-winlogbeat">2. Unzip and configure WinLogBeat</h3>
+<h3 id="2-unzip-and-configure-winlogbeat">2. Unzip and configure WinLogBeat</h3>
 <p>Should look like this:</p>
 
 <p><a href="/images/winlogbeat1.png"><img src="/images/winlogbeat1.png" alt="WinLogBeat Files" /></a></p>
 
 <p>We need to edit the winlogbeat.yml before we install the service.</p>
-<h4 id="edit-the-logs-winlogbeat-is-listening-to">2.1 Edit the Logs WinLogBeat is listening to</h4>
+<h4 id="21-edit-the-logs-winlogbeat-is-listening-to">2.1 Edit the Logs WinLogBeat is listening to</h4>
 <p>I changed the default config from this:</p>
 
-<figure class="highlight"><pre><code class="language-yml" data-lang="yml"><span class="s">winlogbeat.event_logs</span><span class="pi">:</span>
-  <span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s">Application</span>
-    <span class="s">ignore_older</span><span class="pi">:</span> <span class="s">72h</span>
-  <span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s">Security</span>
-  <span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s">System</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-yml" data-lang="yml"><span class="na">winlogbeat.event_logs</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Application</span>
+    <span class="na">ignore_older</span><span class="pi">:</span> <span class="s">72h</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Security</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">System</span></code></pre></figure>
 
 <p>to include sysmon and a few of the other bigger logs from this Windows 10 machine:</p>
 
-<figure class="highlight"><pre><code class="language-yml" data-lang="yml"><span class="s">winlogbeat.event_logs</span><span class="pi">:</span>
-  <span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s">Application</span>
-    <span class="s">ignore_older</span><span class="pi">:</span> <span class="s">72h</span>
-  <span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s">Security</span>
-  <span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s">System</span>
-  <span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s">Microsoft-Windows-Sysmon/Operational</span>
-  <span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s">Microsoft-Windows-Store/Operational</span>
-  <span class="pi">-</span> <span class="s">name</span><span class="pi">:</span> <span class="s">Windows PowerShell</span></code></pre></figure>
+<figure class="highlight"><pre><code class="language-yml" data-lang="yml"><span class="na">winlogbeat.event_logs</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Application</span>
+    <span class="na">ignore_older</span><span class="pi">:</span> <span class="s">72h</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Security</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">System</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Microsoft-Windows-Sysmon/Operational</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Microsoft-Windows-Store/Operational</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">Windows PowerShell</span></code></pre></figure>
 
-<h4 id="configure-network-settings-for-elasticsearch">2.2 Configure network settings for Elasticsearch</h4>
+<h4 id="22-configure-network-settings-for-elasticsearch">2.2 Configure network settings for Elasticsearch</h4>
 <p>On my MacBook I have Elasticsearch configured to run on 0.0.0.0:9200 which means port 9200 on all network interfaces including the network interface VirtualBox setup for the default gateway for the VM.
 <a href="/images/winlogbeat2.png"><img src="/images/winlogbeat2.png" alt="WinLogBeat Files" /></a></p>
 
@@ -189,26 +189,26 @@ Normally, one would setup LogStash to import these logs into Elasticsearch but t
 So I changed:</p>
 
 <figure class="highlight"><pre><code class="language-yml" data-lang="yml"><span class="c1">#-------------------------- Elasticsearch output ------------------------------</span>
-<span class="s">output.elasticsearch</span><span class="pi">:</span>
+<span class="na">output.elasticsearch</span><span class="pi">:</span>
   <span class="c1"># Array of hosts to connect to.</span>
-  <span class="s">hosts</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">localhost:9200"</span><span class="pi">]</span></code></pre></figure>
+  <span class="na">hosts</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">localhost:9200"</span><span class="pi">]</span></code></pre></figure>
 
 <p>To:</p>
 
 <figure class="highlight"><pre><code class="language-yml" data-lang="yml"><span class="c1">#-------------------------- Elasticsearch output ------------------------------</span>
-<span class="s">output.elasticsearch</span><span class="pi">:</span>
+<span class="na">output.elasticsearch</span><span class="pi">:</span>
   <span class="c1"># Array of hosts to connect to.</span>
-  <span class="s">hosts</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">10.0.2.2:9200"</span><span class="pi">]</span></code></pre></figure>
+  <span class="na">hosts</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">10.0.2.2:9200"</span><span class="pi">]</span></code></pre></figure>
 
 <p>I had to change this file again to include authentication creds when I installed the XPACK plugin but I will get there in another post. Baby steps people. Baby steps.</p>
-<h3 id="install-winlogbeat">3. Install WinLogBeat</h3>
+<h3 id="3-install-winlogbeat">3. Install WinLogBeat</h3>
 <p>Included in the WinLogBeat files is a handy dandy install-service-winlogbeat.ps1 that does the heavy lifting for installing the WinLogBeat service. Simply Run that file and then start the service.
 <a href="/images/winlogbeat3.png"><img src="/images/winlogbeat3.png" alt="WinLogBeat Files" /></a>
 Now you should be sending logs from WinLogBeat to Elasticsearch. To confirm, check out the terminal window running Elasticsearch and you should see something like this:</p>
 
 <figure class="highlight"><pre><code class="language-raw" data-lang="raw">[2017-03-12T18:07:59,156][INFO ][o.e.c.m.MetaDataMappingService] [Bo2nJmM] [winlogbeat-2017.03.12/Du3zdxHXQvivwrVBi6czJQ] update_mapping [wineventlog]</code></pre></figure>
 
-<h3 id="configure-kibana-to-index-winlogbeat-logs">4. Configure Kibana to index WinLogBeat logs</h3>
+<h3 id="4-configure-kibana-to-index-winlogbeat-logs">4. Configure Kibana to index WinLogBeat logs</h3>
 <p>Now that logs have a freely flowing into Elastic, it is time to update Kibana with an index. Under management, go to Index Patterns.
 <a href="/images/winlogbeat4.png"><img src="/images/winlogbeat4.png" alt="WinLogBeat Files" /></a>
 In the field, put “winlogbeat*” to start indexing these logs.
@@ -216,7 +216,7 @@ In the field, put “winlogbeat*” to start indexing these logs.
 Then click on discover and BOO YAH we have logs.
 <a href="/images/winlogbeat6.png"><img src="/images/winlogbeat6.png" alt="WinLogBeat Files" /></a></p>
 
-<h3 id="download-configure-and-install-packetbeat-the-same-way">5. Download, Configure, and Install PacketBeat The Same Way</h3>
+<h3 id="5-download-configure-and-install-packetbeat-the-same-way">5. Download, Configure, and Install PacketBeat The Same Way</h3>
 
 <p>Download PacketBeat from <a href="https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-5.2.2-windows-x86_64.zip">here</a>.
 PacketBeat on Windows does require a prior installation of <a href="https://www.winpcap.org/install/bin/WinPcap_4_1_3.exe">WinPcap</a>. I installed <a href="https://www.wireshark.org/#download">WireShark</a> and opted to install WinPcap at the same time. You do what you feel is best.
@@ -224,16 +224,16 @@ After you extract the packetbeat package on the Windows guest, configure the pac
 Change:</p>
 
 <figure class="highlight"><pre><code class="language-yml" data-lang="yml"><span class="c1">#-------------------------- Elasticsearch output ------------------------------</span>
-<span class="s">output.elasticsearch</span><span class="pi">:</span>
+<span class="na">output.elasticsearch</span><span class="pi">:</span>
   <span class="c1"># Array of hosts to connect to.</span>
-  <span class="s">hosts</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">localhost:9200"</span><span class="pi">]</span></code></pre></figure>
+  <span class="na">hosts</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">localhost:9200"</span><span class="pi">]</span></code></pre></figure>
 
 <p>To:</p>
 
 <figure class="highlight"><pre><code class="language-yml" data-lang="yml"><span class="c1">#-------------------------- Elasticsearch output ------------------------------</span>
-<span class="s">output.elasticsearch</span><span class="pi">:</span>
+<span class="na">output.elasticsearch</span><span class="pi">:</span>
   <span class="c1"># Array of hosts to connect to.</span>
-  <span class="s">hosts</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">10.0.2.2:9200"</span><span class="pi">]</span></code></pre></figure>
+  <span class="na">hosts</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">10.0.2.2:9200"</span><span class="pi">]</span></code></pre></figure>
 
 <p>I also had to change this file again to include authentication creds when I installed the X-Pack plugin but I will get there in the aforementioned post.</p>
 <h3 id="next-post">Next Post?</h3>
@@ -247,10 +247,10 @@ and THIS …
     </div><!-- /.entry-wrapper -->
     <nav class="pagination" role="navigation">
       
-        <a href="https://jon.glass/blog/My_ELK_Stack/" class="btn" title="Setting up ELK on my MacBook (Part 1)">Previous</a>
+        <a href="http://localhost:4000/blog/My_ELK_Stack/" class="btn" title="Setting up ELK on my MacBook (Part 1)">Previous</a>
       
       
-        <a href="https://jon.glass/blog/grep-like-you-mean-it/" class="btn" title="Setting up ELK on my MacBook (Part 2)">Next</a>
+        <a href="http://localhost:4000/blog/grep-like-you-mean-it/" class="btn" title="Setting up ELK on my MacBook (Part 2)">Next</a>
       
     </nav><!-- /.pagination -->
   </article>
@@ -260,7 +260,7 @@ and THIS …
   <footer role="contentinfo" class="entry-wrapper">
     
 
-<span>&copy; 2020 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
+<span>&copy; 2023 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
 <div class="social-icons">
 	<a href="https://twitter.com/GlassDFIR" title="Jon Glass on Twitter" target="_blank"><i class="fa fa-twitter-square fa-2x"></i></a>
 	
@@ -273,19 +273,19 @@ and THIS …
 	
   
 	
-  <a href="https://jon.glass/feed.xml" title="Atom/RSS feed"><i class="fa fa-rss-square fa-2x"></i></a>
+  <a href="http://localhost:4000/feed.xml" title="Atom/RSS feed"><i class="fa fa-rss-square fa-2x"></i></a>
 </div><!-- /.social-icons -->
 
   </footer>
 </div><!-- /.footer-wrapper -->
 
 <script type="text/javascript">
-  var BASE_URL = 'https://jon.glass';
+  var BASE_URL = 'http://localhost:4000';
 </script>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="https://jon.glass/assets/js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
-<script src="https://jon.glass/assets/js/scripts.min.js"></script>
+<script>window.jQuery || document.write('<script src="http://localhost:4000/assets/js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script src="http://localhost:4000/assets/js/scripts.min.js"></script>
 
 
 

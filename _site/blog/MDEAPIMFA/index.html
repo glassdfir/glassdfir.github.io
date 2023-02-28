@@ -1,0 +1,360 @@
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8" lang="en"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9" lang="en"><![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<title>Microsoft 365 Security: Multifactor API Access &#8211; Half Full of Security</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+
+
+<!-- Twitter Cards -->
+<meta name="twitter:title" content="Microsoft 365 Security: Multifactor API Access">
+<meta name="twitter:description" content="">
+<meta name="twitter:site" content="@GlassDFIR">
+<meta name="twitter:creator" content="@GlassDFIR">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://localhost:4000/images/site-logo.png">
+
+<!-- Open Graph -->
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Microsoft 365 Security: Multifactor API Access">
+<meta property="og:description" content="">
+<meta property="og:url" content="http://localhost:4000/blog/MDEAPIMFA/">
+<meta property="og:site_name" content="Half Full of Security">
+
+
+
+
+
+<link rel="canonical" href="http://localhost:4000/blog/MDEAPIMFA/">
+<link href="http://localhost:4000/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="http://localhost:4000/assets/css/main.css">
+<!-- Webfonts -->
+<script src="https://use.edgefonts.net/source-sans-pro:n2,i2,n3,i3,n4,i4,n6,i6,n7,i7,n9,i9;source-code-pro:n4,n7;volkhov.js"></script>
+
+<meta http-equiv="cleartype" content="on">
+
+<!-- HTML5 Shiv and Media Query Support -->
+<!--[if lt IE 9]>
+  <script src="http://localhost:4000/assets/js/vendor/html5shiv.min.js"></script>
+  <script src="http://localhost:4000/assets/js/vendor/respond.min.js"></script>
+<![endif]-->
+
+<!-- Modernizr -->
+<script src="http://localhost:4000/assets/js/vendor/modernizr-2.7.1.custom.min.js"></script>
+
+
+<!-- MathJax -->
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+<!-- Icons -->
+<!-- 16x16 -->
+<link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+<!-- 32x32 -->
+<link rel="shortcut icon" href="http://localhost:4000/favicon.png">
+<!-- 57x57 (precomposed) for iPhone 3GS, pre-2011 iPod Touch and older Android devices -->
+<link rel="apple-touch-icon-precomposed" href="http://localhost:4000/images/apple-touch-icon-precomposed.png">
+<!-- 72x72 (precomposed) for 1st generation iPad, iPad 2 and iPad mini -->
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://localhost:4000/images/apple-touch-icon-72x72-precomposed.png">
+<!-- 114x114 (precomposed) for iPhone 4, 4S, 5 and post-2011 iPod Touch -->
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://localhost:4000/images/apple-touch-icon-114x114-precomposed.png">
+<!-- 144x144 (precomposed) for iPad 3rd and 4th generation -->
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://localhost:4000/images/apple-touch-icon-144x144-precomposed.png">
+
+</head>
+
+<body id="post">
+
+<div class="navigation-wrapper">
+	<nav role="navigation" id="site-nav" class="animated drop">
+	    <ul>
+      
+		    
+		    <li><a href="http://localhost:4000/blog/" >Blog</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/adfirwmc/" >ADFIRWMC</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/tips/" >Tips and Tricks</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/about/" >About</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/search/" >Search</a></li>
+		  
+	    </ul>
+	</nav>
+</div><!-- /.navigation-wrapper -->
+
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+
+<header class="masthead">
+	<div class="wrap">
+      
+  		<a href="http://localhost:4000/" class="site-logo" rel="home" title="Half Full of Security"><img src="http://localhost:4000/images/site-logo.png" width="200" height="200" alt="Half Full of Security logo" class="animated fadeInDown"></a>
+      
+      <h1 class="site-title animated fadeIn"><a href="http://localhost:4000/">Half Full of Security</a></h1>
+		<h2 class="site-description animated fadeIn" itemprop="description">Sharpening the ACKs since 2013</h2>
+	</div>
+</header><!-- /.masthead -->
+
+<div class="js-menu-screen menu-screen"></div>
+
+
+<div id="main" role="main">
+  <article class="hentry">
+    
+    <div class="entry-wrapper">
+      <header class="entry-header">
+        <ul class="entry-tags">
+          
+        </ul>
+        
+          <h1 class="entry-title">Microsoft 365 Security: Multifactor API Access</h1>
+        
+      </header>
+
+
+        <time datetime="2022-03-06T17:33:28+00:00"><i class="fa fa-calendar-o"></i> March 06, 2022</time>
+        <p>I have decided to dust off the ol’ blog to start documenting some of my more recent endeavors leveraging the Microsoft 365 Security suite to perform Incident Response. Since I prefer to talk to APIs more than people, this seemed like a good opportunity to explore the different components of the ecosystem through the language of Python. Generic instructions are being provided to get you started but there are a lot of nuances with the environment and I can’t bring myself to document them all.</p>
+
+<h2 id="getting-started">Getting Started</h2>
+<ol>
+  <li>Go <a href="https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/evaluate-mde?view=o365-worldwide">here</a> and get yourself a free 3 month license for Defender for Endpoint</li>
+  <li>Click next and agree until it stops asking. Literally have no clue what I agreed to.</li>
+  <li>Go to <a href="https://security.microsoft.com/homepage">Microsoft 365 Defender</a>.</li>
+  <li>Go to <strong>Settings &gt; Endpoints &gt; Onboarding</strong>, grab an onboarding script, and onboard a device to your environment. <a href="https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/onboard-configure?view=o365-worldwide">Reference</a></li>
+  <li>Reboot the device. You shouldn’t have to but it makes every thing go faster.</li>
+  <li>Head to <a href="https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationsListBlade">Azure</a> and build yourself and App.</li>
+  <li>Go to <strong>YOUR APP &gt; Certificates &amp; secrets</strong> and make yourself a New client secret. Copy that down because you can only look at that once. We will need that later.</li>
+  <li>Go to <strong>YOUR APP &gt; API Permissions</strong> and Click Add a Permission.</li>
+  <li>When the <strong>Request API permissions</strong> side screen pops up, click on <strong>APIs my organization uses</strong>. Type <strong>“WindowsDefenderATP”</strong> in the search box.</li>
+  <li>Click on <strong>Application permissions</strong> Select EVERYTHING. Go nuts. Hit <strong>Update Permissions</strong></li>
+  <li>Now before you click away, Click <strong>Grant admin consent to YOUR DOMAIN</strong>. This should turn all orange “Not granted for”s into green “Granted for”s.</li>
+  <li>Go to the <strong>YOUR APP &gt; Overview</strong> page and gather your <strong>Application (client) ID</strong> and <strong>Directory (tenant) ID</strong>. We will need the <strong>Tenent ID</strong>, <strong>App ID</strong>, and <strong>Client Secret</strong> to play with the API.</li>
+  <li>Go to <strong>YOUR APP &gt; Authentication</strong> page and under Platform configurations:
+    <ul>
+      <li>Click <strong>Add Platform</strong></li>
+      <li>Click <strong>Web</strong></li>
+      <li>Add https://portal.azure.com as a <strong>Redirect URI</strong></li>
+    </ul>
+  </li>
+  <li>Navigate over to <strong><a href="https://portal.azure.com/#blade/Microsoft_AAD_IAM/ConditionalAccessBlade/ClassicPolicies">Conditional Access &gt; Classic policies</a></strong> and disable that <strong>[Windows Defender ATP] Device policy</strong> or…you know, join your computer to this Domain. Your call.</li>
+</ol>
+
+<p>Those are the rough strokes. Is it more complicated than that? Yes. I encourage everyone to RTFMs from Microsoft on spinning up a new M365.</p>
+
+<h2 id="getting-an-auth-token">Getting an Auth Token</h2>
+<p>To talk to the API, we will be leveraging the msal module to query Graph while changing the scope to Microsoft Defender for Endpoint’s API. This is the product of a lot of trial and error BUT the benefit of this is to multifactor the API so we can leverage the API via Jupyter Notebooks without having secret keys laying around everywhere.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">msal</span>
+<span class="kn">import</span> <span class="n">json</span>
+<span class="kn">import</span> <span class="n">requests</span>
+<span class="kn">from</span> <span class="n">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="n">msal_extensions</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="n">urllib3</span>
+<span class="n">urllib3</span><span class="p">.</span><span class="nf">disable_warnings</span><span class="p">()</span>
+
+<span class="n">tenantID</span> <span class="o">=</span> <span class="s">'11111111-1111-1111-1111-111111111111'</span>
+<span class="n">clientID</span> <span class="o">=</span> <span class="s">'22222222-2222-2222-2222-222222222222'</span>
+<span class="n">authority</span> <span class="o">=</span> <span class="s">'https://login.microsoftonline.com/'</span> <span class="o">+</span> <span class="n">tenantID</span>
+<span class="n">scope</span> <span class="o">=</span> <span class="p">[</span><span class="s">"https://api.securitycenter.microsoft.com/AdvancedQuery.Read"</span><span class="p">]</span>
+<span class="n">username</span> <span class="o">=</span> <span class="s">'JonathanGlass@HalfFullofSecurity.onmicrosoft.com'</span>
+<span class="n">result</span> <span class="o">=</span> <span class="bp">None</span>
+<span class="n">tokenExpiry</span> <span class="o">=</span> <span class="bp">None</span>
+
+<span class="k">def</span> <span class="nf">msal_delegated_device_flow</span><span class="p">(</span><span class="n">clientID</span><span class="p">,</span> <span class="n">scope</span><span class="p">,</span> <span class="n">authority</span><span class="p">):</span>
+    <span class="nf">print</span><span class="p">(</span><span class="s">"Initiate Device Code Flow to get an AAD Access Token."</span><span class="p">)</span>
+    <span class="nf">print</span><span class="p">(</span><span class="s">"Open a browser window and paste in the URL below and then enter the Code. CTRL+C to cancel."</span><span class="p">)</span>
+
+    <span class="n">app</span> <span class="o">=</span> <span class="n">msal</span><span class="p">.</span><span class="nc">PublicClientApplication</span><span class="p">(</span><span class="n">client_id</span><span class="o">=</span><span class="n">clientID</span><span class="p">,</span> <span class="n">authority</span><span class="o">=</span><span class="n">authority</span><span class="p">)</span>
+    <span class="n">flow</span> <span class="o">=</span> <span class="n">app</span><span class="p">.</span><span class="nf">initiate_device_flow</span><span class="p">(</span><span class="n">scopes</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s">"user_code"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">flow</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="nc">ValueError</span><span class="p">(</span><span class="s">"Fail to create device flow. Err: %s"</span> <span class="o">%</span> <span class="n">json</span><span class="p">.</span><span class="nf">dumps</span><span class="p">(</span><span class="n">flow</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+
+    <span class="nf">print</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="s">"message"</span><span class="p">])</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">app</span><span class="p">.</span><span class="nf">acquire_token_by_device_flow</span><span class="p">(</span><span class="n">flow</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+<span class="c1"># Get a new Access Token using the Device Code Flow
+</span><span class="n">result</span> <span class="o">=</span> <span class="nf">msal_delegated_device_flow</span><span class="p">(</span><span class="n">clientID</span><span class="p">,</span> <span class="n">scope</span><span class="p">,</span> <span class="n">authority</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">result</span><span class="p">[</span><span class="s">"access_token"</span><span class="p">]:</span>
+    <span class="nf">print</span><span class="p">(</span><span class="s">"We have a Token!"</span><span class="p">)</span>
+    <span class="nf">print</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s">"access_token"</span><span class="p">][:</span><span class="mi">100</span><span class="p">]</span><span class="o">+</span><span class="s">"..."</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Initiate Device Code Flow to get an AAD Access Token.
+Open a browser window and paste in the URL below and then enter the Code. CTRL+C to cancel.
+To sign in, use a web browser to open the page https://microsoft.com/devicelogin and enter the code R8H6RUBCH to authenticate.
+We have a Token!
+eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6ImpTMVhvMU9XRGpfNTJ2YndHTmd2UU8yVnpNYyIsImtpZCI6ImpTMVhv...
+</code></pre></div></div>
+
+<h3 id="what-is-in-this-token">What is in this token?</h3>
+
+<p>This authentication request returns a <a href="https://en.wikipedia.org/wiki/JSON_Web_Token">JSON Web Token</a>.
+A couple of JSON objects and a binary signature at the end. Decoded the main part looks like this</p>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+    </span><span class="nl">"aud"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://api.securitycenter.microsoft.com"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"iss"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://sts.windows.net/11111111-1111-1111-1111-111111111111/"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"iat"</span><span class="p">:</span><span class="w"> </span><span class="mi">1646594420</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"nbf"</span><span class="p">:</span><span class="w"> </span><span class="mi">1646594420</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"exp"</span><span class="p">:</span><span class="w"> </span><span class="mi">1646598320</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"aio"</span><span class="p">:</span><span class="w"> </span><span class="s2">"E2ZgYJgYsw2fBq9T2rVW7Xu8R/3NqgBQA="</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"app_displayname"</span><span class="p">:</span><span class="w"> </span><span class="s2">"API for MDE"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"appid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"33333333-3333-3333-3333-333333333333"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"appidacr"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"idp"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://sts.windows.net/11111111-1111-1111-1111-111111111111/"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"oid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"22222222-2222-2222-2222-222222222222"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"rh"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0.AXYAFoxqAF6E29830mEYB5Wx20IBWUEePwwXINRAoMUwcCJHG5KZAAA."</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"roles"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="s2">"Machine.Isolate"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"Event.Write"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"SecurityConfiguration.ReadWrite.All"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"IntegrationConfiguration.ReadWrite"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"Machine.Scan"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"Url.Read.All"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"Ip.Read.All"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"Ti.ReadWrite"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"Ti.Read.All"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"User.Read.All"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"Machine.ReadWrite.All"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"Ti.ReadWrite.All"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"Machine.LiveResponse"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"SecurityRecommendation.Read.All"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"Machine.RestrictExecution"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"Machine.StopAndQuarantine"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"Alert.Read.All"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"Software.Read.All"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"SecurityConfiguration.Read.All"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"File.Read.All"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"Machine.CollectForensics"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"Machine.Offboard"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"Vulnerability.Read.All"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"Library.Manage"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"Machine.Read.All"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"Score.Read.All"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"RemediationTasks.Read.All"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"Alert.ReadWrite.All"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"AdvancedQuery.Read.All"</span><span class="w">
+      </span><span class="p">],</span><span class="w">
+    </span><span class="nl">"sub"</span><span class="p">:</span><span class="w"> </span><span class="s2">"22222222-2222-2222-2222-222222222222"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"tenant_region_scope"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NA"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"tid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"11111111-1111-1111-1111-111111111111"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"uti"</span><span class="p">:</span><span class="w"> </span><span class="s2">"0gf-Rhig10GmG2T1G7kyvAA"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"ver"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1.0"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="using-the-token-to-run-advanced-threat-hunting-queries">Using the Token to Run Advanced Threat Hunting Queries</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">query</span> <span class="o">=</span> <span class="s">"""DeviceProcessEvents | where InitiatingProcessFileName =~ </span><span class="se">\"</span><span class="s">powershell.exe</span><span class="se">\"</span><span class="s">
+           | project Timestamp, FileName, InitiatingProcessFileName 
+           | order by Timestamp desc 
+           | limit 2"""</span>
+
+<span class="n">url</span> <span class="o">=</span> <span class="s">"https://api.securitycenter.windows.com/api/advancedqueries/run"</span>
+<span class="n">headers</span> <span class="o">=</span> <span class="p">{</span> 
+    <span class="s">'Content-Type'</span> <span class="p">:</span> <span class="s">'application/json'</span><span class="p">,</span>
+    <span class="s">'Accept'</span> <span class="p">:</span> <span class="s">'application/json'</span><span class="p">,</span>
+    <span class="s">'Authorization'</span> <span class="p">:</span> <span class="s">"Bearer "</span> <span class="o">+</span> <span class="n">result</span><span class="p">[</span><span class="s">"access_token"</span><span class="p">]</span>
+<span class="p">}</span>
+<span class="n">data</span> <span class="o">=</span> <span class="p">{</span> <span class="s">'Query'</span> <span class="p">:</span> <span class="n">query</span> <span class="p">}</span>
+
+<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="nf">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="n">jsonResponse</span> <span class="o">=</span> <span class="n">response</span><span class="p">.</span><span class="nf">json</span><span class="p">()</span>
+<span class="n">jsonResponse</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{'Stats': {'ExecutionTime': 0.0157135,
+  'resource_usage': {'cache': {'memory': {'hits': 50,
+     'misses': 0,
+     'total': 50},
+    'disk': {'hits': 0, 'misses': 0, 'total': 0}},
+   'cpu': {'user': '00:00:00.0625000',
+    'kernel': '00:00:00',
+    'total cpu': '00:00:00.0625000'},
+   'memory': {'peak_per_node': 3670944}},
+  'dataset_statistics': [{'table_row_count': 2, 'table_size': 94}]},
+ 'Schema': [{'Name': 'Timestamp', 'Type': 'DateTime'},
+  {'Name': 'FileName', 'Type': 'String'},
+  {'Name': 'InitiatingProcessFileName', 'Type': 'String'}],
+ 'Results': [{'Timestamp': '2022-03-07T21:34:30.1187436Z',
+   'FileName': 'net.exe',
+   'InitiatingProcessFileName': 'powershell.exe'},
+  {'Timestamp': '2022-03-07T21:34:29.380998Z',
+   'FileName': 'csc.exe',
+   'InitiatingProcessFileName': 'powershell.exe'}]}
+</code></pre></div></div>
+
+<h2 id="summary">Summary</h2>
+
+<p>If you have gotten this far, congratulations! You have Multifactor connectivity with the Microsoft Defender for Endpoint API.</p>
+
+        
+
+    </div><!-- /.entry-wrapper -->
+    <nav class="pagination" role="navigation">
+      
+        <a href="http://localhost:4000/blog/BotTricker/" class="btn" title="BotTricker">Previous</a>
+      
+      
+        <a href="http://localhost:4000/blog/Building-API-Wrapper/" class="btn" title="Microsoft 365 Security: Building a quick API wrapper">Next</a>
+      
+    </nav><!-- /.pagination -->
+  </article>
+</div><!-- /#main -->
+
+<div class="footer-wrapper">
+  <footer role="contentinfo" class="entry-wrapper">
+    
+
+<span>&copy; 2023 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
+<div class="social-icons">
+	<a href="https://twitter.com/GlassDFIR" title="Jon Glass on Twitter" target="_blank"><i class="fa fa-twitter-square fa-2x"></i></a>
+	
+	
+	
+	
+	
+	
+	<a href="https://github.com/GlassDFIR" title="Jon Glass on Github" target="_blank"><i class="fa fa-github-square fa-2x"></i></a>
+	
+  
+	
+  <a href="http://localhost:4000/feed.xml" title="Atom/RSS feed"><i class="fa fa-rss-square fa-2x"></i></a>
+</div><!-- /.social-icons -->
+
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+<script type="text/javascript">
+  var BASE_URL = 'http://localhost:4000';
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="http://localhost:4000/assets/js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script src="http://localhost:4000/assets/js/scripts.min.js"></script>
+
+
+
+
+</body>
+</html>

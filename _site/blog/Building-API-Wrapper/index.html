@@ -1,0 +1,257 @@
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8" lang="en"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9" lang="en"><![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<title>Microsoft 365 Security: Building a quick API wrapper &#8211; Half Full of Security</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+
+
+<!-- Twitter Cards -->
+<meta name="twitter:title" content="Microsoft 365 Security: Building a quick API wrapper">
+<meta name="twitter:description" content="">
+<meta name="twitter:site" content="@GlassDFIR">
+<meta name="twitter:creator" content="@GlassDFIR">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://localhost:4000/images/site-logo.png">
+
+<!-- Open Graph -->
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Microsoft 365 Security: Building a quick API wrapper">
+<meta property="og:description" content="">
+<meta property="og:url" content="http://localhost:4000/blog/Building-API-Wrapper/">
+<meta property="og:site_name" content="Half Full of Security">
+
+
+
+
+
+<link rel="canonical" href="http://localhost:4000/blog/Building-API-Wrapper/">
+<link href="http://localhost:4000/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="http://localhost:4000/assets/css/main.css">
+<!-- Webfonts -->
+<script src="https://use.edgefonts.net/source-sans-pro:n2,i2,n3,i3,n4,i4,n6,i6,n7,i7,n9,i9;source-code-pro:n4,n7;volkhov.js"></script>
+
+<meta http-equiv="cleartype" content="on">
+
+<!-- HTML5 Shiv and Media Query Support -->
+<!--[if lt IE 9]>
+  <script src="http://localhost:4000/assets/js/vendor/html5shiv.min.js"></script>
+  <script src="http://localhost:4000/assets/js/vendor/respond.min.js"></script>
+<![endif]-->
+
+<!-- Modernizr -->
+<script src="http://localhost:4000/assets/js/vendor/modernizr-2.7.1.custom.min.js"></script>
+
+
+<!-- MathJax -->
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+<!-- Icons -->
+<!-- 16x16 -->
+<link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+<!-- 32x32 -->
+<link rel="shortcut icon" href="http://localhost:4000/favicon.png">
+<!-- 57x57 (precomposed) for iPhone 3GS, pre-2011 iPod Touch and older Android devices -->
+<link rel="apple-touch-icon-precomposed" href="http://localhost:4000/images/apple-touch-icon-precomposed.png">
+<!-- 72x72 (precomposed) for 1st generation iPad, iPad 2 and iPad mini -->
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://localhost:4000/images/apple-touch-icon-72x72-precomposed.png">
+<!-- 114x114 (precomposed) for iPhone 4, 4S, 5 and post-2011 iPod Touch -->
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://localhost:4000/images/apple-touch-icon-114x114-precomposed.png">
+<!-- 144x144 (precomposed) for iPad 3rd and 4th generation -->
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://localhost:4000/images/apple-touch-icon-144x144-precomposed.png">
+
+</head>
+
+<body id="post">
+
+<div class="navigation-wrapper">
+	<nav role="navigation" id="site-nav" class="animated drop">
+	    <ul>
+      
+		    
+		    <li><a href="http://localhost:4000/blog/" >Blog</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/adfirwmc/" >ADFIRWMC</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/tips/" >Tips and Tricks</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/about/" >About</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/search/" >Search</a></li>
+		  
+	    </ul>
+	</nav>
+</div><!-- /.navigation-wrapper -->
+
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+
+<header class="masthead">
+	<div class="wrap">
+      
+  		<a href="http://localhost:4000/" class="site-logo" rel="home" title="Half Full of Security"><img src="http://localhost:4000/images/site-logo.png" width="200" height="200" alt="Half Full of Security logo" class="animated fadeInDown"></a>
+      
+      <h1 class="site-title animated fadeIn"><a href="http://localhost:4000/">Half Full of Security</a></h1>
+		<h2 class="site-description animated fadeIn" itemprop="description">Sharpening the ACKs since 2013</h2>
+	</div>
+</header><!-- /.masthead -->
+
+<div class="js-menu-screen menu-screen"></div>
+
+
+<div id="main" role="main">
+  <article class="hentry">
+    
+    <div class="entry-wrapper">
+      <header class="entry-header">
+        <ul class="entry-tags">
+          
+        </ul>
+        
+          <h1 class="entry-title">Microsoft 365 Security: Building a quick API wrapper</h1>
+        
+      </header>
+
+
+        <time datetime="2022-03-09T17:33:28+00:00"><i class="fa fa-calendar-o"></i> March 09, 2022</time>
+        <h2 id="building-a-wrapper-for-mde-interactions">Building a Wrapper for MDE interactions</h2>
+
+<p>My goal here is to reduce the amount of redundant code needed to query Microsoft Defender for Endpoint. This is not fault tolerent or comprehensive. Just something quick to save keystrokes.
+This is a continuation of the previous post.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">MDErequest</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="s">""</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="n">result</span><span class="p">[</span><span class="s">"access_token"</span><span class="p">]):</span>
+    <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span> 
+    <span class="s">'Content-Type'</span> <span class="p">:</span> <span class="s">'application/json'</span><span class="p">,</span>
+    <span class="s">'Accept'</span> <span class="p">:</span> <span class="s">'application/json'</span><span class="p">,</span>
+    <span class="s">'Authorization'</span> <span class="p">:</span> <span class="s">"Bearer "</span> <span class="o">+</span> <span class="n">token</span>
+    <span class="p">}</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="s">"https://api.securitycenter.windows.com/api/%s"</span> <span class="o">%</span> <span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">data</span><span class="p">:</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="nf">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">response</span><span class="p">.</span><span class="nf">json</span><span class="p">()</span>
+</code></pre></div></div>
+<h2 id="using-the-api-to-review-mde-alerts">Using the API to Review MDE Alerts</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">queryResponse</span> <span class="o">=</span> <span class="nc">MDErequest</span><span class="p">(</span><span class="s">"alerts"</span><span class="p">)</span>
+<span class="n">queryResponse</span><span class="p">[</span><span class="s">'value'</span><span class="p">]</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[{'id': 'da637821323029223838_-1136569686',
+  'incidentId': 1,
+  'investigationId': None,
+  'assignedTo': None,
+  'severity': 'Informational',
+  'status': 'New',
+  'classification': None,
+  'determination': None,
+  'investigationState': 'UnsupportedOs',
+  'detectionSource': 'WindowsDefenderAtp',
+  'detectorId': '22222222-2222-2222-2222-222222222222',
+  'category': 'Execution',
+  'threatFamilyName': None,
+  'title': '[Test Alert] Suspicious Powershell commandline',
+  'description': ' This is a test alert \nA suspicious Powershell commandline was found on the machine. This commandline might be used during installation, exploration, or in some cases with lateral movement activities which are used by attackers to invoke modules, download external payloads, and get more information about the system. Attackers usually use Powershell to bypass security protection mechanisms by executing their payload in memory without touching the disk and leaving any trace.',
+  'alertCreationTime': '2022-03-06T02:58:22.9224109Z',
+  'firstEventTime': '2022-03-06T02:40:56.1886556Z',
+  'lastEventTime': '2022-03-06T02:40:56.1886556Z',
+  'lastUpdateTime': '2022-03-06T02:58:24.0466667Z',
+  'resolvedTime': None,
+  'machineId': 'c6993a6c004246bf52d2d59237c18e6db4db7e5e',
+  'computerDnsName': 'desktop-l3mnbj9',
+  'rbacGroupName': None,
+  'aadTenantId': '11111111-1111-1111-1111-111111111111',
+  'threatName': None,
+  'mitreTechniques': ['T1059.001'],
+  'relatedUser': {'userName': 'Glass', 'domainName': 'DESKTOP-L3MNBJ9'},
+  'loggedOnUsers': [{'accountName': 'Glass', 'domainName': 'DESKTOP-L3MNBJ9'}],
+  'comments': [],
+  'evidence': []}]
+</code></pre></div></div>
+
+<h2 id="using-the-api-to-do-advanced-threat-hunting">Using the API to do Advanced Threat Hunting</h2>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">query</span> <span class="o">=</span> <span class="p">{</span><span class="s">'Query'</span> <span class="p">:</span><span class="s">"""DeviceProcessEvents | where InitiatingProcessFileName =~ </span><span class="se">\"</span><span class="s">powershell.exe</span><span class="se">\"</span><span class="s">
+           | project Timestamp, FileName, InitiatingProcessCommandLine 
+           | order by Timestamp desc 
+           | limit 1"""</span> <span class="p">}</span>
+<span class="n">queryResponse</span> <span class="o">=</span> <span class="nc">MDErequest</span><span class="p">(</span><span class="s">"advancedqueries/run"</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span>
+<span class="n">queryResponse</span><span class="p">[</span><span class="s">'Results'</span><span class="p">]</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[{'Timestamp': '2022-03-10T14:03:13.1151059Z',
+  'FileName': 'WerFault.exe',
+  'InitiatingProcessCommandLine': 'powershell.exe -ExecutionPolicy AllSigned -NoProfile -NonInteractive -Command "&amp; {$OutputEncoding = [Console]::OutputEncoding =[System.Text.Encoding]::UTF8;$scriptFileStream = [System.IO.File]::Open(\'C:\\ProgramData\\Microsoft\\Windows Defender Advanced Threat Protection\\DataCollection\\8099.7011103.0.7008675-77a99c323dc18f055614eedeb6e307c388905ec9\\0e3d6d2d-06cc-486d-9465-9ef3bee75444.ps1\', [System.IO.FileMode]::Open, [System.IO.FileAccess]::Read, [System.IO.FileShare]::Read);$calculatedHash = Get-FileHash \'C:\\ProgramData\\Microsoft\\Windows Defender Advanced Threat Protection\\DataCollection\\8099.7011103.0.7008675-77a99c323dc18f055614eedeb6e307c388905ec9\\0e3d6d2d-06cc-486d-9465-9ef3bee75444.ps1\' -Algorithm SHA256;if (!($calculatedHash.Hash -eq \'29a688ce6549a06fb576fec79422f6f6882265e0f674ab3b4c3ceb8f83aec9d3\')) { exit 323;}; . \'C:\\ProgramData\\Microsoft\\Windows Defender Advanced Threat Protection\\DataCollection\\8099.7011103.0.7008675-77a99c323dc18f055614eedeb6e307c388905ec9\\0e3d6d2d-06cc-486d-9465-9ef3bee75444.ps1\' }"'}]
+</code></pre></div></div>
+
+<p>Easy Peasy.</p>
+
+
+        
+
+    </div><!-- /.entry-wrapper -->
+    <nav class="pagination" role="navigation">
+      
+        <a href="http://localhost:4000/blog/MDEAPIMFA/" class="btn" title="Microsoft 365 Security: Multifactor API Access">Previous</a>
+      
+      
+        <a href="http://localhost:4000/blog/MDE-Live-Response-via-API/" class="btn" title="Microsoft 365 Security: Using the API for Live Response">Next</a>
+      
+    </nav><!-- /.pagination -->
+  </article>
+</div><!-- /#main -->
+
+<div class="footer-wrapper">
+  <footer role="contentinfo" class="entry-wrapper">
+    
+
+<span>&copy; 2023 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
+<div class="social-icons">
+	<a href="https://twitter.com/GlassDFIR" title="Jon Glass on Twitter" target="_blank"><i class="fa fa-twitter-square fa-2x"></i></a>
+	
+	
+	
+	
+	
+	
+	<a href="https://github.com/GlassDFIR" title="Jon Glass on Github" target="_blank"><i class="fa fa-github-square fa-2x"></i></a>
+	
+  
+	
+  <a href="http://localhost:4000/feed.xml" title="Atom/RSS feed"><i class="fa fa-rss-square fa-2x"></i></a>
+</div><!-- /.social-icons -->
+
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+<script type="text/javascript">
+  var BASE_URL = 'http://localhost:4000';
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="http://localhost:4000/assets/js/vendor/jquery-1.9.1.min.js"><\/script>')</script>
+<script src="http://localhost:4000/assets/js/scripts.min.js"></script>
+
+
+
+
+</body>
+</html>
