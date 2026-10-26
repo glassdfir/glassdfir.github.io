@@ -13,6 +13,10 @@ I recently tore my ACL, and part of getting my quad working again is retraining 
 
 I ended up with a working Python script that drives a FitRx wireless EMS unit from my MacBook, and I got there by decompiling the vendor's Android app. I did most of the digging alongside Gemini, pasting terminal output back and forth until the protocol fell out.
 
+<a href="https://www.walmart.com/ip/FitRx-Electrode-Wireless-Massager-Rechargeable-TENS-Unit-Muscle-Stimulator-with-App-Control/821289612"><img src="{{ site.baseurl }}/images/fitrx.jpg" alt="FitRx Electrode Wireless Massager" width="300"></a>
+
+The unit I used: the [FitRx Electrode Wireless Massager](https://www.walmart.com/ip/FitRx-Electrode-Wireless-Massager-Rechargeable-TENS-Unit-Muscle-Stimulator-with-App-Control/821289612) from Walmart.
+
 The goal was simple. I had a cheap stimulator, and I wanted custom routines it doesn't offer: a slow ramp up, a hold, a ramp down, a rest, repeated for a set time. Eventually I want Claude to be able to kick off and adjust those sessions for me.
 
 The catch: the FitRx companion app wouldn't even install on my Android phone. It was flagged as too old for my "too new" phone. So if I wanted app control at all, I had to build it myself.
