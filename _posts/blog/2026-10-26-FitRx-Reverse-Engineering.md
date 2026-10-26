@@ -5,39 +5,17 @@ date:   2026-10-26 11:00:00 -0400
 categories: blog
 ---
 
+> **Short on time?** [Explore this post as a graph in Spoke](https://jon.glass/spoke/#name=FitRx%20reverse%20engineering&src=source&tgt=target&rel=relation&stype=source_type&ttype=target_type&layout=web&input=H4sIAAAAAAAC_4VXTXPbNhC961fs6NDmg0zkpG3aeHqQZSdxbTce22l7y0AkKCICAQ4ASta_71uQlGhbSi7iF7Bvsfv27crbxmUyCcItZEh8fPoaNnX_qr13UougrElyGYTSow8q3NzT2dUtZdYEZ7WWLpk1PtiKnG2CMtIntbPfZBaShRW6_RnfiKqmpk6otDpPyPFjbtcGt9KHY_zWUgQqrCNBXgYKqpLj_XD_SJPzurqmtTU_B1LGB6H1FhfXuZZVUtmgViLI_Ot8k0yxvNBisZA5CU_BWoIrHaKRa-loanJnVU51aY3cj92-XCvERXrPX7eopXD5WjiZ5E6tEIXxrJSiphPdSICFkjzO1CCc1iU7k_DAIXaCrkR2Yu2yP_MDiPbV9PpiB-JtEeLNzhKfsotNf5LMVrUwyB9Ha7Qz803k9zsTcE8jwbxYsZ21CmVy1ziDMJWSN9BcZEvEOVhkSuQC4aW_xEoMTJ6bZokYbo97ocIOQau5E26TNB6BObk8o7WDQ9IdxywaucLODCn0-KCCnOGYIgvSKcQsoxyxyILeDNAijJShvIPvr-evvsGZYUzyNjAC1Ehm1hjs5yhUwogFsPiETLRMGDKiklQoDbjRXrPTLJM1WES5XKlMxg2-xSiUyZVZoExWUmjk_NPNRTo5-u0kodbXf9s0vuif37179-bFeHCQK-E9XLqCp1P4uFJh8yqbPHt-6DC3gEPws9IuJdUWKXlPpbwHuRy-gNbUhhdRHB20vS9XEabPU8xFcoa0bJhDCFtOWgrQOjKCk1ZKJwfnKH6QhGuVLT19nN7dwfdhdj3NN_Tly_kp1U4W6n60tXQbAAu-44NFfiQ966P7vDWO98FmkbtFFJ7xrXQxRUK-FUkbBb6fJ2SgBcWGH7LxDoLT0Zv_kc2iKCa9Tdz_urWJh1-OqTEBSibz8eh7fh9N0vmGDUABB2A9j6BGlQjJdEbTU5r8Ri-30X9Jb6lG3CqP25VA5nA9mdHJ6TH8QEwl4ttUowcnmt71-_1BrPG1RoIoyPtAvslKFsfp3cvZ1efTsz9xYBlXo_ZpdnP5YTx6eIJznNp4EIueTSfPt7Y71O31EvWhaZL-wdahNKoSGmW9UME_MniFJMDW0WFb1-gYaBBH6e8_NHaHJuJg7c1ha1fKNEgcm_p09t97ejOhqnulPDqRCfzp6Jf97eB6E9Arhm_6brAtg3kDaQF8cPdfrUOeUKncA17VG4qKlH2-HT21A4UVywMCOrNO7tpKY3IcksuytDaPbMgti8Qeq9-j5hZryxSPnrz0yWejN9Q3HkLlNlCHDbV03wPCvd7TT5Q3oEW2yaB_O-MF2nyDq6pqtGiEF5IWJNarLZMsdwPu_0y6fuMenNnleezoe6zL-9pypNK0Yj6laTvTpDuQNGX30ugeHuJA0l5Snkt4C5NnD-ynPhJxQeyMGH_qnRNeFDJs-sutDK1oNkaFnz2x8XZnoZxHzVlS-C0bLLNFQaqIq33mVB1Aa-lHhxAH9O7AelZHmuwLWXD65YxpnYPc3_NaLQyqqoQxHXuzyaRuzxGEXx7DeRNZ0JrSbX3vQby0TR6RqMD82Awnl0eIYuOpZi2C1T4I3dKdAX-Mpsez2rwJAUiq9QlDiSaZ8rK9hFyDrUy3gH6m7eKQD5d24VtVV1kce4nFxMdxAcNt5KhDmwqx1Zay2q8K03Nohkd346htFYGnOQzS7cUn_1q35FFUo1a9Akk_SgiPGj3c_MXLotFxSuVzLtDk84eWklLqWubJ-AJDLMXBjnxtAw8sbZ_Hs8AsuC4V1D1WfTfGYfC6D-NHiB8bmJXMDp6cWfwKlLx_BLqw4evawfVkfG5WKGMsjaXWDkeUNc6xdjphFqyu6GC7DLSd5zHwqU0R-pJD21b1IcQ0revWJO5K4SVK2bXpAjMkVBUMqh0nK-d_FhUEJR_t1OIJUK8aHVK3I9mf3L9jo2TJ2mY22NwmHMtkNPh6B31sC-Zh1cbVu58LpfWw4uNoCg2vRQ6yAxgyUW0FZCcUo0P2D6lFROuIDoUFx1kjBg7POqyumOl1Z2Hy2OWum1MlheF6IdRG3eBfXLceVcl_y1xjONU83A9hTmUWiTIoM_8EwS660uOwMl-lAHn7YYjb8tDkDZf_gH5PrNllLFf8A-We0o2wEGOMEvGPr38QBy2anIsELfDJyQN1n8FaFyILRf6tYSEHe_gso_8B_sZG3FoPAAA): the decompiled app, the protocol, the Python controller, its safety features and what's next, all as clickable nodes.
+
 ## Why I went down this road
+
+I recently tore my ACL, and part of getting my quad working again is retraining it with a TENS machine.
 
 I ended up with a working Python script that drives a FitRx wireless EMS unit from my MacBook, and I got there by decompiling the vendor's Android app. I did most of the digging alongside Gemini, pasting terminal output back and forth until the protocol fell out.
 
 The goal was simple. I had a cheap stimulator, and I wanted custom routines it doesn't offer: a slow ramp up, a hold, a ramp down, a rest, repeated for a set time. Eventually I want Claude to be able to kick off and adjust those sessions for me.
 
 The catch: the FitRx companion app wouldn't even install on my Android phone. It was flagged as too old for my "too new" phone. So if I wanted app control at all, I had to build it myself.
-
-## The hardware detour
-
-My first plan was a Raspberry Pi Pico wired into a TENS unit. Building the high-voltage pulse side from scratch was quickly ruled out. A firmware hang that leaves a GPIO pin high can push DC through skin, and that's not a bug I want to debug on myself.
-
-The safer version was to leave the stimulator's electronics alone and just "press its buttons" electrically. A PC817 optocoupler module sits between the Pico and the button pads, so the Pico and the stimulator share no electrical connection:
-
-```
-Pico GPIO  ->  PC817 input LED  ->  phototransistor across the button pad  ->  TENS unit
-```
-
-The firmware just pulses a pin to simulate a tap:
-
-```python
-def tap_button(name, count=1):
-    pin = BUTTONS[name]
-    for _ in range(count):
-        pin.value(1)
-        time.sleep_ms(120)
-        pin.value(0)
-        time.sleep_ms(150)
-```
-
-It works on paper. In practice, I spent a lot of time figuring out which ring of each keypad contact was ground, and I lifted a trace off the board while soldering. When I admitted I'm not great at soldering, the conversation turned to an option with no soldering at all: a stimulator that already speaks Bluetooth.
-
-So I bought a FitRx wireless EMS unit. It keeps its own factory current limits and battery isolation, and I only have to talk to it over the air.
 
 ## Decompiling the APK
 
