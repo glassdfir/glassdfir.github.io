@@ -1,8 +1,11 @@
 ---
 layout: post
-title:  "Setting up ELK on my MacBook (Part 2)"
+title: "Setting Up ELK on a MacBook (Part 2)"
 date:   2017-03-11 15:33:28 -0500
-categories: blog
+categories: blogsabout
+slug: setting-up-elk-on-a-macbook-part-2
+redirect_from:
+  - /blog/My_ELK_Stack2/
 ---
 
 Now that I have Elasticsearch and Kibana up and running, I need to start feeding in those sweet, sweet logs.

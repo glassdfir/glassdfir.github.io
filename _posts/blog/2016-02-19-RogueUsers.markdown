@@ -1,8 +1,11 @@
 ---
 layout: post
-title:  "Dealing with users gone bad…"
+title: "Dealing with Users Gone Bad"
 date:   2017-02-03 14:52:28 -0500
-categories: blog
+categories: blogsabout
+slug: dealing-with-users-gone-bad
+redirect_from:
+  - /blog/RogueUsers/
 ---
 We have all been there when someone that gets paid more than you do runs in and says “We need to remove User X from the network and lock them out of their PC to preserve evidence!!!”. If not, you will be.
 

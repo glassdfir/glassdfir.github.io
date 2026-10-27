@@ -1,8 +1,11 @@
 ---
 layout: post
-title:  "Microsoft 365 Security: Building a quick API wrapper"
+title: "Building a Quick Defender for Endpoint API Wrapper"
 date:   2022-03-09 12:33:28 -0500
-categories: blog
+categories: blogsabout
+slug: building-an-mde-api-wrapper
+redirect_from:
+  - /blog/Building-API-Wrapper/
 ---
 
 ## Building a Wrapper for MDE interactions

@@ -1,8 +1,11 @@
 ---
 layout: post
-title:  "Analysis of Fiesta EK"
+title: "Analyzing the Fiesta Exploit Kit"
 date:   2018-12-26 15:33:28 -0500
-categories: blog
+categories: blogsabout
+slug: analyzing-the-fiesta-exploit-kit
+redirect_from:
+  - /blog/Fiesta-Analysis/
 ---
 
 For funsies, I snagged a Traffic Analysis Exercise from Malware-Traffic-Analysis.net. If you want to follow along at home, here is the link:

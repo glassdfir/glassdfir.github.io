@@ -135,7 +135,7 @@ The WMI command-line (WMIC) utility provides a command-line interface for WMI. W
  ![WMIC Example](../Images/2018-02-21 13_27_27-Command Prompt.png "WMIC")
 References: 
 https://msdn.microsoft.com/en-us/library/aa394531(v=vs.85).aspx
-http://jon.glass/blog/lists-some-wmic-commands/
+https://jon.glass/blogsabout/wmic-commands-that-arent-yo-mommas/
 
 
 #### Visual Basic Scripting Example (more or less deprecated)

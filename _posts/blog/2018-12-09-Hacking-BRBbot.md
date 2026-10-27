@@ -1,8 +1,11 @@
 ---
 layout: post
-title:  "Hacking BRBBot"
+title: "Hacking BRBBot"
 date:   2018-12-08 15:33:28 -0500
-categories: blog
+categories: blogsabout
+slug: hacking-brbbot
+redirect_from:
+  - /blog/Hacking-BRBbot/
 ---
 
 Recently, in a scramble to find a final exam for my malware course that wasn't multiple choice, I decided to revisit a sample from my youth: BRBBot.

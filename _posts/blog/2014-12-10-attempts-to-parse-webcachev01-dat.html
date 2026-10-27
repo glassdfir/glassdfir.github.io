@@ -1,8 +1,12 @@
 ---
 layout: post
-title: Misadventures in Parsing the WebCacheV01.dat (Part 1)
+title: "Misadventures in Parsing WebCacheV01.dat (Part 1)"
 date: 2014-12-10 09:48:36.000000000 -05:00
-categories: blog
+categories: blogsabout
+slug: parsing-webcachev01-dat-part-1
+redirect_from:
+  - /blog/attempts-to-parse-webcachev01-dat/
+  - /attempts-to-parse-webcachev01-dat/
 ---
 <p>Recently, I found myself with a bit of free time so I decided to attempt to create a python CLI tool for live parsing the WebCache from my Windows 8.1 machine. My goal is to make something that I can include in a live response script.<br />
 For those who may not be aware, since the introduction of Windows 8 and Internet Explorer 10, IE no longer logs internet history to the traditional index.dat file. Microsoft decided to store IE cache information in an Extensible Storage Engine (ESE) database (also known as Jet Blue). This makes sense to me. ESE is used in Microsoft Exchange Server's Mailbox Database.edb and Public Folder Database.edb to store mail data. ESE is used in the Active Directory database NTDS.DIT file for storing objects. ESE is also used in Windows Search Service cache, which can be found in %Profiles%/All Users/Application Data/Microsoft/Search/Data/Applications/Windows/Windows.edb. (<em>Oddly enough I appear to have another copy located in C:\ProgramData\Microsoft\Search\Data\Applications\Windows. I will figure that out later.)</em> For now, let's get back to the topic at hand: WebCacheV01.dat.</p>

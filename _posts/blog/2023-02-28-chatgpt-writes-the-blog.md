@@ -1,8 +1,11 @@
 ---
 layout: post
-title:  "ChatGPT wrote this blog post"
+title: "What ChatGPT Wrote When I Asked It to Blog"
 date:   2023-02-27 12:33:28 -0500
-categories: blog
+categories: blogsabout
+slug: what-chatgpt-wrote
+redirect_from:
+  - /blog/chatgpt-writes-the-blog/
 ---
 
 This is what I got from ChatGPT when I provided the following prompt:

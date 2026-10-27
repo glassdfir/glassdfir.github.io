@@ -1,8 +1,11 @@
 ---
 layout: post
-title:  "BotTricker"
+title: "BotTricker: Decoding TrickBot Modules"
 date:   2020-03-24 12:33:28 -0500
-categories: blog
+categories: blogsabout
+slug: bottricker
+redirect_from:
+  - /blog/BotTricker/
 ---
 
 When I spent some time getting to know TrickBot, I found it was helpful to decrypt the modules it injects manually in Python instead of spending the time to debug each one.

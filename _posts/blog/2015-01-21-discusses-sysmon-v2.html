@@ -1,8 +1,12 @@
 ---
 layout: post
-title: How to Use Sysmon 2.0 (Part 1)
+title: "Sysmon 2.0 (Part 1): The New Events"
 date: 2015-01-21 11:09:07.000000000 -05:00
-categories: blog
+categories: blogsabout
+slug: sysmon-2-0-part-1
+redirect_from:
+  - /blog/discusses-sysmon-v2/
+  - /discusses-sysmon-v2/
 ---
 <p>On <a href="http://blogs.technet.com/b/sysinternals/archive/2015/01/20/updates-sysmon-v2-0-accesschk-v5-21-ru-v1-1.aspx" target="_blank">January 19, 2015</a>, the SysInternals team released <a href="https://technet.microsoft.com/en-us/sysinternals/dn798348" target="_blank">Sysmon 2.0</a>. "This major update to Sysmon, a service that records process activity to the Windows event log for use by incident detection and forensic analysis, includes driver load and image load events with signature information, configurable hashing algorithm reporting, flexible filters for including and excluding events, and support for supplying configuration via a configuration file instead of the command line."</p>
 <p>One interesting update in 2.0 is the addition of Import Hashes (imphash). If you are not familiar, imports are the functions that a piece of software calls from other files. Most of the time, imports are used to augment a program with a function from a Windows DLL. Imphashes are calculated based on library/API names and their specific order within the executable. Imphashes are useful for tracking flavors of malware that use the same functionality but have different binaries. This addition separates Sysmon from being an augmentation of Windows event logging to a utility that is designed to analyze malware. Awesome.</p>

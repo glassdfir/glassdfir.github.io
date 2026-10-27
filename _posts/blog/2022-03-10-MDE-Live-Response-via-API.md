@@ -1,8 +1,11 @@
 ---
 layout: post
-title:  "Microsoft 365 Security: Using the API for Live Response"
+title: "Using the API for Live Response"
 date:   2022-03-10 12:33:28 -0500
-categories: blog
+categories: blogsabout
+slug: using-the-api-for-live-response
+redirect_from:
+  - /blog/MDE-Live-Response-via-API/
 ---
 
 ## Adding a file to the MDE Live Response Library and Running it on an Endpoint

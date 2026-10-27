@@ -1,8 +1,12 @@
 ---
 layout: post
-title: Useless Trivia about Windows Process IDs
+title: "Useless Trivia About Windows Process IDs"
 date: 2015-02-20 11:05:14.000000000 -05:00
-categories: blog
+categories: blogsabout
+slug: useless-trivia-about-windows-process-ids
+redirect_from:
+  - /blog/notes-about-windows-process-ids/
+  - /notes-about-windows-process-ids/
 ---
 <p>Here are some things I discovered about Windows Process IDs that I did not previously know...</p>
 
@@ -14,6 +18,6 @@ I wrote a script to keep launching and closing "calc.exe" until it gave me the P
 <script src="https://gist.github.com/glassdfir/28f4311cceaf1fa7f069.js"></script><br />
 On average, it took around 103 tries to get the pid I wanted.<br />
 I knew PIDs get reused all the time but it's weird that it happens so often.<br />
-The whole problem with the sysmonmap from <a href="{{ site.baseurl }}/blog/looks-at-the-win10-boot-process/" target="_blank">here</a><br />
+The whole problem with the sysmonmap from <a href="{{ site.baseurl }}/blogsabout/a-magic-trick-in-the-windows-10-boot-process/" target="_blank">here</a><br />
 is that there was a PID reused in under a second. That has got to cause other problems than just logging.</p>
 <p>I am not investing any actual research time on this but I am documenting the trivia nonetheless.</p>

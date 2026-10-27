@@ -1,8 +1,11 @@
 ---
 layout: post
-title:  "Decoding AutoIT XOR Encryption Obfuscation"
+title: "Decoding AutoIt XOR Obfuscation"
 date:   2020-03-15 12:33:28 -0500
-categories: blog
+categories: blogsabout
+slug: decoding-autoit-xor-obfuscation
+redirect_from:
+  - /blog/AutoITXOR/
 ---
 
 Recently, I started looking at an AutoIt sample that contained some heavy obfuscation. After I ran the compiled binary through Exe2Aut, I was able to review the underlying script and I saw a lot of this stuff:  
