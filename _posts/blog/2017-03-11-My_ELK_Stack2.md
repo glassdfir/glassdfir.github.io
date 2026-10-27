@@ -6,9 +6,9 @@ categories: blog
 ---
 
 Now that I have Elasticsearch and Kibana up and running, I need to start feeding in those sweet, sweet logs.
-Normally, one would setup LogStash to import these logs into Elasticsearch but those clever cats at Elastic have created Beats to help. [Beats](https://www.elastic.co/products/beats/winlogbeat) is the platform for single-purpose data shippers. They install as lightweight agents and send data from hundreds or thousands of machines to Logstash or Elasticsearch. In this post I am going to cover installing winlogbeat and packetbeat on my Windows 10 VM and configuring them to talk to my Elasticsearch running on my MacBook.
+Normally, one would set up Logstash to import these logs into Elasticsearch but those clever cats at Elastic have created Beats to help. [Beats](https://www.elastic.co/products/beats/winlogbeat) is the platform for single-purpose data shippers. They install as lightweight agents and send data from hundreds or thousands of machines to Logstash or Elasticsearch. In this post I am going to cover installing winlogbeat and packetbeat on my Windows 10 VM and configuring them to talk to my Elasticsearch running on my MacBook.
 ### 0. Virtual Machine Setup
-Although not extremely important to the process below, here is the high level notes about the VM:
+Although not extremely important to the process below, here are the high-level notes about the VM:
 * OS Name:                   Microsoft Windows 10
 * OS Version:                10.0.14393 N/A Build 14393
 * System Model:              VirtualBox
@@ -73,14 +73,14 @@ output.elasticsearch:
 
 I had to change this file again to include authentication creds when I installed the XPACK plugin but I will get there in another post. Baby steps people. Baby steps.
 ### 3. Install WinLogBeat
-Included in the WinLogBeat files is a handy dandy install-service-winlogbeat.ps1 that does the heavy lifting for installing the WinLogBeat service. Simply Run that file and then start the service.
+Included in the WinLogBeat files is a handy dandy install-service-winlogbeat.ps1 that does the heavy lifting for installing the WinLogBeat service. Simply run that file and then start the service.
 <a href="{{ site.baseurl }}/images/winlogbeat3.png">![WinLogBeat Files]({{ site.baseurl }}/images/winlogbeat3.png)</a>
 Now you should be sending logs from WinLogBeat to Elasticsearch. To confirm, check out the terminal window running Elasticsearch and you should see something like this:
 {% highlight raw%}
 [2017-03-12T18:07:59,156][INFO ][o.e.c.m.MetaDataMappingService] [Bo2nJmM] [winlogbeat-2017.03.12/Du3zdxHXQvivwrVBi6czJQ] update_mapping [wineventlog]
 {%endhighlight%}
 ### 4. Configure Kibana to index WinLogBeat logs
-Now that logs have a freely flowing into Elastic, it is time to update Kibana with an index. Under management, go to Index Patterns.
+Now that logs are freely flowing into Elastic, it is time to update Kibana with an index. Under management, go to Index Patterns.
 <a href="{{ site.baseurl }}/images/winlogbeat4.png">![WinLogBeat Files]({{ site.baseurl }}/images/winlogbeat4.png)</a>
 In the field, put "winlogbeat*" to start indexing these logs.
 <a href="{{ site.baseurl }}/images/winlogbeat5.png">![WinLogBeat Files]({{ site.baseurl }}/images/winlogbeat5.png)</a>
@@ -91,7 +91,7 @@ Then click on discover and BOO YAH we have logs.
 
 Download PacketBeat from [here](https://artifacts.elastic.co/downloads/beats/packetbeat/packetbeat-5.2.2-windows-x86_64.zip).
 PacketBeat on Windows does require a prior installation of [WinPcap](https://www.winpcap.org/install/bin/WinPcap_4_1_3.exe). I installed [WireShark](https://www.wireshark.org/#download) and opted to install WinPcap at the same time. You do what you feel is best.
-After you extract the packetbeat package on the Windows guest, configure the packbeat.yml to point to the Elasticsearch on the MacBook.
+After you extract the packetbeat package on the Windows guest, configure the packetbeat.yml to point to the Elasticsearch on the MacBook.
 Change:
 {% highlight yml %}
 #-------------------------- Elasticsearch output ------------------------------
@@ -108,7 +108,7 @@ output.elasticsearch:
 {% endhighlight %}
 I also had to change this file again to include authentication creds when I installed the X-Pack plugin but I will get there in the aforementioned post.
 ### Next Post?
-So there you have have it. In my next post I will cover installing the X-Pack plugin and dig into some of the modifications I made to the Graph plugin to make my logs looks like this:
+So there you have it. In my next post I will cover installing the X-Pack plugin and dig into some of the modifications I made to the Graph plugin to make my logs look like this:
 <a href="{{ site.baseurl }}/images/winlogbeat7.png">![WinLogBeat Files]({{ site.baseurl }}/images/winlogbeat7.png)</a>
 and THIS ...
 <a href="{{ site.baseurl }}/images/winlogbeat8.png">![WinLogBeat Files]({{ site.baseurl }}/images/winlogbeat8.png)</a>

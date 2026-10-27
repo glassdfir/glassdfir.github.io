@@ -4,7 +4,7 @@ title: Parsing Chrome Artifacts with Python! Part 2
 date: 2015-10-11 09:28:03.000000000 -04:00
 categories: blog
 ---
-<p>Continuing on with my riveting series on how to parse the Chrome SQLite files with Python, let's dig a little deeper into SQL portion by taking a look the History database.</p>
+<p>Continuing on with my riveting series on how to parse the Chrome SQLite files with Python, let's dig a little deeper into the SQL portion by taking a look at the History database.</p>
 
 <h2>History Database</h2>
 <p>Here are the tables and associated fields:</p>
@@ -19,9 +19,8 @@ categories: blog
 <li><strong>urls: </strong>id, url, title, visit_count, typed_count, last_visit_time, hidden, favicon_id</li>
 <li><strong>visits: </strong>id, url, visit_time, from_visit, transition, segment_id, visit_duration</li>
 <li><strong>visit_source: </strong>id, source</li>
-<p> ses
 </ul>
-<p>Some of these tables are useful on there own but much more information can be derived from querying more than one at a time. For example, the visits table stores information about the when and how often you visit a URL. To reduce redundant information in the database, instead of storing the URL again in the visits table, the visits table contains a pointer to the index of the URL in the url table.<br />
+<p>Some of these tables are useful on their own but much more information can be derived from querying more than one at a time. For example, the visits table stores information about when and how often you visit a URL. To reduce redundant information in the database, instead of storing the URL again in the visits table, the visits table contains a pointer to the index of the URL in the url table.<br />
 
 {% highlight python %}
 import sqlite3, datetime
@@ -36,7 +35,7 @@ def fixDate(timestamp):
 #Here is a simple example of how to query two tables and produce one meaningful output
 selectStatement = 'SELECT visits.visit_time, urls.url, urls.title FROM visits, urls WHERE visits.url=urls.id;'
 
-#These can be a bit tricky so lets break it down...
+#These can be a bit tricky so let's break it down...
 #FROM visits, urls : From the "visits" and "urls" tables
 #WHERE visits.url=urls.id : If the value in the visits.url field matches an id value in the url table...
 #SELECT visits.visit_time, urls.url, urls.title : Return the visit_time from the visits table, the URL and Title from the url table
@@ -67,7 +66,7 @@ for row in c.execute(selectStatement):
 
 Here are some more examples of SQL statements you could run against the History file if you are interested in the exercise.<br />
 {% highlight sql %}
-/* Look for all search terms and the site they went searched from */
+/* Look for all search terms and the site they searched from */
 SELECT keyword_search_terms.term, urls.url
 FROM urls, keyword_search_terms
 WHERE keyword_search_terms.url_id=urls.id;
@@ -96,7 +95,7 @@ https://github.com/williballenthin	https://github.com/williballenthin/python-reg
 */
 {% endhighlight %}
 
-From the output of this query we can see the referring URL that sponsored the records in the visits table. Note about this particular artifact is that it doesn't look like this visits.from_visit field is propagated on new sessions or tabs. This more or less illustrates the URL changes in one tab. Looking though the sample output, I see a lot of http redirects to https, so these transitions are not dependent upon user interaction. Not saying this is particularly useful but more or less just an example of how you can build tools to leverage SQL differently. You could see the same thing, arguably better, from:<br />
+From the output of this query we can see the referring URL that sponsored the records in the visits table. Note about this particular artifact is that it doesn't look like this visits.from_visit field is propagated on new sessions or tabs. This more or less illustrates the URL changes in one tab. Looking through the sample output, I see a lot of http redirects to https, so these transitions are not dependent upon user interaction. Not saying this is particularly useful but more or less just an example of how you can build tools to leverage SQL differently. You could see the same thing, arguably better, from:<br />
 {% highlight sql %}
 SELECT visits.visit_time, urls.url
 FROM visits, urls
@@ -126,4 +125,4 @@ ORDER BY visits.visit_time
 {% endhighlight %}
 
 
-So these kind of techniques I will use in the next few posts to show various nifty artifacts from Chrome. Thanks for reading. More to come soon.</p>
+I will use these kinds of techniques in the next few posts to show various nifty artifacts from Chrome. Thanks for reading. More to come soon.</p>

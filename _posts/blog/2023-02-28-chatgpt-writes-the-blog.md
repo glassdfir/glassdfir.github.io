@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "ChatGPT wrote this blog post "
+title:  "ChatGPT wrote this blog post"
 date:   2023-02-27 12:33:28 -0500
 categories: blog
 ---

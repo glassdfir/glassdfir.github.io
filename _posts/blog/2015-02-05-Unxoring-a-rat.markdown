@@ -5,13 +5,13 @@ date:   2016-02-05 14:52:28 -0500
 categories: blog
 #categories: Reversing RAT XOR
 ---
-I was looking at a sample of malware and I wanted to highlight a very simple technique I used to remove a layer of encryption without knowing the key. This post is not going to impress the seasoned veterans but since I think it will probably help someone in the community; I will bang out a post on it.
+I was looking at a sample of malware and I wanted to highlight a very simple technique I used to remove a layer of encryption without knowing the key. This post is not going to impress the seasoned veterans but since I think it will probably help someone in the community, I will bang out a post on it.
 
-I was in the middle of reverse engineering a sample of AdWind RAT. McAfee has a great post on it here. As I read their article, my sample seemed to be in line with Variant 2, which among numerous other layers of obfuscation, has an XORed config.ini file in that contains, another Malicious payload.
+I was in the middle of reverse engineering a sample of AdWind RAT. McAfee has a great post on it here. As I read their article, my sample seemed to be in line with Variant 2, which among numerous other layers of obfuscation, has an XORed config.ini file that contains another malicious payload.
 
 Looks like this:
 ![image-title-here]({{site.url}}/images/Screen-Shot-2016-02-05-at-10.26.16-PM.png){:class="img-responsive"}
-Since McAfee article mentions this file is an XML document, I saw an opportunity for a cheap win. The article shows the first line of the file as:
+Since the McAfee article mentions this file is an XML document, I saw an opportunity for a cheap win. The article shows the first line of the file as:
 {% highlight xml %}
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 {% endhighlight %}

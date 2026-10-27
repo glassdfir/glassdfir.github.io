@@ -11,13 +11,13 @@ Welcome to the Advanced DFIR Wizard Master Class
 by Jonathan Glass
 
 ## Goal
-The goal of this course is to explain the principles behind Windows Digital Forensics and Incident Response (DFIR) tools, tactics, and tactics. This course will demonstrate how to accomplish collection and analysis of Windows artifacts using open source or free tools.  
+The goal of this course is to explain the principles behind Windows Digital Forensics and Incident Response (DFIR) tools, tactics, and techniques. This course will demonstrate how to accomplish collection and analysis of Windows artifacts using open source or free tools.  
 
 ## Scope of this Course
 
 In scope for this class:
 
-* Hands on Tools, Tactics, and Techniques of DFIR
+* Hands-on Tools, Tactics, and Techniques of DFIR
 	* System Administration for Incident Responders
 	* Computer Science for Incident Responders
 	* Acquisition and Analysis of Windows artifacts
@@ -54,14 +54,14 @@ Out of scope for this class:
 As I built this course, I started realizing that perhaps the reader might not understand everything I am talking about. DFIR is not a field where everyone can know everything. It's just too wide and too deep. Attempting to define every term and provide background on all material would bloat this project beyond scope and diminish the value. If I didn't cover something, you might have to look it up. Searching for information is the crux of this job.
 
 ### I tried to keep it cheap
-In an effort to limit barriers to education, I tried to limit the examples in this course to native, open source, or readily available free tools. Does that excluding commecial tools limit the completeness of this course? Yes, but this course is about developing your skills and not lining a vendor's pocket. Sadly, you are going to need a Windows 7 or newer system to play with to put a lot of this to use.
+In an effort to limit barriers to education, I tried to limit the examples in this course to native, open source, or readily available free tools. Does excluding commercial tools limit the completeness of this course? Yes, but this course is about developing your skills and not lining a vendor's pocket. Sadly, you are going to need a Windows 7 or newer system to play with to put a lot of this to use.
 
 ### Audience
 I think this course is written to provide examples of DFIR techniques for two groups of people:
- 1. Folks that have been in Information Security in one capacity or another and are looking to get into more hands on DFIR work.
+ 1. Folks that have been in Information Security in one capacity or another and are looking to get into more hands-on DFIR work.
  2. Others who might find this information useful or interesting.
 
-This should not be the first computer related course you attempt.
+This should not be the first computer-related course you attempt.
 
 ### Omissions and Errors
 There are two reasons I didn't include something in this course:
@@ -71,13 +71,13 @@ There are two reasons I didn't include something in this course:
 Either way, feel free to send me feedback and I will take a look.
 ### Organization
 
-This course will cover a lot of material and most of it will be shown by example. While that is helpful in some respects, it can leave some topics less explicitly documented and more demonstrated during the course of scenario. Tools and command line utilities are going to be covered in this manner because I am not wasting our collective time documenting a technique AND all of a tool's command line functions when you can easily find that information elsewhere. 
+This course will cover a lot of material and most of it will be shown by example. While that is helpful in some respects, it can leave some topics less explicitly documented and more demonstrated during the course of a scenario. Tools and command line utilities are going to be covered in this manner because I am not wasting our collective time documenting a technique AND all of a tool's command line functions when you can easily find that information elsewhere. 
 
 ### Tone
-This is meant to be informal. I authored 3 university courses last year and one of the consistent items of feedback I received was how well the frankly dry material was conveyed. While that might come across as unprofessional and lacking academic polish, I find it makes the material more digestible and that is point of learning, right?
+This is meant to be informal. I authored 3 university courses last year and one of the consistent items of feedback I received was how well the frankly dry material was conveyed. While that might come across as unprofessional and lacking academic polish, I find it makes the material more digestible and that is the point of learning, right?
 
 ## 1. Windows Remote Administration for Incident Responders
-Without a system administration background, many incident responders struggle with basic tasks like remotely starting and stopping processes on target machines. Inversely, Incident Responders with sysadmin experience are often faster and more effective. The more familiar you are with native Windows commands, the faster your can operate.
+Without a system administration background, many incident responders struggle with basic tasks like remotely starting and stopping processes on target machines. Inversely, Incident Responders with sysadmin experience are often faster and more effective. The more familiar you are with native Windows commands, the faster you can operate.
 
 While this course cannot hope to supplant the experience gained by years at your average help desk, I will try to highlight some of the more helpful techniques that get me from A to B.
 
@@ -92,7 +92,7 @@ One of the most practical skills you can have as a Windows Admin is an understan
 
 #### WMI Terminology
 
-The four big vocabulary terms we are going to use for the section are:
+The four big vocabulary terms we are going to use for this section are:
 
  - Namespaces: A hierarchical structure of WMI objects used to organize Classes
  - Classes: A WMI Object that contains fun stuff like Properties and Methods
@@ -164,14 +164,14 @@ for s in c.Win32_Process ():
 
 #### BigFix Relevance
 
-You might not have this in your environment but many companies have clients on endpoints that are designed for system administration or patching that can to utilized to perform incident response functions as well. This is especially true in SMBs where the security guy is also the patching and sysadmin team. 
+You might not have this in your environment but many companies have clients on endpoints that are designed for system administration or patching that can be utilized to perform incident response functions as well. This is especially true in SMBs where the security guy is also the patching and sysadmin team. 
 
     (selects "processid,name from Win32_Process where name = 'explorer.exe'" of wmi)
 
 ![BigFix WMI Relevance](../Images/bigfix.png)
 
 #### WMI classes of DFIR interest
- There is a lot of super geeky DFIR information you can pull out of WMI properties and methods that can give you wizard like powers over remote machines. Here are a few of my favorites :
+ There is a lot of super geeky DFIR information you can pull out of WMI properties and methods that can give you wizard-like powers over remote machines. Here are a few of my favorites:
 
 | Class         | Properties         |Methods |
 |---------------|-----------------|----|
@@ -185,7 +185,7 @@ You might not have this in your environment but many companies have clients on e
 
 #### Putting It To Work
 
-Scenario: Your detection team says a user on RemoteComputerName received a malicious Word document that downloads a Remote Access Trojan that your antivirus doesn't have a signature for. From your threat intelligence, this malicious Word document uses a macro to drop an EvilFile.exe in the users Temp directory.
+Scenario: Your detection team says a user on RemoteComputerName received a malicious Word document that downloads a Remote Access Trojan that your antivirus doesn't have a signature for. From your threat intelligence, this malicious Word document uses a macro to drop an EvilFile.exe in the user's Temp directory.
 
 Let's verify the alert..maybe the user didn't open the Word doc...(yeah right)
 
@@ -211,22 +211,22 @@ For fun and containment, let's kill that malicious process using a WMI method:
             ReturnValue = 0;
     };
 
-For even MORE fun, like copy that malicious file to an analysis share so we can get a better look at it:
+For even MORE fun, let's copy that malicious file to an analysis share so we can get a better look at it:
 
     wmic /node:RemoteComputerName process call create "xcopy  /Y C:\Users\Username\AppData\Local\Temp\Scchost.EXE \\AnalysisShare\Scchost.exe.bin" 
 
-For a lot less fun, let's call the User explain the situation, shut it down remotely, and go get the workstation to determine what this malware did :
+For a lot less fun, let's call the user, explain the situation, shut it down remotely, and go get the workstation to determine what this malware did:
 
     wmic /node:RemoteComputerName os call Shutdown
 
 *Disclaimer: This scenario is largely BS. Malware isn't usually this easy to kill and as more work becomes remote, it is increasingly rare to physically walk over to the user's cube and take their workstation.*
 
 ### MMC
-I imagine I scared some of off you with all that "coding" and "command line stuff". While there are GUIer options to accomplish Windows administration tasks, they aren't as efficient or sexy. If you are against coding all together, there is an X at the top right or left of your browser. We can part ways now and no one's feelings need to get hurt. For the sake of completeness, I will cover MMC which is a GUI and can do Windows admin tasks but it is not my "go to".
+I imagine I scared some of you off with all that "coding" and "command line stuff". While there are GUIer options to accomplish Windows administration tasks, they aren't as efficient or sexy. If you are against coding altogether, there is an X at the top right or left of your browser. We can part ways now and no one's feelings need to get hurt. For the sake of completeness, I will cover MMC which is a GUI and can do Windows admin tasks but it is not my "go to".
 According to the big M, the Microsoft Management Console (MMC) is an extensible common presentation service for management applications.
 ![MMC](../Images/2018-02-22-MMC.png "MMC")
 
-This console gives you access to some a lot of administration tools.
+This console gives you access to a lot of administration tools.
  - Computer Management Snap-In
 	 - System Tools
 		 - Task Scheduler
@@ -248,7 +248,7 @@ I don't use this much for IR but if you are in an environment where you don't ha
 
 ### PsTools
 
-Way way way back in 1996, Mark Russinovich and Bryce Cogswell created a little company called Winternals Software LP that created a bunch of software to help administer Windows 2000 boxes. Long story short...in 2006 Microsoft bought the company and all their tools now known as [Windows Sysinternals](https://docs.microsoft.com/en-us/sysinternals/). There is a cornucopia of awesome tools that I will mention throughout the duration of this course but for now we are going to focus on some of the PsTools Suite I find most handy. While you can accomplish all of these functions via WMI via PowerShell or WMIC, these tools are helpful for those who prefer tools with a dedicated tasks and help menus. There is absolutely no shame in that but I found, the more comfortable I become with WMI scripting, the less I needed most of this suite.
+Way way way back in 1996, Mark Russinovich and Bryce Cogswell created a little company called Winternals Software LP that created a bunch of software to help administer Windows 2000 boxes. Long story short...in 2006 Microsoft bought the company and all their tools now known as [Windows Sysinternals](https://docs.microsoft.com/en-us/sysinternals/). There is a cornucopia of awesome tools that I will mention throughout the duration of this course but for now we are going to focus on some of the PsTools Suite I find most handy. While you can accomplish all of these functions via WMI via PowerShell or WMIC, these tools are helpful for those who prefer tools with dedicated tasks and help menus. There is absolutely no shame in that but I found the more comfortable I became with WMI scripting, the less I needed most of this suite.
 
 #### Windows Admin using PsTools Suite
 
@@ -274,7 +274,7 @@ From [Microsoft](https://docs.microsoft.com/en-us/sysinternals/downloads/psexec)
 > IpConfig that otherwise do not have the ability to show information
 > about remote systems."
 
-PsExec is to DFIR as a good blaster is to Han Solo.  I can't tell you how many times PsExec has saved my bacon. Not to mention how many times I have pulled off some nifty DFIRfu with it's various options. Everytime I read PsExec's Usage I learn something new that it does.
+PsExec is to DFIR as a good blaster is to Han Solo.  I can't tell you how many times PsExec has saved my bacon. Not to mention how many times I have pulled off some nifty DFIRfu with its various options. Every time I read PsExec's Usage I learn something new that it does.
 
 ##### Example: Elevating to System Account:
 One of my favorite tricks is to run remote processes as the System account and not a puny User account as seen below:
@@ -282,7 +282,7 @@ One of my favorite tricks is to run remote processes as the System account and n
 This grants a higher level of privileges and leaves less of a footprint on the remote machine. I rarely want to use my own account for anything on a remote machine unless I have to.
 
 Pro Tip: If you are copying evidence from a remote machine to a collection share using PsExec to run as the system account, make sure the share is configured to grant Computer account of the target workstation write permission or you will get errors that will run you in circles. Doesn't matter if your admin account has rights if you are running as the Computer.
-##### Example: Copying an Utility and then Executing it on a Remote System :
+##### Example: Copying a Utility and then Executing it on a Remote System:
 ![enter image description here](../Images/2018-02-25 13_08_02-Administrator_ Command Prompt.png)
 
     PsExec.exe \\192.168.164.130 -c RawCopy.exe /FileNamePath:C:0 /OutputPath:\\ForensicServer\dropbox\ /OutputName:$MFT
@@ -290,16 +290,16 @@ Pro Tip: If you are copying evidence from a remote machine to a collection share
 There is a lot going on in this example so let's break it down...
 
  - I am using PsExec to remotely execute RawCopy on a remote host with an IP of 192.168.164.130. 
- - Since the remote host probably doesn't have RawCopy, a third party tool, laying around, I used the **-c** flag to copy the program over to the remote system. The **-f** flag is used just in case it was already there so we can overwrite it.
+ - Since the remote host probably doesn't have RawCopy, a third party tool, lying around, I used the **-c** flag to copy the program over to the remote system. The **-f** flag is used just in case it was already there so we can overwrite it.
  - RawCopy's options are fairly straightforward. I am copying the Master File Table (record 0) from C:\\$MFT on the remote machine to  my \\\ForensicServer\\dropbox share for analysis
  - After RawCopy finished, I check my dropbox folder to confirm the $MFT landed safely.
 
 ##### Example: Interacting with the User:
-PsExec runs a console session by default but can be configured to interact with the logged on user's session using the **-i** option. This is helpful in those rare instances where you need to user to see something you are doing. 99% of the time the user is going to be logged in under the second session or session 1. It's not often but I have used this a couple times over the years.
+PsExec runs a console session by default but can be configured to interact with the logged on user's session using the **-i** option. This is helpful in those rare instances where you need the user to see something you are doing. 99% of the time the user is going to be logged in under the second session or session 1. It's not often but I have used this a couple times over the years.
 In this example, I use PsExec to create two instances of notepad.exe on my local machine. One is in user session and visible, the other is not. 
 ![enter image description here](../Images/2018-02-26 14_04_26-Sessions.png)
 
-The **-d** flag is used to detach the PsExec session from the child process so we don't have to wait until notepad exits to continue. This is very handy for DFIR collection scripts that might take a while. Detach the process and let it do it's thing. I like to use **-d** on targets that are on flakey VPN connections so that if the connection drops, the process is still running on the remote system. The obvious downside is, you can't interact with the session after it is detached.
+The **-d** flag is used to detach the PsExec session from the child process so we don't have to wait until notepad exits to continue. This is very handy for DFIR collection scripts that might take a while. Detach the process and let it do its thing. I like to use **-d** on targets that are on flaky VPN connections so that if the connection drops, the process is still running on the remote system. The obvious downside is, you can't interact with the session after it is detached.
 
 ##### Example: Running commands on multiple machines
 PsExec allows you to perform administrative tasks on multiple workstations but you can only interact with one at a time. Here is an example of getting a command shell on two different machines:
@@ -320,32 +320,32 @@ When would you ever need to do this? Let's say you want to collect artifacts fro
     #Bit of a cheat code to copy a file over before using it.
     \tools\PsExec.exe \\DESKTOP-132B1OL,RemoteMachine -d -f -c \Tools\RawCopy.exe
   
-  What does this do? PsExec will copy \Tools\RawCopy.exe to the c:\Windows folder of DESKTOP-132B1OL and try to run it. Same with RemoteMachine. RawCopy needs all sorts of command line options so it will gracefully exit BUT the tool has be in place. Why didn't i use the **-c** switch? I'll show you:
+  What does this do? PsExec will copy \Tools\RawCopy.exe to the c:\Windows folder of DESKTOP-132B1OL and try to run it. Same with RemoteMachine. RawCopy needs all sorts of command line options so it will gracefully exit BUT the tool has to be in place. Why didn't I use the **-c** switch? I'll show you:
 
     \tools\PsExec.exe \\DESKTOP-132B1OL,RemoteMachine -d cmd /c c:\Windows\RawCopy.exe /FileNamePath:C:0 /OutputPath:"\\vmware-host\Shared Folders\Evidence\" /OutputName:^%computername^%-$MFT
 
 On my evidence share, I am looking to have one file from each of these workstations. To make sure I can tell the two $MFTs apart, I used the environment variable %COMPUTERNAME% from the remote computer for file name passed to RawCopy.
 
-To access the remote environment variables, I needed to use cmd to launch RawCopy which means I couldn't use the **-c** to copy it over in one foul swoop. By using the carets to escape the percent signs, like this `^%computername^%-$MFT`, you can pass the variable to the next command interpreter. If you don't, your command prompt will interpret it and save all of the file names as YOUR computer name and overwrite each other. Took me a second to figure that out.
+To access the remote environment variables, I needed to use cmd to launch RawCopy which means I couldn't use the **-c** to copy it over in one fell swoop. By using the carets to escape the percent signs, like this `^%computername^%-$MFT`, you can pass the variable to the next command interpreter. If you don't, your command prompt will interpret it and save all of the file names as YOUR computer name and overwrite each other. Took me a second to figure that out.
 
-If all this sounds convoluted, you're paying attention. The point of this course highlight some more complicated methods of approaching the litany of challenges you will encounter during your DFIR day.
+If all this sounds convoluted, you're paying attention. The point of this course is to highlight some more complicated methods of approaching the litany of challenges you will encounter during your DFIR day.
 
 
 ## 2. Remote Acquisition of Windows Artifacts
 Some folks reading this are convinced that Incident Response is all done through Endpoint Detection and Response solutions and in 2018 no one drops collection scripts to gather artifacts for analysis. Those people are wrong.
 
-The first thing you should know is you will run into problems. Even when your collection tool is working perfectly; network connections drop, hard drives run out of room, antivirus and data loss prevention software will freak out... this is going to happen. Embrace it.
+The first thing you should know is you will run into problems. Even when your collection tool is working perfectly, network connections drop, hard drives run out of room, antivirus and data loss prevention software will freak out... this is going to happen. Embrace it.
 
 This chapter is going to cover as many of the lessons learned as I can think of.
 
 ### Issues with Tools for Remote File Acquisition
 
-This can quickly get religious but I am not a fan of most commercial tools. Many do WAY too much stuff I don't need or want for my OCD to handle. I am not going to bad mouth any particular vendor but there are a lot of solutions that just don't work for my exact needs. 
+This can quickly get religious but I am not a fan of most commercial tools. Many do WAY too much stuff I don't need or want for my OCD to handle. I am not going to badmouth any particular vendor but there are a lot of solutions that just don't work for my exact needs. 
 
 Things I have found annoying about collection tools:
 
  - Some tools require special dongles which is often not practical with modern global enterprises.
- - Some use netcat like functionality to talk directly from your workstation to target which triggers NIDS and is blocked by NIPS.
+ - Some use netcat-like functionality to talk directly from your workstation to target which triggers NIDS and is blocked by NIPS.
  - Some won't copy or even find some files on the target because they are locked by the OS or a third party tool like AV or DLP.
  - Some free tools get flagged by AV because they are not signed or what they are written in. 
  - Some tools take too long and then produce too little.
@@ -356,7 +356,7 @@ Enough of my complaining. After a little science, I will explain two completely 
 
 #### The Underlying Mechanics of Copying Locked Files on Windows
 
-Before we discuss tools and examples, an understanding of the mechanics of the NTFS filesystem is helpful to ensure you can adapt and overcome when various things get in between you and your artifacts. Here is a piece of DFIRfu using completely native windows commands. Admittedly, this is more DF than IR and I know it is a lot of hexadecimal but stick with me...
+Before we discuss tools and examples, an understanding of the mechanics of the NTFS filesystem is helpful to ensure you can adapt and overcome when various things get in between you and your artifacts. Here is a piece of DFIRfu using completely native Windows commands. Admittedly, this is more DF than IR and I know it is a lot of hexadecimal but stick with me...
 ![MFT Data Runs](../Images/$MFTdataruns.png)
 
 **Breakdown**
@@ -367,21 +367,21 @@ Before we discuss tools and examples, an understanding of the mechanics of the N
 	 `wmic volume where (name="c:\\") get blocksize`
 	 - This tells us that the file system allocates space to files in chunks of 4096 bytes. Even if the file is smaller, it gets the whole 4K to itself.
  - `fsutil.exe file queryextents c:\$MFT`
-	 - This command shows use the clusters allocated to the $MFT. I pick on the $MFT a lot in my examples for two reasons : it contains almost all of the file system information on the system and it is not directly accessible through the operating system.
+	 - This command shows us the clusters allocated to the $MFT. I pick on the $MFT a lot in my examples for two reasons: it contains almost all of the file system information on the system and it is not directly accessible through the operating system.
 	 - This command outputs three columns of information:
 		 - **VCN**: Virtual Cluster Numbers are used to sequence chunks of allocated data kinda like numbered puzzle pieces.
 		 - **Clusters**: This is the number of contiguous Clusters allocated per Data Run. 
 		 - **LCN**: Logical Cluster Numbers are basically used as addresses. This run of contiguous data begins at X number of clusters from the beginning of the volume.
  - `echo Size of $MFT in Bytes: && set /a (0xC820 + 0x4720) * 4096`
 	 - This is just an example of how to do math on the Windows command line.
-	 - `set /a` can be used for sorts of fun stuff like converting hex to decimal and arithmetic.
-	 - Here I am adding the number of clusters from the first data run and second data run to determine the total number of clusters allocated to the $MFT. Since we know the clusters are 4096 bytes large, we multiple to determine the number of bytes allocated to the $MFT.
+	 - `set /a` can be used for all sorts of fun stuff like converting hex to decimal and arithmetic.
+	 - Here I am adding the number of clusters from the first data run and second data run to determine the total number of clusters allocated to the $MFT. Since we know the clusters are 4096 bytes large, we multiply to determine the number of bytes allocated to the $MFT.
  - `dir "\\vmware-host\Shared Folders\Evidence"` 
 	 - Here I am just showing you that the $MFT we collected from the previous examples using RawCopy is in fact the same size as the crazy math we just did.
 
 Here is another way to look at that information:
 ![enter image description here](../Images/$MFTallocatedspace.png)
-That $MFT only has two but it is common for larger files to have many data runs:
+That $MFT only has two data runs, but it is common for larger files to have many data runs:
 ![enter image description here](../Images/webcachedataruns.png)
 This WebCacheV01.dat file has 25 runs spread out all over the volume.
 
@@ -391,16 +391,16 @@ To access locked files on a live Windows system, your acquisition tool needs to:
 
  1. Determine what physical clusters have been allocated for that file. This is stored in terms of LCN and number of clusters *(inside the $MFT as it just so happens, but we will cover that later)*.
  2. Open the Volume for direct read access.
- 3. Seek to the offset of the LCN on disk and read the numbers of clusters specified. Repeat as needed for all Data Runs.
+ 3. Seek to the offset of the LCN on disk and read the number of clusters specified. Repeat as needed for all Data Runs.
  4. Write the collected information to an output file in the sequence specified by the VCNs.
 
-Piece of cake right? Well the first 3 steps can trip up tools for one reason or another.
+Piece of cake, right? Well, the first 3 steps can trip up tools for one reason or another.
 
 ### Building a Toolkit for Live File Collection:
 
 I wish I could point you to a single perfect free tool that does exactly what you need but sadly, I can't recommend one that checks all the blocks. So, since this is a course designed to expand your knowledge and experience, let's just build one from scratch(ish)!
 
-Lets display a variety of PowerShell fucntionality by using fcat from SleuthKit to make a collection script:
+Let's display a variety of PowerShell functionality by using fcat from SleuthKit to make a collection script:
 
 ```powershell
 #1. Timestamps are a great way to make unique folder names with context.
@@ -464,7 +464,7 @@ Add-Type -assembly "system.io.compression.filesystem"
 write-host "Done"
 ```
 
-This is the platform we will add use and augment throughout the rest of the course. It's free and it works. Strap in because the breakdown on this is going to be brutal.
+This is the platform we will use and augment throughout the rest of the course. It's free and it works. Strap in because the breakdown on this is going to be brutal.
 
 **Breakdown**
 -  ```posh
@@ -480,7 +480,7 @@ $files_to_collect = @()
 - ```powershell
 $files_to_collect += 'c:\$MFT'
 ```
-    - Some files are a part of the filesystem but not direct accessible via a directory listing so we add their paths manually to $files_to_collect array
+    - Some files are a part of the filesystem but not directly accessible via a directory listing so we add their paths manually to $files_to_collect array
 - ```powershell
 $filesigs = @()
 ```
@@ -488,18 +488,18 @@ $filesigs = @()
 - ```powershell
 $filesigs += '^c:\\Users\\.*\\ntuser.dat$'
 ```
-    - This RegEx allows us to collect registry files from all of the profiles on a system without having to explictedly know the path for each
-    - We are using double back slashes to "escape" the single blackslash. If we didn't, it would be interpreted as a RegEx operator.
+    - This RegEx allows us to collect registry files from all of the profiles on a system without having to explicitly know the path for each
+    - We are using double backslashes to "escape" the single backslash. If we didn't, it would be interpreted as a RegEx operator.
 - ```powershell 
 $files_to_collect += gci -Path C:\\Users,C:\\Windows -Recurse -Force -File -ErrorAction SilentlyContinue | Where-Object { $_.FullName -imatch $($filesigs -join "|") }| % { $_.FullName } 
 ```
     - Here we are using the gci alias for the PowerShell command Get-ChildItem which is a fancy command that can enumerate through a directory listing among other things.
     - We specify 2 directories for the **-Path** argument to define the scope of our search.
-    - **-Recurse** continues the seach throughout all of the subdirectories.
+    - **-Recurse** continues the search throughout all of the subdirectories.
     - **-Force** adds hidden files to the search and levitates rocks.
-    - **-File** is used to exclude directories from my results. This is actually important to the mechanincs of the rest of the script.
+    - **-File** is used to exclude directories from my results. This is actually important to the mechanics of the rest of the script.
     - I specified SilentlyContinue for **-ErrorAction** because as it tries to get directory for every file in the C:\Windows folder, there are Access Denied Errors on files I didn't ask for and I don't want to see them.
-    - We redirect the output of the gci command into the Where-Object to filter our results to compare the **FullName** of the file to our array of RegEx $filesigs. $filesigs is an array of strings until use **-Join** to merge each signature together with a pipe which acts as an OR statement in RegEx. "Signature 1 OR Signature 2 OR ..."
+    - We redirect the output of the gci command into the Where-Object to filter our results to compare the **FullName** of the file to our array of RegEx $filesigs. $filesigs is an array of strings until we use **-Join** to merge each signature together with a pipe which acts as an OR statement in RegEx. "Signature 1 OR Signature 2 OR ..."
     - Finally, we redirect THAT output and grab the Fullname of the file that matches one of our signatures and add it to the $files_to_collect array.
 - ```powershell
 foreach($file in $files_to_collect){
@@ -508,7 +508,7 @@ foreach($file in $files_to_collect){
 - ```powershell
 while(@(Get-Process fcat -ErrorAction SilentlyContinue).Count -ge 10){Start-Sleep -Seconds 5}
 ```
-    - This is a While loop in PowerShell. This statement will keep going until the condition is not True. This statement is counting the number of processes containing "fcat" and if it is greater than or equal to 10; it will sleep for 5 seconds and check again. This is being used to keep the number of fcat collectors to a reasonable amount. Is this a perfect solution? No. This is more "Tactical" Multiprocessing, meaning I want more than one instance running at a time but I don't care enough to code true multiprocessing into the script. High yield, low drag. The process count and sleep timer can be adjusted to the desired amount of noise you want the target systems fan to make.
+    - This is a While loop in PowerShell. This statement will keep going until the condition is not True. This statement is counting the number of processes containing "fcat" and if it is greater than or equal to 10; it will sleep for 5 seconds and check again. This is being used to keep the number of fcat collectors to a reasonable amount. Is this a perfect solution? No. This is more "Tactical" Multiprocessing, meaning I want more than one instance running at a time but I don't care enough to code true multiprocessing into the script. High yield, low drag. The process count and sleep timer can be adjusted to the desired amount of noise you want the target system's fan to make.
 - ```powershell
 $unixname = $file -replace "c:","" -replace "\\","/"
 ```
@@ -516,14 +516,14 @@ $unixname = $file -replace "c:","" -replace "\\","/"
 - ```powershell
 $outfile = $('{0}\\{1}' -f $timestamp,$file -replace ':','')
 ```
-    - fcat literally just prints a files contents to screen and has no other frills like saving the file to another location so it makes us do a little work.
+    - fcat literally just prints a file's contents to screen and has no other frills like saving the file to another location so it makes us do a little work.
     - This line of code is responsible for creating the folder structure in the collection folder that represents where the file came from on the target.
     - `C:\Users\Username\ntuser.dat` gets saved to `2018-03-08-5-2-12\c\Users\Username\ntuser.dat`
 - ```powershell
 $outdir  = $outfile.Substring(0,$outfile.LastIndexOf("\"))
 ```
     - In order to store the ntuser.dat file in the `2018-03-08-5-2-12\c\Users\Username` folder, we need to create it.
-    - This line takes a substring of the $outfile path from index 0 (the begining) to the index of the last backslash argo the parent folder of the file.
+    - This line takes a substring of the $outfile path from index 0 (the beginning) to the index of the last backslash, ergo the parent folder of the file.
     - Are there other commands to get the parent folder of a file? Yes, but they don't work on files the OS can't see like c:\\$Extend\\$USNJrnl:$J and I imagine this is faster anyways.
 - Building the command string is wonky looking but there are reasons
     - Example: 
@@ -531,7 +531,7 @@ $outdir  = $outfile.Substring(0,$outfile.LastIndexOf("\"))
 mkdir "2018-03-08-5-2-12\c\Users\Username\" & fcat.exe -h -f NTFS "/Users/Username/ntuser.dat" \\.\c: > "2018-03-08-5-2-12\c\Users\Username\ntuser.dat"
 ```
     - This is pretty simple but gets complicated because all the paths need to be encapsulated with quotes because some paths might have spaces in them.
-    - `$('{0}{1}{0}' -f [char]34, $outdir)` is an example of creating a string from other variables. I am using [char]34 because it is the cleanest method of concatenating quotes I have found. The backtick method didn't survive accoss the cmd interpreter. This method puts a " before and after the $outdir.
+    - `$('{0}{1}{0}' -f [char]34, $outdir)` is an example of creating a string from other variables. I am using [char]34 because it is the cleanest method of concatenating quotes I have found. The backtick method didn't survive across the cmd interpreter. This method puts a " before and after the $outdir.
     - Fun fact: mkdir will make recursive folders if you ask it.
     - For fcat, I used -h to knock down the size of the sparse files we collect. I will cover that later. -f specifies the NTFS file system. 
     - We are using the > to redirect the output of fcat into a file.

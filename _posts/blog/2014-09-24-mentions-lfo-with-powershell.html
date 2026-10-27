@@ -8,7 +8,7 @@ categories: blog
 <p>With that in mind, here is an example of how you can use Sysmon to list all the processes, sorted by frequency count:<br />
 <script src="https://gist.github.com/glassdfir/210ff631af02e47b14cc.js"></script></p>
 <pre>
-PS C:Temp> C:TempLFO.ps1
+PS C:\Temp> C:\Temp\LFO.ps1
 Count Name
 ----- ----
     1 C:\cygwin64\bin\cat.exe
@@ -16,31 +16,31 @@ Count Name
     1 C:\cygwin64\bin\find.exe
     1 C:\cygwin64\bin\grep.exe
     1 C:\cygwin64\bin\mkgroup.exe
-    1 C:\cygwin64binmkpasswd.exe
-    1 C:\cygwin64binrebase.exe
-    1 C:\cygwin64binsort.exe
+    1 C:\cygwin64\bin\mkpasswd.exe
+    1 C:\cygwin64\bin\rebase.exe
+    1 C:\cygwin64\bin\sort.exe
     1 C:\Program Files (x86)\Common Files\Java\Java Update\jaureg.exe
-    1 C:\Program Files (x86)\Common FilesVMwareUSBvnetlib64.exe
+    1 C:\Program Files (x86)\Common Files\VMware\USB\vnetlib64.exe
     1 C:\Program Files (x86)\FileZilla FTP Client\filezilla.exe
     1 C:\Program Files (x86)\FileZilla FTP Client\fzsftp.exe
     1 C:\Program Files (x86)\Inkscape\inkscape.exe
-    1 C:\Program Files (x86)\Java\jre7bin\javaws.exe
+    1 C:\Program Files (x86)\Java\jre7\bin\javaws.exe
     1 C:\Program Files (x86)\Mozilla Firefox\maintenanceservice_installer.exe
     1 C:\Program Files (x86)\Mozilla Maintenance Service\maintenanceservice_tmp.exe
-    1 C:\Program Files (x86)\Notepad++\updatergup.exe
+    1 C:\Program Files (x86)\Notepad++\updater\gup.exe
     1 C:\Program Files (x86)\Optimizer Pro\OptProStart.exe
     1 C:\Program Files (x86)\Optimizer Pro\OptProUninstaller.exe
     1 C:\Program Files (x86)\Optimizer Pro\unins000.exe
     1 C:\Program Files (x86)\VMware\VMware Workstation\vmware.exe
     1 C:\Program Files (x86)\VMware\VMware Workstation\vmware-unity-helper.exe
     1 C:\Program Files (x86)\VMware\VMware Workstation\vprintproxy.exe
-    1 C:\Program Files (x86)\VMware\VMware Workstation\x64vmware-vmx.exe
+    1 C:\Program Files (x86)\VMware\VMware Workstation\x64\vmware-vmx.exe
 ...
 
 </pre>
 <p>Just at a quick glance, I see a few things in there that might be cause for concern. For example:<br />
-C:Users<strong>Guest</strong>Downloadsinstall_flashplayer15x32_mssa_aaa_aih.exe<br />
+C:\Users\<strong>Guest</strong>\Downloads\install_flashplayer15x32_mssa_aaa_aih.exe<br />
 I could crack open the Sysmon log and find out more about this if I wanted to dive deeper.</p>
 <p>Here is an example using just the 4688 event from the security logs:<br />
 <script src="https://gist.github.com/glassdfir/80117cbcbe5e6e145c8a.js"></script><br />
-I realize that this is not ground breaking work but it seemed like something that others could use. </p>
+I realize that this is not groundbreaking work but it seemed like something that others could use. </p>

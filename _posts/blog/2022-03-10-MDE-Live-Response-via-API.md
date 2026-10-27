@@ -9,7 +9,7 @@ categories: blog
 
 Continuing to build on my previous posts...
 
-One of my all time favorite user containment methods is to change the BitLocker keys and shut the system down.  
+One of my all-time favorite user containment methods is to change the BitLocker keys and shut the system down.  
 
 ```powershell
 #Delete existing protections

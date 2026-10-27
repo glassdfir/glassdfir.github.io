@@ -12,7 +12,7 @@ manage-bde.exe -cn ComputerName -protectors -delete c: -Type RecoveryPassword
 #Now that all of the previous Protectors are gone, let's add our own.
 #Let's add a new password that only the security team will need to know.
 manage-bde.exe -cn ComputerName -protectors -add c: -TPMandPIN SuperDuperPassword
-#As a backup, let's also add a couple of recovery keys just in case noone can find the sticky note with the password.
+#As a backup, let's also add a couple of recovery keys just in case no one can find the sticky note with the password.
 manage-bde.exe -cn ComputerName -protectors -add c: -RecoveryPassword 111111-111111-111111-111111-111111-111111-111111-111111 
 manage-bde.exe -cn ComputerName -protectors -add c: -RecoveryPassword 222222-222222-222222-222222-222222-222222-222222-222222 
 manage-bde.exe -cn ComputerName -on c:

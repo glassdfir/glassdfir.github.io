@@ -14,7 +14,7 @@ reg add "hkcu\Environment" /v PROCESSOR_ARCHITECTURE /t REG_SZ /d x86<br />
 rename or delete c:\windows\system32\wbem\repository<br />
 net start winmgmt</p>
 <p><strong>WinMGMT STOP using SC </strong><br />
-sc \\remotemachine stop winmgmt and it's needed deps<br />
+sc \\remotemachine stop winmgmt and its needed deps<br />
 rename c:\windows\system32\wbem\repository<br />
 sc \\remotemachine start winmgmt<br />
 psexec \\remotemachine cmd.exe<br />
@@ -47,7 +47,7 @@ wmic /output:wmic.html process list full /format:hform</p>
 wmic /output:savrt.csv sysdriver where name="savrt" list status /format:csv</p>
 <p><strong>Query this status on all machines in the domain. You have all the machines in the domain in a text file </strong><br />
 wmic /node:"@targets.txt" /output:savrt.csv sysdriver where name="savrt" list status /format:csv</p>
-<p><strong>Get a list of NICs and IP’s in use</strong><br />
+<p><strong>Get a list of NICs and IPs in use</strong><br />
 netsh int ip show config<br />
 wmic nicconfig where IPEnabled='true'</p>
 <p><strong>Remotely change the IP to a static IP (Index is Interface#)</strong><br />
@@ -70,12 +70,12 @@ wmic diskdrive list full<br />
 wmic partition list full</p>
 <p><strong>Bios Info</strong><br />
 wmic bios list full</p>
-<p><strong>List all Hotfixes and Services Packs</strong><br />
+<p><strong>List all Hotfixes and Service Packs</strong><br />
 wmic qfe</p>
 <p><strong>List HotfixID, description and Install date</strong><br />
 wmic qfe where "not description like " get description,hotfixid,installedon<br />
 example: wmic qfe where hotfixid="KB958644" list full
-<lists patch info for ms08-067>
+&lt;lists patch info for ms08-067&gt;</p>
 <p><strong>Remotely List Local Enabled Accounts</strong><br />
 wmic /node:computername USERACCOUNT WHERE "Disabled=0 AND LocalAccount=1" GET Name</p>
 <p><strong>Start a service</strong><br />
@@ -88,7 +88,7 @@ wmic service list brief</p>
 wmic useraccount<br />
 wmic useraccount list brief</p>
 <p><strong>Enable RDP</strong><br />
-wmic /node:"computername" path Win32_TerminalServiceSetting where AllowTSConnections=“0” call SetAllowTSConnections “1”</p>
+wmic /node:"computername" path Win32_TerminalServiceSetting where AllowTSConnections="0" call SetAllowTSConnections "1"</p>
 <p><strong>List ShadowCopy Info</strong><br />
 wmic shadowcopy list brief</p>
 <p><strong>List Event Logs</strong><br />
@@ -99,4 +99,4 @@ wmic /node:machinename /output:wmicevents.html ntevent where (message like "%log
 <p><strong>List number of times a user logged on</strong><br />
 wmic netlogin where (name like "%adm%") get numberoflogons</p>
 <p><strong>Display Shares</strong><br />
-wmic share list brief</lists>
+wmic share list brief</p>

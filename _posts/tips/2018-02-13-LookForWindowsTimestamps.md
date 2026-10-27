@@ -5,7 +5,7 @@ date:   2018-02-20 15:33:28 -0500
 categories: tips
 ---
 
-I did some reverse engineering of 3rd party software in a client environment and wrote this script to help  determine how they logged events.
+I did some reverse engineering of 3rd party software in a client environment and wrote this script to help determine how they logged events.
 
 
 {% highlight python %}

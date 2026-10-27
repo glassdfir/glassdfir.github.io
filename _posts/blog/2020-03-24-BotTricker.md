@@ -59,8 +59,8 @@ print("Base64 character sets found in Raw Data:\n"+"\n".join(keys))
 - For each key found:
     - Translate the characters in the string from the custom character set to the regular set
     - Base64 decode as usual.
-    - To cutdown the noise, I am checking to see if the decoded data contains any any string from 5 - 6000 chars long.
-        - Not prefect
+    - To cut down the noise, I am checking to see if the decoded data contains any string from 5 - 6000 chars long.
+        - Not perfect
 
 
 ```python

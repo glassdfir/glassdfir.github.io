@@ -12,14 +12,14 @@ I have decided to dust off the ol' blog to start documenting some of my more rec
 2. Click next and agree until it stops asking. Literally have no clue what I agreed to.
 3. Go to [Microsoft 365 Defender](https://security.microsoft.com/homepage).
 4. Go to **Settings > Endpoints > Onboarding**, grab an onboarding script, and onboard a device to your environment. [Reference](https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/onboard-configure?view=o365-worldwide)
-5. Reboot the device. You shouldn't have to but it makes every thing go faster.
-6. Head to [Azure](https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationsListBlade) and build yourself and App.
+5. Reboot the device. You shouldn't have to but it makes everything go faster.
+6. Head to [Azure](https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationsListBlade) and build yourself an App.
 7. Go to **YOUR APP > Certificates & secrets** and make yourself a New client secret. Copy that down because you can only look at that once. We will need that later.
 8. Go to **YOUR APP > API Permissions** and Click Add a Permission.
 9. When the **Request API permissions** side screen pops up, click on **APIs my organization uses**. Type **"WindowsDefenderATP"** in the search box.
 10. Click on **Application permissions** Select EVERYTHING. Go nuts. Hit **Update Permissions**
 11. Now before you click away, Click **Grant admin consent to YOUR DOMAIN**. This should turn all orange "Not granted for"s into green "Granted for"s.
-12. Go to the **YOUR APP > Overview** page and gather your **Application (client) ID** and **Directory (tenant) ID**. We will need the **Tenent ID**, **App ID**, and **Client Secret** to play with the API.
+12. Go to the **YOUR APP > Overview** page and gather your **Application (client) ID** and **Directory (tenant) ID**. We will need the **Tenant ID**, **App ID**, and **Client Secret** to play with the API.
 13. Go to **YOUR APP > Authentication** page and under Platform configurations:
     * Click **Add Platform** 
     * Click **Web**
@@ -29,7 +29,7 @@ I have decided to dust off the ol' blog to start documenting some of my more rec
 Those are the rough strokes. Is it more complicated than that? Yes. I encourage everyone to RTFMs from Microsoft on spinning up a new M365. 
 
 ## Getting an Auth Token
-To talk to the API, we will be leveraging the msal module to query Graph while changing the scope to Microsoft Defender for Endpoint's API. This is the product of a lot of trial and error BUT the benefit of this is to multifactor the API so we can leverage the API via Jupyter Notebooks without having secret keys laying around everywhere.
+To talk to the API, we will be leveraging the msal module to query Graph while changing the scope to Microsoft Defender for Endpoint's API. This is the product of a lot of trial and error BUT the benefit of this is to multifactor the API so we can leverage the API via Jupyter Notebooks without having secret keys lying around everywhere.
 
 
 ```python
@@ -81,7 +81,7 @@ if result["access_token"]:
 ### What is in this token?
 
 This authentication request returns a [JSON Web Token](https://en.wikipedia.org/wiki/JSON_Web_Token).
-A couple of JSON objects and a binary signature at the end. Decoded the main part looks like this
+A couple of JSON objects and a binary signature at the end. Decoded, the main part looks like this:
 ```json
 {
     "aud": "https://api.securitycenter.microsoft.com",

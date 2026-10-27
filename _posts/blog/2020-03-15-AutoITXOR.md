@@ -23,8 +23,7 @@ $poe($ergsduf(hsbduoekdcbl("327A3636344134413631343334413441303A3030344034373530
 
 Starting from the inside out:
 
-The **"hsbduoekdcbl"** function is used to XOR. The following is a hex string that is XORed with the pro  
-vide key of "2"
+The **"hsbduoekdcbl"** function is used to XOR. The following is a hex string that is XORed with the provided key of "2"
 ```
 327A3636344134413631343334413441303A3030344034373530344734373441313131303030304130323030353235363530  
 30303041303230303734343B3530353635373433344136333441344134443431303030413032303034363535344435303436  
@@ -46,9 +45,9 @@ The **"ergsduf"** function appears to be used to convert the hex string into tex
 DllCall("kernel32", "ptr", "VirtualAlloc", "dword", "0", "dword", BinaryLen($IEZU) + BinaryLen($OOP), "dword", "0x3000", "dword", "0x40")["0"]
 ```
 
-The **"poe"** function seems like it just there to execute this deobfuscated code.
+The **"poe"** function seems like it is just there to execute this deobfuscated code.
 
-### Lets look at this snippet again but in Python this time:
+### Let's look at this snippet again but in Python this time:
 
 
 
@@ -101,7 +100,7 @@ for match in matches:
     DllCall("kernel32", "ptr", "VirtualAlloc", "dword", "0", "dword", BinaryLen($IEZU) + BinaryLen($OOP), "dword", "0x3000", "dword", "0x40")["0"]
 
 
-### Additionally, lets use RegEx to replace the original text so we can ignore the obfuscation altogether...
+### Additionally, let's use RegEx to replace the original text so we can ignore the obfuscation altogether...
 
 
 ```python
@@ -112,7 +111,7 @@ print(decoded)
     DllCall("kernel32", "ptr", "VirtualAlloc", "dword", "0", "dword", BinaryLen($IEZU) + BinaryLen($OOP), "dword", "0x3000", "dword", "0x40")["0"]
 
 
-### Lets kick this up a notch and make it scale to cover the entire file instead of just this snippet:
+### Let's kick this up a notch and make it scale to cover the entire file instead of just this snippet:
 
 
 ```python
@@ -153,12 +152,12 @@ What did this do? Well line 462 of this script in the original autoit.txt file r
 $poe($ergsduf(hsbduoekdcbl("31793535374237423432363536333634373236353432373436353535373036353730
 33393335353434343434353433423331323033423331333535383534344034343338", "1")))
 ```
-in the new file we have replaced it's actual code:
+in the new file we have replaced it with its actual code:
 ```
 DllStructSetData($EUUE, 1, $IEZU)
 ```
 
-Our signature is fairly specifc to a certain combination of functions: **poe**, **ergsduf**, and **hsbduoekdcbl** BUT there are others in this mess that do the same thing.
+Our signature is fairly specific to a certain combination of functions: **poe**, **ergsduf**, and **hsbduoekdcbl** BUT there are others in this mess that do the same thing.
 
 ```
 If $qnqhwwqbvarvaoqrrvcrunt = 6957 Then
@@ -178,7 +177,7 @@ Else
     6343634363334343533373334333434363337333034333337333833353232", "0")))
 ```
 
-From performing the same steps we can see that poe, e, fcoupewxiogl performs the same way so lets update our signature to capture others:
+From performing the same steps we can see that poe, e, fcoupewxiogl performs the same way so let's update our signature to capture others:
 
 ```
 signature  = '\$poe\(\$(v1|e|gfbvo|rfo|fooi4e|ergsduf|erzgf|ayudergfv|sdvfi|zeyc|grfeus|ufd)'
@@ -225,7 +224,7 @@ with open('newautoit.txt','w') as newautoitfile:
 
 BAM! 303 lines of deobfuscated code!
 
-Are we done? Nah! How is more obfuscated stuff?!
+Are we done? Nah! How about more obfuscated stuff?!
 
 ```
 If $yufanpeqeyqcweddlyi == 8.37539918579835 Then
@@ -234,7 +233,7 @@ Else
 
 ```
 Some of these do not decrypt because they break our RegEx pattern.  
-UGH! What to do? Well if we look at them... the can theoretically be ignored. Why? This is an XOR routine that XORing the Hex value 32 with it's ascii counterpart "2".   
+UGH! What to do? Well if we look at them... they can theoretically be ignored. Why? This XOR routine is XORing the hex value 32 with its ASCII counterpart "2".   
 Since when we XOR anything with itself, we will get 0 for these. So this equates to:  
 
 ```
@@ -306,6 +305,6 @@ with open('newautoit.txt','w') as newautoitfile:
 There we go! 390 lines we didn't need to decode by hand.  
 Plus with minor tweaks, hopefully this could be used for the next sample and maximize my ROI.  
 
-While I will be the first to admit, this decryption could perhaps be tackled in a more efficient manner by ignoring all of the names of the functions, I wanted to make the output as clean as possible for readability and highlight the techniques you can use to solve these sort of problems in the future.   
+While I will be the first to admit, this decryption could perhaps be tackled in a more efficient manner by ignoring all of the names of the functions, I wanted to make the output as clean as possible for readability and highlight the techniques you can use to solve these sorts of problems in the future.   
 
-Well, that is it. thanks for reading!  
+Well, that is it. Thanks for reading!  

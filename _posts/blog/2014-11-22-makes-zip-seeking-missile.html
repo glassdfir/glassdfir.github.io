@@ -4,7 +4,7 @@ title: Zip Seeking Missile
 date: 2014-11-22 00:03:37.000000000 -05:00
 categories: blog
 ---
-<p>In the spirit of "don't give a presentation without offering a script/tool", here is something I am currently dubbing the "Zip Seeking Missile€ (not married to that name, suggestions are welcome). This script reads in a file and looks for the Local File Headers, Central Directory File Headers, and Central Directory End Records. If found it will attempt to parse the various fields. It is still pretty rough but it is good enough now that someone might find it useful. I intend on adding analysis of the compressed file data and automating the carving process as well. I realize there are probably dozens of software that already do this but I enjoy the insight that comes with building tools from the ground up.</p>
+<p>In the spirit of "don't give a presentation without offering a script/tool", here is something I am currently dubbing the "Zip Seeking Missile" (not married to that name, suggestions are welcome). This script reads in a file and looks for the Local File Headers, Central Directory File Headers, and Central Directory End Records. If found it will attempt to parse the various fields. It is still pretty rough but it is good enough now that someone might find it useful. I intend on adding analysis of the compressed file data and automating the carving process as well. I realize there are probably dozens of tools that already do this but I enjoy the insight that comes with building tools from the ground up.</p>
 <p><a href="https://github.com/glassdfir/ZipFileJunk/blob/master/zsm.py">https://github.com/glassdfir/ZipFileJunk/blob/master/zsm.py</a></p>
 <p>Here is the usage information:</p>
 <pre>Zip Seeking Missile
@@ -22,7 +22,7 @@ Options:
  -f FILE, --file=FILE File to carve Zips from
  -v, --verbose Show more than file names
  -c, --count Display only the counts of meta types
-C:DEMO&gt;python zsm.py -f "This is a test.docx"
+C:\DEMO&gt;python zsm.py -f "This is a test.docx"
 Possible 11 Local File Headers at offsets: [0, 915, 1715, 2281, 2884, 4506, 5491, 5991, 6306, 6984, 7661]
 Offset 0 - LH INFO - File name: [Content_Types].xml
 Offset 915 - LH INFO - File name: _rels/.rels
@@ -49,7 +49,7 @@ Offset 11130 - CD INFO - File name: docProps/core.xml
 Offset 11193 - CD INFO - File name: word/styles.xml
 Found 1 hits for Central Dir. End Record at byte offsets [11254] .
 
-C:UsersjonDocumentsGitHubZipFileJunk&gt;python zsm.py -f "c:demozipFile1.zip" -v
+C:\Users\jon\Documents\GitHub\ZipFileJunk&gt;python zsm.py -f "c:\demo\zipFile1.zip" -v
 Possible 3 Local File Headers at offsets: [0, 64, 128]
 Offset 0 - LH INFO - File name: File1.txt
         Version: 2.00

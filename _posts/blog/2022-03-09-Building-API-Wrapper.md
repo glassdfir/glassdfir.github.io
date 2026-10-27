@@ -7,7 +7,7 @@ categories: blog
 
 ## Building a Wrapper for MDE interactions
 
-My goal here is to reduce the amount of redundant code needed to query Microsoft Defender for Endpoint. This is not fault tolerent or comprehensive. Just something quick to save keystrokes.
+My goal here is to reduce the amount of redundant code needed to query Microsoft Defender for Endpoint. This is not fault tolerant or comprehensive. Just something quick to save keystrokes.
 This is a continuation of the previous post. 
 
 

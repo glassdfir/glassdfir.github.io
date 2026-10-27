@@ -72,14 +72,14 @@ C:\Users\User\AppData\Local\Google\Chrome\User Data\Default\Local Storage>dir *e
 10/10/2015  09:59 PM           732,160 https_en.wikipedia.org_0.localstorage
 03/12/2015  02:36 PM         1,492,992 http_en.wikipedia.org_0.localstorage
 {% endhighlight %}
-It is worthy to mention there are a few investigative points you can glean from just this directory listing:</p>
+It is worth mentioning there are a few investigative points you can glean from just this directory listing:</p>
 <ul>
 <li>The protocol of the site (http/https).</li>
 <li>The domain.</li>
 <li>The last modified date and time of the local storage file</li>
 </ul>
 <p>Let's look at my local storage entry from a few angles.<br />
-First lets checkout Chrome's developer tools > Resources > Local Storage:<br />
+First, let's check out Chrome's developer tools > Resources > Local Storage:<br />
 <a href="{{ site.baseurl }}/images/devtool2.png"><img src="{{ site.baseurl }}/images/devtool2.png" /></a><br />
 Here is a shot of what it looks like in the ol' SQLITE Browser:<br />
 <a href="{{ site.baseurl }}/images/devtool3.png"><img src="{{ site.baseurl }}/images/devtool3.png" /></a><br />
@@ -94,7 +94,7 @@ for row in c.execute(selectStatement):
     print str(row[1]).decode("utf-16")
 {% endhighlight %}
 <a href="{{ site.baseurl }}/images/devtool5.png"><img src="{{ site.baseurl }}/images/devtool5.png" /></a><br />
-I have looked at a bunch of these and the format is mostly developers choice. It is interesting to see how they are leveraged. For example, Wikipedia's local storage is so big, comparatively, because they are storing Base64 encoded images in the SQLite database.<br />
+I have looked at a bunch of these and the format is mostly the developer's choice. It is interesting to see how they are leveraged. For example, Wikipedia's local storage is so big, comparatively, because they are storing Base64 encoded images in the SQLite database.<br />
 {% highlight raw %}
 ...
 background-image:url(//bits.wikimedia.org/static-1.25wmf20/skins/Vector/skinStyles/jquery.ui/

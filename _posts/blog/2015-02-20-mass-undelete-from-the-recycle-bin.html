@@ -4,14 +4,14 @@ title: Mass Undelete from the Recycle Bin
 date: 2015-02-20 11:03:47.000000000 -05:00
 categories: blog
 ---
-<p>This is more "e-discovery" than forensics but I recently had a case where I needed to 1,300 files that were in a user's Recycle Bin.
+<p>This is more "e-discovery" than forensics but I recently had a case where I needed to recover 1,300 files that were in a user's Recycle Bin.
 </p>
-It was not overly important to the user's management when they were originally created or when it was deleted. They just wanted to review the documents. So I took an hour and hammered out this beast.<br />
+It was not overly important to the user's management when they were originally created or when they were deleted. They just wanted to review the documents. So I took an hour and hammered out this beast.<br />
 {%highlight python%}
 
 #Purpose: 	Copy all of the contents of the Recycle Bin to a destination folder
-#		perserving the dir structure and filename.
-#		Not meant as a forensically sound aquistion tool. Just a means to an end.
+#		preserving the dir structure and filename.
+#		Not meant as a forensically sound acquisition tool. Just a means to an end.
 #This hack job of a python script does:
 #1. Looks for $I files
 #2. Checks to see if the corresponding $R file exists
@@ -20,7 +20,7 @@ It was not overly important to the user's management when they were originally c
 # Example:
 # c:\test\subdir\uselessfile.txt gets deleted.
 # This script will copy the file out of the Recycle Bin to c:\Temp\Root\Test\subdir\uselessfile.txt.
-# If one already exists there, it will keep trying make a unique name ex: uselessfile12345.txt
+# If one already exists there, it will keep trying to make a unique name ex: uselessfile12345.txt
 
 import os
 import random

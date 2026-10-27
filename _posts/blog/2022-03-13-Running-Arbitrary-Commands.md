@@ -7,7 +7,7 @@ categories: blog
 
 ## Running Arbitrary Commands on an Endpoint via the API
 
-Microsoft Defender's Live Response is a delightful addition to your Incident Response toolbelt, but it does have a particularly irksome deficiency. As of publication, it does not allow execution of arbitrary commands. I know. Ridiculous right? Well there is an simple fix for this...
+Microsoft Defender's Live Response is a delightful addition to your Incident Response toolbelt, but it does have a particularly irksome deficiency. As of publication, it does not allow execution of arbitrary commands. I know. Ridiculous, right? Well, there is a simple fix for this...
 
 ```
 C:\windows\system32\cmd.exe /c $args
@@ -51,7 +51,7 @@ Output:
 
 ## Executing Arbitrary Commands using cmd.ps1 via the API
 ### Building the command sequence
-This is a quick a method of compiling the json needed. Might not be perfect..
+This is a quick method of compiling the json needed. Might not be perfect..
 
 
 ```python
@@ -78,13 +78,13 @@ def addGetfileToCommandList(filepath):
     command["params"].append({"key":"Path","value":filepath})
     return command
 
-# As simple example, if I wanted to look at the hosts DNS cache...
+# As simple example, if I wanted to look at the host's DNS cache...
 liveResponseCommands = {}
 liveResponseCommands['Commands'] = []
 # Add a command to run ipconfig and redirect to a file
 command = addCmdToCommandList("ipconfig /displaydns > c:\dnscache.txt")
 liveResponseCommands['Commands'].append(command)
-# Add a command t collect the file's contents
+# Add a command to collect the file's contents
 command = addGetfileToCommandList("c:\dnscache.txt")
 liveResponseCommands['Commands'].append(command)
 # ALL LIVE RESPONSE REQUESTS MUST HAVE A COMMENT
@@ -299,7 +299,7 @@ compressedFile = BytesIO(response.content)
 decompressedFile = gzip.GzipFile(fileobj=compressedFile)
 ```
 
-Since we know this is a file is going to be a unicode text file, we can view the contents like this..
+Since we know this file is going to be a unicode text file, we can view the contents like this..
 
 
 ```python
@@ -330,9 +330,10 @@ Output:
     
     
 
-SUCCESS!!! I will show in the next post how to just read the STDOUT of a command from the Transcript but there maybe scenarios where you need to pipe the output of a command to file instead of STDOUT. Off the top of my head...
-    * Maybe your command takes longer that 10 minutes to run.
-    * Maybe your output is too large for the buffer Live Response is using to pull back STDOUT.
+SUCCESS!!! I will show in the next post how to just read the STDOUT of a command from the Transcript but there may be scenarios where you need to pipe the output of a command to file instead of STDOUT. Off the top of my head...
+
+* Maybe your command takes longer than 10 minutes to run.
+* Maybe your output is too large for the buffer Live Response is using to pull back STDOUT.
 
 I am sure there are other reasons to send to a file instead of just reading the STDOUT manually.
 
@@ -340,11 +341,11 @@ I am sure there are other reasons to send to a file instead of just reading the 
 1. Rate limitations for this API are 10 calls per minute (additional requests are responded with HTTP 429).
 2. 25 concurrently running sessions (requests exceeding the throttling limit will receive a "429 - Too many requests" response).
 3. If the machine is not available, the session will be queued for up to 3 days.
-4. RunScript command timeouts after 10 minutes.
+4. RunScript commands time out after 10 minutes.
 5. Live response commands cannot be queued up and can only be executed one at a time.
 6. If the machine that you are trying to run this API call is in an RBAC device group that does not have an automated remediation level assigned to it, you'll need to at least enable the minimum Remediation Level for a given Device Group.
 7. Multiple live response commands can be run on a single API call. However, when a live response command fails all the subsequent actions will not be executed.
-8. Parameters are a pain in the ass to encode across PowerShell and Batch it is probably best to stick with Powershell
+8. Parameters are a pain in the ass to encode across PowerShell and Batch; it is probably best to stick with PowerShell
 
 ## References
 * [https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/run-live-response?view=o365-worldwide](https://docs.microsoft.com/en-us/microsoft-365/security/defender-endpoint/run-live-response?view=o365-worldwide)

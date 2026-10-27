@@ -5,7 +5,7 @@ date:   2017-03-06 19:52:28 -0500
 categories: blog
 ---
 
-I am starting up a new run of blog posts to document some malware analysis work I have been doing lately. Since I got my new MacBook, I have used the new hardware to as an opportunity to rebuild my setup from scratch. I am using Elasticsearch, Logstash, and Kibana on my MacBook and WinLogBeat and PacketBeat on my Windows 10 VM. This is post is meant to help me rebuild my ELK stack on MacBook the next time I dork it up. I tried running installing the stack in a few different ways but these are the steps I took that were ultimately successful.
+I am starting up a new run of blog posts to document some malware analysis work I have been doing lately. Since I got my new MacBook, I have used the new hardware as an opportunity to rebuild my setup from scratch. I am using Elasticsearch, Logstash, and Kibana on my MacBook and WinLogBeat and PacketBeat on my Windows 10 VM. This post is meant to help me rebuild my ELK stack on my MacBook the next time I dork it up. I tried installing the stack in a few different ways but these are the steps I took that were ultimately successful.
 
 ### 1. Create some folders:
 {% highlight raw %}
@@ -97,7 +97,7 @@ and you should see something like this:
 }
 {%endhighlight%}
 
-### 3. Download Kibana:
+### 5. Download Kibana:
 Kibana is an open source (Apache Licensed), browser based analytics and search dashboard for Elasticsearch.
 I grabbed [kibana-5.2.2-linux-x86_64.tar.gz](https://artifacts.elastic.co/downloads/kibana/kibana-5.2.2-linux-x86_64.tar.gz)
 and unzipped it in my ~/ELK directory.
@@ -107,13 +107,13 @@ tar -xvzf kibana-5.2.2-linux-x86_64.tar.gz
 
 I left the default configuration alone because I didn't need to change anything.
 
-### 4. Run Kibana:
+### 6. Run Kibana:
 {% highlight raw %}
 ~/ELK/kibana-5.2.2-darwin-x86_64/bin/kibana
 {% endhighlight %}
 For me, it looks like this:
 ![Kibana Running]({{ site.baseurl }}/images/kibanarunning.png)
 So, for those ELK stack nerds out there: "You're right. My first time running Kibana did not look exactly like this because I have installed some plugins." You caught me not taking screenshots in a timely manner. Feel free to file a complaint and I will refund your subscription fee to this blog. The point is there at the bottom: green means good.
- Fire up a browser (I like chrome) and navigate to http://localhost:5601 and should look like this:
+ Fire up a browser (I like chrome) and navigate to http://localhost:5601 and it should look like this:
  ![Kibana Running]({{ site.baseurl }}/images/kibanainchrome.png)
  You will notice that it is immediately complaining about not having an index pattern. That is normal. So far we are good. In my next post, I will cover how I am sending logs into Elasticsearch from my VMs using WinLogBeat and PacketBeat.

@@ -6,7 +6,7 @@ categories: blog
 ---
 We have all been there when someone that gets paid more than you do runs in and says “We need to remove User X from the network and lock them out of their PC to preserve evidence!!!”. If not, you will be.
 
-So…aside from any 3rd party endpoint software you might have in that environment…what do you do? I have a list of steps, native Windows functions, that I have found helps eliminate avenues for User X’s continued use of ComputerX.
+So…aside from any 3rd party endpoint software you might have in that environment…what do you do? I have a list of steps, native Windows functions, that I have found help eliminate avenues for User X’s continued use of ComputerX.
 
 ### 1. Disable User X’s Active Directory Account
 This can be done in a number of ways but this post has a PowerShell tag so I recommend downloading Remote Server Administration Tools for your flavor of Windows if you don’t have it already. Then it is a simple matter of …
@@ -14,7 +14,7 @@ This can be done in a number of ways but this post has a PowerShell tag so I rec
 ### 2. Delete All Cached Credentials
 {% highlight powershell %}
 $credential = Get-Credential -Credential "DOMAIN\adminacct"
-Enter-PSSessio n -ComputerName ComputerX -Credential $credential
+Enter-PSSession -ComputerName ComputerX -Credential $credential
 Set-ItemProperty -Path "HKLM:\Software\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name CachedLogonsCount -Value 0
 {% endhighlight %}
 This will set the number of cached creds Windows is storing to 0 and erase the previous creds.
@@ -26,7 +26,7 @@ manage-bde.exe -protectors -delete c: -Type RecoveryPassword
 #Now that all of the previous Protectors are gone, let's add our own.
 #Let's add a new password that only the security team will need to know.
 manage-bde.exe -protectors -add c: -TPMandPIN SuperDuperPassword
-#As a backup, let's also add a couple of recovery keys just in case noone can find the sticky note with the password.
+#As a backup, let's also add a couple of recovery keys just in case no one can find the sticky note with the password.
 manage-bde.exe -protectors -add c: -RecoveryPassword 111111-111111-111111-111111-111111-111111-111111-111111 
 manage-bde.exe -protectors -add c: -RecoveryPassword 222222-222222-222222-222222-222222-222222-222222-222222 
 manage-bde.exe -on c:

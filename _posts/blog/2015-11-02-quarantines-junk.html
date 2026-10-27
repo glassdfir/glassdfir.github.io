@@ -12,7 +12,7 @@ categories: blog
 <blockquote><p>Windows Defender is a software product that attempts to detect and remove malware. Initially released as an antispyware program, it was first released as a free download for Windows XP, shipped with Windows Vista by default, and currently ships with antivirus capabilities as part of Windows 10. <a href="https://en.wikipedia.org/wiki/Windows_Defender" target="_blank">--Wikipedia </a></p></blockquote>
 <p>I chose to beat up on Windows Defender mostly because it is free and has a huge market share. Nothing personal.</p>
 <p>So first things first: I grabbed the <a href="http://www.eicar.org/86-0-Intended-use.html">EICAR file</a> and saved it to C:\temp.<br />
-Then I grabbed a copy of the $MFT to take a look at the this file's record. Looks like this:<br />
+Then I grabbed a copy of the $MFT to take a look at this file's record. Looks like this:<br />
 <a href="{{ site.baseurl }}/images/2015-11-02-23_26_38-Document-WordPad1.png" rel="lightbox[wp-image-766]"><img src="{{ site.baseurl }}/images/2015-11-02-23_26_38-Document-WordPad1.png" alt="2015-11-02 23_26_38-Document - WordPad" width="90%" class="aligncenter size-large wp-image-766" /></a><br />
 There is a lot going on in there but I just wanted to focus on a few things. <a href="http://www.writeblocked.org/resources/NTFS_CHEAT_SHEETS.pdf" target="_blank">If you are lost, read this.</a></p>
 <p>NEXT, I turned on Windows Defender real-time protection. It was recommended.<br />
@@ -20,9 +20,9 @@ There is a lot going on in there but I just wanted to focus on a few things. <a 
 <p>Then a whole bunch of stuff happened.</p>
 <p>Let's start with $MFT record number 27152. So I quickly dumped the $MFT again and here's what I got:</p>
 <p><a href="{{ site.baseurl }}/images/2015-11-03-00_52_57-Document.rtf-WordPad.png"><img src="{{ site.baseurl }}/images/2015-11-03-00_52_57-Document.rtf-WordPad.png" alt="2015-11-03 00_52_57-Document.rtf - WordPad" width="75%" class="aligncenter size-large wp-image-775" /></a></p>
-<p>So what changed? Pretty much everything accept the $MFT record number.</p>
-<p>The sequence number is increment by 4, indicating that there were numerous changes to the file. Specifically the rename and move to a new parent folder.<br />
-Lets take a closer look at the USNJrnl-$J to get an idea what happened:<br />
+<p>So what changed? Pretty much everything except the $MFT record number.</p>
+<p>The sequence number is incremented by 4, indicating that there were numerous changes to the file. Specifically the rename and move to a new parent folder.<br />
+Let's take a closer look at the USNJrnl-$J to get an idea of what happened:<br />
 
 {% highlight raw %}
 ###When I created the EICAR File and Added the EICAR string to it.###
@@ -39,15 +39,15 @@ Lets take a closer look at the USNJrnl-$J to get an idea what happened:<br />
 {% endhighlight %}
 
 <p>So in short Windows Defender deleted the original file. The MFT record number was up for grabs so it was picked up by a newly created file C:\ProgramData\Microsoft\Windows Defender\Scans\History\RemCheck\5A7D7B64F11FF203E09434276A974A97</p>
-<p>So where did my EICAR file go? Windows Defender puts quarantined files C:\ProgramData\Microsoft\Windows Defender\Quarantine\ResourceData\. Mine was saved C:\ProgramData\Microsoft\Windows Defender\Quarantine\ResourceData\50\50761523FA79FDF68E04707959836D1F6DBA9969.<br />
+<p>So where did my EICAR file go? Windows Defender puts quarantined files in C:\ProgramData\Microsoft\Windows Defender\Quarantine\ResourceData\. Mine was saved in C:\ProgramData\Microsoft\Windows Defender\Quarantine\ResourceData\50\50761523FA79FDF68E04707959836D1F6DBA9969.<br />
 Let's take a look at that:<br />
 <a href="{{ site.baseurl }}/images/2015-11-05-19_55_39-Document.rtf-WordPad.png"><img src="{{ site.baseurl }}/images/2015-11-05-19_55_39-Document.rtf-WordPad.png" alt="2015-11-05 19_55_39-Document.rtf - WordPad" width="75%" class="aligncenter size-large wp-image-792" /></a><br />
 For those that don't know, Windows Defender and Microsoft Security Essentials Quarantine files have a magic number of 0B AD 00. Clever.</p>
 <p>Looking at the histogram of the data, it is pretty obvious that it was stored using some kind of encryption.<br />
 <a href="{{ site.baseurl }}/images/Screen-Shot-2015-11-04-at-10.40.52-AM-1024x396.png"><img src="{{ site.baseurl }}/images/Screen-Shot-2015-11-04-at-10.40.52-AM-1024x396.png" alt="Screen Shot 2015-11-04 at 10.40.52 AM" width="75%" class="aligncenter size-large wp-image-787" /></a><br />
 After doing a bit more digging, it turns out that Windows Defender uses a hard coded RC4 key to encrypt quarantine files.<br />
-A colleague of my pointed me at the <a href="https://raw.githubusercontent.com/brad-accuvant/cuckoo-modified/00ad13c94cc7453c40ed6152d16009ca1c8ed6f2/lib/cuckoo/common/quarantine.py" target="_blank"> this cool script from Cuckoo </a><br />
-Here is the relevant chuck of their code that I bastardized for this blog post:<br />
+A colleague of mine pointed me at <a href="https://raw.githubusercontent.com/brad-accuvant/cuckoo-modified/00ad13c94cc7453c40ed6152d16009ca1c8ed6f2/lib/cuckoo/common/quarantine.py" target="_blank"> this cool script from Cuckoo </a><br />
+Here is the relevant chunk of their code that I bastardized for this blog post:<br />
 
 {% highlight python %}
 # Copyright (C) 2015 KillerInstinct, Optiv, Inc. (brad.spengler@optiv.com)
@@ -135,7 +135,7 @@ def mse_unquarantine(f):
     headerlen = 0x28 + struct.unpack("<I", outdata[8:12])[0]
     origlen = struct.unpack("<I", outdata[headerlen-12:headerlen-8])[0]
 
-    if origlen + headerlen = fsize:
+    if origlen + headerlen == fsize:
         with open("unquar.bin", "wb") as f:
             f.write(outdata[headerlen:])
 
@@ -151,7 +151,7 @@ c:\ProgramData\Microsoft\Windows Defender\Definition Updates\{D45C13C3-59B3-4726
 c:\Users\All Users\Microsoft\Windows Defender\Definition Updates\Backup\mpengine.dll
 c:\Users\All Users\Microsoft\Windows Defender\Definition Updates\Default\MpEngine.dll
 c:\Users\All Users\Microsoft\Windows Defender\Definition Updates\{D45C13C3-59B3-4726-B82F-03461072F006}\mpengine.dll
-c:\Windows\WinSxS\amd64_windows-defender-am-engine_31bf3856ad364e35_6.3.9600.16384_none_efe9bba68a38095a\MpEngine.dll</p>
+c:\Windows\WinSxS\amd64_windows-defender-am-engine_31bf3856ad364e35_6.3.9600.16384_none_efe9bba68a38095a\MpEngine.dll
 {% endhighlight %}
 
 <p>Looks like this:<br />

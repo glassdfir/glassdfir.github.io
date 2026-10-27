@@ -5,7 +5,7 @@ date: 2015-01-21 11:09:07.000000000 -05:00
 categories: blog
 ---
 <p>On <a href="http://blogs.technet.com/b/sysinternals/archive/2015/01/20/updates-sysmon-v2-0-accesschk-v5-21-ru-v1-1.aspx" target="_blank">January 19, 2015</a>, the SysInternals team released <a href="https://technet.microsoft.com/en-us/sysinternals/dn798348" target="_blank">Sysmon 2.0</a>. "This major update to Sysmon, a service that records process activity to the Windows event log for use by incident detection and forensic analysis, includes driver load and image load events with signature information, configurable hashing algorithm reporting, flexible filters for including and excluding events, and support for supplying configuration via a configuration file instead of the command line."</p>
-<p>One interesting update in 2.0 is the addition of Import Hashes (imphash).If you are not familiar, imports are the functions that a piece of software calls from other files. Most of the time, imports are used to augment a program with a function from a Windows DLL. Imphashes are calculated by based on library/API names and their specific order within the executable. Imphashes are useful for tracking flavors of malware that use the same functionality but have different binaries. This addition separates Sysmon from being an augmentation of Windows event logging to a utility that is designed to analyze malware. Awesome.</p>
+<p>One interesting update in 2.0 is the addition of Import Hashes (imphash). If you are not familiar, imports are the functions that a piece of software calls from other files. Most of the time, imports are used to augment a program with a function from a Windows DLL. Imphashes are calculated based on library/API names and their specific order within the executable. Imphashes are useful for tracking flavors of malware that use the same functionality but have different binaries. This addition separates Sysmon from being an augmentation of Windows event logging to a utility that is designed to analyze malware. Awesome.</p>
 <h3>2.0 also comes with 5 new events:</h3>
 <p><strong>Event ID 4: Sysmon service state changed</strong><br />
 The service state change event reports the state of the Sysmon service (started or stopped).<br />
@@ -60,7 +60,7 @@ The process terminate event reports when a process terminates. It provides the U
 <span style="color: #007700">&lt;/Event&gt;</span>
 </pre>
 <p><strong>Event ID 6: Driver loaded</strong><br />
-The driver loaded events provides information about a driver being loaded on the system. The configured hashes are provided as well as signature information. The signature is done asynchronously for performance reasons and indicates if the file was removed after loading.<br />
+The driver loaded event provides information about a driver being loaded on the system. The configured hashes are provided as well as signature information. The signature is done asynchronously for performance reasons and indicates if the file was removed after loading.<br />
 <!-- HTML generated using hilite.me -->
 <pre style="margin: 0; line-height: 125%"><span style="color: #007700">&lt;Event</span> <span style="color: #0000CC">xmlns=</span><span style="background-color: #fff0f0">&quot;http://schemas.microsoft.com/win/2004/08/events/event&quot;</span><span style="color: #007700">&gt;</span>
   <span style="color: #007700">&lt;System&gt;</span>
@@ -123,7 +123,7 @@ The image loaded event logs when a module is loaded in a specific process. This 
 <span style="color: #007700">&lt;/Event&gt;</span>
 </pre>
 <p><strong>Event ID 255: Error</strong><br />
-This event is generated when an error occurred within Sysmon. They can happen if the system is under heavy load and certain tasked could not be performed or a bug exists in the Sysmon service.<br />
+This event is generated when an error occurred within Sysmon. They can happen if the system is under heavy load and certain tasks could not be performed or a bug exists in the Sysmon service.<br />
 <!-- HTML generated using hilite.me -->
 <pre style="margin: 0; line-height: 125%"><span style="color: #007700">&lt;Event</span> <span style="color: #0000CC">xmlns=</span><span style="background-color: #fff0f0">&quot;http://schemas.microsoft.com/win/2004/08/events/event&quot;</span><span style="color: #007700">&gt;</span>
   <span style="color: #007700">&lt;System&gt;</span>
@@ -148,7 +148,7 @@ This event is generated when an error occurred within Sysmon. They can happen if
   <span style="color: #007700">&lt;/EventData&gt;</span>
 <span style="color: #007700">&lt;/Event&gt;</span>
 </pre>
-<p>Took me a second to get Sysmon to throw an error like this. It is worthy to note that, from my observations, Sysmon is not prone to error under normal use. In case anyone is wondering how to make Sysmon barf (along with the rest of the computer) I used an old school fork logic bomb batch script as a means to an end. Drop this into a batch file and run it. <em><strong>THIS WILL LOCK UP YOUR ENTIRE SYSTEM QUICK.</strong></em> You have been told.<br />
+<p>Took me a second to get Sysmon to throw an error like this. It is worth noting that, from my observations, Sysmon is not prone to error under normal use. In case anyone is wondering how to make Sysmon barf (along with the rest of the computer) I used an old school fork logic bomb batch script as a means to an end. Drop this into a batch file and run it. <em><strong>THIS WILL LOCK UP YOUR ENTIRE SYSTEM QUICK.</strong></em> You have been told.<br />
 <!-- HTML generated using hilite.me -->
 <pre style="margin: 0; line-height: 125%"><span style="color: #997700; font-weight: bold">:START</span>
 start <span style="color: #996633">%~dp0%</span>~n<span style="color: #6600EE; font-weight: bold">0</span><span style="color: #996633">%~x0</span>

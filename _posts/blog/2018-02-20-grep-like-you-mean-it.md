@@ -3,6 +3,7 @@ layout: post
 title:  "Setting up ELK on my MacBook (Part 2)"
 date:   2017-03-11 15:33:28 -0500
 categories: blog
+published: false
 ---
 
 Now that I have Elasticsearch and Kibana up and running, I need to start feeding in those sweet, sweet logs.

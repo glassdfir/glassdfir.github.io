@@ -1,7 +1,7 @@
 ---
 layout: page
 title: "Tips And Tricks"
-excerpt: "Quick blobs of Fu that gets me through my day..."
+excerpt: "Quick blobs of Fu that get me through my day..."
 search_omit: true
 ---
 
