@@ -6,6 +6,7 @@ categories: blogsabout
 slug: the-grep-before-christmas
 redirect_from:
   - /blog/TwasTheGrepBeforeXmas/
+image: /images/Screen-Shot-2016-01-02-at-7.01.48-PM.png
 ---
 
 Sometimes when it rains, it pours. It was 3pm on Christmas Eve and I was mentally out the door and halfway home already when proxy alerts came in for a known malicious file (which, for the sake of this blog, will be referred to as “malicious.exe”) hitting a handful of endpoints. Here are a couple of tricks I used to get out of the door by 4:15pm.

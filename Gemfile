@@ -5,6 +5,7 @@ gem "jekyll-sitemap"
 gem "jekyll-gist"
 gem "jekyll-feed"
 gem "jekyll-redirect-from"
+gem "jekyll-seo-tag"
 
 # Needed on Ruby 3.4+ / 4.x, which no longer bundle these by default
 gem "webrick"

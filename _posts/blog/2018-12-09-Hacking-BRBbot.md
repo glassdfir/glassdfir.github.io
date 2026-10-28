@@ -6,6 +6,7 @@ categories: blogsabout
 slug: hacking-brbbot
 redirect_from:
   - /blog/Hacking-BRBbot/
+image: /images/brbconfig.tmp.png
 ---
 
 Recently, in a scramble to find a final exam for my malware course that wasn't multiple choice, I decided to revisit a sample from my youth: BRBBot.

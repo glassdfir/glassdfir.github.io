@@ -6,6 +6,7 @@ categories: blogsabout
 slug: analyzing-the-fiesta-exploit-kit
 redirect_from:
   - /blog/Fiesta-Analysis/
+image: /images/fiestaEKnbns.png
 ---
 
 For funsies, I snagged a Traffic Analysis Exercise from Malware-Traffic-Analysis.net. If you want to follow along at home, here is the link:

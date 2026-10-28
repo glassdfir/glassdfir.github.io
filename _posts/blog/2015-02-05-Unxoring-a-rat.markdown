@@ -7,6 +7,7 @@ categories: blogsabout
 slug: unxoring-a-rat
 redirect_from:
   - /blog/Unxoring-a-rat/
+image: /images/Screen-Shot-2016-02-05-at-10.26.16-PM.png
 ---
 I was looking at a sample of malware and I wanted to highlight a very simple technique I used to remove a layer of encryption without knowing the key. This post is not going to impress the seasoned veterans but since I think it will probably help someone in the community, I will bang out a post on it.
 

@@ -6,6 +6,7 @@ categories: blogsabout
 slug: setting-up-elk-on-a-macbook-part-1
 redirect_from:
   - /blog/My_ELK_Stack/
+image: /images/kibanarunning.png
 ---
 
 I am starting up a new run of blog posts to document some malware analysis work I have been doing lately. Since I got my new MacBook, I have used the new hardware as an opportunity to rebuild my setup from scratch. I am using Elasticsearch, Logstash, and Kibana on my MacBook and WinLogBeat and PacketBeat on my Windows 10 VM. This post is meant to help me rebuild my ELK stack on my MacBook the next time I dork it up. I tried installing the stack in a few different ways but these are the steps I took that were ultimately successful.

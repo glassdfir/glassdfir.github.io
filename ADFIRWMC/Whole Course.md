@@ -1,4 +1,6 @@
 ---
+sitemap: false
+noindex: true
 layout: page
 title:  Advanced DFIR Wizard Master Class
 date:   2018-02-20 15:33:28 -0500

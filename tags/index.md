@@ -1,4 +1,6 @@
 ---
+sitemap: false
+noindex: true
 layout: page
 title: Tag Index
 excerpt: "An archive of posts sorted by tag."

@@ -6,6 +6,7 @@ categories: blogsabout
 slug: setting-up-elk-on-a-macbook-part-2
 redirect_from:
   - /blog/My_ELK_Stack2/
+image: /images/winlogbeat1.png
 ---
 
 Now that I have Elasticsearch and Kibana up and running, I need to start feeding in those sweet, sweet logs.
