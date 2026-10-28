@@ -1384,7 +1384,7 @@ mark { background: rgba(242, 169, 59, 0.35); color: inherit; border-radius: 2px;
     L.push('', '_Built with Mill._');
     return L.join('\n');
   }
-  function eventsCSV(list) {
+  function eventsCSV(list, more) {
     const vis = S.sources.filter((s) => list.some((e) => e.s === s));
     const extra = [];
     vis.forEach((s) => s.headers.forEach((h) => { if (!extra.includes(h)) extra.push(h); }));
@@ -1392,9 +1392,65 @@ mark { background: rgba(242, 169, 59, 0.35); color: inherit; border-radius: 2px;
       const m = S.marks.get(e.id) || {};
       const o = { time_utc: new Date(e.t).toISOString(), source: e.s.name, time_column: e.s.headers[e.ci], tag: m.tag ? TAG[m.tag].name : '', note: m.note || '', event: e.sum };
       e.s.headers.forEach((h, i) => { if (!(h in o)) o[h] = e.s.rows[e.ri][i]; });
+      if (more) Object.assign(o, more.fn(e));
       return o;
     });
-    return U.toCSV(rows, ['time_utc', 'source', 'time_column', 'tag', 'note', 'event', ...extra.filter((h) => !['time_utc', 'source', 'time_column', 'tag', 'note', 'event'].includes(h))]);
+    return U.toCSV(rows, ['time_utc', 'source', 'time_column', 'tag', 'note', 'event', ...extra.filter((h) => !['time_utc', 'source', 'time_column', 'tag', 'note', 'event'].includes(h)), ...(more ? more.cols : [])]);
+  }
+  /* ---------- Spoke hand-off: give each event a from -> to pair ---------- */
+  // Mill timelines mix very different logs, so Spoke can't guess one column mapping
+  // for all of them. Each row gets derived spoke_* columns from well-known field names.
+  const SPK = {
+    parent: ['parentimage', 'parentprocessname', 'parent_image', 'parent_process', 'parentprocess'],
+    proc: ['image', 'newprocessname', 'processname', 'process_name', 'process'],
+    user: ['targetusername', 'user', 'username', 'user_name', 'subjectusername', 'account', 'accountname'],
+    site: ['host', 'domain', 'dest_host', 'hostname', 'url_host'],
+    host: ['workstationname', 'computer', 'computername', 'device', 'devicename'],
+    srcip: ['src_ip', 'source_ip', 'sourceip', 'client_ip', 'clientip', 'ipaddress'],
+    dstip: ['dst_ip', 'dest_ip', 'destip', 'destinationip', 'destination_ip'],
+    folder: ['parentpath', 'parent_path', 'folder', 'directory', 'path'],
+    file: ['filename', 'file_name', 'targetfilename', 'name'],
+  };
+  const LOGON = { 4624: 'logged_on', 4625: 'logon_failed', 4634: 'logged_off', 4647: 'logged_off', 4648: 'explicit_logon', 4672: 'admin_logon' };
+  function spokePair(e) {
+    const H = e.s.headers.map((h) => String(h).toLowerCase());
+    const row = e.s.rows[e.ri];
+    const get = (names) => { for (const n of names) { const i = H.indexOf(n); if (i >= 0 && row[i] != null && String(row[i]).trim() !== '') return { v: String(row[i]).trim(), k: n }; } return null; };
+    const base = (v) => v.split(/[\\/]/).pop();
+    const who = (v) => v.split('\\').pop().split('@')[0].toLowerCase();
+    const box = (v) => /^\d{1,3}(\.\d{1,3}){3}$/.test(v) ? v : v.split('.')[0].toUpperCase();
+    const pp = get(SPK.parent), pr = get(SPK.proc);
+    if (pp && pr) return [base(pp.v), base(pr.v), 'process', 'process', 'spawned'];
+    const u = get(SPK.user);
+    if (u) {
+      const site = get(SPK.site);
+      if (site) { const m = get(['method', 'action']); return [who(u.v), site.v.toLowerCase(), 'user', 'site', m ? m.v : 'visited']; }
+      const h = get(SPK.host) || get(SPK.srcip);
+      if (h) { const id = get(['eventid', 'event_id']); return [who(u.v), box(h.v), 'user', /ip/.test(h.k) ? 'ip' : 'host', (id && LOGON[id.v]) || (id ? 'EID ' + id.v : 'seen_on')]; }
+    }
+    const si = get(SPK.srcip), di = get(SPK.dstip);
+    if (si && di) return [si.v, di.v, 'ip', 'ip', 'connected'];
+    const fo = get(SPK.folder), fi = get(SPK.file);
+    if (fo && fi) { const tc = String(e.s.headers[e.ci] || ''); return [fo.v, fi.v, 'folder', 'file', /creat|birth|0x10/i.test(tc) && !/modif|write|change/i.test(tc) ? 'created' : /modif|write|change/i.test(tc) ? 'modified' : 'file_event']; }
+    return null;
+  }
+  function spokeCSV(list) {
+    let n = 0;
+    const cols = ['spoke_from', 'spoke_to', 'spoke_from_type', 'spoke_to_type', 'spoke_rel'];
+    const text = eventsCSV(list, { cols, fn: (e) => {
+      const p = spokePair(e); if (p) n++;
+      return Object.fromEntries(cols.map((c, i) => [c, p ? p[i] : '']));
+    } });
+    return { text, linked: n };
+  }
+  async function gzipB64url(text) {
+    let bytes = new TextEncoder().encode(text);
+    if (typeof CompressionStream !== 'undefined') {
+      try { bytes = new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer()); } catch (e) { /* send uncompressed */ }
+    }
+    let s = '';
+    for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   }
   function b64(text) {
     const bytes = new TextEncoder().encode(text);
@@ -1418,12 +1474,26 @@ mark { background: rgba(242, 169, 59, 0.35); color: inherit; border-radius: 2px;
       if (!ev.length) { U.toast('No tagged events yet', true); return; }
       U.download(slug() + '-tagged.csv', eventsCSV(ev), 'text/csv');
     } else if (kind === 'case') U.download(slug() + '.mill.json', JSON.stringify(caseData()), 'application/json');
-    else if (kind === 'spoke' || kind === 'cyberchef') {
+    else if (kind === 'spoke') {
+      if (S.view.length > 50000) { U.toast('Too many events for a link. Filter or zoom to under 50,000 first.', true); return; }
+      const win = window.open('about:blank', '_blank');
+      (async () => {
+        const { text, linked } = spokeCSV(S.view);
+        if (!linked) { if (win) win.close(); U.toast('None of these events have a who/what pair Spoke can draw (process, user, host, IP or file fields).', true); return; }
+        const data = await gzipB64url(text);
+        if (data.length > 1.8e6) { if (win) win.close(); U.toast('That is too much data for a link (' + (data.length / 1e6).toFixed(1) + ' MB). Filter or zoom in first.', true); return; }
+        const q = (v) => encodeURIComponent(v);
+        const url = 'https://jon.glass/spoke/#name=' + q(S.name || 'Mill timeline') +
+          '&src=spoke_from&tgt=spoke_to&rel=spoke_rel&stype=spoke_from_type&ttype=spoke_to_type&time=time_utc&layout=web&input=' + data;
+        if (win) win.location.href = url; else window.open(url, '_blank');
+        U.toast(linked.toLocaleString() + ' of ' + S.view.length.toLocaleString() + ' events sent to Spoke' + (linked < S.view.length ? ' (the rest have no who/what pair)' : ''));
+      })();
+    }
+    else if (kind === 'cyberchef') {
       if (S.view.length > 50000) { U.toast('Too many events for a link. Filter or zoom to under 50,000 first.', true); return; }
       const data = encodeURIComponent(b64(eventsCSV(S.view)));
       if (data.length > 1.8e6) { U.toast('That is too much data for a link (' + (data.length / 1e6).toFixed(1) + ' MB). Filter or zoom in first.', true); return; }
-      const url = kind === 'spoke' ? 'https://jon.glass/spoke/#input=' + data : 'https://gchq.github.io/CyberChef/#input=' + data;
-      window.open(url, '_blank', 'noopener');
+      window.open('https://gchq.github.io/CyberChef/#input=' + data, '_blank', 'noopener');
     }
   }
 
