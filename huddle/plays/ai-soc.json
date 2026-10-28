@@ -1,6 +1,6 @@
 {
   "name": "AI-Assisted SOC",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Plays for a SOC where AI agents do the legwork and people approve, verify and own decisions. Steps start with \"Agent:\" or \"Human:\".",
   "plays": [
     {
@@ -202,6 +202,33 @@
       ],
       "attack": [],
       "time": "4h"
+    },
+    {
+      "id": "AIS-009",
+      "phase": "prep",
+      "title": "Inventory and pin the agent's tools and MCP servers",
+      "summary": "Every tool an agent can call is part of your attack surface. Know them, pin them and review them.",
+      "steps": [
+        "Human: List every tool, plugin and MCP server the agent can call, with its owner and what it can change",
+        "Human: Pin versions, and review tool descriptions and code for hidden instructions before every upgrade",
+        "Human: Allow only servers from approved sources and stop agents from adding tools at runtime",
+        "Agent: Report every day which tools it called, and flag any call to a tool that is not on the list"
+      ],
+      "tools": [],
+      "roles": [
+        "Platform Engineering",
+        "SOC Lead"
+      ],
+      "tags": [
+        "ai-soc",
+        "mcp",
+        "supply-chain",
+        "tools"
+      ],
+      "attack": [
+        "AML.T0010"
+      ],
+      "time": "1d"
     },
     {
       "id": "AIS-010",
@@ -420,6 +447,70 @@
       "time": "2h"
     },
     {
+      "id": "AIS-018",
+      "phase": "ident",
+      "title": "Agent-run phishing analysis",
+      "summary": "The agent does the analysis on a reported phish; a person confirms the verdict before anything is purged.",
+      "steps": [
+        "Agent: Parse the headers, sender authentication results (SPF, DKIM, DMARC), URLs and attachments",
+        "Agent: Detonate URLs and attachments in the sandbox and attach the verdicts to the case",
+        "Agent: Search all mailboxes for the same sender, subject, URLs or attachment hashes, and list the recipients",
+        "Agent: Check proxy and sign-in logs to find who clicked or entered credentials",
+        "Human: Confirm the verdict and the recipient list"
+      ],
+      "tools": [
+        "Sandbox",
+        "Email security gateway",
+        "SIEM"
+      ],
+      "roles": [
+        "SOC Analyst"
+      ],
+      "tags": [
+        "ai-soc",
+        "phishing",
+        "email",
+        "triage"
+      ],
+      "attack": [
+        "T1566.001",
+        "T1566.002"
+      ],
+      "time": "15m"
+    },
+    {
+      "id": "AIS-019",
+      "phase": "ident",
+      "title": "Agent-assisted identity compromise investigation",
+      "summary": "The agent sifts sign-in and audit logs and cites its evidence; a person decides if the account is compromised.",
+      "steps": [
+        "Agent: Pull 30 days of sign-ins and flag new IPs, ASNs, devices and user agents",
+        "Agent: Flag token replay, impossible travel and repeated MFA prompts, citing the exact log rows",
+        "Agent: List changes the account made: MFA methods, inbox rules, app consents and role changes",
+        "Human: Check the cited rows and decide whether the account is compromised"
+      ],
+      "tools": [
+        "SIEM",
+        "Identity provider logs"
+      ],
+      "roles": [
+        "SOC Analyst",
+        "Identity"
+      ],
+      "tags": [
+        "ai-soc",
+        "identity",
+        "sign-in"
+      ],
+      "attack": [
+        "T1078",
+        "T1621",
+        "T1539",
+        "T1098.005"
+      ],
+      "time": "30m"
+    },
+    {
       "id": "AIS-020",
       "phase": "contain",
       "title": "Agent-proposed containment with human approval",
@@ -529,6 +620,66 @@
       "time": "30m"
     },
     {
+      "id": "AIS-024",
+      "phase": "contain",
+      "title": "Agent-run email purge with approval",
+      "summary": "The agent scopes and runs the purge; a person approves the scope first.",
+      "steps": [
+        "Agent: Build the purge search and report how many messages and mailboxes it matches",
+        "Agent: Show a sample of matching messages so the approver can spot false matches",
+        "Human: Approve the scope, or narrow it",
+        "Agent: Run the purge, then re-run the search to confirm nothing remains",
+        "Agent: Block the sender, URLs and hashes at the email gateway, and log each action to the case"
+      ],
+      "tools": [
+        "Microsoft Defender for Office 365",
+        "Google Workspace",
+        "Email security gateway"
+      ],
+      "roles": [
+        "SOC Analyst"
+      ],
+      "tags": [
+        "ai-soc",
+        "phishing",
+        "email",
+        "approval"
+      ],
+      "attack": [
+        "T1566"
+      ],
+      "time": "30m"
+    },
+    {
+      "id": "AIS-025",
+      "phase": "contain",
+      "title": "Agent-proposed bulk host isolation",
+      "summary": "During a fast-moving incident, the agent finds affected hosts and isolates them in approved batches.",
+      "steps": [
+        "Agent: List hosts showing the incident's indicators, with the evidence and a confidence level for each",
+        "Agent: Flag hosts on the critical-systems list; these are never isolated without their owner",
+        "Human: Approve isolation in batches, highest confidence first",
+        "Agent: Isolate each approved batch and confirm every host shows as isolated in EDR",
+        "Human: Decide on critical systems with their owners"
+      ],
+      "tools": [
+        "EDR console",
+        "SOAR"
+      ],
+      "roles": [
+        "IR Lead",
+        "SOC Analyst"
+      ],
+      "tags": [
+        "ai-soc",
+        "isolation",
+        "ransomware",
+        "approval"
+      ],
+      "attack": [],
+      "time": "1h"
+    },
+    {
       "id": "AIS-030",
       "phase": "erad",
       "title": "Agent-generated eradication checklist",
@@ -631,6 +782,33 @@
       "time": "3d"
     },
     {
+      "id": "AIS-042",
+      "phase": "recover",
+      "title": "Agent-assisted recovery validation",
+      "summary": "The agent checks every restored system; people spot-check and sign off.",
+      "steps": [
+        "Agent: Check each restored host for the incident's indicators and known persistence locations",
+        "Agent: Confirm EDR, logging and patch levels match the baseline",
+        "Agent: Produce a pass/fail list per host, with evidence",
+        "Human: Spot-check a sample of passes and sign off each batch for production"
+      ],
+      "tools": [
+        "EDR console",
+        "Vulnerability scanner"
+      ],
+      "roles": [
+        "Infrastructure",
+        "SOC Analyst"
+      ],
+      "tags": [
+        "ai-soc",
+        "recovery",
+        "validation"
+      ],
+      "attack": [],
+      "time": "4h"
+    },
+    {
       "id": "AIS-050",
       "phase": "lessons",
       "title": "Review agent decisions from the incident",
@@ -725,6 +903,120 @@
       ],
       "attack": [],
       "time": "1h"
+    },
+    {
+      "id": "AIS-054",
+      "phase": "lessons",
+      "title": "Agent-drafted detections, human-reviewed",
+      "summary": "Turn the incident's techniques into detections quickly, with people owning what goes live.",
+      "steps": [
+        "Agent: Draft detection rules for each technique seen in the incident, mapped to ATT&CK",
+        "Agent: Test each rule against the incident's logs and 30 days of normal activity, and report hit counts",
+        "Human: Review the logic, false-positive rate and response guidance",
+        "Human: Deploy through the normal detection-as-code review"
+      ],
+      "tools": [
+        "SIEM",
+        "Detection-as-code"
+      ],
+      "roles": [
+        "Detection Engineering"
+      ],
+      "tags": [
+        "ai-soc",
+        "detections",
+        "lessons"
+      ],
+      "attack": [],
+      "time": "1d"
+    },
+    {
+      "id": "AIS-060",
+      "phase": "ident",
+      "title": "Investigate data leakage through an AI agent",
+      "summary": "An agent may have sent sensitive data somewhere it should not, often after reading attacker-controlled content.",
+      "steps": [
+        "Human: List the data the agent can reach and every place its output can go: tickets, chat, email, external APIs",
+        "Human: Pull the agent's outbound tool calls and messages for the window from its audit log",
+        "Human: Look for sensitive data in outputs to unapproved destinations, including data hidden in URL parameters, links and image references",
+        "Human: Trace the input that triggered it; indirect prompt injection in an email, ticket or web page is a common cause"
+      ],
+      "tools": [
+        "Agent audit log",
+        "DLP"
+      ],
+      "roles": [
+        "SOC Lead",
+        "Privacy"
+      ],
+      "tags": [
+        "ai-soc",
+        "data-leakage",
+        "prompt-injection",
+        "agent-security"
+      ],
+      "attack": [
+        "AML.T0057",
+        "AML.T0051"
+      ],
+      "time": "3h"
+    },
+    {
+      "id": "AIS-061",
+      "phase": "contain",
+      "title": "Quarantine a compromised agent tool or MCP server",
+      "summary": "A tool the agent relies on is malicious or compromised. Cut it off from every agent.",
+      "steps": [
+        "Human: Disable the tool or MCP server for every agent that uses it, not just the one that misbehaved",
+        "Human: Revoke the credentials and tokens the tool held or could reach",
+        "Human: Pull every call made to the tool during the window, with inputs and outputs",
+        "Human: Compare recent versions of the tool's code and descriptions for injected instructions or new behavior"
+      ],
+      "tools": [
+        "Agent platform admin",
+        "Agent audit log"
+      ],
+      "roles": [
+        "Platform Engineering",
+        "SOC Lead"
+      ],
+      "tags": [
+        "ai-soc",
+        "mcp",
+        "supply-chain",
+        "agent-security"
+      ],
+      "attack": [
+        "AML.T0010",
+        "AML.T0051"
+      ],
+      "time": "1h"
+    },
+    {
+      "id": "AIS-062",
+      "phase": "erad",
+      "title": "Remove poisoned content from agent memory and knowledge bases",
+      "summary": "Injected instructions can live on in retrieval indexes, memory and caches. Clean them out.",
+      "steps": [
+        "Human: Identify the documents, tickets or memory entries that carried injected instructions",
+        "Human: Remove them from the retrieval index, agent memory and caches, then re-index from clean sources",
+        "Human: Re-run the agent against the evaluation set, including the injection that worked",
+        "Human: Add the malicious content to the injection test set so it stays tested"
+      ],
+      "tools": [],
+      "roles": [
+        "Platform Engineering"
+      ],
+      "tags": [
+        "ai-soc",
+        "prompt-injection",
+        "rag",
+        "agent-security"
+      ],
+      "attack": [
+        "AML.T0051"
+      ],
+      "time": "4h"
     }
   ],
   "templates": [
@@ -837,6 +1129,10 @@
         ]
       ],
       "edges": [
+        [
+          "a",
+          "n"
+        ],
         [
           "s",
           "a"
@@ -1012,6 +1308,636 @@
         [
           "g",
           "z"
+        ]
+      ]
+    },
+    {
+      "id": "ai-phishing",
+      "name": "Agentic phishing response",
+      "description": "The agent analyzes a reported phish and runs the purge; people confirm the verdict and approve changes.",
+      "nodes": [
+        [
+          "s",
+          "start",
+          "User reports a phishing email",
+          "ident"
+        ],
+        [
+          "a",
+          "play",
+          "AIS-018"
+        ],
+        [
+          "q",
+          "decision",
+          "Anyone entered credentials or ran the attachment?",
+          "ident"
+        ],
+        [
+          "b",
+          "play",
+          "AIS-019"
+        ],
+        [
+          "c",
+          "play",
+          "AIS-020"
+        ],
+        [
+          "d",
+          "play",
+          "AIS-024"
+        ],
+        [
+          "e",
+          "play",
+          "AIS-054"
+        ],
+        [
+          "f",
+          "play",
+          "AIS-050"
+        ],
+        [
+          "z",
+          "end",
+          "Case closed",
+          "lessons"
+        ]
+      ],
+      "edges": [
+        [
+          "s",
+          "a"
+        ],
+        [
+          "a",
+          "q"
+        ],
+        [
+          "q",
+          "b",
+          "Yes"
+        ],
+        [
+          "q",
+          "d",
+          "No"
+        ],
+        [
+          "b",
+          "c"
+        ],
+        [
+          "c",
+          "d"
+        ],
+        [
+          "d",
+          "e"
+        ],
+        [
+          "e",
+          "f"
+        ],
+        [
+          "f",
+          "z"
+        ]
+      ]
+    },
+    {
+      "id": "ai-identity",
+      "name": "Agentic identity compromise",
+      "description": "The agent investigates a risky sign-in; a person confirms and approves containment.",
+      "nodes": [
+        [
+          "s",
+          "start",
+          "Risky sign-in alert",
+          "ident"
+        ],
+        [
+          "a",
+          "play",
+          "AIS-010"
+        ],
+        [
+          "b",
+          "play",
+          "AIS-019"
+        ],
+        [
+          "c",
+          "play",
+          "AIS-013"
+        ],
+        [
+          "q",
+          "decision",
+          "Compromise confirmed?",
+          "ident"
+        ],
+        [
+          "fp",
+          "end",
+          "Closed; feedback to the agent",
+          "ident"
+        ],
+        [
+          "d",
+          "play",
+          "AIS-015"
+        ],
+        [
+          "e",
+          "play",
+          "AIS-020"
+        ],
+        [
+          "f",
+          "play",
+          "CON-004"
+        ],
+        [
+          "g",
+          "play",
+          "ERA-008"
+        ],
+        [
+          "h",
+          "play",
+          "AIS-042"
+        ],
+        [
+          "i",
+          "play",
+          "AIS-050"
+        ],
+        [
+          "z",
+          "end",
+          "Incident closed",
+          "lessons"
+        ]
+      ],
+      "edges": [
+        [
+          "s",
+          "a"
+        ],
+        [
+          "a",
+          "b"
+        ],
+        [
+          "b",
+          "c"
+        ],
+        [
+          "c",
+          "q"
+        ],
+        [
+          "q",
+          "fp",
+          "No"
+        ],
+        [
+          "q",
+          "d",
+          "Yes"
+        ],
+        [
+          "d",
+          "e"
+        ],
+        [
+          "e",
+          "f"
+        ],
+        [
+          "f",
+          "g"
+        ],
+        [
+          "g",
+          "h"
+        ],
+        [
+          "h",
+          "i"
+        ],
+        [
+          "i",
+          "z"
+        ]
+      ]
+    },
+    {
+      "id": "ai-ransomware",
+      "name": "Agent-assisted ransomware response",
+      "description": "Agents do the scoping, isolation and validation legwork; the incident commander owns every decision.",
+      "nodes": [
+        [
+          "s",
+          "start",
+          "Ransomware detected",
+          "ident"
+        ],
+        [
+          "a",
+          "play",
+          "AIS-010"
+        ],
+        [
+          "b",
+          "play",
+          "AIS-015"
+        ],
+        [
+          "c",
+          "play",
+          "IDN-002"
+        ],
+        [
+          "n",
+          "note",
+          "Human: the incident commander owns every decision. The agent prepares options and evidence; it does not choose.",
+          "ident"
+        ],
+        [
+          "o",
+          "play",
+          "AIS-016"
+        ],
+        [
+          "q",
+          "decision",
+          "Encryption still spreading?",
+          "contain"
+        ],
+        [
+          "d",
+          "play",
+          "CON-012"
+        ],
+        [
+          "e",
+          "play",
+          "AIS-025"
+        ],
+        [
+          "f",
+          "play",
+          "AIS-012"
+        ],
+        [
+          "g",
+          "play",
+          "AIS-014"
+        ],
+        [
+          "h",
+          "play",
+          "AIS-030"
+        ],
+        [
+          "i",
+          "play",
+          "AIS-031"
+        ],
+        [
+          "j",
+          "play",
+          "REC-001"
+        ],
+        [
+          "k",
+          "play",
+          "AIS-042"
+        ],
+        [
+          "l",
+          "play",
+          "AIS-051"
+        ],
+        [
+          "m",
+          "play",
+          "AIS-050"
+        ],
+        [
+          "z",
+          "end",
+          "Incident closed",
+          "lessons"
+        ]
+      ],
+      "edges": [
+        [
+          "s",
+          "a"
+        ],
+        [
+          "a",
+          "b"
+        ],
+        [
+          "b",
+          "c"
+        ],
+        [
+          "c",
+          "n"
+        ],
+        [
+          "c",
+          "o"
+        ],
+        [
+          "c",
+          "q"
+        ],
+        [
+          "q",
+          "d",
+          "Yes"
+        ],
+        [
+          "q",
+          "e",
+          "No"
+        ],
+        [
+          "d",
+          "e"
+        ],
+        [
+          "e",
+          "f"
+        ],
+        [
+          "f",
+          "g"
+        ],
+        [
+          "g",
+          "h"
+        ],
+        [
+          "h",
+          "i"
+        ],
+        [
+          "i",
+          "j"
+        ],
+        [
+          "j",
+          "k"
+        ],
+        [
+          "k",
+          "l"
+        ],
+        [
+          "l",
+          "m"
+        ],
+        [
+          "m",
+          "z"
+        ]
+      ]
+    },
+    {
+      "id": "ai-tool-compromise",
+      "name": "Agent tool or MCP server compromise",
+      "description": "A tool or MCP server the agent uses was compromised or turned malicious.",
+      "nodes": [
+        [
+          "s",
+          "start",
+          "Agent tool behaving unexpectedly",
+          "ident"
+        ],
+        [
+          "a",
+          "play",
+          "AIS-017"
+        ],
+        [
+          "b",
+          "play",
+          "AIS-061"
+        ],
+        [
+          "q",
+          "decision",
+          "Agent changed systems through the tool?",
+          "contain"
+        ],
+        [
+          "c",
+          "play",
+          "AIS-023"
+        ],
+        [
+          "d",
+          "play",
+          "AIS-022"
+        ],
+        [
+          "e",
+          "play",
+          "AIS-060"
+        ],
+        [
+          "q2",
+          "decision",
+          "Data left approved destinations?",
+          "ident"
+        ],
+        [
+          "f",
+          "play",
+          "IDN-006"
+        ],
+        [
+          "g",
+          "play",
+          "AIS-062"
+        ],
+        [
+          "h",
+          "play",
+          "AIS-009"
+        ],
+        [
+          "i",
+          "play",
+          "AIS-041"
+        ],
+        [
+          "j",
+          "play",
+          "AIS-050"
+        ],
+        [
+          "z",
+          "end",
+          "Incident closed",
+          "lessons"
+        ]
+      ],
+      "edges": [
+        [
+          "s",
+          "a"
+        ],
+        [
+          "a",
+          "b"
+        ],
+        [
+          "b",
+          "q"
+        ],
+        [
+          "q",
+          "c",
+          "Yes"
+        ],
+        [
+          "q",
+          "e",
+          "No"
+        ],
+        [
+          "c",
+          "d"
+        ],
+        [
+          "d",
+          "e"
+        ],
+        [
+          "e",
+          "q2"
+        ],
+        [
+          "q2",
+          "f",
+          "Yes"
+        ],
+        [
+          "q2",
+          "g",
+          "No"
+        ],
+        [
+          "f",
+          "g"
+        ],
+        [
+          "g",
+          "h"
+        ],
+        [
+          "h",
+          "i"
+        ],
+        [
+          "i",
+          "j"
+        ],
+        [
+          "j",
+          "z"
+        ]
+      ]
+    },
+    {
+      "id": "ai-hunt",
+      "name": "Agent-assisted threat hunt",
+      "description": "The agent runs a hypothesis-driven hunt from a threat report; a person verifies before escalating.",
+      "nodes": [
+        [
+          "s",
+          "start",
+          "New threat report or hypothesis",
+          "ident"
+        ],
+        [
+          "a",
+          "play",
+          "AIS-014"
+        ],
+        [
+          "b",
+          "play",
+          "AIS-013"
+        ],
+        [
+          "q",
+          "decision",
+          "Malicious activity found?",
+          "ident"
+        ],
+        [
+          "c",
+          "play",
+          "AIS-054"
+        ],
+        [
+          "z1",
+          "end",
+          "Hunt closed; detections added",
+          "lessons"
+        ],
+        [
+          "d",
+          "play",
+          "AIS-015"
+        ],
+        [
+          "z2",
+          "end",
+          "Hand off to the matching incident playbook",
+          "ident"
+        ]
+      ],
+      "edges": [
+        [
+          "s",
+          "a"
+        ],
+        [
+          "a",
+          "b"
+        ],
+        [
+          "b",
+          "q"
+        ],
+        [
+          "q",
+          "c",
+          "No"
+        ],
+        [
+          "c",
+          "z1"
+        ],
+        [
+          "q",
+          "d",
+          "Yes"
+        ],
+        [
+          "d",
+          "z2"
         ]
       ]
     }

@@ -1,0 +1,682 @@
+{
+  "name": "OT / ICS",
+  "version": "1.0.0",
+  "description": "Industrial control systems. Operations owns the process; safety comes before evidence. T0xxx IDs are ATT&CK for ICS.",
+  "plays": [
+    {
+      "id": "OT-001",
+      "phase": "prep",
+      "title": "Map OT assets and network zones",
+      "summary": "You cannot scope an OT incident without knowing which controllers, HMIs and links exist.",
+      "steps": [
+        "Inventory PLCs, RTUs, HMIs, historians and engineering workstations with firmware versions",
+        "Map zones and conduits (Purdue levels or IEC 62443 zones), including every IT/OT connection",
+        "List remote access paths, including vendor connections and cellular modems",
+        "Mark safety instrumented systems and who is allowed to touch them"
+      ],
+      "tools": [
+        "Passive OT monitoring",
+        "Network diagrams"
+      ],
+      "roles": [
+        "OT Engineering",
+        "OT Security"
+      ],
+      "tags": [
+        "ot",
+        "ics",
+        "inventory"
+      ],
+      "time": "1w"
+    },
+    {
+      "id": "OT-002",
+      "phase": "prep",
+      "title": "Agree safety-first IR authority with operations",
+      "summary": "Decide before an incident who may isolate networks, stop a process or run manually.",
+      "steps": [
+        "Write down who decides to isolate IT from OT and who decides to stop production",
+        "Agree what \"safe state\" means for each process and how long manual operation can last",
+        "Put plant operations, safety and engineering contacts in the IR call tree",
+        "Practice the decision in a tabletop with operations in the room"
+      ],
+      "roles": [
+        "Plant Manager",
+        "OT Engineering",
+        "IR Lead",
+        "Safety"
+      ],
+      "tags": [
+        "ot",
+        "safety",
+        "governance"
+      ],
+      "time": "1d"
+    },
+    {
+      "id": "OT-003",
+      "phase": "prep",
+      "title": "Keep known-good controller logic and configs offline",
+      "summary": "Recovery depends on trusted copies of PLC programs, HMI projects and device configs.",
+      "steps": [
+        "Back up PLC programs, HMI projects, historian configs and network device configs",
+        "Hash each backup and store copies offline",
+        "Record firmware versions and keep vendor firmware images",
+        "Re-take backups after every approved change"
+      ],
+      "roles": [
+        "OT Engineering"
+      ],
+      "tags": [
+        "ot",
+        "backups",
+        "plc"
+      ],
+      "time": "1d"
+    },
+    {
+      "id": "OT-010",
+      "phase": "ident",
+      "title": "Assess safety and process impact first",
+      "summary": "Before any technical step, find out whether the process is safe and under control.",
+      "steps": [
+        "Ask operators whether the process is behaving normally and whether HMIs show the true state",
+        "Check safety instrumented system status with the safety engineer",
+        "Decide with operations whether to keep running, go to manual or shut down safely",
+        "Log every operational decision with time and owner"
+      ],
+      "roles": [
+        "Plant Manager",
+        "Operators",
+        "Safety"
+      ],
+      "tags": [
+        "ot",
+        "safety",
+        "triage"
+      ],
+      "attack": [
+        "T0880",
+        "T0827",
+        "T0826"
+      ],
+      "time": "30m"
+    },
+    {
+      "id": "OT-011",
+      "phase": "ident",
+      "title": "Review IT/OT boundary traffic",
+      "summary": "Most OT intrusions arrive through IT or remote access. Check the conduits.",
+      "steps": [
+        "Review firewall and jump host logs for connections into OT networks",
+        "Review remote access sessions, including vendor sessions, for the suspected window",
+        "Look for new protocols or hosts crossing the boundary",
+        "Check whether IT ransomware or malware reached shared services such as historians, AD or file shares"
+      ],
+      "tools": [
+        "Firewall logs",
+        "Jump host logs",
+        "SIEM"
+      ],
+      "roles": [
+        "OT Security",
+        "Network"
+      ],
+      "tags": [
+        "ot",
+        "boundary",
+        "remote-access"
+      ],
+      "attack": [
+        "T0822",
+        "T0886",
+        "T0859",
+        "T0883"
+      ],
+      "time": "3h"
+    },
+    {
+      "id": "OT-012",
+      "phase": "ident",
+      "title": "Triage engineering workstations and HMIs",
+      "summary": "Engineering workstations hold the tools to reprogram controllers. Check them carefully.",
+      "steps": [
+        "Coordinate with operations before touching any live HMI",
+        "Collect triage data with tools approved for OT; avoid heavy scans",
+        "Check for unexpected project file changes, logic downloads and new software",
+        "Check USB use and removable media history"
+      ],
+      "tools": [
+        "KAPE",
+        "Velociraptor"
+      ],
+      "artifacts": [
+        "Project files",
+        "Event logs",
+        "USB history"
+      ],
+      "roles": [
+        "OT Security",
+        "Forensics"
+      ],
+      "tags": [
+        "ot",
+        "engineering-workstation",
+        "hmi"
+      ],
+      "attack": [
+        "T0843",
+        "T0847"
+      ],
+      "time": "3h"
+    },
+    {
+      "id": "OT-013",
+      "phase": "ident",
+      "title": "Compare controller logic to known-good",
+      "summary": "Find out whether anyone changed what the controllers actually do.",
+      "steps": [
+        "Upload the current logic and configuration from affected controllers",
+        "Compare against the offline known-good copies",
+        "Review controller event logs for mode changes, program downloads and firmware updates",
+        "Have the controls engineer explain every difference"
+      ],
+      "tools": [
+        "Vendor engineering software"
+      ],
+      "roles": [
+        "OT Engineering"
+      ],
+      "tags": [
+        "ot",
+        "plc",
+        "integrity"
+      ],
+      "attack": [
+        "T0889",
+        "T0836",
+        "T0857"
+      ],
+      "time": "4h"
+    },
+    {
+      "id": "OT-014",
+      "phase": "ident",
+      "title": "Look for anomalous industrial protocol traffic",
+      "summary": "Use passive monitoring to spot unauthorized commands and logic changes on the wire.",
+      "steps": [
+        "Review OT monitoring alerts for program downloads, mode changes and new talkers",
+        "Look for writes and commands from hosts that do not normally send them (Modbus, S7comm, EtherNet/IP, DNP3)",
+        "Capture traffic passively from a SPAN or tap; never scan actively without approval",
+        "Baseline normal traffic so the anomalies are easy to show to operations"
+      ],
+      "tools": [
+        "Zeek with ICS parsers",
+        "Wireshark",
+        "Passive OT monitoring"
+      ],
+      "artifacts": [
+        "PCAP"
+      ],
+      "roles": [
+        "OT Security"
+      ],
+      "tags": [
+        "ot",
+        "network",
+        "protocols"
+      ],
+      "attack": [
+        "T0855",
+        "T0831",
+        "T0843"
+      ],
+      "time": "3h"
+    },
+    {
+      "id": "OT-020",
+      "phase": "contain",
+      "title": "Separate IT from OT",
+      "summary": "Cut or narrow the conduits so IT-side compromise cannot reach control systems.",
+      "steps": [
+        "Get the go-ahead from the people named in your OT authority plan",
+        "Block IT/OT traffic at the boundary firewall, except flows operations confirms are essential",
+        "Confirm with operators that the process is still visible and controllable",
+        "Record exactly what changed so it can be reversed"
+      ],
+      "roles": [
+        "OT Security",
+        "Network",
+        "Plant Manager"
+      ],
+      "tags": [
+        "ot",
+        "isolation",
+        "boundary"
+      ],
+      "attack": [
+        "T0886"
+      ],
+      "time": "30m"
+    },
+    {
+      "id": "OT-021",
+      "phase": "contain",
+      "title": "Disable remote and vendor access to OT",
+      "summary": "Close remote paths until you understand how the attacker got in.",
+      "steps": [
+        "Disable vendor accounts and remote access tools into OT",
+        "Unplug or disable cellular modems and unauthorized remote access hardware",
+        "Rotate shared credentials used for remote OT access",
+        "Agree an emergency process for vendor support in the meantime"
+      ],
+      "roles": [
+        "OT Security",
+        "OT Engineering"
+      ],
+      "tags": [
+        "ot",
+        "remote-access",
+        "vendors"
+      ],
+      "attack": [
+        "T0822",
+        "T0859"
+      ],
+      "time": "1h"
+    },
+    {
+      "id": "OT-022",
+      "phase": "contain",
+      "title": "Move the process to a safe or manual state",
+      "summary": "If control is in doubt, operations moves the process to a state that does not depend on the suspect systems.",
+      "steps": [
+        "Operations decides; security advises",
+        "Follow the documented procedure for manual operation or safe shutdown",
+        "Increase physical rounds and local readings to catch false HMI data",
+        "Log the state change and the conditions for returning to automatic"
+      ],
+      "roles": [
+        "Plant Manager",
+        "Operators",
+        "Safety"
+      ],
+      "tags": [
+        "ot",
+        "safety",
+        "manual-operation"
+      ],
+      "attack": [
+        "T0831",
+        "T0827"
+      ],
+      "time": "1h"
+    },
+    {
+      "id": "OT-030",
+      "phase": "erad",
+      "title": "Restore controller logic and firmware",
+      "summary": "Put trusted logic and firmware back on every affected controller.",
+      "steps": [
+        "Verify the hashes of the known-good programs and firmware",
+        "Load them with the engineering software during an approved window",
+        "Verify by uploading again and comparing",
+        "Change controller passwords and key switch positions where supported"
+      ],
+      "roles": [
+        "OT Engineering"
+      ],
+      "tags": [
+        "ot",
+        "plc",
+        "restore"
+      ],
+      "attack": [
+        "T0889",
+        "T0857"
+      ],
+      "time": "1d"
+    },
+    {
+      "id": "OT-031",
+      "phase": "erad",
+      "title": "Rebuild engineering workstations and HMIs",
+      "summary": "Replace compromised Windows hosts in OT with clean builds.",
+      "steps": [
+        "Rebuild from known-good images with vendor-supported versions",
+        "Reinstall engineering software from verified media",
+        "Restore project files from offline copies, not from the compromised host",
+        "Apply hardening and application allowlisting before reconnecting"
+      ],
+      "roles": [
+        "OT Engineering"
+      ],
+      "tags": [
+        "ot",
+        "rebuild",
+        "hmi"
+      ],
+      "time": "2d"
+    },
+    {
+      "id": "OT-040",
+      "phase": "recover",
+      "title": "Restart the process in stages",
+      "summary": "Return to normal operation step by step, with operations signing off at each stage.",
+      "steps": [
+        "Agree the restart order and checks with operations and safety",
+        "Reconnect zones one at a time and watch for anomalies",
+        "Validate sensor readings against physical measurements",
+        "Keep IT/OT connectivity narrowed until monitoring confirms it is clean"
+      ],
+      "roles": [
+        "Plant Manager",
+        "OT Engineering",
+        "Safety"
+      ],
+      "tags": [
+        "ot",
+        "recovery",
+        "restart"
+      ],
+      "attack": [
+        "T0828"
+      ],
+      "time": "2d"
+    },
+    {
+      "id": "OT-050",
+      "phase": "lessons",
+      "title": "Report and strengthen OT defenses",
+      "summary": "Share what happened with the bodies that need to know, and fix the conduits that failed.",
+      "steps": [
+        "Check reporting duties to sector regulators and national CERTs (for example CISA, E-ISAC or NERC CIP in the US)",
+        "Share indicators with your sector ISAC",
+        "Fix the boundary and remote access weaknesses the attacker used",
+        "Update the OT playbook and repeat the tabletop with operations"
+      ],
+      "roles": [
+        "IR Lead",
+        "Compliance",
+        "OT Security"
+      ],
+      "tags": [
+        "ot",
+        "reporting",
+        "lessons"
+      ],
+      "time": "1d"
+    }
+  ],
+  "templates": [
+    {
+      "id": "ot-ransomware",
+      "name": "IT ransomware threatening OT",
+      "description": "Ransomware is spreading on the IT network and the plant shares services with IT.",
+      "nodes": [
+        [
+          "s",
+          "start",
+          "Ransomware on IT network",
+          "ident"
+        ],
+        [
+          "a",
+          "play",
+          "OT-010"
+        ],
+        [
+          "b",
+          "play",
+          "OT-011"
+        ],
+        [
+          "q",
+          "decision",
+          "Signs of spread into OT?",
+          "ident"
+        ],
+        [
+          "c",
+          "play",
+          "OT-020"
+        ],
+        [
+          "d",
+          "play",
+          "OT-021"
+        ],
+        [
+          "e",
+          "play",
+          "OT-022"
+        ],
+        [
+          "f",
+          "play",
+          "OT-012"
+        ],
+        [
+          "g",
+          "play",
+          "OT-031"
+        ],
+        [
+          "h",
+          "play",
+          "OT-040"
+        ],
+        [
+          "i",
+          "play",
+          "OT-050"
+        ],
+        [
+          "n",
+          "note",
+          "Run the IT ransomware playbook in parallel; OT stays isolated until IT is clean.",
+          "contain"
+        ],
+        [
+          "z",
+          "end",
+          "Incident closed",
+          "lessons"
+        ]
+      ],
+      "edges": [
+        [
+          "s",
+          "a"
+        ],
+        [
+          "a",
+          "b"
+        ],
+        [
+          "b",
+          "q"
+        ],
+        [
+          "q",
+          "e",
+          "Yes"
+        ],
+        [
+          "q",
+          "c",
+          "No"
+        ],
+        [
+          "e",
+          "c"
+        ],
+        [
+          "c",
+          "d"
+        ],
+        [
+          "c",
+          "n"
+        ],
+        [
+          "d",
+          "f"
+        ],
+        [
+          "f",
+          "g"
+        ],
+        [
+          "g",
+          "h"
+        ],
+        [
+          "h",
+          "i"
+        ],
+        [
+          "i",
+          "z"
+        ]
+      ]
+    },
+    {
+      "id": "plc-change",
+      "name": "Unauthorized controller change",
+      "description": "OT monitoring flags a program download or logic change nobody scheduled.",
+      "nodes": [
+        [
+          "s",
+          "start",
+          "Unexpected program download alert",
+          "ident"
+        ],
+        [
+          "a",
+          "play",
+          "OT-010"
+        ],
+        [
+          "b",
+          "play",
+          "OT-014"
+        ],
+        [
+          "c",
+          "play",
+          "OT-013"
+        ],
+        [
+          "q",
+          "decision",
+          "Logic differs from known-good?",
+          "ident"
+        ],
+        [
+          "fp",
+          "end",
+          "Unrecorded but legitimate change: fix change control",
+          "ident"
+        ],
+        [
+          "d",
+          "play",
+          "OT-022"
+        ],
+        [
+          "e",
+          "play",
+          "OT-021"
+        ],
+        [
+          "f",
+          "play",
+          "OT-012"
+        ],
+        [
+          "g",
+          "play",
+          "OT-030"
+        ],
+        [
+          "h",
+          "play",
+          "OT-031"
+        ],
+        [
+          "i",
+          "play",
+          "OT-040"
+        ],
+        [
+          "j",
+          "play",
+          "OT-050"
+        ],
+        [
+          "z",
+          "end",
+          "Incident closed",
+          "lessons"
+        ]
+      ],
+      "edges": [
+        [
+          "s",
+          "a"
+        ],
+        [
+          "a",
+          "b"
+        ],
+        [
+          "b",
+          "c"
+        ],
+        [
+          "c",
+          "q"
+        ],
+        [
+          "q",
+          "fp",
+          "No"
+        ],
+        [
+          "q",
+          "d",
+          "Yes"
+        ],
+        [
+          "d",
+          "e"
+        ],
+        [
+          "e",
+          "f"
+        ],
+        [
+          "f",
+          "g"
+        ],
+        [
+          "g",
+          "h"
+        ],
+        [
+          "h",
+          "i"
+        ],
+        [
+          "i",
+          "j"
+        ],
+        [
+          "j",
+          "z"
+        ]
+      ]
+    }
+  ]
+}
