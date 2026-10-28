@@ -18,7 +18,7 @@
   }
 
   $(function () {
-    $('.entry-content img').each(function () {
+    $('#main article img').not('.entry-feature-image, .entry-header img').each(function () {
       var img = this, $img = $(img);
       var src = $img.attr('src') || '';
       if (/^data:/i.test(src) && src.length < 200) return;          // tiny inline icons
@@ -49,7 +49,7 @@
       }
     });
 
-    $('.entry-content .image-popup').magnificPopup({
+    $('#main article .image-popup').magnificPopup({
       type: 'image',
       tLoading: 'Loading image #%curr%...',
       gallery: { enabled: true, navigateByImgClick: true, preload: [0, 1], tCounter: '%curr% of %total%' },

@@ -115,7 +115,7 @@ html:not(.theme-light) {
   }
 
   /* Screenshots with white backgrounds get a subtle edge */
-  .entry-content img { box-shadow: 0 0 0 1px $dm-border; }
+  #main article img:not(.entry-feature-image) { box-shadow: 0 0 0 1px $dm-border; }
 
   /* ---- Code blocks (Rouge), GitHub-dark-style palette ---- */
   .highlight {

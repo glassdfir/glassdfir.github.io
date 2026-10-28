@@ -3,7 +3,7 @@
    Works with assets/js/image-enhance.js
    ========================================================================== */
 
-.entry-content {
+#main article {
 
   img {
     max-width: 100%;
@@ -70,7 +70,7 @@ img.mfp-img { border-radius: 6px; }
 .mfp-arrow:hover { opacity: 1; }
 
 /* Dark theme */
-html:not(.theme-light) .entry-content {
+html:not(.theme-light) #main article {
   a.image-popup img {
     box-shadow: 0 0 0 1px #343944, 0 6px 18px rgba(0, 0, 0, .45);
   }
@@ -82,7 +82,7 @@ html:not(.theme-light) .entry-content {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .entry-content a.image-popup img { transition: none; }
-  .entry-content a.image-popup:hover img,
-  .entry-content a.image-popup:focus img { transform: none; }
+  #main article a.image-popup img { transition: none; }
+  #main article a.image-popup:hover img,
+  #main article a.image-popup:focus img { transform: none; }
 }
