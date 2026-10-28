@@ -86,3 +86,6 @@
     }
   }
 }
+
+/* Let unbroken strings (hex, SSID dumps, URLs) in list excerpts wrap */
+.post-list .excerpt { overflow-wrap: anywhere; }
