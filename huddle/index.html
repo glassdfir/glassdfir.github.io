@@ -408,6 +408,17 @@ a.tag:hover { border-color: var(--accent); }
 .pbl-actions { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
 @media (max-width: 1100px) { .save-state { display: none; } }
 
+/* Agent / Human step labels */
+.actor { display: inline-block; font-size: 9.5px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; padding: 0 5px; border-radius: 4px; margin-right: 6px; vertical-align: 1px; line-height: 16px; }
+.actor.agent { background: color-mix(in srgb, #a879ff 22%, transparent); color: #b89bff; border: 1px solid color-mix(in srgb, #a879ff 45%, transparent); }
+.actor.human { background: color-mix(in srgb, #3ecf8e 18%, transparent); color: #3ecf8e; border: 1px solid color-mix(in srgb, #3ecf8e 40%, transparent); }
+:root[data-theme="light"] .actor.agent { color: #6d3fd6; }
+:root[data-theme="light"] .actor.human { color: #13865a; }
+.actor-n.agent { color: #b89bff; }
+.actor-n.human { color: #3ecf8e; }
+:root[data-theme="light"] .actor-n.agent { color: #6d3fd6; }
+:root[data-theme="light"] .actor-n.human { color: #13865a; }
+
 </style>
 </head>
 <body>
@@ -1643,7 +1654,7 @@ a.tag:hover { border-color: var(--accent); }
             n.owner ? el('span.owner', { title: 'Owner' }, n.owner) : null),
           el('div.nt', H.nodeTitle(n)),
           el('div.nf',
-            p ? [steps.length ? el('span', steps.length + ' steps') : null,
+            p ? [H.stepSummary(steps),
               p.tools.length ? el('span', p.tools.length + ' tools') : null,
               p.attack.length ? el('span', p.attack.join(' ')) : null,
               n.notes ? el('span', '✎ note') : null]
@@ -1937,6 +1948,25 @@ a.tag:hover { border-color: var(--accent); }
     H.renderLibrary();
   }
 
+  /* Steps can say who does them: "Agent: ..." or "Human: ..." */
+  H.stepActor = function (step) {
+    const m = String(step).match(/^\s*(agent|ai|bot|automation|human|analyst|person)\s*:\s*/i);
+    if (!m) return { actor: null, text: step };
+    const k = m[1].toLowerCase();
+    return { actor: ['agent', 'ai', 'bot', 'automation'].includes(k) ? 'agent' : 'human', text: step.slice(m[0].length) };
+  };
+  H.stepEl = function (step) {
+    const a = H.stepActor(step);
+    return el('span.step-txt', a.actor ? el('span.actor.' + a.actor, a.actor === 'agent' ? 'Agent' : 'Human') : null, a.text);
+  };
+  H.stepSummary = function (steps) {
+    if (!steps.length) return null;
+    let ag = 0, hu = 0;
+    steps.forEach((x) => { const a = H.stepActor(x).actor; if (a === 'agent') ag++; else if (a === 'human') hu++; });
+    if (!ag && !hu) return el('span', steps.length + ' steps');
+    return el('span', ag ? el('span.actor-n.agent', ag + ' agent') : null, ag && hu ? ' · ' : null, hu ? el('span.actor-n.human', hu + ' human') : null);
+  };
+
   /* ---------------- Library ---------------- */
   function haystack(p) {
     return [p.id, p.title, p.summary, H.phase(p.phase).name, ...p.tags, ...p.tools, ...p.attack, ...p.roles, ...p.artifacts, ...p.steps].join(' \u0001 ').toLowerCase();
@@ -2108,7 +2138,7 @@ a.tag:hover { border-color: var(--accent); }
   function playBody(p, steps) {
     return [
       el('div.summary', p.summary),
-      listSection('Steps', steps || p.steps, true),
+      (steps || p.steps).length ? el('section', el('h4', 'Steps'), el('ol', (steps || p.steps).map((x) => el('li', H.stepEl(x))))) : null,
       tagSection('Tools', p.tools),
       tagSection('Artifacts', p.artifacts),
       tagSection('Suggested roles', p.roles),
@@ -2695,7 +2725,7 @@ a.tag:hover { border-color: var(--accent); }
           if (!all && x.done) delete x.done;
           save(); render(); H.renderCanvas();
         });
-        return el('li' + (ts ? '.checked' : ''), el('label', { style: { display: 'flex', gap: '8px', flex: 1, cursor: 'pointer' } }, cb, el('span', s)), ts ? el('span.ts', U.fmtTs(ts)) : null);
+        return el('li' + (ts ? '.checked' : ''), el('label', { style: { display: 'flex', gap: '8px', flex: 1, cursor: 'pointer' } }, cb, H.stepEl(s)), ts ? el('span.ts', U.fmtTs(ts)) : null);
       })));
     }
     const actions = [];
