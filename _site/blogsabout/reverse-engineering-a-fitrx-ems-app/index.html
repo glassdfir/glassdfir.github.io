@@ -1,0 +1,712 @@
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8" lang="en"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9" lang="en"><![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<title>Reverse-Engineering a FitRx EMS App into a Python Controller &#8211; Half Full of Security</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+
+
+<!-- Twitter Cards -->
+<meta name="twitter:title" content="Reverse-Engineering a FitRx EMS App into a Python Controller">
+<meta name="twitter:description" content="">
+<meta name="twitter:site" content="@GlassDFIR">
+<meta name="twitter:creator" content="@GlassDFIR">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://localhost:4000/images/site-logo.png">
+
+<!-- Open Graph -->
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Reverse-Engineering a FitRx EMS App into a Python Controller">
+<meta property="og:description" content="">
+<meta property="og:url" content="http://localhost:4000/blogsabout/reverse-engineering-a-fitrx-ems-app/">
+<meta property="og:site_name" content="Half Full of Security">
+
+
+
+
+
+<link rel="canonical" href="http://localhost:4000/blogsabout/reverse-engineering-a-fitrx-ems-app/">
+<link href="http://localhost:4000/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Theme: dark by default; remember a reader's choice of light -->
+<script>
+  try { if (localStorage.getItem('theme') === 'light') document.documentElement.classList.add('theme-light'); } catch (e) {}
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="http://localhost:4000/assets/css/main.css">
+<!-- Webfonts -->
+<script src="https://use.edgefonts.net/source-sans-pro:n2,i2,n3,i3,n4,i4,n6,i6,n7,i7,n9,i9;source-code-pro:n4,n7;volkhov.js"></script>
+
+<meta http-equiv="cleartype" content="on">
+
+<!-- HTML5 Shiv and Media Query Support -->
+<!--[if lt IE 9]>
+  <script src="http://localhost:4000/assets/js/vendor/html5shiv.min.js"></script>
+  <script src="http://localhost:4000/assets/js/vendor/respond.min.js"></script>
+<![endif]-->
+
+<!-- Modernizr -->
+<script src="http://localhost:4000/assets/js/vendor/modernizr-2.7.1.custom.min.js"></script>
+
+
+<!-- MathJax -->
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+<!-- Icons -->
+<!-- 16x16 -->
+<link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+<!-- 32x32 -->
+<link rel="shortcut icon" href="http://localhost:4000/favicon.png">
+<!-- 57x57 (precomposed) for iPhone 3GS, pre-2011 iPod Touch and older Android devices -->
+<link rel="apple-touch-icon-precomposed" href="http://localhost:4000/images/apple-touch-icon-precomposed.png">
+<!-- 72x72 (precomposed) for 1st generation iPad, iPad 2 and iPad mini -->
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://localhost:4000/images/apple-touch-icon-72x72-precomposed.png">
+<!-- 114x114 (precomposed) for iPhone 4, 4S, 5 and post-2011 iPod Touch -->
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://localhost:4000/images/apple-touch-icon-114x114-precomposed.png">
+<!-- 144x144 (precomposed) for iPad 3rd and 4th generation -->
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://localhost:4000/images/apple-touch-icon-144x144-precomposed.png">
+
+</head>
+
+<body id="post">
+
+<div class="navigation-wrapper">
+	<nav role="navigation" id="site-nav" class="animated drop">
+	    <ul>
+      
+		    
+		    <li><a href="http://localhost:4000/blogsabout/" >Blog</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/tools/" >Tools</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/adfirwmc/" >ADFIRWMC</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/tips/" >Tips and Tricks</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/about/" >About</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/search/" >Search</a></li>
+		  
+		    <li><a href="#" class="theme-toggle" id="theme-toggle" role="button" aria-label="Switch to light mode" title="Switch to light mode"><i class="fa fa-sun-o" aria-hidden="true"></i></a></li>
+	    </ul>
+	</nav>
+</div><!-- /.navigation-wrapper -->
+<script>
+  (function () {
+    var root = document.documentElement, btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    function label() {
+      var light = root.classList.contains('theme-light');
+      btn.innerHTML = '<i class="fa ' + (light ? 'fa-moon-o' : 'fa-sun-o') + '" aria-hidden="true"></i>';
+      btn.title = light ? 'Switch to dark mode' : 'Switch to light mode';
+      btn.setAttribute('aria-label', btn.title);
+    }
+    label();
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      var light = root.classList.toggle('theme-light');
+      try { localStorage.setItem('theme', light ? 'light' : 'dark'); } catch (err) {}
+      label();
+    });
+  })();
+</script>
+
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+
+<header class="masthead">
+	<div class="wrap">
+      
+  		<a href="http://localhost:4000/" class="site-logo" rel="home" title="Half Full of Security"><img src="http://localhost:4000/images/site-logo.png" width="200" height="200" alt="Half Full of Security logo" class="animated fadeInDown"></a>
+      
+      <h1 class="site-title animated fadeIn"><a href="http://localhost:4000/">Half Full of Security</a></h1>
+		<h2 class="site-description animated fadeIn" itemprop="description">Sharpening the ACKs since 2013</h2>
+	</div>
+</header><!-- /.masthead -->
+
+<div class="js-menu-screen menu-screen"></div>
+
+
+<div id="main" role="main">
+  <article class="hentry">
+    
+    <div class="entry-wrapper">
+      <header class="entry-header">
+        <ul class="entry-tags">
+          
+        </ul>
+        
+          <h1 class="entry-title">Reverse-Engineering a FitRx EMS App into a Python Controller</h1>
+        
+      </header>
+
+
+        <time datetime="2026-10-26T11:00:00-04:00"><i class="fa fa-calendar-o"></i> October 26, 2026</time>
+        <blockquote>
+  <p><strong>Short on time?</strong> <a href="https://jon.glass/spoke/#name=FitRx%20reverse%20engineering&amp;src=source&amp;tgt=target&amp;rel=relation&amp;stype=source_type&amp;ttype=target_type&amp;layout=web&amp;input=H4sIAAAAAAAC_4VXTXPbNhC961fs6NDmg0zkpG3aeHqQZSdxbTce22l7y0AkKCICAQ4ASta_71uQlGhbSi7iF7Bvsfv27crbxmUyCcItZEh8fPoaNnX_qr13UougrElyGYTSow8q3NzT2dUtZdYEZ7WWLpk1PtiKnG2CMtIntbPfZBaShRW6_RnfiKqmpk6otDpPyPFjbtcGt9KHY_zWUgQqrCNBXgYKqpLj_XD_SJPzurqmtTU_B1LGB6H1FhfXuZZVUtmgViLI_Ot8k0yxvNBisZA5CU_BWoIrHaKRa-loanJnVU51aY3cj92-XCvERXrPX7eopXD5WjiZ5E6tEIXxrJSiphPdSICFkjzO1CCc1iU7k_DAIXaCrkR2Yu2yP_MDiPbV9PpiB-JtEeLNzhKfsotNf5LMVrUwyB9Ha7Qz803k9zsTcE8jwbxYsZ21CmVy1ziDMJWSN9BcZEvEOVhkSuQC4aW_xEoMTJ6bZokYbo97ocIOQau5E26TNB6BObk8o7WDQ9IdxywaucLODCn0-KCCnOGYIgvSKcQsoxyxyILeDNAijJShvIPvr-evvsGZYUzyNjAC1Ehm1hjs5yhUwogFsPiETLRMGDKiklQoDbjRXrPTLJM1WES5XKlMxg2-xSiUyZVZoExWUmjk_NPNRTo5-u0kodbXf9s0vuif37179-bFeHCQK-E9XLqCp1P4uFJh8yqbPHt-6DC3gEPws9IuJdUWKXlPpbwHuRy-gNbUhhdRHB20vS9XEabPU8xFcoa0bJhDCFtOWgrQOjKCk1ZKJwfnKH6QhGuVLT19nN7dwfdhdj3NN_Tly_kp1U4W6n60tXQbAAu-44NFfiQ966P7vDWO98FmkbtFFJ7xrXQxRUK-FUkbBb6fJ2SgBcWGH7LxDoLT0Zv_kc2iKCa9Tdz_urWJh1-OqTEBSibz8eh7fh9N0vmGDUABB2A9j6BGlQjJdEbTU5r8Ri-30X9Jb6lG3CqP25VA5nA9mdHJ6TH8QEwl4ttUowcnmt71-_1BrPG1RoIoyPtAvslKFsfp3cvZ1efTsz9xYBlXo_ZpdnP5YTx6eIJznNp4EIueTSfPt7Y71O31EvWhaZL-wdahNKoSGmW9UME_MniFJMDW0WFb1-gYaBBH6e8_NHaHJuJg7c1ha1fKNEgcm_p09t97ejOhqnulPDqRCfzp6Jf97eB6E9Arhm_6brAtg3kDaQF8cPdfrUOeUKncA17VG4qKlH2-HT21A4UVywMCOrNO7tpKY3IcksuytDaPbMgti8Qeq9-j5hZryxSPnrz0yWejN9Q3HkLlNlCHDbV03wPCvd7TT5Q3oEW2yaB_O-MF2nyDq6pqtGiEF5IWJNarLZMsdwPu_0y6fuMenNnleezoe6zL-9pypNK0Yj6laTvTpDuQNGX30ugeHuJA0l5Snkt4C5NnD-ynPhJxQeyMGH_qnRNeFDJs-sutDK1oNkaFnz2x8XZnoZxHzVlS-C0bLLNFQaqIq33mVB1Aa-lHhxAH9O7AelZHmuwLWXD65YxpnYPc3_NaLQyqqoQxHXuzyaRuzxGEXx7DeRNZ0JrSbX3vQby0TR6RqMD82Awnl0eIYuOpZi2C1T4I3dKdAX-Mpsez2rwJAUiq9QlDiSaZ8rK9hFyDrUy3gH6m7eKQD5d24VtVV1kce4nFxMdxAcNt5KhDmwqx1Zay2q8K03Nohkd346htFYGnOQzS7cUn_1q35FFUo1a9Akk_SgiPGj3c_MXLotFxSuVzLtDk84eWklLqWubJ-AJDLMXBjnxtAw8sbZ_Hs8AsuC4V1D1WfTfGYfC6D-NHiB8bmJXMDp6cWfwKlLx_BLqw4evawfVkfG5WKGMsjaXWDkeUNc6xdjphFqyu6GC7DLSd5zHwqU0R-pJD21b1IcQ0revWJO5K4SVK2bXpAjMkVBUMqh0nK-d_FhUEJR_t1OIJUK8aHVK3I9mf3L9jo2TJ2mY22NwmHMtkNPh6B31sC-Zh1cbVu58LpfWw4uNoCg2vRQ6yAxgyUW0FZCcUo0P2D6lFROuIDoUFx1kjBg7POqyumOl1Z2Hy2OWum1MlheF6IdRG3eBfXLceVcl_y1xjONU83A9hTmUWiTIoM_8EwS660uOwMl-lAHn7YYjb8tDkDZf_gH5PrNllLFf8A-We0o2wEGOMEvGPr38QBy2anIsELfDJyQN1n8FaFyILRf6tYSEHe_gso_8B_sZG3FoPAAA">Explore this post as a graph in Spoke</a>: the decompiled app, the protocol, the Python controller, its safety features and what’s next, all as clickable nodes.</p>
+</blockquote>
+
+<h2 id="why-i-went-down-this-road">Why I went down this road</h2>
+
+<p>I recently tore my ACL, and part of getting my quad working again is retraining it with a TENS machine.</p>
+
+<p>I ended up with a working Python script that drives a FitRx wireless EMS unit from my MacBook, and I got there by decompiling the vendor’s Android app. I did most of the digging alongside Gemini, pasting terminal output back and forth until the protocol fell out.</p>
+
+<p><a href="https://www.walmart.com/ip/FitRx-Electrode-Wireless-Massager-Rechargeable-TENS-Unit-Muscle-Stimulator-with-App-Control/821289612"><img src="/images/fitrx.jpg" alt="FitRx Electrode Wireless Massager" width="300" /></a></p>
+
+<p>The unit I used: the <a href="https://www.walmart.com/ip/FitRx-Electrode-Wireless-Massager-Rechargeable-TENS-Unit-Muscle-Stimulator-with-App-Control/821289612">FitRx Electrode Wireless Massager</a> from Walmart.</p>
+
+<p>The goal was simple. I had a cheap stimulator, and I wanted custom routines it doesn’t offer: a slow ramp up, a hold, a ramp down, a rest, repeated for a set time. Eventually I want Claude to be able to kick off and adjust those sessions for me.</p>
+
+<p>The catch: the FitRx companion app wouldn’t even install on my Android phone. It was flagged as too old for my “too new” phone. So if I wanted app control at all, I had to build it myself.</p>
+
+<h2 id="decompiling-the-apk">Decompiling the APK</h2>
+
+<p>My first attempt at sharing the app’s code was a mistake: I pasted the raw APK contents, which is just a ZIP archive full of compressed class files. Useless. The right tool is <a href="https://github.com/skylot/jadx">jadx</a>, which turns the APK back into readable Java:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>brew <span class="nb">install </span>jadx
+jadx <span class="nt">-d</span> fitrx_src /path/to/FitRx.apk
+<span class="nb">cd </span>fitrx_src
+</code></pre></div></div>
+
+<p>Then I started grepping for the obvious Bluetooth write call:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">grep</span> <span class="nt">-rn</span> <span class="s2">"writeCharacteristic"</span> <span class="nb">.</span>
+</code></pre></div></div>
+
+<p>Every hit was inside <code class="language-plaintext highlighter-rouge">sources/com/inuker/bluetooth/library/</code>. That’s Inuker BluetoothKit, an Android BLE wrapper library. It hides the raw GATT calls, so the app’s own code never calls <code class="language-plaintext highlighter-rouge">writeCharacteristic</code> directly. I needed to find where the app called into the library instead.</p>
+
+<p>Grepping the app’s own package for “write” only turned up Android <code class="language-plaintext highlighter-rouge">Parcel</code> boilerplate. So I listed the package to get the lay of the land:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">ls</span> <span class="nt">-R</span> sources/com/fitrx/songhua/massagetool/
+</code></pre></div></div>
+
+<p>Two folders stood out: <code class="language-plaintext highlighter-rouge">BlueteethTool/</code> (yes, “Blueteeth”) and <code class="language-plaintext highlighter-rouge">massagemain/</code>, which holds the main control screen.</p>
+
+<h2 id="following-the-trail">Following the trail</h2>
+
+<p><strong>Device names.</strong> <code class="language-plaintext highlighter-rouge">BlueteethTool/b.java</code> is the connection manager. Its scan callback only accepts devices with these names, which told me what to look for when scanning:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="o">(</span><span class="n">hVar</span><span class="o">.</span><span class="na">b</span><span class="o">().</span><span class="na">equals</span><span class="o">(</span><span class="s">"HRK-016B"</span><span class="o">)</span>
+    <span class="o">||</span> <span class="n">hVar</span><span class="o">.</span><span class="na">b</span><span class="o">().</span><span class="na">toLowerCase</span><span class="o">().</span><span class="na">startsWith</span><span class="o">(</span><span class="s">"FitRx Wireles"</span><span class="o">.</span><span class="na">toLowerCase</span><span class="o">())</span>
+    <span class="o">||</span> <span class="n">hVar</span><span class="o">.</span><span class="na">b</span><span class="o">().</span><span class="na">toLowerCase</span><span class="o">().</span><span class="na">startsWith</span><span class="o">(</span><span class="s">"FitRx 7772"</span><span class="o">.</span><span class="na">toLowerCase</span><span class="o">()))</span> <span class="o">{</span>
+</code></pre></div></div>
+
+<p>HRK-016B looks like the OEM board model. The same file also counts connections in SharedPreferences and has a check that returns false after 35 or 130 connects. I never confirmed where that check is used, so I’m filing it under “interesting” rather than “explains everything.”</p>
+
+<p><strong>The Bluetooth client.</strong> <code class="language-plaintext highlighter-rouge">BlueteethTool/c.java</code> is just a singleton that hands out the Inuker client. So I grepped for every caller:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">grep</span> <span class="nt">-rn</span> <span class="s2">"c</span><span class="se">\.</span><span class="s2">a()"</span> sources/com/fitrx/songhua/massagetool/
+</code></pre></div></div>
+
+<p>The interesting hits were in <code class="language-plaintext highlighter-rouge">MassageMainActivity.java</code>. One method, <code class="language-plaintext highlighter-rouge">c0</code>, is the single choke point where every command leaves the app. It takes a hex string, converts it to bytes, and writes it:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">private</span> <span class="kt">void</span> <span class="nf">c0</span><span class="o">(</span><span class="nc">String</span> <span class="n">str</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">Log</span><span class="o">.</span><span class="na">e</span><span class="o">(</span><span class="s">"BLE"</span><span class="o">,</span> <span class="s">"postMessage : "</span> <span class="o">+</span> <span class="n">str</span><span class="o">);</span>
+    <span class="n">com</span><span class="o">.</span><span class="na">inuker</span><span class="o">.</span><span class="na">bluetooth</span><span class="o">.</span><span class="na">library</span><span class="o">.</span><span class="na">a</span> <span class="n">aVarA</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="na">a</span><span class="o">();</span>
+    <span class="n">com</span><span class="o">.</span><span class="na">fitrx</span><span class="o">.</span><span class="na">songhua</span><span class="o">.</span><span class="na">massagetool</span><span class="o">.</span><span class="na">f</span><span class="o">.</span><span class="na">b</span> <span class="n">bVar</span> <span class="o">=</span> <span class="k">this</span><span class="o">.</span><span class="na">D</span><span class="o">;</span>
+    <span class="n">aVarA</span><span class="o">.</span><span class="na">c</span><span class="o">(</span><span class="n">bVar</span><span class="o">.</span><span class="na">f934b</span><span class="o">,</span> <span class="n">bVar</span><span class="o">.</span><span class="na">c</span><span class="o">().</span><span class="na">c</span><span class="o">,</span> <span class="k">this</span><span class="o">.</span><span class="na">D</span><span class="o">.</span><span class="na">c</span><span class="o">().</span><span class="na">f936b</span><span class="o">,</span>
+            <span class="n">com</span><span class="o">.</span><span class="na">inuker</span><span class="o">.</span><span class="na">bluetooth</span><span class="o">.</span><span class="na">library</span><span class="o">.</span><span class="na">n</span><span class="o">.</span><span class="na">c</span><span class="o">.</span><span class="na">c</span><span class="o">(</span><span class="n">str</span><span class="o">),</span> <span class="k">this</span><span class="o">.</span><span class="na">H</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p><strong>The UUIDs.</strong> <code class="language-plaintext highlighter-rouge">bVar.c()</code> and <code class="language-plaintext highlighter-rouge">bVar.b()</code> come from <code class="language-plaintext highlighter-rouge">f/b.java</code>, which walks the device’s GATT services and picks characteristics by prefix. There are two profiles, chosen by whether the device name starts with “FitRx 7772”:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="o">(</span><span class="n">d</span><span class="o">())</span> <span class="o">{</span>  <span class="c1">// "FitRx 7772"</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">svc</span><span class="o">.</span><span class="na">startsWith</span><span class="o">(</span><span class="s">"0000fff0"</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="n">chr</span><span class="o">.</span><span class="na">startsWith</span><span class="o">(</span><span class="s">"0000fff5"</span><span class="o">))</span> <span class="k">this</span><span class="o">.</span><span class="na">e</span> <span class="o">=</span> <span class="n">cVar</span><span class="o">;</span>  <span class="c1">// write</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">svc</span><span class="o">.</span><span class="na">startsWith</span><span class="o">(</span><span class="s">"0000fff0"</span><span class="o">)</span> <span class="o">&amp;</span> <span class="n">chr</span><span class="o">.</span><span class="na">startsWith</span><span class="o">(</span><span class="s">"0000fff4"</span><span class="o">))</span> <span class="k">this</span><span class="o">.</span><span class="na">f</span> <span class="o">=</span> <span class="n">cVar</span><span class="o">;</span>   <span class="c1">// notify</span>
+<span class="o">}</span> <span class="k">else</span> <span class="o">{</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">svc</span><span class="o">.</span><span class="na">startsWith</span><span class="o">(</span><span class="s">"0000ae3a"</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="n">chr</span><span class="o">.</span><span class="na">startsWith</span><span class="o">(</span><span class="s">"0000ae3b"</span><span class="o">))</span> <span class="k">this</span><span class="o">.</span><span class="na">e</span> <span class="o">=</span> <span class="n">cVar</span><span class="o">;</span>  <span class="c1">// write</span>
+    <span class="k">if</span> <span class="o">(</span><span class="n">svc</span><span class="o">.</span><span class="na">startsWith</span><span class="o">(</span><span class="s">"0000ae3a"</span><span class="o">)</span> <span class="o">&amp;&amp;</span> <span class="n">chr</span><span class="o">.</span><span class="na">startsWith</span><span class="o">(</span><span class="s">"0000ae3c"</span><span class="o">))</span> <span class="k">this</span><span class="o">.</span><span class="na">f</span> <span class="o">=</span> <span class="n">cVar</span><span class="o">;</span>  <span class="c1">// notify</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p><strong>The commands.</strong> Finally, the methods just above <code class="language-plaintext highlighter-rouge">c0</code> build the strings. Here’s intensity:</p>
+
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">public</span> <span class="kt">void</span> <span class="nf">W</span><span class="o">(</span><span class="kt">int</span> <span class="n">i2</span><span class="o">)</span> <span class="o">{</span>
+    <span class="nc">String</span> <span class="n">str</span> <span class="o">=</span> <span class="nc">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">"%02d"</span><span class="o">,</span> <span class="nc">Integer</span><span class="o">.</span><span class="na">valueOf</span><span class="o">(</span><span class="n">i2</span><span class="o">));</span>
+    <span class="n">c0</span><span class="o">(</span><span class="s">"ACAD06A0000000"</span> <span class="o">+</span> <span class="n">str</span> <span class="o">+</span> <span class="s">"BCBD"</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Mode and timer follow the same pattern with <code class="language-plaintext highlighter-rouge">A1</code> and <code class="language-plaintext highlighter-rouge">A2</code>. Each one also has a twin that sends something completely different for the 7772 profile.</p>
+
+<h2 id="decoding-the-protocol">Decoding the protocol</h2>
+
+<p>The standard profile uses a fixed 10-byte frame. It opens with <code class="language-plaintext highlighter-rouge">AC AD 06</code>, then a command byte, three parameter bytes, the value, and closes with <code class="language-plaintext highlighter-rouge">BC BD</code>. No checksum.</p>
+
+<p>The 7772 strings looked like noise until I decoded the hex as ASCII. <code class="language-plaintext highlighter-rouge">41542B434D4F44453D302C</code> is just <code class="language-plaintext highlighter-rouge">AT+CMODE=0,</code>. That profile speaks plain-text AT commands ending in <code class="language-plaintext highlighter-rouge">\r\n</code>.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Command</th>
+      <th>Standard (HRK-016B)</th>
+      <th>7772 variant</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Intensity</td>
+      <td><code class="language-plaintext highlighter-rouge">ACAD06A0000000{level:02d}BCBD</code></td>
+      <td><code class="language-plaintext highlighter-rouge">AT+CSTR=1,{level}\r\n</code></td>
+    </tr>
+    <tr>
+      <td>Mode</td>
+      <td><code class="language-plaintext highlighter-rouge">ACAD06A1000000{mode:02d}BCBD</code></td>
+      <td><code class="language-plaintext highlighter-rouge">AT+CMODE=0,{mode}\r\n</code></td>
+    </tr>
+    <tr>
+      <td>Timer (minutes)</td>
+      <td><code class="language-plaintext highlighter-rouge">ACAD06A2010100{minutes:02X}BCBD</code></td>
+      <td><code class="language-plaintext highlighter-rouge">AT+CDCLK=00{mm}00\r\n</code></td>
+    </tr>
+    <tr>
+      <td>Timer off</td>
+      <td><code class="language-plaintext highlighter-rouge">ACAD06A200000000BCBD</code></td>
+      <td><code class="language-plaintext highlighter-rouge">AT+CDCLK=000000\n\r\n</code></td>
+    </tr>
+    <tr>
+      <td>Write / notify UUIDs</td>
+      <td><code class="language-plaintext highlighter-rouge">ae3b</code> / <code class="language-plaintext highlighter-rouge">ae3c</code> on service <code class="language-plaintext highlighter-rouge">ae3a</code></td>
+      <td><code class="language-plaintext highlighter-rouge">fff5</code> / <code class="language-plaintext highlighter-rouge">fff4</code> on service <code class="language-plaintext highlighter-rouge">fff0</code></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Two quirks are worth noting. Intensity and mode are formatted as <em>decimal</em> digits (<code class="language-plaintext highlighter-rouge">%02d</code>), but the timer is formatted as <em>hex</em> (<code class="language-plaintext highlighter-rouge">Integer.toHexString</code>). So a 20-minute timer is sent as <code class="language-plaintext highlighter-rouge">14</code>. And the 7772 “timer off” string really does have that odd <code class="language-plaintext highlighter-rouge">\n\r\n</code> ending; I copied it from the app as-is.</p>
+
+<p>In Python, sending a frame is a one-liner with <a href="https://github.com/hbldh/bleak">bleak</a>:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">WRITE_UUID</span> <span class="o">=</span> <span class="sh">"</span><span class="s">0000ae3b-0000-1000-8000-00805f9b34fb</span><span class="sh">"</span>
+<span class="k">await</span> <span class="n">client</span><span class="p">.</span><span class="nf">write_gatt_char</span><span class="p">(</span><span class="n">WRITE_UUID</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">.</span><span class="nf">fromhex</span><span class="p">(</span><span class="sh">"</span><span class="s">ACAD06A000000003BCBD</span><span class="sh">"</span><span class="p">),</span> <span class="n">response</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>  <span class="c1"># level 3
+</span></code></pre></div></div>
+
+<h2 id="building-the-python-controller">Building the Python controller</h2>
+
+<p>macOS supports BLE natively, and bleak uses CoreBluetooth under the hood, so no dongle is needed. Two Mac-specific notes: your terminal needs Bluetooth permission under <strong>System Settings &gt; Privacy &amp; Security &gt; Bluetooth</strong>, and macOS shows devices by a UUID instead of a MAC address.</p>
+
+<p><strong>Scan and connect.</strong> I reuse the app’s own name filter, then subscribe to the notify characteristic:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">devices</span> <span class="o">=</span> <span class="k">await</span> <span class="n">BleakScanner</span><span class="p">.</span><span class="nf">discover</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mf">7.0</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">devices</span><span class="p">:</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="p">(</span><span class="n">d</span><span class="p">.</span><span class="n">name</span> <span class="ow">or</span> <span class="sh">""</span><span class="p">).</span><span class="nf">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nf">any</span><span class="p">(</span><span class="n">name</span><span class="p">.</span><span class="nf">startswith</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="sh">"</span><span class="s">HRK-016B</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">FitRx Wireles</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">FitRx 7772</span><span class="sh">"</span><span class="p">]):</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">d</span>
+        <span class="k">break</span>
+
+<span class="n">self</span><span class="p">.</span><span class="n">client</span> <span class="o">=</span> <span class="nc">BleakClient</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">device</span><span class="p">.</span><span class="n">address</span><span class="p">)</span>
+<span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="nf">connect</span><span class="p">()</span>
+<span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="nf">start_notify</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">notify_uuid</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">_notification_handler</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>Commands.</strong> Each device command is a thin wrapper that clamps its input and builds the frame from the table above:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">async</span> <span class="k">def</span> <span class="nf">set_intensity</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="n">level</span> <span class="o">=</span> <span class="nf">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nf">min</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+    <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="nf">_send_payload</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">ACAD06A0000000</span><span class="si">{</span><span class="n">level</span><span class="si">:</span><span class="mi">02</span><span class="n">d</span><span class="si">}</span><span class="s">BCBD</span><span class="sh">"</span><span class="p">)</span>
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">set_timer</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">minutes</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">minutes</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="nf">_send_payload</span><span class="p">(</span><span class="sh">"</span><span class="s">ACAD06A200000000BCBD</span><span class="sh">"</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="nf">_send_payload</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">ACAD06A2010100</span><span class="si">{</span><span class="n">minutes</span><span class="si">:</span><span class="mi">02</span><span class="n">X</span><span class="si">}</span><span class="s">BCBD</span><span class="sh">"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>Ramps and duty cycles.</strong> The unit only knows eight fixed modes and ten intensity levels. Everything else, like ramping and work/rest cycles, I do in software by stepping the intensity over time:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">async</span> <span class="k">def</span> <span class="nf">_ramp</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">start_lvl</span><span class="p">,</span> <span class="n">end_lvl</span><span class="p">,</span> <span class="n">duration_sec</span><span class="p">):</span>
+    <span class="n">steps</span> <span class="o">=</span> <span class="nf">abs</span><span class="p">(</span><span class="n">end_lvl</span> <span class="o">-</span> <span class="n">start_lvl</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">steps</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">duration_sec</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="n">massager</span><span class="p">.</span><span class="nf">set_intensity</span><span class="p">(</span><span class="n">end_lvl</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="n">interval</span> <span class="o">=</span> <span class="n">duration_sec</span> <span class="o">/</span> <span class="n">steps</span>
+    <span class="n">direction</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">end_lvl</span> <span class="o">&gt;</span> <span class="n">start_lvl</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">current</span> <span class="o">=</span> <span class="n">start_lvl</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">steps</span><span class="p">):</span>
+        <span class="n">current</span> <span class="o">+=</span> <span class="n">direction</span>
+        <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="n">massager</span><span class="p">.</span><span class="nf">set_intensity</span><span class="p">(</span><span class="n">current</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="p">.</span><span class="nf">sleep</span><span class="p">(</span><span class="n">interval</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>The session loop then runs ramp up, hold, ramp down, and rest until the session time runs out.</p>
+
+<p><strong>The CLI.</strong> Gemini’s first version had <code class="language-plaintext highlighter-rouge">--pps</code> and <code class="language-plaintext highlighter-rouge">--phase-duration</code> flags for frequency and pulse width. They didn’t do anything; they were only printed. The unit doesn’t expose those settings over Bluetooth, so I removed them. The flags that are left all do something real:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python3 fitrx_orchestrator.py <span class="se">\</span>
+  <span class="nt">--mode</span> 1 <span class="se">\</span>
+  <span class="nt">--target-intensity</span> 4 <span class="se">\</span>
+  <span class="nt">--duty-cycle</span> 10 20 <span class="se">\</span>
+  <span class="nt">--ramp</span> 5 <span class="se">\</span>
+  <span class="nt">--ramp-down</span> 2 <span class="se">\</span>
+  <span class="nt">--timer</span> 20
+</code></pre></div></div>
+
+<h2 id="safety-and-what-the-ai-got-wrong">Safety, and what the AI got wrong</h2>
+
+<p>This is a script that controls current going into my body, so I designed it to fail toward “off.”</p>
+
+<ul>
+  <li><strong>Hardware timer first.</strong> Before anything else, the script sets the unit’s own timer to the session length. If my Mac sleeps, crashes, or loses Bluetooth, the unit should still shut itself off.</li>
+  <li><strong>Ctrl+C always sends a stop.</strong> A signal handler turns Ctrl+C into a task cancellation, so the <code class="language-plaintext highlighter-rouge">finally</code> block always runs and sends level 0.</li>
+  <li><strong>Loud failure.</strong> If the software stop itself fails, the script says so plainly instead of exiting quietly.</li>
+  <li><strong>Raw telemetry only.</strong> I log notification bytes with timestamps but don’t interpret them, because I haven’t confirmed the format yet.</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">cfg</span><span class="p">):</span>
+    <span class="n">task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="p">.</span><span class="nf">current_task</span><span class="p">()</span>
+    <span class="n">asyncio</span><span class="p">.</span><span class="nf">get_running_loop</span><span class="p">().</span><span class="nf">add_signal_handler</span><span class="p">(</span><span class="n">signal</span><span class="p">.</span><span class="n">SIGINT</span><span class="p">,</span> <span class="n">task</span><span class="p">.</span><span class="n">cancel</span><span class="p">)</span>
+    <span class="k">await</span> <span class="nc">SessionOrchestrator</span><span class="p">(</span><span class="n">cfg</span><span class="p">).</span><span class="nf">run</span><span class="p">()</span>
+
+<span class="c1"># ...inside run():
+</span><span class="k">finally</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="n">massager</span><span class="p">.</span><span class="nf">stop</span><span class="p">()</span>
+    <span class="k">except</span> <span class="nb">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">!! SOFTWARE STOP FAILED (</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s">).</span><span class="sh">"</span><span class="p">)</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">!! Turn the unit off with its power button or remove the pads.</span><span class="sh">"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>The real emergency stop is still the power button or pulling a pad. The software stop depends on Bluetooth working.</p>
+
+<p>AI was genuinely useful for the grind: knowing jadx, recognizing Inuker BluetoothKit, and telling me which file to <code class="language-plaintext highlighter-rouge">cat</code> next. But it also stated guesses as facts. It gave me names and frequencies for all eight modes, current ranges per intensity level, and a battery and pad-fault format for the notifications. None of that came from the code. It also called my final script “production-grade” without catching that the hardware timer backstop had never been tested. Treat its confident details as hypotheses.</p>
+
+<h2 id="whats-next">What’s next</h2>
+
+<ul class="task-list">
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Test the hardware timer backstop with no pads attached: start a session, kill the script, confirm the unit shuts off on time</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Confirm that level 0 means no output, and that timer 0 doesn’t mean “run forever”</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Log notification bytes next to each command I send and start decoding them</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Look up the real mode names in the app’s resources</li>
+  <li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox" disabled="disabled" />Wrap the controller as a tool so Claude can start and adjust sessions</li>
+</ul>
+
+<h2 id="appendix-the-full-script">Appendix: the full script</h2>
+
+<p>Here’s the complete <code class="language-plaintext highlighter-rouge">fitrx_orchestrator.py</code>. The 7772 profile is untested; I only have the standard HRK-016B hardware.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env python3
+</span><span class="sh">"""</span><span class="s">
+FitRx / HRK-016B session controller (BLE, macOS).
+
+Runs ramp / hold / ramp-down / rest cycles using the unit</span><span class="sh">'</span><span class="s">s own mode presets
+(1-8) and intensity levels (0-9), with the hardware timer set as a backstop.
+Logs raw notification bytes from the device for study; it does not interpret
+them, because the device</span><span class="sh">'</span><span class="s">s status format hasn</span><span class="sh">'</span><span class="s">t been confirmed yet.
+
+The real emergency stop is the unit</span><span class="sh">'</span><span class="s">s power button or removing a pad.
+The software stop below depends on Bluetooth working.
+</span><span class="sh">"""</span>
+
+<span class="kn">import</span> <span class="n">argparse</span>
+<span class="kn">import</span> <span class="n">asyncio</span>
+<span class="kn">import</span> <span class="n">signal</span>
+<span class="kn">import</span> <span class="n">sys</span>
+<span class="kn">import</span> <span class="n">time</span>
+<span class="kn">from</span> <span class="n">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+
+<span class="kn">from</span> <span class="n">bleak</span> <span class="kn">import</span> <span class="n">BleakClient</span><span class="p">,</span> <span class="n">BleakScanner</span>
+
+<span class="c1"># GATT UUIDs from the decompiled app
+</span><span class="n">UUID_MAP</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="sh">"</span><span class="s">standard</span><span class="sh">"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="sh">"</span><span class="s">service</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">0000ae3a-0000-1000-8000-00805f9b34fb</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">write</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">0000ae3b-0000-1000-8000-00805f9b34fb</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">notify</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">0000ae3c-0000-1000-8000-00805f9b34fb</span><span class="sh">"</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="c1"># Untested: no hardware with this profile has been tried.
+</span>    <span class="sh">"</span><span class="s">7772</span><span class="sh">"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="sh">"</span><span class="s">service</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">0000fff0-0000-1000-8000-00805f9b34fb</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">write</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">0000fff5-0000-1000-8000-00805f9b34fb</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">notify</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">0000fff4-0000-1000-8000-00805f9b34fb</span><span class="sh">"</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+
+<span class="n">TIMER_MIN</span><span class="p">,</span> <span class="n">TIMER_MAX</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">40</span>  <span class="c1"># the unit's advertised timer range, in minutes
+</span>
+
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">SessionConfig</span><span class="p">:</span>
+    <span class="n">mode_preset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">target_intensity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">ramp_up_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span>
+    <span class="n">ramp_down_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span>
+    <span class="n">work_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span>
+    <span class="n">rest_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">20.0</span>
+    <span class="n">total_minutes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span>
+
+
+<span class="k">class</span> <span class="nc">FitRxMassager</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">):</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">client</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">device</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">variant</span> <span class="o">=</span> <span class="sh">"</span><span class="s">standard</span><span class="sh">"</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">write_uuid</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">notify_uuid</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">_t0</span> <span class="o">=</span> <span class="n">time</span><span class="p">.</span><span class="nf">monotonic</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_notification_handler</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">sender</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytearray</span><span class="p">):</span>
+        <span class="sh">"""</span><span class="s">Log raw notification bytes with a timestamp. No interpretation.</span><span class="sh">"""</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">time</span><span class="p">.</span><span class="nf">monotonic</span><span class="p">()</span> <span class="o">-</span> <span class="n">self</span><span class="p">.</span><span class="n">_t0</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">[RX </span><span class="si">{</span><span class="n">t</span><span class="si">:</span><span class="mf">8.2</span><span class="n">f</span><span class="si">}</span><span class="s">s] </span><span class="si">{</span><span class="n">data</span><span class="p">.</span><span class="nf">hex</span><span class="p">(</span><span class="sh">'</span><span class="s"> </span><span class="sh">'</span><span class="p">).</span><span class="nf">upper</span><span class="p">()</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">scan_and_connect</span><span class="p">(</span><span class="n">self</span><span class="p">):</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Searching for FitRx / HRK-016B...</span><span class="sh">"</span><span class="p">)</span>
+        <span class="n">devices</span> <span class="o">=</span> <span class="k">await</span> <span class="n">BleakScanner</span><span class="p">.</span><span class="nf">discover</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mf">7.0</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">devices</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="p">(</span><span class="n">d</span><span class="p">.</span><span class="n">name</span> <span class="ow">or</span> <span class="sh">""</span><span class="p">).</span><span class="nf">strip</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nf">any</span><span class="p">(</span><span class="n">name</span><span class="p">.</span><span class="nf">startswith</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="sh">"</span><span class="s">HRK-016B</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">FitRx Wireles</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">FitRx 7772</span><span class="sh">"</span><span class="p">]):</span>
+                <span class="n">self</span><span class="p">.</span><span class="n">device</span> <span class="o">=</span> <span class="n">d</span>
+                <span class="k">break</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">self</span><span class="p">.</span><span class="n">device</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="nc">RuntimeError</span><span class="p">(</span><span class="sh">"</span><span class="s">FitRx device not found. Make sure the unit is on and blinking.</span><span class="sh">"</span><span class="p">)</span>
+
+        <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">Found </span><span class="si">{</span><span class="n">self</span><span class="p">.</span><span class="n">device</span><span class="p">.</span><span class="n">name</span><span class="si">}</span><span class="s"> [</span><span class="si">{</span><span class="n">self</span><span class="p">.</span><span class="n">device</span><span class="p">.</span><span class="n">address</span><span class="si">}</span><span class="s">]</span><span class="sh">"</span><span class="p">)</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">variant</span> <span class="o">=</span> <span class="sh">"</span><span class="s">7772</span><span class="sh">"</span> <span class="k">if</span> <span class="sh">"</span><span class="s">7772</span><span class="sh">"</span> <span class="ow">in</span> <span class="n">self</span><span class="p">.</span><span class="n">device</span><span class="p">.</span><span class="n">name</span> <span class="k">else</span> <span class="sh">"</span><span class="s">standard</span><span class="sh">"</span>
+        <span class="k">if</span> <span class="n">self</span><span class="p">.</span><span class="n">variant</span> <span class="o">==</span> <span class="sh">"</span><span class="s">7772</span><span class="sh">"</span><span class="p">:</span>
+            <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Warning: the 7772 profile is untested.</span><span class="sh">"</span><span class="p">)</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">write_uuid</span> <span class="o">=</span> <span class="n">UUID_MAP</span><span class="p">[</span><span class="n">self</span><span class="p">.</span><span class="n">variant</span><span class="p">][</span><span class="sh">"</span><span class="s">write</span><span class="sh">"</span><span class="p">]</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">notify_uuid</span> <span class="o">=</span> <span class="n">UUID_MAP</span><span class="p">[</span><span class="n">self</span><span class="p">.</span><span class="n">variant</span><span class="p">][</span><span class="sh">"</span><span class="s">notify</span><span class="sh">"</span><span class="p">]</span>
+
+        <span class="n">self</span><span class="p">.</span><span class="n">client</span> <span class="o">=</span> <span class="nc">BleakClient</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">device</span><span class="p">.</span><span class="n">address</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="nf">connect</span><span class="p">()</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">Connected (</span><span class="si">{</span><span class="n">self</span><span class="p">.</span><span class="n">variant</span><span class="si">}</span><span class="s"> profile).</span><span class="sh">"</span><span class="p">)</span>
+
+        <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="nf">start_notify</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">notify_uuid</span><span class="p">,</span> <span class="n">self</span><span class="p">.</span><span class="n">_notification_handler</span><span class="p">)</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Logging notifications.</span><span class="sh">"</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_send_payload</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">hex_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">self</span><span class="p">.</span><span class="n">client</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">self</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="n">is_connected</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="nc">ConnectionError</span><span class="p">(</span><span class="sh">"</span><span class="s">BLE client is not connected.</span><span class="sh">"</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="nf">write_gatt_char</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">write_uuid</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">.</span><span class="nf">fromhex</span><span class="p">(</span><span class="n">hex_string</span><span class="p">),</span> <span class="n">response</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="p">.</span><span class="nf">sleep</span><span class="p">(</span><span class="mf">0.08</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">set_mode</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">mode</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="nf">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nf">min</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">[TX] mode </span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">self</span><span class="p">.</span><span class="n">variant</span> <span class="o">==</span> <span class="sh">"</span><span class="s">standard</span><span class="sh">"</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="nf">_send_payload</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">ACAD06A1000000</span><span class="si">{</span><span class="n">mode</span><span class="si">:</span><span class="mi">02</span><span class="n">d</span><span class="si">}</span><span class="s">BCBD</span><span class="sh">"</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="nf">_send_payload</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">AT+CMODE=0,</span><span class="si">{</span><span class="n">mode</span><span class="si">:</span><span class="mi">02</span><span class="n">d</span><span class="si">}</span><span class="se">\r\n</span><span class="sh">"</span><span class="p">.</span><span class="nf">encode</span><span class="p">().</span><span class="nf">hex</span><span class="p">())</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">set_intensity</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">level</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">level</span> <span class="o">=</span> <span class="nf">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nf">min</span><span class="p">(</span><span class="n">level</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">[TX] level </span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">self</span><span class="p">.</span><span class="n">variant</span> <span class="o">==</span> <span class="sh">"</span><span class="s">standard</span><span class="sh">"</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="nf">_send_payload</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">ACAD06A0000000</span><span class="si">{</span><span class="n">level</span><span class="si">:</span><span class="mi">02</span><span class="n">d</span><span class="si">}</span><span class="s">BCBD</span><span class="sh">"</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="nf">_send_payload</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">41542b435354523d312C</span><span class="si">{</span><span class="sa">f</span><span class="sh">'</span><span class="si">{</span><span class="n">level</span><span class="si">:</span><span class="n">X</span><span class="si">}</span><span class="sh">'</span><span class="s">.encode().hex()</span><span class="si">}</span><span class="s">0D0A</span><span class="sh">"</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">set_timer</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">minutes</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">[TX] timer </span><span class="si">{</span><span class="n">minutes</span><span class="si">}</span><span class="s"> min</span><span class="sh">"</span> <span class="k">if</span> <span class="n">minutes</span> <span class="k">else</span> <span class="sh">"</span><span class="s">[TX] timer off</span><span class="sh">"</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">self</span><span class="p">.</span><span class="n">variant</span> <span class="o">==</span> <span class="sh">"</span><span class="s">standard</span><span class="sh">"</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">minutes</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="nf">_send_payload</span><span class="p">(</span><span class="sh">"</span><span class="s">ACAD06A200000000BCBD</span><span class="sh">"</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="nf">_send_payload</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">ACAD06A2010100</span><span class="si">{</span><span class="n">minutes</span><span class="si">:</span><span class="mi">02</span><span class="n">X</span><span class="si">}</span><span class="s">BCBD</span><span class="sh">"</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">minutes</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="nf">_send_payload</span><span class="p">(</span><span class="sh">"</span><span class="s">41542B4344434C4B3D3030303030300A0D0A</span><span class="sh">"</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="nf">_send_payload</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">41542B4344434C4B3D3030</span><span class="si">{</span><span class="sa">f</span><span class="sh">'</span><span class="si">{</span><span class="n">minutes</span><span class="si">:</span><span class="mi">02</span><span class="n">d</span><span class="si">}</span><span class="sh">'</span><span class="s">.encode().hex()</span><span class="si">}</span><span class="s">30300D0A</span><span class="sh">"</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="n">self</span><span class="p">):</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">[Software stop] Setting level 0 and clearing timer...</span><span class="sh">"</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="nf">set_intensity</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="nf">set_timer</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">disconnect</span><span class="p">(</span><span class="n">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">self</span><span class="p">.</span><span class="n">client</span> <span class="ow">and</span> <span class="n">self</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="n">is_connected</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="nf">stop_notify</span><span class="p">(</span><span class="n">self</span><span class="p">.</span><span class="n">notify_uuid</span><span class="p">)</span>
+            <span class="k">except</span> <span class="nb">Exception</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="n">client</span><span class="p">.</span><span class="nf">disconnect</span><span class="p">()</span>
+            <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">Disconnected.</span><span class="sh">"</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">SessionOrchestrator</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">SessionConfig</span><span class="p">):</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">cfg</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="n">self</span><span class="p">.</span><span class="n">massager</span> <span class="o">=</span> <span class="nc">FitRxMassager</span><span class="p">()</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">_ramp</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">start_lvl</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">end_lvl</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">duration_sec</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="n">steps</span> <span class="o">=</span> <span class="nf">abs</span><span class="p">(</span><span class="n">end_lvl</span> <span class="o">-</span> <span class="n">start_lvl</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">steps</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">duration_sec</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="n">massager</span><span class="p">.</span><span class="nf">set_intensity</span><span class="p">(</span><span class="n">end_lvl</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="n">interval</span> <span class="o">=</span> <span class="n">duration_sec</span> <span class="o">/</span> <span class="n">steps</span>
+        <span class="n">direction</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">end_lvl</span> <span class="o">&gt;</span> <span class="n">start_lvl</span> <span class="k">else</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="n">start_lvl</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="n">steps</span><span class="p">):</span>
+            <span class="n">current</span> <span class="o">+=</span> <span class="n">direction</span>
+            <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="n">massager</span><span class="p">.</span><span class="nf">set_intensity</span><span class="p">(</span><span class="n">current</span><span class="p">)</span>
+            <span class="k">await</span> <span class="n">asyncio</span><span class="p">.</span><span class="nf">sleep</span><span class="p">(</span><span class="n">interval</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="n">self</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">self</span><span class="p">.</span><span class="n">cfg</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="n">massager</span><span class="p">.</span><span class="nf">scan_and_connect</span><span class="p">()</span>
+
+            <span class="c1"># Hardware timer first, so the unit shuts itself off even if this script dies.
+</span>            <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="n">massager</span><span class="p">.</span><span class="nf">set_timer</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">total_minutes</span><span class="p">)</span>
+            <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="n">massager</span><span class="p">.</span><span class="nf">set_mode</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">mode_preset</span><span class="p">)</span>
+            <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="n">massager</span><span class="p">.</span><span class="nf">set_intensity</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+            <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="se">\n</span><span class="s">Session:</span><span class="sh">"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">  Duration     : </span><span class="si">{</span><span class="n">c</span><span class="p">.</span><span class="n">total_minutes</span><span class="si">}</span><span class="s"> min (hardware timer set)</span><span class="sh">"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">  Mode preset  : </span><span class="si">{</span><span class="n">c</span><span class="p">.</span><span class="n">mode_preset</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">  Peak level   : </span><span class="si">{</span><span class="n">c</span><span class="p">.</span><span class="n">target_intensity</span><span class="si">}</span><span class="s"> of 9</span><span class="sh">"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">  Work / rest  : </span><span class="si">{</span><span class="n">c</span><span class="p">.</span><span class="n">work_seconds</span><span class="si">}</span><span class="s">s / </span><span class="si">{</span><span class="n">c</span><span class="p">.</span><span class="n">rest_seconds</span><span class="si">}</span><span class="s">s</span><span class="sh">"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">  Ramp up/down : </span><span class="si">{</span><span class="n">c</span><span class="p">.</span><span class="n">ramp_up_seconds</span><span class="si">}</span><span class="s">s / </span><span class="si">{</span><span class="n">c</span><span class="p">.</span><span class="n">ramp_down_seconds</span><span class="si">}</span><span class="s">s</span><span class="sh">"</span><span class="p">)</span>
+            <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">  Ctrl+C to stop. Power button or removing a pad is the real emergency stop.</span><span class="se">\n</span><span class="sh">"</span><span class="p">)</span>
+
+            <span class="n">total_seconds</span> <span class="o">=</span> <span class="n">c</span><span class="p">.</span><span class="n">total_minutes</span> <span class="o">*</span> <span class="mi">60</span>
+            <span class="n">elapsed</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">cycle</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">while</span> <span class="n">elapsed</span> <span class="o">&lt;</span> <span class="n">total_seconds</span><span class="p">:</span>
+                <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">[Cycle </span><span class="si">{</span><span class="n">cycle</span><span class="si">}</span><span class="s">] Ramp up 0 -&gt; </span><span class="si">{</span><span class="n">c</span><span class="p">.</span><span class="n">target_intensity</span><span class="si">}</span><span class="s"> over </span><span class="si">{</span><span class="n">c</span><span class="p">.</span><span class="n">ramp_up_seconds</span><span class="si">}</span><span class="s">s</span><span class="sh">"</span><span class="p">)</span>
+                <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="nf">_ramp</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="p">.</span><span class="n">target_intensity</span><span class="p">,</span> <span class="n">c</span><span class="p">.</span><span class="n">ramp_up_seconds</span><span class="p">)</span>
+                <span class="n">elapsed</span> <span class="o">+=</span> <span class="n">c</span><span class="p">.</span><span class="n">ramp_up_seconds</span>
+
+                <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">[Cycle </span><span class="si">{</span><span class="n">cycle</span><span class="si">}</span><span class="s">] Hold level </span><span class="si">{</span><span class="n">c</span><span class="p">.</span><span class="n">target_intensity</span><span class="si">}</span><span class="s"> for </span><span class="si">{</span><span class="n">c</span><span class="p">.</span><span class="n">work_seconds</span><span class="si">}</span><span class="s">s</span><span class="sh">"</span><span class="p">)</span>
+                <span class="k">await</span> <span class="n">asyncio</span><span class="p">.</span><span class="nf">sleep</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">work_seconds</span><span class="p">)</span>
+                <span class="n">elapsed</span> <span class="o">+=</span> <span class="n">c</span><span class="p">.</span><span class="n">work_seconds</span>
+
+                <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">[Cycle </span><span class="si">{</span><span class="n">cycle</span><span class="si">}</span><span class="s">] Ramp down </span><span class="si">{</span><span class="n">c</span><span class="p">.</span><span class="n">target_intensity</span><span class="si">}</span><span class="s"> -&gt; 0 over </span><span class="si">{</span><span class="n">c</span><span class="p">.</span><span class="n">ramp_down_seconds</span><span class="si">}</span><span class="s">s</span><span class="sh">"</span><span class="p">)</span>
+                <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="nf">_ramp</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">target_intensity</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="p">.</span><span class="n">ramp_down_seconds</span><span class="p">)</span>
+                <span class="n">elapsed</span> <span class="o">+=</span> <span class="n">c</span><span class="p">.</span><span class="n">ramp_down_seconds</span>
+
+                <span class="k">if</span> <span class="n">elapsed</span> <span class="o">&gt;=</span> <span class="n">total_seconds</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+                <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="s">[Cycle </span><span class="si">{</span><span class="n">cycle</span><span class="si">}</span><span class="s">] Rest at level 0 for </span><span class="si">{</span><span class="n">c</span><span class="p">.</span><span class="n">rest_seconds</span><span class="si">}</span><span class="s">s</span><span class="se">\n</span><span class="sh">"</span><span class="p">)</span>
+                <span class="k">await</span> <span class="n">asyncio</span><span class="p">.</span><span class="nf">sleep</span><span class="p">(</span><span class="n">c</span><span class="p">.</span><span class="n">rest_seconds</span><span class="p">)</span>
+                <span class="n">elapsed</span> <span class="o">+=</span> <span class="n">c</span><span class="p">.</span><span class="n">rest_seconds</span>
+                <span class="n">cycle</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="se">\n</span><span class="s">Session complete.</span><span class="sh">"</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">asyncio</span><span class="p">.</span><span class="n">CancelledError</span><span class="p">:</span>
+            <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="se">\n</span><span class="s">Interrupted.</span><span class="sh">"</span><span class="p">)</span>
+        <span class="k">except</span> <span class="nb">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="se">\n</span><span class="s">Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="sh">"</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="n">massager</span><span class="p">.</span><span class="nf">stop</span><span class="p">()</span>
+            <span class="k">except</span> <span class="nb">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="nf">print</span><span class="p">(</span><span class="sa">f</span><span class="sh">"</span><span class="se">\n</span><span class="s">!! SOFTWARE STOP FAILED (</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s">).</span><span class="sh">"</span><span class="p">)</span>
+                <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="s">!! Turn the unit off with its power button or remove the pads.</span><span class="sh">"</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">self</span><span class="p">.</span><span class="n">massager</span><span class="p">.</span><span class="nf">disconnect</span><span class="p">()</span>
+            <span class="k">except</span> <span class="nb">Exception</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+
+<span class="k">def</span> <span class="nf">parse_args</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">SessionConfig</span><span class="p">:</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">argparse</span><span class="p">.</span><span class="nc">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="sh">"</span><span class="s">FitRx BLE session runner with ramps and duty cycles</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">p</span><span class="p">.</span><span class="nf">add_argument</span><span class="p">(</span><span class="sh">"</span><span class="s">--mode</span><span class="sh">"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="nf">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">9</span><span class="p">),</span>
+                   <span class="nb">help</span><span class="o">=</span><span class="sh">"</span><span class="s">Hardware mode preset 1-8 (default: 1)</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">p</span><span class="p">.</span><span class="nf">add_argument</span><span class="p">(</span><span class="sh">"</span><span class="s">--target-intensity</span><span class="sh">"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="nf">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+                   <span class="nb">help</span><span class="o">=</span><span class="sh">"</span><span class="s">Peak level 1-9 (default: 4)</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">p</span><span class="p">.</span><span class="nf">add_argument</span><span class="p">(</span><span class="sh">"</span><span class="s">--duty-cycle</span><span class="sh">"</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="p">(</span><span class="sh">"</span><span class="s">WORK</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">REST</span><span class="sh">"</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="p">[</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">],</span>
+                   <span class="nb">help</span><span class="o">=</span><span class="sh">"</span><span class="s">Hold and rest times in seconds (default: 10 20)</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">p</span><span class="p">.</span><span class="nf">add_argument</span><span class="p">(</span><span class="sh">"</span><span class="s">--ramp</span><span class="sh">"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="nb">help</span><span class="o">=</span><span class="sh">"</span><span class="s">Ramp-up seconds (default: 5)</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">p</span><span class="p">.</span><span class="nf">add_argument</span><span class="p">(</span><span class="sh">"</span><span class="s">--ramp-down</span><span class="sh">"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="nb">help</span><span class="o">=</span><span class="sh">"</span><span class="s">Ramp-down seconds (default: 2)</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">p</span><span class="p">.</span><span class="nf">add_argument</span><span class="p">(</span><span class="sh">"</span><span class="s">--timer</span><span class="sh">"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="nf">range</span><span class="p">(</span><span class="n">TIMER_MIN</span><span class="p">,</span> <span class="n">TIMER_MAX</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+                   <span class="n">metavar</span><span class="o">=</span><span class="sa">f</span><span class="sh">"</span><span class="si">{</span><span class="n">TIMER_MIN</span><span class="si">}</span><span class="s">-</span><span class="si">{</span><span class="n">TIMER_MAX</span><span class="si">}</span><span class="sh">"</span><span class="p">,</span>
+                   <span class="nb">help</span><span class="o">=</span><span class="sa">f</span><span class="sh">"</span><span class="s">Session length in minutes, </span><span class="si">{</span><span class="n">TIMER_MIN</span><span class="si">}</span><span class="s">-</span><span class="si">{</span><span class="n">TIMER_MAX</span><span class="si">}</span><span class="s"> (default: 20)</span><span class="sh">"</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">p</span><span class="p">.</span><span class="nf">parse_args</span><span class="p">()</span>
+
+    <span class="n">work</span><span class="p">,</span> <span class="n">rest</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="n">duty_cycle</span>
+    <span class="k">if</span> <span class="n">work</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">rest</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">a</span><span class="p">.</span><span class="n">ramp</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">a</span><span class="p">.</span><span class="n">ramp_down</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">p</span><span class="p">.</span><span class="nf">error</span><span class="p">(</span><span class="sh">"</span><span class="s">work time must be positive; rest and ramp times can</span><span class="sh">'</span><span class="s">t be negative</span><span class="sh">"</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="nc">SessionConfig</span><span class="p">(</span>
+        <span class="n">mode_preset</span><span class="o">=</span><span class="n">a</span><span class="p">.</span><span class="n">mode</span><span class="p">,</span>
+        <span class="n">target_intensity</span><span class="o">=</span><span class="n">a</span><span class="p">.</span><span class="n">target_intensity</span><span class="p">,</span>
+        <span class="n">ramp_up_seconds</span><span class="o">=</span><span class="n">a</span><span class="p">.</span><span class="n">ramp</span><span class="p">,</span>
+        <span class="n">ramp_down_seconds</span><span class="o">=</span><span class="n">a</span><span class="p">.</span><span class="n">ramp_down</span><span class="p">,</span>
+        <span class="n">work_seconds</span><span class="o">=</span><span class="n">work</span><span class="p">,</span>
+        <span class="n">rest_seconds</span><span class="o">=</span><span class="n">rest</span><span class="p">,</span>
+        <span class="n">total_minutes</span><span class="o">=</span><span class="n">a</span><span class="p">.</span><span class="n">timer</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">async</span> <span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">cfg</span><span class="p">:</span> <span class="n">SessionConfig</span><span class="p">):</span>
+    <span class="c1"># Turn Ctrl+C into a task cancellation so the stop in `finally` always gets
+</span>    <span class="c1"># sent, on every Python version, instead of the loop being torn down first.
+</span>    <span class="n">task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="p">.</span><span class="nf">current_task</span><span class="p">()</span>
+    <span class="n">asyncio</span><span class="p">.</span><span class="nf">get_running_loop</span><span class="p">().</span><span class="nf">add_signal_handler</span><span class="p">(</span><span class="n">signal</span><span class="p">.</span><span class="n">SIGINT</span><span class="p">,</span> <span class="n">task</span><span class="p">.</span><span class="n">cancel</span><span class="p">)</span>
+    <span class="k">await</span> <span class="nc">SessionOrchestrator</span><span class="p">(</span><span class="n">cfg</span><span class="p">).</span><span class="nf">run</span><span class="p">()</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="sh">"</span><span class="s">__main__</span><span class="sh">"</span><span class="p">:</span>
+    <span class="n">cfg</span> <span class="o">=</span> <span class="nf">parse_args</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">asyncio</span><span class="p">.</span><span class="nf">run</span><span class="p">(</span><span class="nf">main</span><span class="p">(</span><span class="n">cfg</span><span class="p">))</span>
+    <span class="k">except</span> <span class="nb">KeyboardInterrupt</span><span class="p">:</span>
+        <span class="nf">print</span><span class="p">(</span><span class="sh">"</span><span class="se">\n</span><span class="s">Aborted. If the unit is still running, use its power button.</span><span class="sh">"</span><span class="p">)</span>
+        <span class="n">sys</span><span class="p">.</span><span class="nf">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div></div>
+
+        
+
+    </div><!-- /.entry-wrapper -->
+    <nav class="pagination" role="navigation">
+      
+        <a href="http://localhost:4000/blogsabout/spoke/" class="btn" title="Spoke: Seeing the Relationships in Your CSVs">Previous</a>
+      
+      
+        <a href="http://localhost:4000/adfirwmc/Ch5-1/" class="btn" title="ADFIRWMC - 5.1 Did It Run? Evidence of Execution">Next</a>
+      
+    </nav><!-- /.pagination -->
+  </article>
+</div><!-- /#main -->
+
+<div class="footer-wrapper">
+  <footer role="contentinfo" class="entry-wrapper">
+    
+
+<span>&copy; 2026 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
+<div class="social-icons">
+	<a href="https://twitter.com/GlassDFIR" title="Jon Glass on Twitter" target="_blank"><i class="fa fa-twitter-square fa-2x"></i></a>
+	
+	
+	
+	
+	
+	
+	<a href="https://github.com/GlassDFIR" title="Jon Glass on Github" target="_blank"><i class="fa fa-github-square fa-2x"></i></a>
+	
+  
+	
+  <a href="http://localhost:4000/feed.xml" title="Atom/RSS feed"><i class="fa fa-rss-square fa-2x"></i></a>
+</div><!-- /.social-icons -->
+
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+<script type="text/javascript">
+  var BASE_URL = 'http://localhost:4000';
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/l

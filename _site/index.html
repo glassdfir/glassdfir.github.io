@@ -6,13 +6,13 @@
 <head>
 <meta charset="utf-8">
 <title>Latest Posts &#8211; Half Full of Security</title>
-<meta name="description" content="A simple and clean responsive Jekyll theme for words and photos.">
+<meta name="description" content="DFIR, malware analysis, and the scripts and tools I build along the way.">
 
 
 
 <!-- Twitter Cards -->
 <meta name="twitter:title" content="Latest Posts">
-<meta name="twitter:description" content="A simple and clean responsive Jekyll theme for words and photos.">
+<meta name="twitter:description" content="DFIR, malware analysis, and the scripts and tools I build along the way.">
 <meta name="twitter:site" content="@GlassDFIR">
 <meta name="twitter:creator" content="@GlassDFIR">
 
@@ -23,7 +23,7 @@
 <meta property="og:locale" content="en_US">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Latest Posts">
-<meta property="og:description" content="A simple and clean responsive Jekyll theme for words and photos.">
+<meta property="og:description" content="DFIR, malware analysis, and the scripts and tools I build along the way.">
 <meta property="og:url" content="http://localhost:4000/">
 <meta property="og:site_name" content="Half Full of Security">
 
@@ -38,6 +38,11 @@
 <meta name="HandheldFriendly" content="True">
 <meta name="MobileOptimized" content="320">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Theme: dark by default; remember a reader's choice of light -->
+<script>
+  try { if (localStorage.getItem('theme') === 'light') document.documentElement.classList.add('theme-light'); } catch (e) {}
+</script>
 
 <!-- For all browsers -->
 <link rel="stylesheet" href="http://localhost:4000/assets/css/main.css">
@@ -83,7 +88,10 @@
 	    <ul>
       
 		    
-		    <li><a href="http://localhost:4000/blog/" >Blog</a></li>
+		    <li><a href="http://localhost:4000/blogsabout/" >Blog</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/tools/" >Tools</a></li>
 		  
 		    
 		    <li><a href="http://localhost:4000/adfirwmc/" >ADFIRWMC</a></li>
@@ -97,9 +105,24 @@
 		    
 		    <li><a href="http://localhost:4000/search/" >Search</a></li>
 		  
+		    <li><a href="#" class="theme-toggle" id="theme-toggle" role="button" aria-label="Switch between dark and light theme">Light</a></li>
 	    </ul>
 	</nav>
 </div><!-- /.navigation-wrapper -->
+<script>
+  (function () {
+    var root = document.documentElement, btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    function label() { btn.textContent = root.classList.contains('theme-light') ? 'Dark' : 'Light'; }
+    label();
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      var light = root.classList.toggle('theme-light');
+      try { localStorage.setItem('theme', light ? 'light' : 'dark'); } catch (err) {}
+      label();
+    });
+  })();
+</script>
 
 <!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
 
@@ -126,25 +149,25 @@
       <div class="entry-content">
         <ul class="post-list">
 
-  <li><article><a href="http://localhost:4000/blog/chatgpt-writes-the-blog/">ChatGPT wrote this blog post  <span class="entry-date"><time datetime="2023-02-27T17:33:28+00:00">February 27, 2023</time></span> <span class="excerpt"></span></a></article></li>
+  <li><article><a href="http://localhost:4000/blogsabout/building-dfir-playbooks-with-huddle/">Building DFIR Playbooks with Huddle <span class="entry-date"><time datetime="2026-10-28T11:00:00-04:00">October 28, 2026</time></span> <span class="excerpt"></span></a></article></li>
 
-  <li><article><a href="http://localhost:4000/blog/Live-Response-Kernel-Access/">Microsoft 365 Security: Kernel Level Access with Live Response <span class="entry-date"><time datetime="2022-03-13T17:33:28+00:00">March 13, 2022</time></span> <span class="excerpt"></span></a></article></li>
+  <li><article><a href="http://localhost:4000/adfirwmc/Ch5-1/">ADFIRWMC - 5.1 Did It Run? Evidence of Execution <span class="entry-date"><time datetime="2026-10-28T08:00:00-04:00">October 28, 2026</time></span> <span class="excerpt"></span></a></article></li>
 
-  <li><article><a href="http://localhost:4000/blog/Running-Arbitrary-Commands/">Microsoft 365 Security: Running Arbitrary Commands via the API <span class="entry-date"><time datetime="2022-03-13T17:33:28+00:00">March 13, 2022</time></span> <span class="excerpt"></span></a></article></li>
+  <li><article><a href="http://localhost:4000/blogsabout/reverse-engineering-a-fitrx-ems-app/">Reverse-Engineering a FitRx EMS App into a Python Controller <span class="entry-date"><time datetime="2026-10-26T11:00:00-04:00">October 26, 2026</time></span> <span class="excerpt"></span></a></article></li>
 
-  <li><article><a href="http://localhost:4000/blog/MDE-Live-Response-via-API/">Microsoft 365 Security: Using the API for Live Response <span class="entry-date"><time datetime="2022-03-10T17:33:28+00:00">March 10, 2022</time></span> <span class="excerpt"></span></a></article></li>
+  <li><article><a href="http://localhost:4000/blogsabout/spoke/">Spoke: Seeing the Relationships in Your CSVs <span class="entry-date"><time datetime="2026-10-26T10:00:00-04:00">October 26, 2026</time></span> <span class="excerpt"></span></a></article></li>
 
-  <li><article><a href="http://localhost:4000/blog/Building-API-Wrapper/">Microsoft 365 Security: Building a quick API wrapper <span class="entry-date"><time datetime="2022-03-09T17:33:28+00:00">March 09, 2022</time></span> <span class="excerpt"></span></a></article></li>
+  <li><article><a href="http://localhost:4000/blogsabout/what-chatgpt-wrote/">What ChatGPT Wrote When I Asked It to Blog <span class="entry-date"><time datetime="2023-02-27T12:33:28-05:00">February 27, 2023</time></span> <span class="excerpt"></span></a></article></li>
 
-  <li><article><a href="http://localhost:4000/blog/MDEAPIMFA/">Microsoft 365 Security: Multifactor API Access <span class="entry-date"><time datetime="2022-03-06T17:33:28+00:00">March 06, 2022</time></span> <span class="excerpt"></span></a></article></li>
+  <li><article><a href="http://localhost:4000/blogsabout/kernel-level-access-with-live-response/">Kernel-Level Access with Live Response <span class="entry-date"><time datetime="2022-03-13T13:33:28-04:00">March 13, 2022</time></span> <span class="excerpt"></span></a></article></li>
 
-  <li><article><a href="http://localhost:4000/blog/BotTricker/">BotTricker <span class="entry-date"><time datetime="2020-03-24T17:33:28+00:00">March 24, 2020</time></span> <span class="excerpt"></span></a></article></li>
+  <li><article><a href="http://localhost:4000/blogsabout/running-arbitrary-commands-with-live-response/">Running Arbitrary Commands with Live Response <span class="entry-date"><time datetime="2022-03-13T13:33:28-04:00">March 13, 2022</time></span> <span class="excerpt"></span></a></article></li>
 
-  <li><article><a href="http://localhost:4000/blog/AutoITXOR/">Decoding AutoIT XOR Encryption Obfuscation <span class="entry-date"><time datetime="2020-03-15T17:33:28+00:00">March 15, 2020</time></span> <span class="excerpt"></span></a></article></li>
+  <li><article><a href="http://localhost:4000/blogsabout/using-the-api-for-live-response/">Using the API for Live Response <span class="entry-date"><time datetime="2022-03-10T12:33:28-05:00">March 10, 2022</time></span> <span class="excerpt"></span></a></article></li>
 
-  <li><article><a href="http://localhost:4000/blog/CyberChef-Slides-From-RVASec/">Cybersecurity Zero to Hero with CyberChef <span class="entry-date"><time datetime="2019-06-23T20:33:28+00:00">June 23, 2019</time></span> <span class="excerpt"></span></a></article></li>
+  <li><article><a href="http://localhost:4000/blogsabout/building-an-mde-api-wrapper/">Building a Quick Defender for Endpoint API Wrapper <span class="entry-date"><time datetime="2022-03-09T12:33:28-05:00">March 09, 2022</time></span> <span class="excerpt"></span></a></article></li>
 
-  <li><article><a href="http://localhost:4000/blog/Fiesta-Analysis/">Analysis of Fiesta EK <span class="entry-date"><time datetime="2018-12-26T20:33:28+00:00">December 26, 2018</time></span> <span class="excerpt"></span></a></article></li>
+  <li><article><a href="http://localhost:4000/blogsabout/multifactor-access-to-the-mde-api/">Multifactor Access to the Defender for Endpoint API <span class="entry-date"><time datetime="2022-03-06T12:33:28-05:00">March 06, 2022</time></span> <span class="excerpt"></span></a></article></li>
 
 </ul>
 
@@ -157,7 +180,7 @@
   <footer role="contentinfo" class="entry-wrapper">
     
 
-<span>&copy; 2023 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
+<span>&copy; 2026 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
 <div class="social-icons">
 	<a href="https://twitter.com/GlassDFIR" title="Jon Glass on Twitter" target="_blank"><i class="fa fa-twitter-square fa-2x"></i></a>
 	

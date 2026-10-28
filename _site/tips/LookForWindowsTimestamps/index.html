@@ -39,6 +39,11 @@
 <meta name="MobileOptimized" content="320">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- Theme: dark by default; remember a reader's choice of light -->
+<script>
+  try { if (localStorage.getItem('theme') === 'light') document.documentElement.classList.add('theme-light'); } catch (e) {}
+</script>
+
 <!-- For all browsers -->
 <link rel="stylesheet" href="http://localhost:4000/assets/css/main.css">
 <!-- Webfonts -->
@@ -83,7 +88,10 @@
 	    <ul>
       
 		    
-		    <li><a href="http://localhost:4000/blog/" >Blog</a></li>
+		    <li><a href="http://localhost:4000/blogsabout/" >Blog</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/tools/" >Tools</a></li>
 		  
 		    
 		    <li><a href="http://localhost:4000/adfirwmc/" >ADFIRWMC</a></li>
@@ -97,9 +105,24 @@
 		    
 		    <li><a href="http://localhost:4000/search/" >Search</a></li>
 		  
+		    <li><a href="#" class="theme-toggle" id="theme-toggle" role="button" aria-label="Switch between dark and light theme">Light</a></li>
 	    </ul>
 	</nav>
 </div><!-- /.navigation-wrapper -->
+<script>
+  (function () {
+    var root = document.documentElement, btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    function label() { btn.textContent = root.classList.contains('theme-light') ? 'Dark' : 'Light'; }
+    label();
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      var light = root.classList.toggle('theme-light');
+      try { localStorage.setItem('theme', light ? 'light' : 'dark'); } catch (err) {}
+      label();
+    });
+  })();
+</script>
 
 <!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
 
@@ -130,8 +153,8 @@
       </header>
 
 
-        <time datetime="2018-02-20T20:33:28+00:00"><i class="fa fa-calendar-o"></i> February 20, 2018</time>
-        <p>I did some reverse engineering of 3rd party software in a client environment and wrote this script to help  determine how they logged events.</p>
+        <time datetime="2018-02-20T15:33:28-05:00"><i class="fa fa-calendar-o"></i> February 20, 2018</time>
+        <p>I did some reverse engineering of 3rd party software in a client environment and wrote this script to help determine how they logged events.</p>
 
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">struct</span><span class="p">,</span> <span class="n">time</span><span class="p">,</span> <span class="n">os</span><span class="p">,</span> <span class="n">sys</span>
 <span class="k">def</span> <span class="nf">conv_time</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">h</span><span class="p">):</span>
@@ -142,12 +165,12 @@
        <span class="n">newTime</span> <span class="o">=</span> <span class="mi">0</span>
    <span class="c1">#if the datestamp happens between Jan 1 2000 and now.
 </span>   <span class="k">if</span> <span class="n">newTime</span> <span class="o">&lt;=</span> <span class="n">time</span><span class="p">.</span><span class="nf">time</span><span class="p">()</span> <span class="ow">and</span> <span class="n">newTime</span> <span class="o">&gt;=</span> <span class="mi">946684800</span><span class="p">:</span>
-       <span class="k">return</span> <span class="n">time</span><span class="p">.</span><span class="nf">strftime</span><span class="p">(</span><span class="s">"%Y/%m/%d %H:%M:%S"</span><span class="p">,</span> <span class="n">time</span><span class="p">.</span><span class="nf">localtime</span><span class="p">(</span><span class="n">newTime</span><span class="p">))</span>
+       <span class="k">return</span> <span class="n">time</span><span class="p">.</span><span class="nf">strftime</span><span class="p">(</span><span class="sh">"</span><span class="s">%Y/%m/%d %H:%M:%S</span><span class="sh">"</span><span class="p">,</span> <span class="n">time</span><span class="p">.</span><span class="nf">localtime</span><span class="p">(</span><span class="n">newTime</span><span class="p">))</span>
    <span class="k">else</span><span class="p">:</span>
        <span class="k">return</span> <span class="mi">0</span>
-<span class="k">with</span> <span class="nf">open</span><span class="p">(</span><span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="s">'rb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">FileData</span><span class="p">:</span>
+<span class="k">with</span> <span class="nf">open</span><span class="p">(</span><span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="sh">'</span><span class="s">rb</span><span class="sh">'</span><span class="p">)</span> <span class="k">as</span> <span class="n">FileData</span><span class="p">:</span>
    <span class="nb">buffer</span> <span class="o">=</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span>
-   <span class="n">rawdata</span> <span class="o">=</span> <span class="s">" "</span>
+   <span class="n">rawdata</span> <span class="o">=</span> <span class="sh">"</span><span class="s"> </span><span class="sh">"</span>
    <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>
    <span class="n">chunkoffset</span> <span class="o">=</span> <span class="mi">0</span>
    <span class="k">while</span> <span class="n">rawdata</span><span class="p">:</span>
@@ -159,10 +182,10 @@
        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nf">range</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="n">rawdata</span><span class="p">)):</span>
            <span class="n">possible_timestamp</span> <span class="o">=</span> <span class="n">rawdata</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">8</span><span class="p">]</span>
            <span class="k">try</span><span class="p">:</span> <span class="c1">#Try to format these 8 bytes as a timestamp
-</span>               <span class="n">formatted_timestamp</span> <span class="o">=</span> <span class="nf">conv_time</span><span class="p">(</span><span class="n">struct</span><span class="p">.</span><span class="nf">unpack</span><span class="p">(</span><span class="s">"&lt;L"</span><span class="p">,</span><span class="n">possible_timestamp</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">])[</span><span class="mi">0</span><span class="p">],</span>
-                                               <span class="n">struct</span><span class="p">.</span><span class="nf">unpack</span><span class="p">(</span><span class="s">"&lt;L"</span><span class="p">,</span><span class="n">possible_timestamp</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">8</span><span class="p">])[</span><span class="mi">0</span><span class="p">])</span>
+</span>               <span class="n">formatted_timestamp</span> <span class="o">=</span> <span class="nf">conv_time</span><span class="p">(</span><span class="n">struct</span><span class="p">.</span><span class="nf">unpack</span><span class="p">(</span><span class="sh">"</span><span class="s">&lt;L</span><span class="sh">"</span><span class="p">,</span><span class="n">possible_timestamp</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">])[</span><span class="mi">0</span><span class="p">],</span>
+                                               <span class="n">struct</span><span class="p">.</span><span class="nf">unpack</span><span class="p">(</span><span class="sh">"</span><span class="s">&lt;L</span><span class="sh">"</span><span class="p">,</span><span class="n">possible_timestamp</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">8</span><span class="p">])[</span><span class="mi">0</span><span class="p">])</span>
                <span class="k">if</span> <span class="n">formatted_timestamp</span><span class="p">:</span>
-                   <span class="k">print</span> <span class="s">"Offset"</span><span class="p">,</span> <span class="nf">int</span><span class="p">(</span><span class="n">chunkoffset</span> <span class="o">+</span> <span class="n">i</span><span class="p">),</span> <span class="s">"Timestamp"</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">formatted_timestamp</span>
+                   <span class="k">print</span> <span class="sh">"</span><span class="s">Offset</span><span class="sh">"</span><span class="p">,</span> <span class="nf">int</span><span class="p">(</span><span class="n">chunkoffset</span> <span class="o">+</span> <span class="n">i</span><span class="p">),</span> <span class="sh">"</span><span class="s">Timestamp</span><span class="sh">"</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">formatted_timestamp</span>
                    <span class="n">x</span> <span class="o">+=</span> <span class="mi">1</span> <span class="c1"># add one to the timestamp count
 </span>           <span class="k">except</span><span class="p">:</span> <span class="c1"># Something broke...
 </span>               <span class="k">continue</span> <span class="c1"># Try the next 8 bytes</span></code></pre></figure>
@@ -185,7 +208,7 @@
   <footer role="contentinfo" class="entry-wrapper">
     
 
-<span>&copy; 2023 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
+<span>&copy; 2026 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
 <div class="social-icons">
 	<a href="https://twitter.com/GlassDFIR" title="Jon Glass on Twitter" target="_blank"><i class="fa fa-twitter-square fa-2x"></i></a>
 	

@@ -39,6 +39,11 @@
 <meta name="MobileOptimized" content="320">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- Theme: dark by default; remember a reader's choice of light -->
+<script>
+  try { if (localStorage.getItem('theme') === 'light') document.documentElement.classList.add('theme-light'); } catch (e) {}
+</script>
+
 <!-- For all browsers -->
 <link rel="stylesheet" href="http://localhost:4000/assets/css/main.css">
 <!-- Webfonts -->
@@ -83,7 +88,10 @@
 	    <ul>
       
 		    
-		    <li><a href="http://localhost:4000/blog/" >Blog</a></li>
+		    <li><a href="http://localhost:4000/blogsabout/" >Blog</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/tools/" >Tools</a></li>
 		  
 		    
 		    <li><a href="http://localhost:4000/adfirwmc/" >ADFIRWMC</a></li>
@@ -97,9 +105,24 @@
 		    
 		    <li><a href="http://localhost:4000/search/" >Search</a></li>
 		  
+		    <li><a href="#" class="theme-toggle" id="theme-toggle" role="button" aria-label="Switch between dark and light theme">Light</a></li>
 	    </ul>
 	</nav>
 </div><!-- /.navigation-wrapper -->
+<script>
+  (function () {
+    var root = document.documentElement, btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    function label() { btn.textContent = root.classList.contains('theme-light') ? 'Dark' : 'Light'; }
+    label();
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      var light = root.classList.toggle('theme-light');
+      try { localStorage.setItem('theme', light ? 'light' : 'dark'); } catch (err) {}
+      label();
+    });
+  })();
+</script>
 
 <!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
 
@@ -130,7 +153,7 @@
       </header>
 
 
-        <time datetime="2018-02-20T20:33:28+00:00"><i class="fa fa-calendar-o"></i> February 20, 2018</time>
+        <time datetime="2018-02-20T15:33:28-05:00"><i class="fa fa-calendar-o"></i> February 20, 2018</time>
         
 <figure class="highlight"><pre><code class="language-powershell" data-lang="powershell"><span class="c">#Delete existing protections</span><span class="w">
 </span><span class="n">manage-bde.exe</span><span class="w"> </span><span class="nt">-cn</span><span class="w"> </span><span class="nx">ComputerName</span><span class="w"> </span><span class="nt">-protectors</span><span class="w"> </span><span class="nt">-delete</span><span class="w"> </span><span class="nx">c:</span><span class="w"> </span><span class="nt">-Type</span><span class="w"> </span><span class="nx">TPMAndPIN</span><span class="w">
@@ -138,7 +161,7 @@
 </span><span class="c">#Now that all of the previous Protectors are gone, let's add our own.</span><span class="w">
 </span><span class="c">#Let's add a new password that only the security team will need to know.</span><span class="w">
 </span><span class="n">manage-bde.exe</span><span class="w"> </span><span class="nt">-cn</span><span class="w"> </span><span class="nx">ComputerName</span><span class="w"> </span><span class="nt">-protectors</span><span class="w"> </span><span class="nt">-add</span><span class="w"> </span><span class="nx">c:</span><span class="w"> </span><span class="nt">-TPMandPIN</span><span class="w"> </span><span class="nx">SuperDuperPassword</span><span class="w">
-</span><span class="c">#As a backup, let's also add a couple of recovery keys just in case noone can find the sticky note with the password.</span><span class="w">
+</span><span class="c">#As a backup, let's also add a couple of recovery keys just in case no one can find the sticky note with the password.</span><span class="w">
 </span><span class="n">manage-bde.exe</span><span class="w"> </span><span class="nt">-cn</span><span class="w"> </span><span class="nx">ComputerName</span><span class="w"> </span><span class="nt">-protectors</span><span class="w"> </span><span class="nt">-add</span><span class="w"> </span><span class="nx">c:</span><span class="w"> </span><span class="nt">-RecoveryPassword</span><span class="w"> </span><span class="nx">111111-111111-111111-111111-111111-111111-111111-111111</span><span class="w"> 
 </span><span class="n">manage-bde.exe</span><span class="w"> </span><span class="nt">-cn</span><span class="w"> </span><span class="nx">ComputerName</span><span class="w"> </span><span class="nt">-protectors</span><span class="w"> </span><span class="nt">-add</span><span class="w"> </span><span class="nx">c:</span><span class="w"> </span><span class="nt">-RecoveryPassword</span><span class="w"> </span><span class="nx">222222-222222-222222-222222-222222-222222-222222-222222</span><span class="w"> 
 </span><span class="n">manage-bde.exe</span><span class="w"> </span><span class="nt">-cn</span><span class="w"> </span><span class="nx">ComputerName</span><span class="w"> </span><span class="nt">-on</span><span class="w"> </span><span class="nx">c:</span></code></pre></figure>
@@ -161,7 +184,7 @@
   <footer role="contentinfo" class="entry-wrapper">
     
 
-<span>&copy; 2023 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
+<span>&copy; 2026 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
 <div class="social-icons">
 	<a href="https://twitter.com/GlassDFIR" title="Jon Glass on Twitter" target="_blank"><i class="fa fa-twitter-square fa-2x"></i></a>
 	

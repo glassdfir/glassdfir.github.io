@@ -39,6 +39,11 @@
 <meta name="MobileOptimized" content="320">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- Theme: dark by default; remember a reader's choice of light -->
+<script>
+  try { if (localStorage.getItem('theme') === 'light') document.documentElement.classList.add('theme-light'); } catch (e) {}
+</script>
+
 <!-- For all browsers -->
 <link rel="stylesheet" href="http://localhost:4000/assets/css/main.css">
 <!-- Webfonts -->
@@ -83,7 +88,10 @@
 	    <ul>
       
 		    
-		    <li><a href="http://localhost:4000/blog/" >Blog</a></li>
+		    <li><a href="http://localhost:4000/blogsabout/" >Blog</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/tools/" >Tools</a></li>
 		  
 		    
 		    <li><a href="http://localhost:4000/adfirwmc/" >ADFIRWMC</a></li>
@@ -97,9 +105,24 @@
 		    
 		    <li><a href="http://localhost:4000/search/" >Search</a></li>
 		  
+		    <li><a href="#" class="theme-toggle" id="theme-toggle" role="button" aria-label="Switch between dark and light theme">Light</a></li>
 	    </ul>
 	</nav>
 </div><!-- /.navigation-wrapper -->
+<script>
+  (function () {
+    var root = document.documentElement, btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    function label() { btn.textContent = root.classList.contains('theme-light') ? 'Dark' : 'Light'; }
+    label();
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      var light = root.classList.toggle('theme-light');
+      try { localStorage.setItem('theme', light ? 'light' : 'dark'); } catch (err) {}
+      label();
+    });
+  })();
+</script>
 
 <!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
 
@@ -130,22 +153,22 @@
       </header>
 
 
-        <time datetime="2018-03-03T20:33:28+00:00"><i class="fa fa-calendar-o"></i> March 03, 2018</time>
+        <time datetime="2018-03-03T15:33:28-05:00"><i class="fa fa-calendar-o"></i> March 03, 2018</time>
         <p>Some folks reading this are convinced that Incident Response is all done through Endpoint Detection and Response solutions and in 2018 no one drops collection scripts to gather artifacts for analysis. Those people are wrong.</p>
 
-<p>The first thing you should know is you will run into problems. Even when your collection tool is working perfectly; network connections drop, hard drives run out of room, antivirus and data loss prevention software will freak out… this is going to happen. Embrace it.</p>
+<p>The first thing you should know is you will run into problems. Even when your collection tool is working perfectly, network connections drop, hard drives run out of room, antivirus and data loss prevention software will freak out… this is going to happen. Embrace it.</p>
 
 <p>This chapter is going to cover as many of the lessons learned as I can think of.</p>
 
 <h3 id="issues-with-tools-for-remote-file-acquisition">Issues with Tools for Remote File Acquisition</h3>
 
-<p>This can quickly get religious but I am not a fan of most commercial tools. Many do WAY too much stuff I don’t need or want for my OCD to handle. I am not going to bad mouth any particular vendor but there are a lot of solutions that just don’t work for my exact needs.</p>
+<p>This can quickly get religious but I am not a fan of most commercial tools. Many do WAY too much stuff I don’t need or want for my OCD to handle. I am not going to badmouth any particular vendor but there are a lot of solutions that just don’t work for my exact needs.</p>
 
 <p>Things I have found annoying about collection tools:</p>
 
 <ul>
   <li>Some tools require special dongles which is often not practical with modern global enterprises.</li>
-  <li>Some use netcat like functionality to talk directly from your workstation to target which triggers NIDS and is blocked by NIPS.</li>
+  <li>Some use netcat-like functionality to talk directly from your workstation to target which triggers NIDS and is blocked by NIPS.</li>
   <li>Some won’t copy or even find some files on the target because they are locked by the OS or a third party tool like AV or DLP.</li>
   <li>Some free tools get flagged by AV because they are not signed or what they are written in.</li>
   <li>Some tools take too long and then produce too little.</li>
@@ -157,8 +180,8 @@
 
 <h4 id="the-underlying-mechanics-of-copying-locked-files-on-windows">The Underlying Mechanics of Copying Locked Files on Windows</h4>
 
-<p>Before we discuss tools and examples, an understanding of the mechanics of the NTFS filesystem is helpful to ensure you can adapt and overcome when various things get in between you and your artifacts. Here is a piece of DFIRfu using completely native windows commands. Admittedly, this is more DF than IR and I know it is a lot of hexadecimal but stick with me…
-<img src="../images/MFTdataruns.png" alt="MFT Data Runs" /></p>
+<p>Before we discuss tools and examples, an understanding of the mechanics of the NTFS filesystem is helpful to ensure you can adapt and overcome when various things get in between you and your artifacts. Here is a piece of DFIRfu using completely native Windows commands. Admittedly, this is more DF than IR and I know it is a lot of hexadecimal but stick with me…
+<img src="/adfirwmc/images/MFTdataruns.png" alt="MFT Data Runs" /></p>
 
 <p><strong>Breakdown</strong></p>
 
@@ -173,7 +196,7 @@
   </li>
   <li><code class="language-plaintext highlighter-rouge">fsutil.exe file queryextents c:\$MFT</code>
     <ul>
-      <li>This command shows use the clusters allocated to the $MFT. I pick on the $MFT a lot in my examples for two reasons : it contains almost all of the file system information on the system and it is not directly accessible through the operating system.</li>
+      <li>This command shows us the clusters allocated to the $MFT. I pick on the $MFT a lot in my examples for two reasons: it contains almost all of the file system information on the system and it is not directly accessible through the operating system.</li>
       <li>This command outputs three columns of information:
         <ul>
           <li><strong>VCN</strong>: Virtual Cluster Numbers are used to sequence chunks of allocated data kinda like numbered puzzle pieces.</li>
@@ -186,8 +209,8 @@
   <li><code class="language-plaintext highlighter-rouge">echo Size of $MFT in Bytes: &amp;&amp; set /a (0xC820 + 0x4720) * 4096</code>
     <ul>
       <li>This is just an example of how to do math on the Windows command line.</li>
-      <li><code class="language-plaintext highlighter-rouge">set /a</code> can be used for sorts of fun stuff like converting hex to decimal and arithmetic.</li>
-      <li>Here I am adding the number of clusters from the first data run and second data run to determine the total number of clusters allocated to the $MFT. Since we know the clusters are 4096 bytes large, we multiple to determine the number of bytes allocated to the $MFT.</li>
+      <li><code class="language-plaintext highlighter-rouge">set /a</code> can be used for all sorts of fun stuff like converting hex to decimal and arithmetic.</li>
+      <li>Here I am adding the number of clusters from the first data run and second data run to determine the total number of clusters allocated to the $MFT. Since we know the clusters are 4096 bytes large, we multiply to determine the number of bytes allocated to the $MFT.</li>
     </ul>
   </li>
   <li><code class="language-plaintext highlighter-rouge">dir "\\vmware-host\Shared Folders\Evidence"</code>
@@ -199,11 +222,11 @@
 
 <p>Here is another way to look at that information:</p>
 
-<p><img src="../images/MFTallocatedspace.png" alt="enter image description here" /></p>
+<p><img src="/adfirwmc/images/MFTallocatedspace.png" alt="enter image description here" /></p>
 
-<p>That $MFT only has two but it is common for larger files to have many data runs:</p>
+<p>That $MFT only has two data runs, but it is common for larger files to have many data runs:</p>
 
-<p><img src="../images/2018-Webcachedataruns.png" alt="webcache data runs" /></p>
+<p><img src="/adfirwmc/images/2018-Webcachedataruns.png" alt="webcache data runs" /></p>
 
 <p>This WebCacheV01.dat file has 25 runs spread out all over the volume.</p>
 
@@ -214,17 +237,17 @@
 <ol>
   <li>Determine what physical clusters have been allocated for that file. This is stored in terms of LCN and number of clusters <em>(inside the $MFT as it just so happens, but we will cover that later)</em>.</li>
   <li>Open the Volume for direct read access.</li>
-  <li>Seek to the offset of the LCN on disk and read the numbers of clusters specified. Repeat as needed for all Data Runs.</li>
+  <li>Seek to the offset of the LCN on disk and read the number of clusters specified. Repeat as needed for all Data Runs.</li>
   <li>Write the collected information to an output file in the sequence specified by the VCNs.</li>
 </ol>
 
-<p>Piece of cake right? Well the first 3 steps can trip up tools for one reason or another.</p>
+<p>Piece of cake, right? Well, the first 3 steps can trip up tools for one reason or another.</p>
 
 <h3 id="building-a-toolkit-for-live-file-collection">Building a Toolkit for Live File Collection:</h3>
 
 <p>I wish I could point you to a single perfect free tool that does exactly what you need but sadly, I can’t recommend one that checks all the blocks. So, since this is a course designed to expand your knowledge and experience, let’s just build one from scratch(ish)!</p>
 
-<p>Lets display a variety of PowerShell fucntionality by using fcat from SleuthKit to make a collection script:</p>
+<p>Let’s display a variety of PowerShell functionality by using fcat from SleuthKit to make a collection script:</p>
 
 <div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#1. Timestamps are a great way to make unique folder names with context.</span><span class="w">
 </span><span class="nv">$timestamp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">get-date</span><span class="p">)</span><span class="o">.</span><span class="nf">ToString</span><span class="p">(</span><span class="s1">'yyyy-MM-dd-h-m-s'</span><span class="p">)</span><span class="w">
@@ -287,7 +310,7 @@
 </span><span class="n">write-host</span><span class="w"> </span><span class="s2">"Done"</span><span class="w">
 </span></code></pre></div></div>
 
-<p>This is the platform we will add use and augment throughout the rest of the course. It’s free and it works. Strap in because the breakdown on this is going to be brutal.</p>
+<p>This is the platform we will use and augment throughout the rest of the course. It’s free and it works. Strap in because the breakdown on this is going to be brutal.</p>
 
 <p><strong>Breakdown</strong></p>
 <ul>
@@ -310,7 +333,7 @@
     <div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$filestocollect</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="s1">'c:\$MFT'</span><span class="w">
 </span></code></pre></div>    </div>
     <ul>
-      <li>Some files are a part of the filesystem but not direct accessible via a directory listing so we add their paths manually to $filestocollect array</li>
+      <li>Some files are a part of the filesystem but not directly accessible via a directory listing so we add their paths manually to $filestocollect array</li>
     </ul>
   </li>
   <li>
@@ -324,8 +347,8 @@
     <div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$filesigs</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="s1">'^c:\\Users\\.*\\ntuser.dat$'</span><span class="w">
 </span></code></pre></div>    </div>
     <ul>
-      <li>This RegEx allows us to collect registry files from all of the profiles on a system without having to explictedly know the path for each</li>
-      <li>We are using double back slashes to “escape” the single blackslash. If we didn’t, it would be interpreted as a RegEx operator.</li>
+      <li>This RegEx allows us to collect registry files from all of the profiles on a system without having to explicitly know the path for each</li>
+      <li>We are using double backslashes to “escape” the single backslash. If we didn’t, it would be interpreted as a RegEx operator.</li>
     </ul>
   </li>
   <li>
@@ -334,11 +357,11 @@
     <ul>
       <li>Here we are using the gci alias for the PowerShell command Get-ChildItem which is a fancy command that can enumerate through a directory listing among other things.</li>
       <li>We specify 2 directories for the <strong>-Path</strong> argument to define the scope of our search.</li>
-      <li><strong>-Recurse</strong> continues the seach throughout all of the subdirectories.</li>
+      <li><strong>-Recurse</strong> continues the search throughout all of the subdirectories.</li>
       <li><strong>-Force</strong> adds hidden files to the search and levitates rocks.</li>
-      <li><strong>-File</strong> is used to exclude directories from my results. This is actually important to the mechanincs of the rest of the script.</li>
+      <li><strong>-File</strong> is used to exclude directories from my results. This is actually important to the mechanics of the rest of the script.</li>
       <li>I specified SilentlyContinue for <strong>-ErrorAction</strong> because as it tries to get directory for every file in the C:\Windows folder, there are Access Denied Errors on files I didn’t ask for and I don’t want to see them.</li>
-      <li>We redirect the output of the gci command into the Where-Object to filter our results to compare the <strong>FullName</strong> of the file to our array of RegEx $filesigs. $filesigs is an array of strings until use <strong>-Join</strong> to merge each signature together with a pipe which acts as an OR statement in RegEx. “Signature 1 OR Signature 2 OR …”</li>
+      <li>We redirect the output of the gci command into the Where-Object to filter our results to compare the <strong>FullName</strong> of the file to our array of RegEx $filesigs. $filesigs is an array of strings until we use <strong>-Join</strong> to merge each signature together with a pipe which acts as an OR statement in RegEx. “Signature 1 OR Signature 2 OR …”</li>
       <li>Finally, we redirect THAT output and grab the Fullname of the file that matches one of our signatures and add it to the $filestocollect array.</li>
     </ul>
   </li>
@@ -353,7 +376,7 @@
     <div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">while</span><span class="p">(@(</span><span class="err">Get-Process</span><span class="w"> </span><span class="err">fcat</span><span class="w"> </span><span class="err">-ErrorAction</span><span class="w"> </span><span class="err">SilentlyContinue</span><span class="p">)</span><span class="o">.</span><span class="nf">Count</span><span class="w"> </span><span class="o">-ge</span><span class="w"> </span><span class="mi">10</span><span class="p">){</span><span class="n">Start-Sleep</span><span class="w"> </span><span class="nt">-Seconds</span><span class="w"> </span><span class="nx">5</span><span class="p">}</span><span class="w">
 </span></code></pre></div>    </div>
     <ul>
-      <li>This is a While loop in PowerShell. This statement will keep going until the condition is not True. This statement is counting the number of processes containing “fcat” and if it is greater than or equal to 10; it will sleep for 5 seconds and check again. This is being used to keep the number of fcat collectors to a reasonable amount. Is this a perfect solution? No. This is more “Tactical” Multiprocessing, meaning I want more than one instance running at a time but I don’t care enough to code true multiprocessing into the script. High yield, low drag. The process count and sleep timer can be adjusted to the desired amount of noise you want the target systems fan to make.</li>
+      <li>This is a While loop in PowerShell. This statement will keep going until the condition is not True. This statement is counting the number of processes containing “fcat” and if it is greater than or equal to 10; it will sleep for 5 seconds and check again. This is being used to keep the number of fcat collectors to a reasonable amount. Is this a perfect solution? No. This is more “Tactical” Multiprocessing, meaning I want more than one instance running at a time but I don’t care enough to code true multiprocessing into the script. High yield, low drag. The process count and sleep timer can be adjusted to the desired amount of noise you want the target system’s fan to make.</li>
     </ul>
   </li>
   <li>
@@ -367,7 +390,7 @@
     <div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$outfile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">$</span><span class="p">(</span><span class="s1">'{0}\\{1}'</span><span class="w"> </span><span class="nt">-f</span><span class="w"> </span><span class="nv">$timestamp</span><span class="p">,</span><span class="nv">$file</span><span class="w"> </span><span class="o">-replace</span><span class="w"> </span><span class="s1">':'</span><span class="p">,</span><span class="s1">''</span><span class="p">)</span><span class="w">
 </span></code></pre></div>    </div>
     <ul>
-      <li>fcat literally just prints a files contents to screen and has no other frills like saving the file to another location so it makes us do a little work.</li>
+      <li>fcat literally just prints a file’s contents to screen and has no other frills like saving the file to another location so it makes us do a little work.</li>
       <li>This line of code is responsible for creating the folder structure in the collection folder that represents where the file came from on the target.</li>
       <li><code class="language-plaintext highlighter-rouge">C:\Users\Username\ntuser.dat</code> gets saved to <code class="language-plaintext highlighter-rouge">2018-03-08-5-2-12\c\Users\Username\ntuser.dat</code></li>
     </ul>
@@ -377,7 +400,7 @@
 </span></code></pre></div>    </div>
     <ul>
       <li>In order to store the ntuser.dat file in the <code class="language-plaintext highlighter-rouge">2018-03-08-5-2-12\c\Users\Username</code> folder, we need to create it.</li>
-      <li>This line takes a substring of the $outfile path from index 0 (the begining) to the index of the last backslash argo the parent folder of the file.</li>
+      <li>This line takes a substring of the $outfile path from index 0 (the beginning) to the index of the last backslash, ergo the parent folder of the file.</li>
       <li>Are there other commands to get the parent folder of a file? Yes, but they don’t work on files the OS can’t see like c:\$Extend\$USNJrnl:$J and I imagine this is faster anyways.</li>
     </ul>
   </li>
@@ -388,7 +411,7 @@
 </code></pre></div>        </div>
       </li>
       <li>This is pretty simple but gets complicated because all the paths need to be encapsulated with quotes because some paths might have spaces in them.</li>
-      <li><code class="language-plaintext highlighter-rouge">$('{0}{1}{0}' -f [char]34, $outdir)</code> is an example of creating a string from other variables. I am using [char]34 because it is the cleanest method of concatenating quotes I have found. The backtick method didn’t survive accoss the cmd interpreter. This method puts a “ before and after the $outdir.</li>
+      <li><code class="language-plaintext highlighter-rouge">$('{0}{1}{0}' -f [char]34, $outdir)</code> is an example of creating a string from other variables. I am using [char]34 because it is the cleanest method of concatenating quotes I have found. The backtick method didn’t survive across the cmd interpreter. This method puts a “ before and after the $outdir.</li>
       <li>Fun fact: mkdir will make recursive folders if you ask it.</li>
       <li>For fcat, I used -h to knock down the size of the sparse files we collect. I will cover that later. -f specifies the NTFS file system.</li>
       <li>We are using the &gt; to redirect the output of fcat into a file.</li>
@@ -398,31 +421,31 @@
     <div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Start-Process</span><span class="w"> </span><span class="nx">cmd.exe</span><span class="w"> </span><span class="nt">-ArgumentList</span><span class="w"> </span><span class="nv">$cmdstr</span><span class="w"> </span><span class="nt">-WindowStyle</span><span class="w"> </span><span class="nx">Hidden</span><span class="w">
 </span></code></pre></div>    </div>
     <ul>
-      <li>Fire off the procress in a hidden window.</li>
+      <li>Fire off the process in a hidden window.</li>
     </ul>
   </li>
   <li>
     <div class="language-posh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">while</span><span class="p">(@(</span><span class="err">Get-Process</span><span class="w"> </span><span class="err">fcat</span><span class="w">  </span><span class="err">-ErrorAction</span><span class="w"> </span><span class="err">SilentlyContinue</span><span class="p">)</span><span class="o">.</span><span class="nf">Count</span><span class="p">){</span><span class="n">Start-Sleep</span><span class="w"> </span><span class="nt">-Seconds</span><span class="w"> </span><span class="nx">30</span><span class="p">}</span><span class="w">
 </span></code></pre></div>    </div>
-    <p>Since we have a few collectors going at a the same time, we need to want until they are all finished before zipping up the collection. I wrote it to check and then wait 30 secs which seems to work pretty well but ymmv.</p>
+    <p>Since we have a few collectors going at the same time, we need to wait until they are all finished before zipping up the collection. I wrote it to check and then wait 30 secs which seems to work pretty well but ymmv.</p>
   </li>
   <li>The rest of the code just makes a zip file by compressing the 2018-03-08-5-2-12 folder and saving to 2018-03-08-5-2-12.zip</li>
 </ul>
 
 <p>The folder structure ends up looking like this:</p>
 
-<p><img src="../images/tree.png" alt="Folder Structure" /></p>
+<p><img src="/adfirwmc/images/tree.png" alt="Folder Structure" /></p>
 
 <h2 id="securely-copying-files">Securely Copying Files</h2>
-<p>We will dive more into this later but the title of this chapter is REMOTE file aquisition right? Since this zip file was created locally, we need a secure way to copy it from the remote machine. This is a bit of a cheat code BUT all of PsExec’s network communications are encrypted to prevent admin credentials being sniffed over the network traffic. We can use this to send files over a secure channel with something like this:</p>
+<p>We will dive more into this later but the title of this chapter is REMOTE file acquisition right? Since this zip file was created locally, we need a secure way to copy it from the remote machine. This is a bit of a cheat code BUT all of PsExec’s network communications are encrypted to prevent admin credentials being sniffed over the network traffic. We can use this to send files over a secure channel with something like this:</p>
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PsExec \\RemoteMachine cmd /c type C:\temp\2018-03-08-5-2-12.zip 2&gt;nul 1&gt; 2018-03-08-5-2-12-RemoteMachine.zip
 </code></pre></div></div>
-<p>This is a cheap method of secure transport without having to set up network shares or netcat like direct TCP communication.
+<p>This is a cheap method of secure transport without having to set up network shares or netcat-like direct TCP communication.
 I normally use PsExec on systems with my existing token but in the rare instances that I need to use a Username and Password it will add extra crap to the file. 
 At the top of the file:
-<img src="../images/topbottom.png" alt="top" />
+<img src="/adfirwmc/images/topbottom.png" alt="top" />
 and the bottom:
-<img src="../images/topbottom2.png" alt="bottom" /></p>
+<img src="/adfirwmc/images/topbottom2.png" alt="bottom" /></p>
 
 <p>You can clip that off in PowerShell like this:</p>
 <div class="language-posh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$PATH</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">"2018-03-08-5-2-12.zip"</span><span class="w">
@@ -452,7 +475,7 @@ and the bottom:
   <footer role="contentinfo" class="entry-wrapper">
     
 
-<span>&copy; 2023 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
+<span>&copy; 2026 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
 <div class="social-icons">
 	<a href="https://twitter.com/GlassDFIR" title="Jon Glass on Twitter" target="_blank"><i class="fa fa-twitter-square fa-2x"></i></a>
 	

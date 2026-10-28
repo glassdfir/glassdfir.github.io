@@ -39,6 +39,11 @@
 <meta name="MobileOptimized" content="320">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- Theme: dark by default; remember a reader's choice of light -->
+<script>
+  try { if (localStorage.getItem('theme') === 'light') document.documentElement.classList.add('theme-light'); } catch (e) {}
+</script>
+
 <!-- For all browsers -->
 <link rel="stylesheet" href="http://localhost:4000/assets/css/main.css">
 <!-- Webfonts -->
@@ -83,7 +88,10 @@
 	    <ul>
       
 		    
-		    <li><a href="http://localhost:4000/blog/" >Blog</a></li>
+		    <li><a href="http://localhost:4000/blogsabout/" >Blog</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/tools/" >Tools</a></li>
 		  
 		    
 		    <li><a href="http://localhost:4000/adfirwmc/" >ADFIRWMC</a></li>
@@ -97,9 +105,24 @@
 		    
 		    <li><a href="http://localhost:4000/search/" >Search</a></li>
 		  
+		    <li><a href="#" class="theme-toggle" id="theme-toggle" role="button" aria-label="Switch between dark and light theme">Light</a></li>
 	    </ul>
 	</nav>
 </div><!-- /.navigation-wrapper -->
+<script>
+  (function () {
+    var root = document.documentElement, btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    function label() { btn.textContent = root.classList.contains('theme-light') ? 'Dark' : 'Light'; }
+    label();
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      var light = root.classList.toggle('theme-light');
+      try { localStorage.setItem('theme', light ? 'light' : 'dark'); } catch (err) {}
+      label();
+    });
+  })();
+</script>
 
 <!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
 
@@ -295,7 +318,7 @@ bundle <span class="nb">exec </span>jekyll serve
 <p>For example. Say you want to group all your posts under blog/ instead of articles/. In your post add <code class="language-plaintext highlighter-rouge">categories: blog</code> to the YAML front matter, rename or duplicate articles/index.md to blog/index.md and update the <em>for loop</em> to limit posts to just the blog category.</p>
 
 <div class="language-liquid highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
-<span class="p">{%</span><span class="w"> </span><span class="nt">for</span><span class="w"> </span><span class="nv">post</span><span class="w"> </span><span class="nt">in</span><span class="w"> </span><span class="nv">site.categories.blog</span><span class="w"> </span><span class="p">%}</span>
+<span class="cp">{%</span><span class="w"> </span><span class="nt">for</span><span class="w"> </span><span class="nv">post</span><span class="w"> </span><span class="nt">in</span><span class="w"> </span><span class="nv">site</span><span class="p">.</span><span class="nv">categories</span><span class="p">.</span><span class="nv">blog</span><span class="w"> </span><span class="cp">%}</span>
 
 </code></pre></div></div>
 
@@ -303,7 +326,7 @@ bundle <span class="nb">exec </span>jekyll serve
 
 <h3 id="feature-images">Feature Images</h3>
 
-<p>A good rule of thumb is to keep feature images nice and wide so you don’t push the body text too far down. An image cropped around around 1024 x 256 pixels will keep file size down with an acceptable resolution for most devices. If you want to serve these images responsively I’d suggest looking at the <a href="https://github.com/robwierzbowski/jekyll-picture-tag">Jekyll Picture Tag</a> plugin<sup id="fnref:plugins" role="doc-noteref"><a href="#fn:plugins" class="footnote" rel="footnote">1</a></sup>.</p>
+<p>A good rule of thumb is to keep feature images nice and wide so you don’t push the body text too far down. An image cropped around around 1024 x 256 pixels will keep file size down with an acceptable resolution for most devices. If you want to serve these images responsively I’d suggest looking at the <a href="https://github.com/robwierzbowski/jekyll-picture-tag">Jekyll Picture Tag</a> plugin<sup id="fnref:plugins"><a href="#fn:plugins" class="footnote" rel="footnote" role="doc-noteref">1</a></sup>.</p>
 
 <p>The post and page layouts make the assumption that the feature images live in the <code class="language-plaintext highlighter-rouge">images/</code> folder. To add a feature image to a post or page just include the filename in the front matter like so.</p>
 
@@ -441,7 +464,7 @@ bundle <span class="nb">exec </span>jekyll serve
 <p>This theme is free and open source software, distributed under the MIT License. So feel free to use this Jekyll theme on your site without linking back to me or including a disclaimer.</p>
 <div class="footnotes" role="doc-endnotes">
   <ol>
-    <li id="fn:plugins" role="doc-endnote">
+    <li id="fn:plugins">
       <p>If you’re using GitHub Pages to host your site be aware that plugins are disabled. You’ll need to build your site locally and then manually deploy if you want to use this sweet plugin. <a href="#fnref:plugins" class="reversefootnote" role="doc-backlink">&#8617;</a></p>
     </li>
   </ol>
@@ -456,7 +479,7 @@ bundle <span class="nb">exec </span>jekyll serve
   <footer role="contentinfo" class="entry-wrapper">
     
 
-<span>&copy; 2023 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
+<span>&copy; 2026 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
 <div class="social-icons">
 	<a href="https://twitter.com/GlassDFIR" title="Jon Glass on Twitter" target="_blank"><i class="fa fa-twitter-square fa-2x"></i></a>
 	

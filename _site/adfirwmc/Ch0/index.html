@@ -39,6 +39,11 @@
 <meta name="MobileOptimized" content="320">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- Theme: dark by default; remember a reader's choice of light -->
+<script>
+  try { if (localStorage.getItem('theme') === 'light') document.documentElement.classList.add('theme-light'); } catch (e) {}
+</script>
+
 <!-- For all browsers -->
 <link rel="stylesheet" href="http://localhost:4000/assets/css/main.css">
 <!-- Webfonts -->
@@ -83,7 +88,10 @@
 	    <ul>
       
 		    
-		    <li><a href="http://localhost:4000/blog/" >Blog</a></li>
+		    <li><a href="http://localhost:4000/blogsabout/" >Blog</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/tools/" >Tools</a></li>
 		  
 		    
 		    <li><a href="http://localhost:4000/adfirwmc/" >ADFIRWMC</a></li>
@@ -97,9 +105,24 @@
 		    
 		    <li><a href="http://localhost:4000/search/" >Search</a></li>
 		  
+		    <li><a href="#" class="theme-toggle" id="theme-toggle" role="button" aria-label="Switch between dark and light theme">Light</a></li>
 	    </ul>
 	</nav>
 </div><!-- /.navigation-wrapper -->
+<script>
+  (function () {
+    var root = document.documentElement, btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    function label() { btn.textContent = root.classList.contains('theme-light') ? 'Dark' : 'Light'; }
+    label();
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      var light = root.classList.toggle('theme-light');
+      try { localStorage.setItem('theme', light ? 'light' : 'dark'); } catch (err) {}
+      label();
+    });
+  })();
+</script>
 
 <!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
 
@@ -130,23 +153,23 @@
       </header>
 
 
-        <time datetime="2018-03-01T20:33:28+00:00"><i class="fa fa-calendar-o"></i> March 01, 2018</time>
+        <time datetime="2018-03-01T15:33:28-05:00"><i class="fa fa-calendar-o"></i> March 01, 2018</time>
         <h2 id="0-disclaimers">0. Disclaimers</h2>
 
 <h3 id="you-have-to-dig">You have to dig</h3>
 <p>As I built this course, I started realizing that perhaps the reader might not understand everything I am talking about. DFIR is not a field where everyone can know everything. It’s just too wide and too deep. Attempting to define every term and provide background on all material would bloat this project beyond scope and diminish the value. If I didn’t cover something, you might have to look it up. Searching for information is the crux of this job.</p>
 
 <h3 id="i-tried-to-keep-it-cheap">I tried to keep it cheap</h3>
-<p>In an effort to limit barriers to education, I tried to limit the examples in this course to native, open source, or readily available free tools. Does that excluding commecial tools limit the completeness of this course? Yes, but this course is about developing your skills and not lining a vendor’s pocket. Sadly, you are going to need a Windows 7 or newer system to play with to put a lot of this to use.</p>
+<p>In an effort to limit barriers to education, I tried to limit the examples in this course to native, open source, or readily available free tools. Does excluding commercial tools limit the completeness of this course? Yes, but this course is about developing your skills and not lining a vendor’s pocket. Sadly, you are going to need a Windows 7 or newer system to play with to put a lot of this to use.</p>
 
 <h3 id="audience">Audience</h3>
 <p>I think this course is written to provide examples of DFIR techniques for two groups of people:</p>
 <ol>
-  <li>Folks that have been in Information Security in one capacity or another and are looking to get into more hands on DFIR work.</li>
+  <li>Folks that have been in Information Security in one capacity or another and are looking to get into more hands-on DFIR work.</li>
   <li>Others who might find this information useful or interesting.</li>
 </ol>
 
-<p>This should not be the first computer related course you attempt.</p>
+<p>This should not be the first computer-related course you attempt.</p>
 
 <h3 id="omissions-and-errors">Omissions and Errors</h3>
 <p>There are two reasons I didn’t include something in this course:</p>
@@ -158,10 +181,10 @@
 <p>Either way, feel free to send me feedback and I will take a look.</p>
 <h3 id="organization">Organization</h3>
 
-<p>This course will cover a lot of material and most of it will be shown by example. While that is helpful in some respects, it can leave some topics less explicitly documented and more demonstrated during the course of scenario. Tools and command line utilities are going to be covered in this manner because I am not wasting our collective time documenting a technique AND all of a tool’s command line functions when you can easily find that information elsewhere.</p>
+<p>This course will cover a lot of material and most of it will be shown by example. While that is helpful in some respects, it can leave some topics less explicitly documented and more demonstrated during the course of a scenario. Tools and command line utilities are going to be covered in this manner because I am not wasting our collective time documenting a technique AND all of a tool’s command line functions when you can easily find that information elsewhere.</p>
 
 <h3 id="tone">Tone</h3>
-<p>This is meant to be informal. I authored 3 university courses last year and one of the consistent items of feedback I received was how well the frankly dry material was conveyed. While that might come across as unprofessional and lacking academic polish, I find it makes the material more digestible and that is point of learning, right?</p>
+<p>This is meant to be informal. I authored 3 university courses last year and one of the consistent items of feedback I received was how well the frankly dry material was conveyed. While that might come across as unprofessional and lacking academic polish, I find it makes the material more digestible and that is the point of learning, right?</p>
 
 
         
@@ -182,7 +205,7 @@
   <footer role="contentinfo" class="entry-wrapper">
     
 
-<span>&copy; 2023 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
+<span>&copy; 2026 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
 <div class="social-icons">
 	<a href="https://twitter.com/GlassDFIR" title="Jon Glass on Twitter" target="_blank"><i class="fa fa-twitter-square fa-2x"></i></a>
 	

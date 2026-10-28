@@ -1,0 +1,352 @@
+<!doctype html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="en"> <![endif]-->
+<!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8" lang="en"><![endif]-->
+<!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9" lang="en"><![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"><!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<title>Spoke: Seeing the Relationships in Your CSVs &#8211; Half Full of Security</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+
+
+<!-- Twitter Cards -->
+<meta name="twitter:title" content="Spoke: Seeing the Relationships in Your CSVs">
+<meta name="twitter:description" content="">
+<meta name="twitter:site" content="@GlassDFIR">
+<meta name="twitter:creator" content="@GlassDFIR">
+
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://localhost:4000/images/site-logo.png">
+
+<!-- Open Graph -->
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Spoke: Seeing the Relationships in Your CSVs">
+<meta property="og:description" content="">
+<meta property="og:url" content="http://localhost:4000/blogsabout/spoke/">
+<meta property="og:site_name" content="Half Full of Security">
+
+
+
+
+
+<link rel="canonical" href="http://localhost:4000/blogsabout/spoke/">
+<link href="http://localhost:4000/feed.xml" type="application/atom+xml" rel="alternate" title="Half Full of Security Feed">
+
+<!-- https://t.co/dKP3o1e -->
+<meta name="HandheldFriendly" content="True">
+<meta name="MobileOptimized" content="320">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Theme: dark by default; remember a reader's choice of light -->
+<script>
+  try { if (localStorage.getItem('theme') === 'light') document.documentElement.classList.add('theme-light'); } catch (e) {}
+</script>
+
+<!-- For all browsers -->
+<link rel="stylesheet" href="http://localhost:4000/assets/css/main.css">
+<!-- Webfonts -->
+<script src="https://use.edgefonts.net/source-sans-pro:n2,i2,n3,i3,n4,i4,n6,i6,n7,i7,n9,i9;source-code-pro:n4,n7;volkhov.js"></script>
+
+<meta http-equiv="cleartype" content="on">
+
+<!-- HTML5 Shiv and Media Query Support -->
+<!--[if lt IE 9]>
+  <script src="http://localhost:4000/assets/js/vendor/html5shiv.min.js"></script>
+  <script src="http://localhost:4000/assets/js/vendor/respond.min.js"></script>
+<![endif]-->
+
+<!-- Modernizr -->
+<script src="http://localhost:4000/assets/js/vendor/modernizr-2.7.1.custom.min.js"></script>
+
+
+<!-- MathJax -->
+<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+<!-- Icons -->
+<!-- 16x16 -->
+<link rel="shortcut icon" href="http://localhost:4000/favicon.ico">
+<!-- 32x32 -->
+<link rel="shortcut icon" href="http://localhost:4000/favicon.png">
+<!-- 57x57 (precomposed) for iPhone 3GS, pre-2011 iPod Touch and older Android devices -->
+<link rel="apple-touch-icon-precomposed" href="http://localhost:4000/images/apple-touch-icon-precomposed.png">
+<!-- 72x72 (precomposed) for 1st generation iPad, iPad 2 and iPad mini -->
+<link rel="apple-touch-icon-precomposed" sizes="72x72" href="http://localhost:4000/images/apple-touch-icon-72x72-precomposed.png">
+<!-- 114x114 (precomposed) for iPhone 4, 4S, 5 and post-2011 iPod Touch -->
+<link rel="apple-touch-icon-precomposed" sizes="114x114" href="http://localhost:4000/images/apple-touch-icon-114x114-precomposed.png">
+<!-- 144x144 (precomposed) for iPad 3rd and 4th generation -->
+<link rel="apple-touch-icon-precomposed" sizes="144x144" href="http://localhost:4000/images/apple-touch-icon-144x144-precomposed.png">
+
+</head>
+
+<body id="post">
+
+<div class="navigation-wrapper">
+	<nav role="navigation" id="site-nav" class="animated drop">
+	    <ul>
+      
+		    
+		    <li><a href="http://localhost:4000/blogsabout/" >Blog</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/tools/" >Tools</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/adfirwmc/" >ADFIRWMC</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/tips/" >Tips and Tricks</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/about/" >About</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/search/" >Search</a></li>
+		  
+		    <li><a href="#" class="theme-toggle" id="theme-toggle" role="button" aria-label="Switch to light mode" title="Switch to light mode"><i class="fa fa-sun-o" aria-hidden="true"></i></a></li>
+	    </ul>
+	</nav>
+</div><!-- /.navigation-wrapper -->
+<script>
+  (function () {
+    var root = document.documentElement, btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    function label() {
+      var light = root.classList.contains('theme-light');
+      btn.innerHTML = '<i class="fa ' + (light ? 'fa-moon-o' : 'fa-sun-o') + '" aria-hidden="true"></i>';
+      btn.title = light ? 'Switch to dark mode' : 'Switch to light mode';
+      btn.setAttribute('aria-label', btn.title);
+    }
+    label();
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      var light = root.classList.toggle('theme-light');
+      try { localStorage.setItem('theme', light ? 'light' : 'dark'); } catch (err) {}
+      label();
+    });
+  })();
+</script>
+
+<!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
+
+<header class="masthead">
+	<div class="wrap">
+      
+  		<a href="http://localhost:4000/" class="site-logo" rel="home" title="Half Full of Security"><img src="http://localhost:4000/images/site-logo.png" width="200" height="200" alt="Half Full of Security logo" class="animated fadeInDown"></a>
+      
+      <h1 class="site-title animated fadeIn"><a href="http://localhost:4000/">Half Full of Security</a></h1>
+		<h2 class="site-description animated fadeIn" itemprop="description">Sharpening the ACKs since 2013</h2>
+	</div>
+</header><!-- /.masthead -->
+
+<div class="js-menu-screen menu-screen"></div>
+
+
+<div id="main" role="main">
+  <article class="hentry">
+    
+    <div class="entry-wrapper">
+      <header class="entry-header">
+        <ul class="entry-tags">
+          
+        </ul>
+        
+          <h1 class="entry-title">Spoke: Seeing the Relationships in Your CSVs</h1>
+        
+      </header>
+
+
+        <time datetime="2026-10-26T10:00:00-04:00"><i class="fa fa-calendar-o"></i> October 26, 2026</time>
+        <p>A lot of security data is really a graph pretending to be a spreadsheet. A process tree is parent and child PIDs. An insider risk case is users, hosts, files and USB devices tied together by actions. You can grep through those rows all day, but the story usually pops the moment you can see the shape of it.</p>
+
+<p>So I built <strong>Spoke</strong>, a browser-based tool that turns rows like <em>who → did what → to what</em> into an interactive graph. You can try it right now at <a href="https://jon.glass/spoke/">jon.glass/spoke</a>.</p>
+
+<p><img src="/images/spoke-insider-risk.png" alt="Spoke showing the insider risk sample" />
+<em>The Insider risk sample with jsmith selected. The Details panel lists every action in time order.</em></p>
+
+<h2 id="goals">Goals</h2>
+<ul>
+  <li><strong>Low code.</strong> Anyone on the team should be able to use it by visiting a web page. No installs, no database.</li>
+  <li><strong>Versatile.</strong> The same tool should handle process parent-child chains and insider risk webs without changing code.</li>
+  <li><strong>Keep the data local.</strong> Insider risk data is sensitive. Nothing should be uploaded anywhere.</li>
+</ul>
+
+<p>That last one drove the whole design. Everything runs in the browser. Node.js is only used to build it, and the output is a single static page, which is how Spoke lives right here on this GitHub Pages blog. Your files never leave your machine because there is no server to send them to. There is also a <strong>Download</strong> button that gives you the whole app as one HTML file for offline or air-gapped use.</p>
+
+<p>Under the hood it is <a href="https://js.cytoscape.org/">Cytoscape.js</a> for the graph, dagre for hierarchical layouts, <a href="https://www.papaparse.com/">PapaParse</a> and <a href="https://sheetjs.com/">SheetJS</a> for reading files, and <a href="https://vitejs.dev/">Vite</a> to bundle it.</p>
+
+<h2 id="the-workflow">The Workflow</h2>
+<p>The sidebar walks you through five steps: <strong>Load</strong>, <strong>Map</strong>, <strong>Filter</strong>, <strong>View</strong> and <strong>Export</strong>. If you just want to poke at it, the <strong>Samples</strong> menu has four datasets ready to go:</p>
+<ul>
+  <li><strong>Insider risk:</strong> a user’s activity before leaving, with files, USB and email</li>
+  <li><strong>Process tree:</strong> a small malware process hierarchy</li>
+  <li><strong>Endpoint activity:</strong> a noisy three-sheet Excel export for practicing filtering</li>
+  <li><strong>EDR export:</strong> repeated process names and IDs, to show why combined keys matter</li>
+</ul>
+
+<h3 id="1-load">1. Load</h3>
+<p>Spoke takes CSV or Excel (.xlsx, .xlsm, .xlsb, .xls, .ods). For workbooks with several sheets you can pick one, or choose <strong>All matching sheets</strong> to stack every sheet with the same columns. A <code class="language-plaintext highlighter-rouge">sheet</code> column records where each row came from, and summary or README tabs are skipped.</p>
+
+<h3 id="2-map">2. Map</h3>
+<p>Every row becomes an edge between two nodes. You pick the <strong>Source</strong>, <strong>Target</strong>, <strong>Relationship</strong>, optional <strong>Source type</strong> and <strong>Target type</strong> (which drive the colors and legend), and a <strong>Time column</strong>. Spoke guesses all of these from your column names, so a lot of the time you just check them and hit <strong>Build graph</strong>.</p>
+
+<p>The feature I care most about here is <strong>combined keys</strong>. In real EDR data, a name alone isn’t unique. There are dozens of <code class="language-plaintext highlighter-rouge">cmd.exe</code> processes, and process IDs get reused across machines. If you map on the name alone, every <code class="language-plaintext highlighter-rouge">cmd.exe</code> collapses into one node and the tree turns into nonsense.</p>
+
+<p><strong>+ Combine with another column</strong> lets you build a node’s identity from several columns, so <code class="language-plaintext highlighter-rouge">ProcessName</code> + <code class="language-plaintext highlighter-rouge">ProcessId</code> + <code class="language-plaintext highlighter-rouge">Hostname</code> becomes <code class="language-plaintext highlighter-rouge">cmd.exe (3400, WS-01)</code>. A preview shows what the IDs will look like, and Spoke suggests name/ID pairs automatically, adding the host column when it sees more than one machine. If your data has a <code class="language-plaintext highlighter-rouge">ProcessGuid</code>, mapping on that alone is the most reliable option.</p>
+
+<p><img src="/images/spoke-combined-keys.png" alt="Combined keys in the Map columns panel" />
+<em>Process name, ID and host combined into one key, so each process instance is its own node.</em></p>
+
+<h3 id="3-filter">3. Filter</h3>
+<p>Big exports are mostly noise, so the filter takes a <strong>regular expression</strong> and applies it as you type. You can match against node names, the relationship label, or <strong>any column</strong> in the row, such as severity, user or command line. Then either <strong>Hide</strong> the matches, or <strong>Show only</strong> the matches plus context: one to three hops of neighbors, or the entire connected group. Actual matches are outlined in purple.</p>
+
+<p>A few examples against the Endpoint activity sample:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Pattern</th>
+      <th>Settings</th>
+      <th>Result</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">svchost\|chrome\|teams\|onedrive\|msmpeng</code></td>
+      <td>Node names, Hide</td>
+      <td>224 nodes drop to a few dozen and the attack chain on WS-07 stands out</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">high\|critical</code></td>
+      <td>Any column, Show only</td>
+      <td>Just the serious events</td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">rundll32</code></td>
+      <td>Node names, Show only, +1 hop</td>
+      <td>One process and everything it touched</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><img src="/images/spoke-filter.png" alt="Regex filter hiding routine processes" />
+<em>Hiding routine processes takes the Endpoint activity sample from 224 nodes to 28, leaving the attack chain on WS-07.</em></p>
+
+<p>The built-in help includes a regex cheat sheet, since not everyone who touches this will live in regex the way we do.</p>
+
+<h3 id="the-time-bar">The Time Bar</h3>
+<p>When there is a time column, a histogram appears under the graph showing when events happened, so bursts stand out. Drag across it to pick a window, click a bar to zoom into that slice, or type exact times. Nodes stay put as you scrub, so you can watch activity come and go.</p>
+
+<p><strong>Fade instead of hide</strong> keeps out-of-window items as faint ghosts for context, and <strong>Keep undated</strong> holds onto rows with no timestamp, like an org chart link. You can switch the whole app between UTC and local time. It reads ISO 8601, common date formats, Unix epoch seconds or milliseconds, and Excel dates. The time window and the regex filter stack: something is shown only if it passes both.</p>
+
+<p>On the Insider risk sample, clicking the tall bar on the evening of 18 Oct narrows the graph to just the late-night downloads and USB copies.</p>
+
+<p><img src="/images/spoke-time-window.png" alt="Time window narrowed to one hour" />
+<em>One click on the histogram narrows the Insider risk sample to the late-night hour on 18 Oct.</em></p>
+
+<h3 id="4-view">4. View</h3>
+<p>Two layouts cover most cases:</p>
+<ul>
+  <li><strong>Process Tree</strong> for hierarchies like parent → child processes</li>
+  <li><strong>Relationship Web</strong>, a force-directed layout for “who touched what” questions</li>
+</ul>
+
+<p>Clicking a node highlights its full chain, everything upstream and downstream, and fades the rest. Click <code class="language-plaintext highlighter-rouge">rundll32.exe</code> in a process tree and you immediately see how it got there. Search outlines matches in orange without hiding anything, and you can adjust label size and font, or set edge labels to show only on hover to keep dense graphs readable.</p>
+
+<p><img src="/images/spoke-process-tree.png" alt="Process tree with rundll32 ancestry highlighted" />
+<em>Selecting rundll32.exe highlights the full chain from explorer.exe through Outlook, Word, cmd and PowerShell.</em></p>
+
+<p>The <strong>Details</strong> panel is where a lot of the investigation actually happens. For a node, it shows its type, its number of connections, and an <strong>Activity</strong> list of every relationship in time order, with severity, IPs, command lines and any other columns. Severity, risk or priority columns are color-coded. Click a name to jump to that node. For an edge, you get the full original row from your file.</p>
+
+<h3 id="5-export">5. Export</h3>
+<ul>
+  <li><strong>PNG or JPG</strong> at 1×, 2× or 4× (good for print), or <strong>SVG</strong> so it stays sharp in slides and reports</li>
+  <li><strong>CSV</strong> of the original rows behind what’s visible, which loads straight back into Spoke and is handy for passing along a trimmed dataset</li>
+  <li><strong>JSON</strong> of visible nodes and edges with their full records and the filter used</li>
+</ul>
+
+<p>Exports match the screen, so anything filtered out or outside the time window is left out.</p>
+
+<h2 id="plays-nicely-with-cyberchef">Plays Nicely with CyberChef</h2>
+<p><strong>Send to CyberChef</strong> opens the visible rows in CyberChef in a new tab, ready for decoding, extracting or reformatting. It uses CyberChef’s trick of putting the data after the <code class="language-plaintext highlighter-rouge">#</code> in the link, which browsers never send to a server, so it stays local there too.</p>
+
+<h2 id="share-links">Share Links</h2>
+<p><strong>Copy share link</strong> packs the loaded file, compressed, together with your column mapping, layout, filter and time window. Whoever opens the link sees exactly the same view.</p>
+
+<p>The important caveat: <strong>the data is in the link.</strong> Anyone with the link can see it, and links end up in browser history. Treat a share link like the file itself. Browsers also cap links at about 2 MB, so for big datasets share a filtered CSV export instead.</p>
+
+<h2 id="linking-from-other-tools">Linking from Other Tools</h2>
+<p>Because the data rides in the URL, scripts and other tools can open Spoke pre-loaded. Put base64 of a CSV or Excel file after <code class="language-plaintext highlighter-rouge">#input=</code>, gzip-compressed or not, and optionally set the mapping and view ahead of it:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>https://jon.glass/spoke/#src=parent&amp;tgt=child&amp;layout=tree&amp;input=cGFyZW50LGNoaWxk...
+</code></pre></div></div>
+
+<p>Supported settings include:</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">src</code>, <code class="language-plaintext highlighter-rouge">tgt</code>: source and target columns, or a JSON list to combine them, e.g. <code class="language-plaintext highlighter-rouge">["ProcessName","ProcessId"]</code></li>
+  <li><code class="language-plaintext highlighter-rouge">rel</code>, <code class="language-plaintext highlighter-rouge">stype</code>, <code class="language-plaintext highlighter-rouge">ttype</code>, <code class="language-plaintext highlighter-rouge">time</code>: the other column mappings</li>
+  <li><code class="language-plaintext highlighter-rouge">layout</code>: <code class="language-plaintext highlighter-rouge">tree</code> or <code class="language-plaintext highlighter-rouge">web</code></li>
+  <li><code class="language-plaintext highlighter-rouge">re</code>, <code class="language-plaintext highlighter-rouge">scope</code>, <code class="language-plaintext highlighter-rouge">mode</code>, <code class="language-plaintext highlighter-rouge">depth</code>, <code class="language-plaintext highlighter-rouge">case</code>: the filter</li>
+  <li><code class="language-plaintext highlighter-rouge">from</code>, <code class="language-plaintext highlighter-rouge">to</code>, <code class="language-plaintext highlighter-rouge">undated</code>, <code class="language-plaintext highlighter-rouge">fade</code>: the time window</li>
+</ul>
+
+<p>Values need to be URL-encoded, and anything left out is guessed as if you had opened the file normally. That makes it easy to have a triage script or SIEM query spit out a link that drops an analyst straight into the right view.</p>
+
+<h2 id="shortcuts">Shortcuts</h2>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">?</code> opens the help</li>
+  <li><code class="language-plaintext highlighter-rouge">/</code> jumps to the filter box</li>
+  <li><code class="language-plaintext highlighter-rouge">[</code> hides or shows the sidebar</li>
+  <li><code class="language-plaintext highlighter-rouge">F</code> fits the graph to the screen</li>
+  <li><code class="language-plaintext highlighter-rouge">Esc</code> clears the selection</li>
+</ul>
+
+<h2 id="try-it">Try It</h2>
+<p>Open <a href="https://jon.glass/spoke/">Spoke</a>, pick <strong>Samples → Insider risk</strong>, and click the <code class="language-plaintext highlighter-rouge">jsmith</code> node. The whole chain lights up and the Details panel lists everything jsmith did, in order.</p>
+
+<p>If you work in DFIR or insider risk and have an export format you’d like it to handle better, let me know.</p>
+
+        
+
+    </div><!-- /.entry-wrapper -->
+    <nav class="pagination" role="navigation">
+      
+        <a href="http://localhost:4000/blogsabout/what-chatgpt-wrote/" class="btn" title="What ChatGPT Wrote When I Asked It to Blog">Previous</a>
+      
+      
+        <a href="http://localhost:4000/blogsabout/reverse-engineering-a-fitrx-ems-app/" class="btn" title="Reverse-Engineering a FitRx EMS App into a Python Controller">Next</a>
+      
+    </nav><!-- /.pagination -->
+  </article>
+</div><!-- /#main -->
+
+<div class="footer-wrapper">
+  <footer role="contentinfo" class="entry-wrapper">
+    
+
+<span>&copy; 2026 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
+<div class="social-icons">
+	<a href="https://twitter.com/GlassDFIR" title="Jon Glass on Twitter" target="_blank"><i class="fa fa-twitter-square fa-2x"></i></a>
+	
+	
+	
+	
+	
+	
+	<a href="https://github.com/GlassDFIR" title="Jon Glass on Github" target="_blank"><i class="fa fa-github-square fa-2x"></i></a>
+	
+  
+	
+  <a href="http://localhost:4000/feed.xml" title="Atom/RSS feed"><i class="fa fa-rss-square fa-2x"></i></a>
+</div><!-- /.social-icons -->
+
+  </footer>
+</div><!-- /.footer-wrapper -->
+
+<script type="text/javascript">
+  var BASE_URL = 'http://localhost:4000';
+</script>
+
+<script src="https://ajax.googleapis.com/ajax/l

@@ -39,6 +39,11 @@
 <meta name="MobileOptimized" content="320">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- Theme: dark by default; remember a reader's choice of light -->
+<script>
+  try { if (localStorage.getItem('theme') === 'light') document.documentElement.classList.add('theme-light'); } catch (e) {}
+</script>
+
 <!-- For all browsers -->
 <link rel="stylesheet" href="http://localhost:4000/assets/css/main.css">
 <!-- Webfonts -->
@@ -83,7 +88,10 @@
 	    <ul>
       
 		    
-		    <li><a href="http://localhost:4000/blog/" >Blog</a></li>
+		    <li><a href="http://localhost:4000/blogsabout/" >Blog</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/tools/" >Tools</a></li>
 		  
 		    
 		    <li><a href="http://localhost:4000/adfirwmc/" >ADFIRWMC</a></li>
@@ -97,9 +105,24 @@
 		    
 		    <li><a href="http://localhost:4000/search/" >Search</a></li>
 		  
+		    <li><a href="#" class="theme-toggle" id="theme-toggle" role="button" aria-label="Switch between dark and light theme">Light</a></li>
 	    </ul>
 	</nav>
 </div><!-- /.navigation-wrapper -->
+<script>
+  (function () {
+    var root = document.documentElement, btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    function label() { btn.textContent = root.classList.contains('theme-light') ? 'Dark' : 'Light'; }
+    label();
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      var light = root.classList.toggle('theme-light');
+      try { localStorage.setItem('theme', light ? 'light' : 'dark'); } catch (err) {}
+      label();
+    });
+  })();
+</script>
 
 <!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
 
@@ -130,14 +153,14 @@
 by Jonathan Glass</p>
 
 <h2 id="goal">Goal</h2>
-<p>The goal of this course is to explain the principles behind Windows Digital Forensics and Incident Response (DFIR) tools, tactics, and tactics. This course will demonstrate how to accomplish collection and analysis of Windows artifacts using open source or free tools.</p>
+<p>The goal of this course is to explain the principles behind Windows Digital Forensics and Incident Response (DFIR) tools, tactics, and techniques. This course will demonstrate how to accomplish collection and analysis of Windows artifacts using open source or free tools.</p>
 
 <h2 id="scope-of-this-course">Scope of this Course</h2>
 
 <p>In scope for this class:</p>
 
 <ul>
-  <li>Hands on Tools, Tactics, and Techniques of DFIR
+  <li>Hands-on Tools, Tactics, and Techniques of DFIR
     <ul>
       <li>System Administration for Incident Responders</li>
       <li>Computer Science for Incident Responders</li>
@@ -182,16 +205,16 @@ by Jonathan Glass</p>
 <p>As I built this course, I started realizing that perhaps the reader might not understand everything I am talking about. DFIR is not a field where everyone can know everything. It’s just too wide and too deep. Attempting to define every term and provide background on all material would bloat this project beyond scope and diminish the value. If I didn’t cover something, you might have to look it up. Searching for information is the crux of this job.</p>
 
 <h3 id="i-tried-to-keep-it-cheap">I tried to keep it cheap</h3>
-<p>In an effort to limit barriers to education, I tried to limit the examples in this course to native, open source, or readily available free tools. Does that excluding commecial tools limit the completeness of this course? Yes, but this course is about developing your skills and not lining a vendor’s pocket. Sadly, you are going to need a Windows 7 or newer system to play with to put a lot of this to use.</p>
+<p>In an effort to limit barriers to education, I tried to limit the examples in this course to native, open source, or readily available free tools. Does excluding commercial tools limit the completeness of this course? Yes, but this course is about developing your skills and not lining a vendor’s pocket. Sadly, you are going to need a Windows 7 or newer system to play with to put a lot of this to use.</p>
 
 <h3 id="audience">Audience</h3>
 <p>I think this course is written to provide examples of DFIR techniques for two groups of people:</p>
 <ol>
-  <li>Folks that have been in Information Security in one capacity or another and are looking to get into more hands on DFIR work.</li>
+  <li>Folks that have been in Information Security in one capacity or another and are looking to get into more hands-on DFIR work.</li>
   <li>Others who might find this information useful or interesting.</li>
 </ol>
 
-<p>This should not be the first computer related course you attempt.</p>
+<p>This should not be the first computer-related course you attempt.</p>
 
 <h3 id="omissions-and-errors">Omissions and Errors</h3>
 <p>There are two reasons I didn’t include something in this course:</p>
@@ -203,13 +226,13 @@ by Jonathan Glass</p>
 <p>Either way, feel free to send me feedback and I will take a look.</p>
 <h3 id="organization">Organization</h3>
 
-<p>This course will cover a lot of material and most of it will be shown by example. While that is helpful in some respects, it can leave some topics less explicitly documented and more demonstrated during the course of scenario. Tools and command line utilities are going to be covered in this manner because I am not wasting our collective time documenting a technique AND all of a tool’s command line functions when you can easily find that information elsewhere.</p>
+<p>This course will cover a lot of material and most of it will be shown by example. While that is helpful in some respects, it can leave some topics less explicitly documented and more demonstrated during the course of a scenario. Tools and command line utilities are going to be covered in this manner because I am not wasting our collective time documenting a technique AND all of a tool’s command line functions when you can easily find that information elsewhere.</p>
 
 <h3 id="tone">Tone</h3>
-<p>This is meant to be informal. I authored 3 university courses last year and one of the consistent items of feedback I received was how well the frankly dry material was conveyed. While that might come across as unprofessional and lacking academic polish, I find it makes the material more digestible and that is point of learning, right?</p>
+<p>This is meant to be informal. I authored 3 university courses last year and one of the consistent items of feedback I received was how well the frankly dry material was conveyed. While that might come across as unprofessional and lacking academic polish, I find it makes the material more digestible and that is the point of learning, right?</p>
 
 <h2 id="1-windows-remote-administration-for-incident-responders">1. Windows Remote Administration for Incident Responders</h2>
-<p>Without a system administration background, many incident responders struggle with basic tasks like remotely starting and stopping processes on target machines. Inversely, Incident Responders with sysadmin experience are often faster and more effective. The more familiar you are with native Windows commands, the faster your can operate.</p>
+<p>Without a system administration background, many incident responders struggle with basic tasks like remotely starting and stopping processes on target machines. Inversely, Incident Responders with sysadmin experience are often faster and more effective. The more familiar you are with native Windows commands, the faster you can operate.</p>
 
 <p>While this course cannot hope to supplant the experience gained by years at your average help desk, I will try to highlight some of the more helpful techniques that get me from A to B.</p>
 
@@ -226,7 +249,7 @@ by Jonathan Glass</p>
 
 <h4 id="wmi-terminology">WMI Terminology</h4>
 
-<p>The four big vocabulary terms we are going to use for the section are:</p>
+<p>The four big vocabulary terms we are going to use for this section are:</p>
 
 <ul>
   <li>Namespaces: A hierarchical structure of WMI objects used to organize Classes</li>
@@ -292,7 +315,7 @@ Reference: https://blogs.technet.microsoft.com/heyscriptingguy/2012/07/10/three-
 <p><img src="../Images/2018-02-21 13_27_27-Command Prompt.png" alt="WMIC Example" title="WMIC" />
 References: 
 https://msdn.microsoft.com/en-us/library/aa394531(v=vs.85).aspx
-http://jon.glass/blog/lists-some-wmic-commands/</p>
+https://jon.glass/blogsabout/wmic-commands-that-arent-yo-mommas/</p>
 
 <h4 id="visual-basic-scripting-example-more-or-less-deprecated">Visual Basic Scripting Example (more or less deprecated)</h4>
 
@@ -313,12 +336,12 @@ Next</code></pre></figure>
 <figure class="highlight"><pre><code class="language-python" data-lang="python"><span class="kn">import</span> <span class="n">wmi</span>
 <span class="n">c</span> <span class="o">=</span> <span class="n">wmi</span><span class="p">.</span><span class="nc">WMI </span><span class="p">()</span>
 <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">c</span><span class="p">.</span><span class="nc">Win32_Process </span><span class="p">():</span>
-    <span class="k">if</span> <span class="n">s</span><span class="p">.</span><span class="n">Name</span> <span class="o">==</span> <span class="s">"python.exe"</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">s</span><span class="p">.</span><span class="n">Name</span> <span class="o">==</span> <span class="sh">"</span><span class="s">python.exe</span><span class="sh">"</span><span class="p">:</span>
         <span class="nf">print</span><span class="p">(</span><span class="n">s</span><span class="p">.</span><span class="n">Name</span><span class="p">,</span> <span class="n">s</span><span class="p">.</span><span class="n">ProcessID</span><span class="p">)</span></code></pre></figure>
 
 <h4 id="bigfix-relevance">BigFix Relevance</h4>
 
-<p>You might not have this in your environment but many companies have clients on endpoints that are designed for system administration or patching that can to utilized to perform incident response functions as well. This is especially true in SMBs where the security guy is also the patching and sysadmin team.</p>
+<p>You might not have this in your environment but many companies have clients on endpoints that are designed for system administration or patching that can be utilized to perform incident response functions as well. This is especially true in SMBs where the security guy is also the patching and sysadmin team.</p>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(selects "processid,name from Win32_Process where name = 'explorer.exe'" of wmi)
 </code></pre></div></div>
@@ -326,7 +349,7 @@ Next</code></pre></figure>
 <p><img src="../Images/bigfix.png" alt="BigFix WMI Relevance" /></p>
 
 <h4 id="wmi-classes-of-dfir-interest">WMI classes of DFIR interest</h4>
-<p>There is a lot of super geeky DFIR information you can pull out of WMI properties and methods that can give you wizard like powers over remote machines. Here are a few of my favorites :</p>
+<p>There is a lot of super geeky DFIR information you can pull out of WMI properties and methods that can give you wizard-like powers over remote machines. Here are a few of my favorites:</p>
 
 <table>
   <thead>
@@ -377,7 +400,7 @@ Next</code></pre></figure>
 
 <h4 id="putting-it-to-work">Putting It To Work</h4>
 
-<p>Scenario: Your detection team says a user on RemoteComputerName received a malicious Word document that downloads a Remote Access Trojan that your antivirus doesn’t have a signature for. From your threat intelligence, this malicious Word document uses a macro to drop an EvilFile.exe in the users Temp directory.</p>
+<p>Scenario: Your detection team says a user on RemoteComputerName received a malicious Word document that downloads a Remote Access Trojan that your antivirus doesn’t have a signature for. From your threat intelligence, this malicious Word document uses a macro to drop an EvilFile.exe in the user’s Temp directory.</p>
 
 <p>Let’s verify the alert..maybe the user didn’t open the Word doc…(yeah right)</p>
 
@@ -406,12 +429,12 @@ instance of __PARAMETERS
 };
 </code></pre></div></div>
 
-<p>For even MORE fun, like copy that malicious file to an analysis share so we can get a better look at it:</p>
+<p>For even MORE fun, let’s copy that malicious file to an analysis share so we can get a better look at it:</p>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wmic /node:RemoteComputerName process call create "xcopy  /Y C:\Users\Username\AppData\Local\Temp\Scchost.EXE \\AnalysisShare\Scchost.exe.bin" 
 </code></pre></div></div>
 
-<p>For a lot less fun, let’s call the User explain the situation, shut it down remotely, and go get the workstation to determine what this malware did :</p>
+<p>For a lot less fun, let’s call the user, explain the situation, shut it down remotely, and go get the workstation to determine what this malware did:</p>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wmic /node:RemoteComputerName os call Shutdown
 </code></pre></div></div>
@@ -419,11 +442,11 @@ instance of __PARAMETERS
 <p><em>Disclaimer: This scenario is largely BS. Malware isn’t usually this easy to kill and as more work becomes remote, it is increasingly rare to physically walk over to the user’s cube and take their workstation.</em></p>
 
 <h3 id="mmc">MMC</h3>
-<p>I imagine I scared some of off you with all that “coding” and “command line stuff”. While there are GUIer options to accomplish Windows administration tasks, they aren’t as efficient or sexy. If you are against coding all together, there is an X at the top right or left of your browser. We can part ways now and no one’s feelings need to get hurt. For the sake of completeness, I will cover MMC which is a GUI and can do Windows admin tasks but it is not my “go to”.
+<p>I imagine I scared some of you off with all that “coding” and “command line stuff”. While there are GUIer options to accomplish Windows administration tasks, they aren’t as efficient or sexy. If you are against coding altogether, there is an X at the top right or left of your browser. We can part ways now and no one’s feelings need to get hurt. For the sake of completeness, I will cover MMC which is a GUI and can do Windows admin tasks but it is not my “go to”.
 According to the big M, the Microsoft Management Console (MMC) is an extensible common presentation service for management applications.
 <img src="../Images/2018-02-22-MMC.png" alt="MMC" title="MMC" /></p>
 
-<p>This console gives you access to some a lot of administration tools.</p>
+<p>This console gives you access to a lot of administration tools.</p>
 <ul>
   <li>Computer Management Snap-In
     <ul>
@@ -474,7 +497,7 @@ According to the big M, the Microsoft Management Console (MMC) is an extensible 
 
 <h3 id="pstools">PsTools</h3>
 
-<p>Way way way back in 1996, Mark Russinovich and Bryce Cogswell created a little company called Winternals Software LP that created a bunch of software to help administer Windows 2000 boxes. Long story short…in 2006 Microsoft bought the company and all their tools now known as <a href="https://docs.microsoft.com/en-us/sysinternals/">Windows Sysinternals</a>. There is a cornucopia of awesome tools that I will mention throughout the duration of this course but for now we are going to focus on some of the PsTools Suite I find most handy. While you can accomplish all of these functions via WMI via PowerShell or WMIC, these tools are helpful for those who prefer tools with a dedicated tasks and help menus. There is absolutely no shame in that but I found, the more comfortable I become with WMI scripting, the less I needed most of this suite.</p>
+<p>Way way way back in 1996, Mark Russinovich and Bryce Cogswell created a little company called Winternals Software LP that created a bunch of software to help administer Windows 2000 boxes. Long story short…in 2006 Microsoft bought the company and all their tools now known as <a href="https://docs.microsoft.com/en-us/sysinternals/">Windows Sysinternals</a>. There is a cornucopia of awesome tools that I will mention throughout the duration of this course but for now we are going to focus on some of the PsTools Suite I find most handy. While you can accomplish all of these functions via WMI via PowerShell or WMIC, these tools are helpful for those who prefer tools with dedicated tasks and help menus. There is absolutely no shame in that but I found the more comfortable I became with WMI scripting, the less I needed most of this suite.</p>
 
 <h4 id="windows-admin-using-pstools-suite">Windows Admin using PsTools Suite</h4>
 
@@ -528,7 +551,7 @@ IpConfig that otherwise do not have the ability to show information
 about remote systems.”</p>
 </blockquote>
 
-<p>PsExec is to DFIR as a good blaster is to Han Solo.  I can’t tell you how many times PsExec has saved my bacon. Not to mention how many times I have pulled off some nifty DFIRfu with it’s various options. Everytime I read PsExec’s Usage I learn something new that it does.</p>
+<p>PsExec is to DFIR as a good blaster is to Han Solo.  I can’t tell you how many times PsExec has saved my bacon. Not to mention how many times I have pulled off some nifty DFIRfu with its various options. Every time I read PsExec’s Usage I learn something new that it does.</p>
 
 <h5 id="example-elevating-to-system-account">Example: Elevating to System Account:</h5>
 <p>One of my favorite tricks is to run remote processes as the System account and not a puny User account as seen below:
@@ -536,7 +559,7 @@ about remote systems.”</p>
 This grants a higher level of privileges and leaves less of a footprint on the remote machine. I rarely want to use my own account for anything on a remote machine unless I have to.</p>
 
 <p>Pro Tip: If you are copying evidence from a remote machine to a collection share using PsExec to run as the system account, make sure the share is configured to grant Computer account of the target workstation write permission or you will get errors that will run you in circles. Doesn’t matter if your admin account has rights if you are running as the Computer.</p>
-<h5 id="example-copying-an-utility-and-then-executing-it-on-a-remote-system-">Example: Copying an Utility and then Executing it on a Remote System :</h5>
+<h5 id="example-copying-a-utility-and-then-executing-it-on-a-remote-system">Example: Copying a Utility and then Executing it on a Remote System:</h5>
 <p><img src="../Images/2018-02-25 13_08_02-Administrator_ Command Prompt.png" alt="enter image description here" /></p>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>PsExec.exe \\192.168.164.130 -c RawCopy.exe /FileNamePath:C:0 /OutputPath:\\ForensicServer\dropbox\ /OutputName:$MFT
@@ -546,17 +569,17 @@ This grants a higher level of privileges and leaves less of a footprint on the r
 
 <ul>
   <li>I am using PsExec to remotely execute RawCopy on a remote host with an IP of 192.168.164.130.</li>
-  <li>Since the remote host probably doesn’t have RawCopy, a third party tool, laying around, I used the <strong>-c</strong> flag to copy the program over to the remote system. The <strong>-f</strong> flag is used just in case it was already there so we can overwrite it.</li>
+  <li>Since the remote host probably doesn’t have RawCopy, a third party tool, lying around, I used the <strong>-c</strong> flag to copy the program over to the remote system. The <strong>-f</strong> flag is used just in case it was already there so we can overwrite it.</li>
   <li>RawCopy’s options are fairly straightforward. I am copying the Master File Table (record 0) from C:\$MFT on the remote machine to  my \\ForensicServer\dropbox share for analysis</li>
   <li>After RawCopy finished, I check my dropbox folder to confirm the $MFT landed safely.</li>
 </ul>
 
 <h5 id="example-interacting-with-the-user">Example: Interacting with the User:</h5>
-<p>PsExec runs a console session by default but can be configured to interact with the logged on user’s session using the <strong>-i</strong> option. This is helpful in those rare instances where you need to user to see something you are doing. 99% of the time the user is going to be logged in under the second session or session 1. It’s not often but I have used this a couple times over the years.
+<p>PsExec runs a console session by default but can be configured to interact with the logged on user’s session using the <strong>-i</strong> option. This is helpful in those rare instances where you need the user to see something you are doing. 99% of the time the user is going to be logged in under the second session or session 1. It’s not often but I have used this a couple times over the years.
 In this example, I use PsExec to create two instances of notepad.exe on my local machine. One is in user session and visible, the other is not. 
 <img src="../Images/2018-02-26 14_04_26-Sessions.png" alt="enter image description here" /></p>
 
-<p>The <strong>-d</strong> flag is used to detach the PsExec session from the child process so we don’t have to wait until notepad exits to continue. This is very handy for DFIR collection scripts that might take a while. Detach the process and let it do it’s thing. I like to use <strong>-d</strong> on targets that are on flakey VPN connections so that if the connection drops, the process is still running on the remote system. The obvious downside is, you can’t interact with the session after it is detached.</p>
+<p>The <strong>-d</strong> flag is used to detach the PsExec session from the child process so we don’t have to wait until notepad exits to continue. This is very handy for DFIR collection scripts that might take a while. Detach the process and let it do its thing. I like to use <strong>-d</strong> on targets that are on flaky VPN connections so that if the connection drops, the process is still running on the remote system. The obvious downside is, you can’t interact with the session after it is detached.</p>
 
 <h5 id="example-running-commands-on-multiple-machines">Example: Running commands on multiple machines</h5>
 <p>PsExec allows you to perform administrative tasks on multiple workstations but you can only interact with one at a time. Here is an example of getting a command shell on two different machines:
@@ -579,33 +602,33 @@ In this example, I use PsExec to create two instances of notepad.exe on my local
 \tools\PsExec.exe \\DESKTOP-132B1OL,RemoteMachine -d -f -c \Tools\RawCopy.exe
 </code></pre></div></div>
 
-<p>What does this do? PsExec will copy \Tools\RawCopy.exe to the c:\Windows folder of DESKTOP-132B1OL and try to run it. Same with RemoteMachine. RawCopy needs all sorts of command line options so it will gracefully exit BUT the tool has be in place. Why didn’t i use the <strong>-c</strong> switch? I’ll show you:</p>
+<p>What does this do? PsExec will copy \Tools\RawCopy.exe to the c:\Windows folder of DESKTOP-132B1OL and try to run it. Same with RemoteMachine. RawCopy needs all sorts of command line options so it will gracefully exit BUT the tool has to be in place. Why didn’t I use the <strong>-c</strong> switch? I’ll show you:</p>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>\tools\PsExec.exe \\DESKTOP-132B1OL,RemoteMachine -d cmd /c c:\Windows\RawCopy.exe /FileNamePath:C:0 /OutputPath:"\\vmware-host\Shared Folders\Evidence\" /OutputName:^%computername^%-$MFT
 </code></pre></div></div>
 
 <p>On my evidence share, I am looking to have one file from each of these workstations. To make sure I can tell the two $MFTs apart, I used the environment variable %COMPUTERNAME% from the remote computer for file name passed to RawCopy.</p>
 
-<p>To access the remote environment variables, I needed to use cmd to launch RawCopy which means I couldn’t use the <strong>-c</strong> to copy it over in one foul swoop. By using the carets to escape the percent signs, like this <code class="language-plaintext highlighter-rouge">^%computername^%-$MFT</code>, you can pass the variable to the next command interpreter. If you don’t, your command prompt will interpret it and save all of the file names as YOUR computer name and overwrite each other. Took me a second to figure that out.</p>
+<p>To access the remote environment variables, I needed to use cmd to launch RawCopy which means I couldn’t use the <strong>-c</strong> to copy it over in one fell swoop. By using the carets to escape the percent signs, like this <code class="language-plaintext highlighter-rouge">^%computername^%-$MFT</code>, you can pass the variable to the next command interpreter. If you don’t, your command prompt will interpret it and save all of the file names as YOUR computer name and overwrite each other. Took me a second to figure that out.</p>
 
-<p>If all this sounds convoluted, you’re paying attention. The point of this course highlight some more complicated methods of approaching the litany of challenges you will encounter during your DFIR day.</p>
+<p>If all this sounds convoluted, you’re paying attention. The point of this course is to highlight some more complicated methods of approaching the litany of challenges you will encounter during your DFIR day.</p>
 
 <h2 id="2-remote-acquisition-of-windows-artifacts">2. Remote Acquisition of Windows Artifacts</h2>
 <p>Some folks reading this are convinced that Incident Response is all done through Endpoint Detection and Response solutions and in 2018 no one drops collection scripts to gather artifacts for analysis. Those people are wrong.</p>
 
-<p>The first thing you should know is you will run into problems. Even when your collection tool is working perfectly; network connections drop, hard drives run out of room, antivirus and data loss prevention software will freak out… this is going to happen. Embrace it.</p>
+<p>The first thing you should know is you will run into problems. Even when your collection tool is working perfectly, network connections drop, hard drives run out of room, antivirus and data loss prevention software will freak out… this is going to happen. Embrace it.</p>
 
 <p>This chapter is going to cover as many of the lessons learned as I can think of.</p>
 
 <h3 id="issues-with-tools-for-remote-file-acquisition">Issues with Tools for Remote File Acquisition</h3>
 
-<p>This can quickly get religious but I am not a fan of most commercial tools. Many do WAY too much stuff I don’t need or want for my OCD to handle. I am not going to bad mouth any particular vendor but there are a lot of solutions that just don’t work for my exact needs.</p>
+<p>This can quickly get religious but I am not a fan of most commercial tools. Many do WAY too much stuff I don’t need or want for my OCD to handle. I am not going to badmouth any particular vendor but there are a lot of solutions that just don’t work for my exact needs.</p>
 
 <p>Things I have found annoying about collection tools:</p>
 
 <ul>
   <li>Some tools require special dongles which is often not practical with modern global enterprises.</li>
-  <li>Some use netcat like functionality to talk directly from your workstation to target which triggers NIDS and is blocked by NIPS.</li>
+  <li>Some use netcat-like functionality to talk directly from your workstation to target which triggers NIDS and is blocked by NIPS.</li>
   <li>Some won’t copy or even find some files on the target because they are locked by the OS or a third party tool like AV or DLP.</li>
   <li>Some free tools get flagged by AV because they are not signed or what they are written in.</li>
   <li>Some tools take too long and then produce too little.</li>
@@ -617,7 +640,7 @@ In this example, I use PsExec to create two instances of notepad.exe on my local
 
 <h4 id="the-underlying-mechanics-of-copying-locked-files-on-windows">The Underlying Mechanics of Copying Locked Files on Windows</h4>
 
-<p>Before we discuss tools and examples, an understanding of the mechanics of the NTFS filesystem is helpful to ensure you can adapt and overcome when various things get in between you and your artifacts. Here is a piece of DFIRfu using completely native windows commands. Admittedly, this is more DF than IR and I know it is a lot of hexadecimal but stick with me…
+<p>Before we discuss tools and examples, an understanding of the mechanics of the NTFS filesystem is helpful to ensure you can adapt and overcome when various things get in between you and your artifacts. Here is a piece of DFIRfu using completely native Windows commands. Admittedly, this is more DF than IR and I know it is a lot of hexadecimal but stick with me…
 <img src="../Images/$MFTdataruns.png" alt="MFT Data Runs" /></p>
 
 <p><strong>Breakdown</strong></p>
@@ -633,7 +656,7 @@ In this example, I use PsExec to create two instances of notepad.exe on my local
   </li>
   <li><code class="language-plaintext highlighter-rouge">fsutil.exe file queryextents c:\$MFT</code>
     <ul>
-      <li>This command shows use the clusters allocated to the $MFT. I pick on the $MFT a lot in my examples for two reasons : it contains almost all of the file system information on the system and it is not directly accessible through the operating system.</li>
+      <li>This command shows us the clusters allocated to the $MFT. I pick on the $MFT a lot in my examples for two reasons: it contains almost all of the file system information on the system and it is not directly accessible through the operating system.</li>
       <li>This command outputs three columns of information:
         <ul>
           <li><strong>VCN</strong>: Virtual Cluster Numbers are used to sequence chunks of allocated data kinda like numbered puzzle pieces.</li>
@@ -646,8 +669,8 @@ In this example, I use PsExec to create two instances of notepad.exe on my local
   <li><code class="language-plaintext highlighter-rouge">echo Size of $MFT in Bytes: &amp;&amp; set /a (0xC820 + 0x4720) * 4096</code>
     <ul>
       <li>This is just an example of how to do math on the Windows command line.</li>
-      <li><code class="language-plaintext highlighter-rouge">set /a</code> can be used for sorts of fun stuff like converting hex to decimal and arithmetic.</li>
-      <li>Here I am adding the number of clusters from the first data run and second data run to determine the total number of clusters allocated to the $MFT. Since we know the clusters are 4096 bytes large, we multiple to determine the number of bytes allocated to the $MFT.</li>
+      <li><code class="language-plaintext highlighter-rouge">set /a</code> can be used for all sorts of fun stuff like converting hex to decimal and arithmetic.</li>
+      <li>Here I am adding the number of clusters from the first data run and second data run to determine the total number of clusters allocated to the $MFT. Since we know the clusters are 4096 bytes large, we multiply to determine the number of bytes allocated to the $MFT.</li>
     </ul>
   </li>
   <li><code class="language-plaintext highlighter-rouge">dir "\\vmware-host\Shared Folders\Evidence"</code>
@@ -659,7 +682,7 @@ In this example, I use PsExec to create two instances of notepad.exe on my local
 
 <p>Here is another way to look at that information:
 <img src="../Images/$MFTallocatedspace.png" alt="enter image description here" />
-That $MFT only has two but it is common for larger files to have many data runs:
+That $MFT only has two data runs, but it is common for larger files to have many data runs:
 <img src="../Images/webcachedataruns.png" alt="enter image description here" />
 This WebCacheV01.dat file has 25 runs spread out all over the volume.</p>
 
@@ -670,17 +693,17 @@ This WebCacheV01.dat file has 25 runs spread out all over the volume.</p>
 <ol>
   <li>Determine what physical clusters have been allocated for that file. This is stored in terms of LCN and number of clusters <em>(inside the $MFT as it just so happens, but we will cover that later)</em>.</li>
   <li>Open the Volume for direct read access.</li>
-  <li>Seek to the offset of the LCN on disk and read the numbers of clusters specified. Repeat as needed for all Data Runs.</li>
+  <li>Seek to the offset of the LCN on disk and read the number of clusters specified. Repeat as needed for all Data Runs.</li>
   <li>Write the collected information to an output file in the sequence specified by the VCNs.</li>
 </ol>
 
-<p>Piece of cake right? Well the first 3 steps can trip up tools for one reason or another.</p>
+<p>Piece of cake, right? Well, the first 3 steps can trip up tools for one reason or another.</p>
 
 <h3 id="building-a-toolkit-for-live-file-collection">Building a Toolkit for Live File Collection:</h3>
 
 <p>I wish I could point you to a single perfect free tool that does exactly what you need but sadly, I can’t recommend one that checks all the blocks. So, since this is a course designed to expand your knowledge and experience, let’s just build one from scratch(ish)!</p>
 
-<p>Lets display a variety of PowerShell fucntionality by using fcat from SleuthKit to make a collection script:</p>
+<p>Let’s display a variety of PowerShell functionality by using fcat from SleuthKit to make a collection script:</p>
 
 <div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#1. Timestamps are a great way to make unique folder names with context.</span><span class="w">
 </span><span class="nv">$timestamp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">get-date</span><span class="p">)</span><span class="o">.</span><span class="nf">ToString</span><span class="p">(</span><span class="s1">'yyyy-MM-dd-h-m-s'</span><span class="p">)</span><span class="w">
@@ -743,7 +766,7 @@ This WebCacheV01.dat file has 25 runs spread out all over the volume.</p>
 </span><span class="n">write-host</span><span class="w"> </span><span class="s2">"Done"</span><span class="w">
 </span></code></pre></div></div>
 
-<p>This is the platform we will add use and augment throughout the rest of the course. It’s free and it works. Strap in because the breakdown on this is going to be brutal.</p>
+<p>This is the platform we will use and augment throughout the rest of the course. It’s free and it works. Strap in because the breakdown on this is going to be brutal.</p>
 
 <p><strong>Breakdown</strong></p>
 <ul>
@@ -766,7 +789,7 @@ This WebCacheV01.dat file has 25 runs spread out all over the volume.</p>
     <div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$files_to_collect</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="s1">'c:\$MFT'</span><span class="w">
 </span></code></pre></div>    </div>
     <ul>
-      <li>Some files are a part of the filesystem but not direct accessible via a directory listing so we add their paths manually to $files_to_collect array</li>
+      <li>Some files are a part of the filesystem but not directly accessible via a directory listing so we add their paths manually to $files_to_collect array</li>
     </ul>
   </li>
   <li>
@@ -780,8 +803,8 @@ This WebCacheV01.dat file has 25 runs spread out all over the volume.</p>
     <div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$filesigs</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="s1">'^c:\\Users\\.*\\ntuser.dat$'</span><span class="w">
 </span></code></pre></div>    </div>
     <ul>
-      <li>This RegEx allows us to collect registry files from all of the profiles on a system without having to explictedly know the path for each</li>
-      <li>We are using double back slashes to “escape” the single blackslash. If we didn’t, it would be interpreted as a RegEx operator.</li>
+      <li>This RegEx allows us to collect registry files from all of the profiles on a system without having to explicitly know the path for each</li>
+      <li>We are using double backslashes to “escape” the single backslash. If we didn’t, it would be interpreted as a RegEx operator.</li>
     </ul>
   </li>
   <li>
@@ -790,11 +813,11 @@ This WebCacheV01.dat file has 25 runs spread out all over the volume.</p>
     <ul>
       <li>Here we are using the gci alias for the PowerShell command Get-ChildItem which is a fancy command that can enumerate through a directory listing among other things.</li>
       <li>We specify 2 directories for the <strong>-Path</strong> argument to define the scope of our search.</li>
-      <li><strong>-Recurse</strong> continues the seach throughout all of the subdirectories.</li>
+      <li><strong>-Recurse</strong> continues the search throughout all of the subdirectories.</li>
       <li><strong>-Force</strong> adds hidden files to the search and levitates rocks.</li>
-      <li><strong>-File</strong> is used to exclude directories from my results. This is actually important to the mechanincs of the rest of the script.</li>
+      <li><strong>-File</strong> is used to exclude directories from my results. This is actually important to the mechanics of the rest of the script.</li>
       <li>I specified SilentlyContinue for <strong>-ErrorAction</strong> because as it tries to get directory for every file in the C:\Windows folder, there are Access Denied Errors on files I didn’t ask for and I don’t want to see them.</li>
-      <li>We redirect the output of the gci command into the Where-Object to filter our results to compare the <strong>FullName</strong> of the file to our array of RegEx $filesigs. $filesigs is an array of strings until use <strong>-Join</strong> to merge each signature together with a pipe which acts as an OR statement in RegEx. “Signature 1 OR Signature 2 OR …”</li>
+      <li>We redirect the output of the gci command into the Where-Object to filter our results to compare the <strong>FullName</strong> of the file to our array of RegEx $filesigs. $filesigs is an array of strings until we use <strong>-Join</strong> to merge each signature together with a pipe which acts as an OR statement in RegEx. “Signature 1 OR Signature 2 OR …”</li>
       <li>Finally, we redirect THAT output and grab the Fullname of the file that matches one of our signatures and add it to the $files_to_collect array.</li>
     </ul>
   </li>
@@ -809,7 +832,7 @@ This WebCacheV01.dat file has 25 runs spread out all over the volume.</p>
     <div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kr">while</span><span class="p">(@(</span><span class="err">Get-Process</span><span class="w"> </span><span class="err">fcat</span><span class="w"> </span><span class="err">-ErrorAction</span><span class="w"> </span><span class="err">SilentlyContinue</span><span class="p">)</span><span class="o">.</span><span class="nf">Count</span><span class="w"> </span><span class="o">-ge</span><span class="w"> </span><span class="mi">10</span><span class="p">){</span><span class="n">Start-Sleep</span><span class="w"> </span><span class="nt">-Seconds</span><span class="w"> </span><span class="nx">5</span><span class="p">}</span><span class="w">
 </span></code></pre></div>    </div>
     <ul>
-      <li>This is a While loop in PowerShell. This statement will keep going until the condition is not True. This statement is counting the number of processes containing “fcat” and if it is greater than or equal to 10; it will sleep for 5 seconds and check again. This is being used to keep the number of fcat collectors to a reasonable amount. Is this a perfect solution? No. This is more “Tactical” Multiprocessing, meaning I want more than one instance running at a time but I don’t care enough to code true multiprocessing into the script. High yield, low drag. The process count and sleep timer can be adjusted to the desired amount of noise you want the target systems fan to make.</li>
+      <li>This is a While loop in PowerShell. This statement will keep going until the condition is not True. This statement is counting the number of processes containing “fcat” and if it is greater than or equal to 10; it will sleep for 5 seconds and check again. This is being used to keep the number of fcat collectors to a reasonable amount. Is this a perfect solution? No. This is more “Tactical” Multiprocessing, meaning I want more than one instance running at a time but I don’t care enough to code true multiprocessing into the script. High yield, low drag. The process count and sleep timer can be adjusted to the desired amount of noise you want the target system’s fan to make.</li>
     </ul>
   </li>
   <li>
@@ -823,7 +846,7 @@ This WebCacheV01.dat file has 25 runs spread out all over the volume.</p>
     <div class="language-powershell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$outfile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="err">$</span><span class="p">(</span><span class="s1">'{0}\\{1}'</span><span class="w"> </span><span class="nt">-f</span><span class="w"> </span><span class="nv">$timestamp</span><span class="p">,</span><span class="nv">$file</span><span class="w"> </span><span class="o">-replace</span><span class="w"> </span><span class="s1">':'</span><span class="p">,</span><span class="s1">''</span><span class="p">)</span><span class="w">
 </span></code></pre></div>    </div>
     <ul>
-      <li>fcat literally just prints a files contents to screen and has no other frills like saving the file to another location so it makes us do a little work.</li>
+      <li>fcat literally just prints a file’s contents to screen and has no other frills like saving the file to another location so it makes us do a little work.</li>
       <li>This line of code is responsible for creating the folder structure in the collection folder that represents where the file came from on the target.</li>
       <li><code class="language-plaintext highlighter-rouge">C:\Users\Username\ntuser.dat</code> gets saved to <code class="language-plaintext highlighter-rouge">2018-03-08-5-2-12\c\Users\Username\ntuser.dat</code></li>
     </ul>
@@ -833,7 +856,7 @@ This WebCacheV01.dat file has 25 runs spread out all over the volume.</p>
 </span></code></pre></div>    </div>
     <ul>
       <li>In order to store the ntuser.dat file in the <code class="language-plaintext highlighter-rouge">2018-03-08-5-2-12\c\Users\Username</code> folder, we need to create it.</li>
-      <li>This line takes a substring of the $outfile path from index 0 (the begining) to the index of the last backslash argo the parent folder of the file.</li>
+      <li>This line takes a substring of the $outfile path from index 0 (the beginning) to the index of the last backslash, ergo the parent folder of the file.</li>
       <li>Are there other commands to get the parent folder of a file? Yes, but they don’t work on files the OS can’t see like c:\$Extend\$USNJrnl:$J and I imagine this is faster anyways.</li>
     </ul>
   </li>
@@ -844,7 +867,7 @@ This WebCacheV01.dat file has 25 runs spread out all over the volume.</p>
 </code></pre></div>        </div>
       </li>
       <li>This is pretty simple but gets complicated because all the paths need to be encapsulated with quotes because some paths might have spaces in them.</li>
-      <li><code class="language-plaintext highlighter-rouge">$('{0}{1}{0}' -f [char]34, $outdir)</code> is an example of creating a string from other variables. I am using [char]34 because it is the cleanest method of concatenating quotes I have found. The backtick method didn’t survive accoss the cmd interpreter. This method puts a “ before and after the $outdir.</li>
+      <li><code class="language-plaintext highlighter-rouge">$('{0}{1}{0}' -f [char]34, $outdir)</code> is an example of creating a string from other variables. I am using [char]34 because it is the cleanest method of concatenating quotes I have found. The backtick method didn’t survive across the cmd interpreter. This method puts a “ before and after the $outdir.</li>
       <li>Fun fact: mkdir will make recursive folders if you ask it.</li>
       <li>For fcat, I used -h to knock down the size of the sparse files we collect. I will cover that later. -f specifies the NTFS file system.</li>
       <li>We are using the &gt; to redirect the output of fcat into a file.</li>
@@ -865,7 +888,7 @@ eyJoaXN0b3J5IjpbOTE1ODQwOTAwXX0=
   <footer role="contentinfo" class="entry-wrapper">
     
 
-<span>&copy; 2023 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
+<span>&copy; 2026 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
 <div class="social-icons">
 	<a href="https://twitter.com/GlassDFIR" title="Jon Glass on Twitter" target="_blank"><i class="fa fa-twitter-square fa-2x"></i></a>
 	

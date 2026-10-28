@@ -39,6 +39,11 @@
 <meta name="MobileOptimized" content="320">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<!-- Theme: dark by default; remember a reader's choice of light -->
+<script>
+  try { if (localStorage.getItem('theme') === 'light') document.documentElement.classList.add('theme-light'); } catch (e) {}
+</script>
+
 <!-- For all browsers -->
 <link rel="stylesheet" href="http://localhost:4000/assets/css/main.css">
 <!-- Webfonts -->
@@ -83,7 +88,10 @@
 	    <ul>
       
 		    
-		    <li><a href="http://localhost:4000/blog/" >Blog</a></li>
+		    <li><a href="http://localhost:4000/blogsabout/" >Blog</a></li>
+		  
+		    
+		    <li><a href="http://localhost:4000/tools/" >Tools</a></li>
 		  
 		    
 		    <li><a href="http://localhost:4000/adfirwmc/" >ADFIRWMC</a></li>
@@ -97,9 +105,24 @@
 		    
 		    <li><a href="http://localhost:4000/search/" >Search</a></li>
 		  
+		    <li><a href="#" class="theme-toggle" id="theme-toggle" role="button" aria-label="Switch between dark and light theme">Light</a></li>
 	    </ul>
 	</nav>
 </div><!-- /.navigation-wrapper -->
+<script>
+  (function () {
+    var root = document.documentElement, btn = document.getElementById('theme-toggle');
+    if (!btn) return;
+    function label() { btn.textContent = root.classList.contains('theme-light') ? 'Dark' : 'Light'; }
+    label();
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      var light = root.classList.toggle('theme-light');
+      try { localStorage.setItem('theme', light ? 'light' : 'dark'); } catch (err) {}
+      label();
+    });
+  })();
+</script>
 
 <!--[if lt IE 9]><div class="upgrade"><strong><a href="http://whatbrowser.org/">Your browser is quite old!</strong> Why not upgrade to a different browser to better enjoy this site?</a></div><![endif]-->
 
@@ -130,8 +153,8 @@
       </header>
 
 
-        <time datetime="2018-03-04T20:33:28+00:00"><i class="fa fa-calendar-o"></i> March 04, 2018</time>
-        <p>Each and every one of these artifacts are a deep world of details all to themselves but I tried to boil them down for this list. We will cover most of these in greater detail further in this course.</p>
+        <time datetime="2018-03-04T15:33:28-05:00"><i class="fa fa-calendar-o"></i> March 04, 2018</time>
+        <p>Each and every one of these artifacts is a deep world of details all to themselves but I tried to boil them down for this list. We will cover most of these in greater detail further in this course.</p>
 
 <ul>
   <li>NTFS Master File Table ($MFT)
@@ -140,7 +163,7 @@
       <li>Importance: ★★★★★
         <ul>
           <li>This contains the vast majority of the filesystem information for an NTFS volume.</li>
-          <li>Once parsed, you can establish file paths and variety of timestamps that make timelining events easier.</li>
+          <li>Once parsed, you can establish file paths and a variety of timestamps that make timelining events easier.</li>
           <li>So much info can be derived from the MFT that I refuse to try to explain it here.</li>
         </ul>
       </li>
@@ -163,13 +186,13 @@
       <li>Description: Update Sequence Number Journal is a feature of NTFS which maintains a record of changes made to the volume. Whenever a change is made to the volume, a record is added to the file. Each record is identified by a 64-bit Update Sequence Number or USN. (For this reason Change Journals are sometimes called USN Journals.) Each record in the Change Journal contains the USN, the name of the file, and information about what the change was.</li>
       <li>Importance: ★★★☆☆
         <ul>
-          <li>This is another one of those files you don’t need on a day to day basis, mostly for the deep forensic dives where you need to know exactly what changes took place at the volume level during a period of time.</li>
-          <li>Using the $MFT, $LogFile, and $USNJrnl:$J in concert can paint a very high fidelity picture of file system events. Using them together can help shed light on things like timestomping.</li>
+          <li>This is another one of those files you don’t need on a day-to-day basis, mostly for the deep forensic dives where you need to know exactly what changes took place at the volume level during a period of time.</li>
+          <li>Using the $MFT, $LogFile, and $USNJrnl:$J in concert can paint a very high-fidelity picture of file system events. Using them together can help shed light on things like timestomping.</li>
         </ul>
       </li>
       <li>Line to add to collection script
         <ul>
-          <li><code class="language-plaintext highlighter-rouge">$filestocollect += 'c:\$Extend\USNjrnl:$J'</code></li>
+          <li><code class="language-plaintext highlighter-rouge">$filestocollect += 'c:\$Extend\$UsnJrnl:$J'</code></li>
         </ul>
       </li>
     </ul>
@@ -210,8 +233,8 @@
   </li>
   <li>Prefetch Files
     <ul>
-      <li>Description:</li>
-      <li>Importance:</li>
+      <li>Description: Windows records what a program loads in its first few seconds so it can launch faster next time. As a side effect, you get the program’s run count, last run times (up to eight on Windows 8 and later), and the files it touched. Disabled by default on Windows Server. Covered in <a href="/adfirwmc/Ch5-1/">5.1</a>.</li>
+      <li>Importance: ★★★★★</li>
       <li>Line to add to collection script:
         <ul>
           <li><code class="language-plaintext highlighter-rouge">$filesigs += '^c:\\Windows\\Prefetch\\.*\.pf$'</code></li>
@@ -221,12 +244,12 @@
   </li>
   <li>Application Experience Service Artifacts
     <ul>
-      <li>Description:</li>
-      <li>Importance:</li>
-      <li>Line to add to collection script:
+      <li>Description: Amcache.hve is a registry hive that inventories programs on the system, including their full path and SHA1 hash. An entry means Windows knew about the file, not that it ran. RecentFileCache.bcf is its Windows 7 predecessor. Covered in <a href="/adfirwmc/Ch5-1/">5.1</a>.</li>
+      <li>Importance: ★★★★☆</li>
+      <li>Line to add to collection script (includes the hive’s transaction logs):
         <ul>
-          <li><code class="language-plaintext highlighter-rouge">$filesigs += '^c:\\Windows\\AppCompat\\Programs\\Amcache.hve$'</code></li>
-          <li><code class="language-plaintext highlighter-rouge">$filesigs += '^C:\\Windows\\AppCompat\\Programs\\RecentFilecache.bcf$'</code></li>
+          <li><code class="language-plaintext highlighter-rouge">$filesigs += '^c:\\Windows\\AppCompat\\Programs\\Amcache\.hve(\.LOG[12])?$'</code></li>
+          <li><code class="language-plaintext highlighter-rouge">$filesigs += '^C:\\Windows\\AppCompat\\Programs\\RecentFilecache.bcf$'</code> (Windows 7 only)</li>
         </ul>
       </li>
     </ul>
@@ -315,7 +338,7 @@
   <footer role="contentinfo" class="entry-wrapper">
     
 
-<span>&copy; 2023 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
+<span>&copy; 2026 Jon Glass. Powered by <a href="http://jekyllrb.com" rel="nofollow">Jekyll</a> using the <a href="https://mademistakes.com/work/so-simple-jekyll-theme/" rel="nofollow">So Simple Theme</a>.</span>
 <div class="social-icons">
 	<a href="https://twitter.com/GlassDFIR" title="Jon Glass on Twitter" target="_blank"><i class="fa fa-twitter-square fa-2x"></i></a>
 	
