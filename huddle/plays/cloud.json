@@ -1,0 +1,1478 @@
+{
+  "name": "Cloud & SaaS",
+  "version": "1.0.0",
+  "description": "AWS, Microsoft Entra ID and 365, Google Cloud, Okta, Kubernetes and SaaS integrations.",
+  "plays": [
+    {
+      "id": "CLD-001",
+      "phase": "prep",
+      "title": "Turn on cloud audit logging everywhere",
+      "summary": "Most cloud investigations die for lack of logs. Turn them on, centralize them and keep them before you need them.",
+      "steps": [
+        "AWS: create an organization CloudTrail covering all regions, plus S3 and Lambda data events for sensitive resources",
+        "Azure: send Entra ID sign-in and audit logs and the Azure Activity log to a Log Analytics workspace or SIEM",
+        "Google Cloud: enable Data Access audit logs for sensitive services (only BigQuery has them on by default)",
+        "Microsoft 365: confirm Purview audit is on and check which license sets your retention period",
+        "Send everything to a log archive account or project that workload admins cannot change"
+      ],
+      "tools": [
+        "CloudTrail",
+        "Log Analytics",
+        "Cloud Logging",
+        "Purview Audit"
+      ],
+      "roles": [
+        "Cloud Security"
+      ],
+      "tags": [
+        "cloud",
+        "logging",
+        "aws",
+        "azure",
+        "gcp",
+        "m365"
+      ],
+      "time": "1d"
+    },
+    {
+      "id": "CLD-002",
+      "phase": "prep",
+      "title": "Pre-provision responder access to every cloud account",
+      "summary": "Make sure responders can get read-only and forensic access fast, without asking the team whose account may be compromised.",
+      "steps": [
+        "Create a read-only security audit role in every AWS account, Azure subscription and GCP project",
+        "Create a separate forensic role that can snapshot disks and share them to the forensics account",
+        "Protect both roles with phishing-resistant MFA and alert on every use",
+        "Keep two break-glass accounts outside SSO and the main identity provider, and test them each quarter"
+      ],
+      "roles": [
+        "Cloud Security",
+        "Identity"
+      ],
+      "tags": [
+        "cloud",
+        "access",
+        "break-glass"
+      ],
+      "time": "1d"
+    },
+    {
+      "id": "CLD-003",
+      "phase": "prep",
+      "title": "Build an isolated cloud forensics account",
+      "summary": "A clean account or project to receive snapshots, run analysis instances and store evidence.",
+      "steps": [
+        "Create a dedicated forensics AWS account, Azure subscription or GCP project with no trust to production",
+        "Create encryption keys there and document how to re-encrypt and share snapshots into it",
+        "Pre-build an analysis image with forensic tools and no outbound internet",
+        "Turn on object lock or immutable storage for the evidence bucket"
+      ],
+      "tools": [
+        "AWS KMS",
+        "Azure Key Vault",
+        "Cloud KMS"
+      ],
+      "roles": [
+        "Cloud Security",
+        "Forensics"
+      ],
+      "tags": [
+        "cloud",
+        "forensics"
+      ],
+      "time": "1d"
+    },
+    {
+      "id": "CLD-010",
+      "phase": "ident",
+      "title": "Investigate AWS activity in CloudTrail",
+      "summary": "Work out what a suspect key, user or role did, where, and when.",
+      "steps": [
+        "Filter CloudTrail by the access key ID, user or role session name across all regions",
+        "Look for reconnaissance: GetCallerIdentity, ListBuckets, ListUsers, DescribeInstances",
+        "Look for persistence: CreateUser, CreateAccessKey, CreateLoginProfile, AttachUserPolicy, UpdateAssumeRolePolicy",
+        "Look for defense evasion: StopLogging, DeleteTrail, PutEventSelectors, DeleteDetector",
+        "Check for activity in regions you do not use and for RunInstances of large or GPU instance types",
+        "Record source IPs and user agents, then pivot on them across the organization"
+      ],
+      "tools": [
+        "CloudTrail Lake",
+        "Athena",
+        "SIEM",
+        "GuardDuty"
+      ],
+      "artifacts": [
+        "CloudTrail logs"
+      ],
+      "roles": [
+        "Cloud Security",
+        "Forensics"
+      ],
+      "tags": [
+        "cloud",
+        "aws",
+        "cloudtrail",
+        "iam"
+      ],
+      "attack": [
+        "T1078.004",
+        "T1098.001",
+        "T1136.003",
+        "T1562.008",
+        "T1535"
+      ],
+      "time": "3h"
+    },
+    {
+      "id": "CLD-011",
+      "phase": "ident",
+      "title": "Investigate Entra ID sign-in and audit logs",
+      "summary": "Find how a Microsoft cloud identity was compromised and what the attacker changed in the tenant.",
+      "steps": [
+        "Review interactive and non-interactive sign-ins for the user: IPs, ASNs, user agents, device IDs, risk detections",
+        "Look for token replay: the same session ID used from new IPs or devices",
+        "Check audit logs for MFA method changes, device registrations, and new app credentials or role assignments",
+        "Check for new or changed Conditional Access policies, federation settings and custom domains",
+        "Export the evidence before it ages out (sign-in logs are kept 30 days on P1/P2 licenses, 7 days without them)"
+      ],
+      "tools": [
+        "Microsoft Entra admin center",
+        "Microsoft Graph",
+        "Microsoft-Extractor-Suite",
+        "Sentinel"
+      ],
+      "artifacts": [
+        "Sign-in logs",
+        "Audit logs"
+      ],
+      "roles": [
+        "Identity",
+        "Cloud Security"
+      ],
+      "tags": [
+        "cloud",
+        "azure",
+        "entra",
+        "identity",
+        "m365"
+      ],
+      "attack": [
+        "T1078.004",
+        "T1098.005",
+        "T1556",
+        "T1484.002",
+        "T1539"
+      ],
+      "time": "3h"
+    },
+    {
+      "id": "CLD-012",
+      "phase": "ident",
+      "title": "Search the Microsoft 365 unified audit log",
+      "summary": "Reconstruct mailbox, SharePoint, OneDrive and Teams activity for a compromised user.",
+      "steps": [
+        "Search the unified audit log for the user over the suspected window, and widen it if you find earlier activity",
+        "Mail: New-InboxRule, Set-InboxRule, UpdateInboxRules, Set-Mailbox (forwarding), Add-MailboxPermission, Send",
+        "MailItemsAccessed shows which messages were read; check it is being recorded for the mailbox under your license",
+        "Files: FileDownloaded, FileAccessed, FileSyncDownloadedFull and SharingSet/AnonymousLinkCreated on SharePoint and OneDrive",
+        "Apps: \"Consent to application\" and \"Add service principal credentials\""
+      ],
+      "tools": [
+        "Purview Audit",
+        "Microsoft-Extractor-Suite",
+        "Untitled Goose Tool",
+        "Search-UnifiedAuditLog"
+      ],
+      "artifacts": [
+        "Unified audit log"
+      ],
+      "roles": [
+        "Cloud Security",
+        "Forensics"
+      ],
+      "tags": [
+        "cloud",
+        "m365",
+        "email",
+        "sharepoint",
+        "bec"
+      ],
+      "attack": [
+        "T1114.002",
+        "T1114.003",
+        "T1564.008",
+        "T1213",
+        "T1528"
+      ],
+      "time": "3h"
+    },
+    {
+      "id": "CLD-013",
+      "phase": "ident",
+      "title": "Investigate Google Cloud audit logs",
+      "summary": "Trace what a Google Cloud principal did across projects.",
+      "steps": [
+        "Query Admin Activity logs for the principal across the organization",
+        "Look for SetIamPolicy calls, service account key creation (CreateServiceAccountKey) and new service accounts",
+        "Check for compute instances created in unusual zones and firewall rule changes",
+        "Review Data Access logs for storage and BigQuery reads, if they were enabled",
+        "Check Security Command Center findings for the same window"
+      ],
+      "tools": [
+        "Cloud Logging",
+        "Log Analytics (BigQuery)",
+        "Security Command Center"
+      ],
+      "artifacts": [
+        "Cloud Audit Logs"
+      ],
+      "roles": [
+        "Cloud Security"
+      ],
+      "tags": [
+        "cloud",
+        "gcp",
+        "iam"
+      ],
+      "attack": [
+        "T1078.004",
+        "T1098.001",
+        "T1098.003",
+        "T1530"
+      ],
+      "time": "3h"
+    },
+    {
+      "id": "CLD-014",
+      "phase": "ident",
+      "title": "Investigate the Okta System Log",
+      "summary": "Find attacker sessions and admin changes in Okta, and everything downstream they reached.",
+      "steps": [
+        "Filter the System Log by user and by suspect IPs, ASNs and user agents",
+        "Look for user.session.start from new locations and sessions without the usual device context",
+        "Look for factor resets and deactivations (user.mfa.factor.reset_all, user.mfa.factor.deactivate)",
+        "Look for admin changes: user.account.privilege.grant, system.api_token.create, policy.lifecycle.update",
+        "List the apps the attacker session opened, then investigate each of those apps' own logs"
+      ],
+      "tools": [
+        "Okta Admin Console",
+        "SIEM"
+      ],
+      "artifacts": [
+        "Okta System Log"
+      ],
+      "roles": [
+        "Identity"
+      ],
+      "tags": [
+        "identity",
+        "okta",
+        "sso",
+        "saas"
+      ],
+      "attack": [
+        "T1078.004",
+        "T1556",
+        "T1539",
+        "T1098"
+      ],
+      "time": "2h"
+    },
+    {
+      "id": "CLD-015",
+      "phase": "ident",
+      "title": "Investigate a secret exposed in code",
+      "summary": "A key, token or password was committed to a repository, pasted somewhere public, or found by secret scanning.",
+      "steps": [
+        "Identify the secret type, what it can reach, and its privilege level",
+        "Find the first commit or paste that exposed it and whether the repo or paste was public",
+        "Search provider logs for any use of the secret since exposure, especially from IPs outside your ranges",
+        "Check for copies in forks, CI logs, build artifacts and container images",
+        "Decide whether you are dealing with exposure only or exposure plus use; that decides the scale of response"
+      ],
+      "tools": [
+        "GitHub secret scanning",
+        "TruffleHog",
+        "gitleaks",
+        "CloudTrail"
+      ],
+      "roles": [
+        "AppSec",
+        "Cloud Security"
+      ],
+      "tags": [
+        "cloud",
+        "secrets",
+        "github",
+        "code"
+      ],
+      "attack": [
+        "T1552.001",
+        "T1078.004"
+      ],
+      "time": "2h"
+    },
+    {
+      "id": "CLD-016",
+      "phase": "ident",
+      "title": "Investigate a compromised SaaS integration",
+      "summary": "A third-party app connected by OAuth was breached, and its tokens were used against your tenant.",
+      "steps": [
+        "List the integration's OAuth grants, scopes and service accounts in each SaaS platform it connects to",
+        "Pull API logs for those tokens. Look for bulk exports, queries for credentials, and access from new IPs",
+        "Search data the attacker could read (cases, notes, tickets) for embedded secrets such as API keys and passwords",
+        "Check the vendor's advisory for indicators and time windows",
+        "Find every other system that trusts the integration's credentials"
+      ],
+      "tools": [
+        "Salesforce Event Monitoring",
+        "GitHub audit log",
+        "Slack audit logs",
+        "SIEM"
+      ],
+      "roles": [
+        "Cloud Security",
+        "Third-Party Risk"
+      ],
+      "tags": [
+        "saas",
+        "oauth",
+        "third-party",
+        "supply-chain"
+      ],
+      "attack": [
+        "T1199",
+        "T1528",
+        "T1550.001",
+        "T1213"
+      ],
+      "time": "4h"
+    },
+    {
+      "id": "CLD-017",
+      "phase": "ident",
+      "title": "Determine cloud storage data access",
+      "summary": "Work out exactly which objects were listed, read or copied from cloud storage.",
+      "steps": [
+        "AWS: use CloudTrail S3 data events or S3 server access logs: GetObject, ListObjects, and CopyObject to external buckets",
+        "Azure: use Storage diagnostic logs (StorageRead) and check for SAS token use from unknown IPs",
+        "Google Cloud: use Data Access logs for storage.objects.get and storage.objects.list",
+        "Check bucket policies and ACLs for recent public or cross-account grants",
+        "Turn bytes and object counts into a list of affected data for counsel"
+      ],
+      "tools": [
+        "CloudTrail",
+        "Athena",
+        "Azure Monitor",
+        "Cloud Logging"
+      ],
+      "artifacts": [
+        "Storage access logs"
+      ],
+      "roles": [
+        "Cloud Security",
+        "Privacy"
+      ],
+      "tags": [
+        "cloud",
+        "storage",
+        "exfiltration",
+        "data"
+      ],
+      "attack": [
+        "T1530",
+        "T1537",
+        "T1619"
+      ],
+      "time": "4h"
+    },
+    {
+      "id": "CLD-018",
+      "phase": "ident",
+      "title": "Investigate cryptomining or resource hijacking",
+      "summary": "A billing spike, quota alert or provider notice suggests someone is running workloads on your bill.",
+      "steps": [
+        "Find new compute: large and GPU instances, container tasks, serverless functions, in every region",
+        "Identify the principal that created them and how it got credentials",
+        "Check outbound connections from new instances to mining pools",
+        "Open a case with the provider early; they may adjust charges for documented abuse",
+        "Check quota and spending alerts were in place, and why they did not fire sooner"
+      ],
+      "tools": [
+        "Cost Explorer",
+        "Azure Cost Management",
+        "Cloud Billing",
+        "GuardDuty"
+      ],
+      "roles": [
+        "Cloud Security",
+        "Finance"
+      ],
+      "tags": [
+        "cloud",
+        "cryptomining",
+        "billing"
+      ],
+      "attack": [
+        "T1496",
+        "T1578",
+        "T1535"
+      ],
+      "time": "2h"
+    },
+    {
+      "id": "CLD-019",
+      "phase": "ident",
+      "title": "Investigate a Kubernetes workload compromise",
+      "summary": "Work out how an attacker got into a cluster and what they reached from there.",
+      "steps": [
+        "Pull Kubernetes audit logs. Look for pods/exec, new privileged or hostPath pods, and new ClusterRoleBindings",
+        "Check which service account tokens the compromised pod could read, and their RBAC rights",
+        "Check whether the pod could reach the cloud metadata service and use the node's cloud identity",
+        "Review runtime alerts and container images for unexpected binaries",
+        "Capture pod and node state before anything restarts"
+      ],
+      "tools": [
+        "kubectl",
+        "Falco",
+        "EKS/AKS/GKE audit logs"
+      ],
+      "artifacts": [
+        "Kubernetes audit log",
+        "Container filesystem"
+      ],
+      "roles": [
+        "Platform Engineering",
+        "Cloud Security"
+      ],
+      "tags": [
+        "cloud",
+        "kubernetes",
+        "containers"
+      ],
+      "attack": [
+        "T1609",
+        "T1610",
+        "T1611",
+        "T1552.005",
+        "T1613"
+      ],
+      "time": "4h"
+    },
+    {
+      "id": "CLD-020",
+      "phase": "contain",
+      "title": "Disable exposed AWS access keys and sessions",
+      "summary": "Cut off a leaked or misused IAM key, including any temporary credentials already minted with it.",
+      "steps": [
+        "Deactivate the key: aws iam update-access-key --status Inactive (keep it, do not delete yet)",
+        "Attach a deny-all policy to the user so session tokens minted with the key stop working too",
+        "For roles, use \"Revoke active sessions\" to deny tokens issued before now",
+        "Check for and disable any other keys, users or login profiles the attacker created",
+        "Tell application owners first if the key is in production use, and have a replacement ready"
+      ],
+      "tools": [
+        "AWS CLI",
+        "IAM console"
+      ],
+      "roles": [
+        "Cloud Security"
+      ],
+      "tags": [
+        "cloud",
+        "aws",
+        "iam",
+        "keys"
+      ],
+      "attack": [
+        "T1078.004",
+        "T1098.001"
+      ],
+      "time": "30m"
+    },
+    {
+      "id": "CLD-021",
+      "phase": "contain",
+      "title": "Quarantine a compromised cloud instance",
+      "summary": "Isolate a VM without destroying the evidence on it.",
+      "steps": [
+        "Enable termination protection and tag the instance as under investigation",
+        "Swap its security groups or NSG for one with no inbound or outbound rules",
+        "Snapshot all disks and share the snapshots to the forensics account; capture memory if your tooling allows",
+        "Revoke the sessions of the instance role or managed identity; already-issued credentials stay valid until they expire",
+        "Deregister it from load balancers and auto scaling so it is not replaced or killed"
+      ],
+      "tools": [
+        "EC2 console",
+        "Azure portal",
+        "gcloud"
+      ],
+      "artifacts": [
+        "Disk snapshots",
+        "Memory image"
+      ],
+      "roles": [
+        "Cloud Security",
+        "Forensics"
+      ],
+      "tags": [
+        "cloud",
+        "isolation",
+        "forensics"
+      ],
+      "time": "1h"
+    },
+    {
+      "id": "CLD-022",
+      "phase": "contain",
+      "title": "Revoke Entra ID sessions and app credentials",
+      "summary": "Kick an attacker out of a Microsoft tenant and close the doors they added.",
+      "steps": [
+        "Reset the user's password and revoke sessions (Revoke-MgUserSignInSession)",
+        "Access tokens already issued stay valid until they expire (60 to 90 minutes by default) unless continuous access evaluation applies; plan for that gap",
+        "Remove MFA methods and devices the attacker registered, then require re-registration",
+        "Remove credentials (secrets and certificates) added to app registrations and service principals",
+        "Revoke admin consent for malicious apps and disable their service principals"
+      ],
+      "tools": [
+        "Microsoft Graph PowerShell",
+        "Entra admin center"
+      ],
+      "roles": [
+        "Identity"
+      ],
+      "tags": [
+        "cloud",
+        "azure",
+        "entra",
+        "identity",
+        "m365"
+      ],
+      "attack": [
+        "T1078.004",
+        "T1098.001",
+        "T1098.005",
+        "T1528"
+      ],
+      "time": "1h"
+    },
+    {
+      "id": "CLD-023",
+      "phase": "contain",
+      "title": "Lock down exposed cloud storage",
+      "summary": "Stop ongoing access to buckets, containers or shares that were opened up.",
+      "steps": [
+        "AWS: turn on S3 Block Public Access at account level and remove public or cross-account bucket policies",
+        "Azure: disable anonymous blob access and rotate storage account keys to kill SAS tokens signed with them",
+        "Google Cloud: remove allUsers and allAuthenticatedUsers bindings and enforce public access prevention",
+        "Record the policies before you change them, for the timeline"
+      ],
+      "roles": [
+        "Cloud Security"
+      ],
+      "tags": [
+        "cloud",
+        "storage",
+        "exposure"
+      ],
+      "attack": [
+        "T1530"
+      ],
+      "time": "1h"
+    },
+    {
+      "id": "CLD-024",
+      "phase": "contain",
+      "title": "Apply organization-level guardrails",
+      "summary": "Use the cloud's top-level policy to stop an attacker even if they hold admin rights in an account.",
+      "steps": [
+        "AWS: apply a service control policy to deny unused regions and IAM changes except from the break-glass role",
+        "Azure: use management group policy and deny assignments to block risky resource types and regions",
+        "Google Cloud: use organization policies to restrict service account key creation and resource locations",
+        "Test the guardrails on a non-production account first if time allows"
+      ],
+      "tools": [
+        "AWS Organizations",
+        "Azure Policy",
+        "GCP Organization Policy"
+      ],
+      "roles": [
+        "Cloud Security",
+        "Platform Engineering"
+      ],
+      "tags": [
+        "cloud",
+        "guardrails",
+        "policy"
+      ],
+      "time": "2h"
+    },
+    {
+      "id": "CLD-025",
+      "phase": "contain",
+      "title": "Revoke compromised SaaS integration tokens",
+      "summary": "Cut the connection between a breached third-party app and your SaaS tenants.",
+      "steps": [
+        "Revoke the integration's OAuth tokens and disable its connected app in each platform",
+        "Rotate any API keys or service account passwords stored in or for the integration",
+        "Rotate secrets the attacker may have read from SaaS data, such as keys pasted into tickets",
+        "Tell the business owner which workflows will break until the vendor gives the all-clear"
+      ],
+      "tools": [
+        "Salesforce Setup",
+        "GitHub",
+        "Slack admin"
+      ],
+      "roles": [
+        "Cloud Security",
+        "Business Owners"
+      ],
+      "tags": [
+        "saas",
+        "oauth",
+        "third-party"
+      ],
+      "attack": [
+        "T1528",
+        "T1550.001"
+      ],
+      "time": "1h"
+    },
+    {
+      "id": "CLD-026",
+      "phase": "contain",
+      "title": "Isolate a compromised Kubernetes workload",
+      "summary": "Stop a compromised pod spreading without losing the evidence on it.",
+      "steps": [
+        "Apply a deny-all NetworkPolicy to the pod's labels; keep the pod running",
+        "Cordon the node so nothing new is scheduled there",
+        "Remove the pod's service account RBAC bindings and rotate any secrets it mounted",
+        "Block the pod and node from the cloud metadata endpoint if it was not already blocked"
+      ],
+      "tools": [
+        "kubectl"
+      ],
+      "roles": [
+        "Platform Engineering"
+      ],
+      "tags": [
+        "cloud",
+        "kubernetes",
+        "containers",
+        "isolation"
+      ],
+      "attack": [
+        "T1610",
+        "T1552.005"
+      ],
+      "time": "1h"
+    },
+    {
+      "id": "CLD-030",
+      "phase": "erad",
+      "title": "Remove attacker persistence in cloud IAM",
+      "summary": "Cloud attackers persist through identities, not files. Find and remove every foothold.",
+      "steps": [
+        "AWS: review new users, keys, roles with external trust, Lambda functions, EventBridge rules and identity providers",
+        "Entra ID: review new app credentials, federated domains, service principals with high privileges and guest users",
+        "Google Cloud: review service account keys, IAM bindings on folders and the organization, and workload identity pools",
+        "Compare against IaC or a known-good snapshot of IAM, not just your memory of it"
+      ],
+      "tools": [
+        "IAM Access Analyzer",
+        "Prowler",
+        "ScoutSuite"
+      ],
+      "roles": [
+        "Cloud Security"
+      ],
+      "tags": [
+        "cloud",
+        "persistence",
+        "iam"
+      ],
+      "attack": [
+        "T1098.001",
+        "T1098.003",
+        "T1136.003",
+        "T1484.002"
+      ],
+      "time": "4h"
+    },
+    {
+      "id": "CLD-031",
+      "phase": "erad",
+      "title": "Rotate secrets the attacker could read",
+      "summary": "Assume every secret reachable by the compromised identity is now known to the attacker.",
+      "steps": [
+        "List secrets in Secrets Manager, Parameter Store, Key Vault and Secret Manager the identity could read",
+        "Check the access logs to see which ones were actually read",
+        "Rotate the read secrets first, then the rest, in order of business impact",
+        "Update dependent applications and confirm they still work"
+      ],
+      "tools": [
+        "AWS Secrets Manager",
+        "Azure Key Vault",
+        "GCP Secret Manager"
+      ],
+      "roles": [
+        "Cloud Security",
+        "Application Owners"
+      ],
+      "tags": [
+        "cloud",
+        "secrets"
+      ],
+      "attack": [
+        "T1555.006"
+      ],
+      "time": "4h"
+    },
+    {
+      "id": "CLD-032",
+      "phase": "erad",
+      "title": "Redeploy cloud workloads from known-good code",
+      "summary": "Replace compromised instances, containers and functions instead of cleaning them.",
+      "steps": [
+        "Rebuild from infrastructure-as-code and images built before the compromise",
+        "Verify image digests and pipeline integrity before redeploying",
+        "Use fresh credentials and keys for the new deployment",
+        "Keep the old resources quarantined until the investigation closes"
+      ],
+      "tools": [
+        "Terraform",
+        "CloudFormation",
+        "CI/CD"
+      ],
+      "roles": [
+        "Platform Engineering"
+      ],
+      "tags": [
+        "cloud",
+        "rebuild",
+        "iac"
+      ],
+      "time": "1d"
+    },
+    {
+      "id": "CLD-040",
+      "phase": "recover",
+      "title": "Restore cloud data from versions and backups",
+      "summary": "Bring back deleted or encrypted cloud data from protected copies.",
+      "steps": [
+        "Restore from S3 versioning or Object Lock, Azure soft delete, or GCS object versioning",
+        "For databases, restore to a point in time before the attacker's first action",
+        "Restore into a new resource, validate it, then switch traffic",
+        "Confirm the backups were not reachable by the compromised identity before trusting them"
+      ],
+      "roles": [
+        "Infrastructure",
+        "Application Owners"
+      ],
+      "tags": [
+        "cloud",
+        "backups",
+        "restore"
+      ],
+      "attack": [
+        "T1485",
+        "T1486"
+      ],
+      "time": "1d"
+    },
+    {
+      "id": "CLD-041",
+      "phase": "recover",
+      "title": "Validate cloud posture before closing",
+      "summary": "Confirm the environment is back to a secure baseline across every account.",
+      "steps": [
+        "Run a posture scan (Security Hub, Defender for Cloud, Security Command Center, or Prowler)",
+        "Confirm logging, GuardDuty or Defender plans, and alerting are back on everywhere",
+        "Re-check public exposure of storage, snapshots and AMIs",
+        "Review spending for a week to catch leftover attacker resources"
+      ],
+      "tools": [
+        "AWS Security Hub",
+        "Microsoft Defender for Cloud",
+        "Security Command Center",
+        "Prowler"
+      ],
+      "roles": [
+        "Cloud Security"
+      ],
+      "tags": [
+        "cloud",
+        "posture",
+        "validation"
+      ],
+      "time": "4h"
+    },
+    {
+      "id": "CLD-050",
+      "phase": "lessons",
+      "title": "Turn the cloud attack path into guardrails",
+      "summary": "Make the same path impossible, not just detectable.",
+      "steps": [
+        "Map each attacker step to the control that would have stopped it",
+        "Prefer preventive org-level policies over per-account fixes",
+        "Add detections for the API calls you saw, tested against replayed logs",
+        "Remove long-lived keys where workload identity or federation can replace them"
+      ],
+      "roles": [
+        "Cloud Security",
+        "Detection Engineering"
+      ],
+      "tags": [
+        "cloud",
+        "lessons",
+        "guardrails"
+      ],
+      "time": "1d"
+    }
+  ],
+  "templates": [
+    {
+      "id": "aws-key",
+      "name": "AWS access key exposure",
+      "description": "An IAM access key was leaked or GuardDuty flagged its use from outside your environment.",
+      "nodes": [
+        [
+          "s",
+          "start",
+          "Leaked or misused AWS key",
+          "ident"
+        ],
+        [
+          "a",
+          "play",
+          "CLD-015"
+        ],
+        [
+          "b",
+          "play",
+          "CLD-010"
+        ],
+        [
+          "q",
+          "decision",
+          "Key used by the attacker?",
+          "ident"
+        ],
+        [
+          "c",
+          "play",
+          "CLD-020"
+        ],
+        [
+          "n",
+          "note",
+          "Exposure only: still rotate the key, scrub the secret from history, and record why no further action was needed.",
+          "contain"
+        ],
+        [
+          "d",
+          "play",
+          "CLD-018"
+        ],
+        [
+          "e",
+          "play",
+          "CLD-017"
+        ],
+        [
+          "f",
+          "play",
+          "CLD-024"
+        ],
+        [
+          "g",
+          "play",
+          "CLD-030"
+        ],
+        [
+          "h",
+          "play",
+          "CLD-031"
+        ],
+        [
+          "q2",
+          "decision",
+          "Customer or regulated data read?",
+          "erad"
+        ],
+        [
+          "i",
+          "play",
+          "IDN-006"
+        ],
+        [
+          "j",
+          "play",
+          "CLD-041"
+        ],
+        [
+          "k",
+          "play",
+          "CLD-050"
+        ],
+        [
+          "z",
+          "end",
+          "Incident closed",
+          "lessons"
+        ]
+      ],
+      "edges": [
+        [
+          "s",
+          "a"
+        ],
+        [
+          "a",
+          "b"
+        ],
+        [
+          "b",
+          "q"
+        ],
+        [
+          "q",
+          "c",
+          "Yes"
+        ],
+        [
+          "q",
+          "n",
+          "No"
+        ],
+        [
+          "n",
+          "k"
+        ],
+        [
+          "c",
+          "d"
+        ],
+        [
+          "c",
+          "e"
+        ],
+        [
+          "d",
+          "f"
+        ],
+        [
+          "e",
+          "f"
+        ],
+        [
+          "f",
+          "g"
+        ],
+        [
+          "g",
+          "h"
+        ],
+        [
+          "h",
+          "q2"
+        ],
+        [
+          "q2",
+          "i",
+          "Yes"
+        ],
+        [
+          "q2",
+          "j",
+          "No"
+        ],
+        [
+          "i",
+          "j"
+        ],
+        [
+          "j",
+          "k"
+        ],
+        [
+          "k",
+          "z"
+        ]
+      ]
+    },
+    {
+      "id": "m365-tenant",
+      "name": "Entra ID / Microsoft 365 account takeover",
+      "description": "Adversary-in-the-middle phishing or token theft gives an attacker a cloud session in your tenant.",
+      "nodes": [
+        [
+          "s",
+          "start",
+          "Risky sign-in or user report",
+          "ident"
+        ],
+        [
+          "a",
+          "play",
+          "IDN-001"
+        ],
+        [
+          "b",
+          "play",
+          "CLD-011"
+        ],
+        [
+          "c",
+          "play",
+          "CLD-012"
+        ],
+        [
+          "q",
+          "decision",
+          "Admin roles or app credentials touched?",
+          "ident"
+        ],
+        [
+          "d",
+          "play",
+          "CLD-022"
+        ],
+        [
+          "e",
+          "play",
+          "CON-006"
+        ],
+        [
+          "f",
+          "play",
+          "CON-007"
+        ],
+        [
+          "g",
+          "play",
+          "CLD-030"
+        ],
+        [
+          "h",
+          "play",
+          "IDN-017"
+        ],
+        [
+          "i",
+          "play",
+          "ERA-008"
+        ],
+        [
+          "j",
+          "play",
+          "REC-006"
+        ],
+        [
+          "k",
+          "play",
+          "LES-001"
+        ],
+        [
+          "z",
+          "end",
+          "Incident closed",
+          "lessons"
+        ]
+      ],
+      "edges": [
+        [
+          "s",
+          "a"
+        ],
+        [
+          "a",
+          "b"
+        ],
+        [
+          "b",
+          "c"
+        ],
+        [
+          "c",
+          "q"
+        ],
+        [
+          "q",
+          "g",
+          "Yes"
+        ],
+        [
+          "q",
+          "d",
+          "No"
+        ],
+        [
+          "g",
+          "d"
+        ],
+        [
+          "d",
+          "e"
+        ],
+        [
+          "e",
+          "f"
+        ],
+        [
+          "f",
+          "h"
+        ],
+        [
+          "h",
+          "i"
+        ],
+        [
+          "i",
+          "j"
+        ],
+        [
+          "j",
+          "k"
+        ],
+        [
+          "k",
+          "z"
+        ]
+      ]
+    },
+    {
+      "id": "saas-oauth",
+      "name": "SaaS integration breach",
+      "description": "A third-party app with OAuth access to your SaaS tenants was compromised upstream.",
+      "nodes": [
+        [
+          "s",
+          "start",
+          "Vendor advisory or anomalous API use",
+          "ident"
+        ],
+        [
+          "a",
+          "play",
+          "CLD-016"
+        ],
+        [
+          "b",
+          "play",
+          "CLD-025"
+        ],
+        [
+          "c",
+          "play",
+          "IDN-004"
+        ],
+        [
+          "q",
+          "decision",
+          "Secrets found in the exposed data?",
+          "contain"
+        ],
+        [
+          "d",
+          "play",
+          "CLD-031"
+        ],
+        [
+          "e",
+          "play",
+          "CLD-010"
+        ],
+        [
+          "f",
+          "play",
+          "IDN-006"
+        ],
+        [
+          "g",
+          "play",
+          "LES-004"
+        ],
+        [
+          "n",
+          "note",
+          "Third-party risk: ask the vendor for their root cause and indicators, in writing.",
+          "lessons"
+        ],
+        [
+          "z",
+          "end",
+          "Incident closed",
+          "lessons"
+        ]
+      ],
+      "edges": [
+        [
+          "s",
+          "a"
+        ],
+        [
+          "a",
+          "b"
+        ],
+        [
+          "a",
+          "c"
+        ],
+        [
+          "b",
+          "q"
+        ],
+        [
+          "q",
+          "d",
+          "Yes"
+        ],
+        [
+          "q",
+          "f",
+          "No"
+        ],
+        [
+          "d",
+          "e"
+        ],
+        [
+          "e",
+          "f"
+        ],
+        [
+          "f",
+          "g"
+        ],
+        [
+          "g",
+          "n"
+        ],
+        [
+          "n",
+          "z"
+        ]
+      ]
+    },
+    {
+      "id": "cryptomining",
+      "name": "Cloud cryptomining",
+      "description": "Unexpected compute appears across regions and the bill climbs.",
+      "nodes": [
+        [
+          "s",
+          "start",
+          "Billing spike or provider abuse notice",
+          "ident"
+        ],
+        [
+          "a",
+          "play",
+          "CLD-018"
+        ],
+        [
+          "b",
+          "play",
+          "CLD-010"
+        ],
+        [
+          "c",
+          "play",
+          "CLD-020"
+        ],
+        [
+          "d",
+          "play",
+          "CLD-021"
+        ],
+        [
+          "e",
+          "play",
+          "CLD-024"
+        ],
+        [
+          "f",
+          "play",
+          "CLD-030"
+        ],
+        [
+          "g",
+          "play",
+          "CLD-041"
+        ],
+        [
+          "h",
+          "play",
+          "CLD-050"
+        ],
+        [
+          "z",
+          "end",
+          "Incident closed",
+          "lessons"
+        ]
+      ],
+      "edges": [
+        [
+          "s",
+          "a"
+        ],
+        [
+          "a",
+          "b"
+        ],
+        [
+          "b",
+          "c"
+        ],
+        [
+          "c",
+          "d"
+        ],
+        [
+          "d",
+          "e"
+        ],
+        [
+          "e",
+          "f"
+        ],
+        [
+          "f",
+          "g"
+        ],
+        [
+          "g",
+          "h"
+        ],
+        [
+          "h",
+          "z"
+        ]
+      ]
+    },
+    {
+      "id": "k8s",
+      "name": "Kubernetes workload compromise",
+      "description": "Runtime alert on a container, such as a shell spawned in a web pod.",
+      "nodes": [
+        [
+          "s",
+          "start",
+          "Runtime alert in a pod",
+          "ident"
+        ],
+        [
+          "a",
+          "play",
+          "IDN-001"
+        ],
+        [
+          "b",
+          "play",
+          "CLD-019"
+        ],
+        [
+          "c",
+          "play",
+          "CLD-026"
+        ],
+        [
+          "q",
+          "decision",
+          "Cloud identity used from the pod?",
+          "contain"
+        ],
+        [
+          "d",
+          "play",
+          "CLD-010"
+        ],
+        [
+          "e",
+          "play",
+          "CLD-030"
+        ],
+        [
+          "f",
+          "play",
+          "ERA-003"
+        ],
+        [
+          "g",
+          "play",
+          "CLD-032"
+        ],
+        [
+          "h",
+          "play",
+          "REC-006"
+        ],
+        [
+          "i",
+          "play",
+          "LES-003"
+        ],
+        [
+          "z",
+          "end",
+          "Incident closed",
+          "lessons"
+        ]
+      ],
+      "edges": [
+        [
+          "s",
+          "a"
+        ],
+        [
+          "a",
+          "b"
+        ],
+        [
+          "b",
+          "c"
+        ],
+        [
+          "c",
+          "q"
+        ],
+        [
+          "q",
+          "d",
+          "Yes"
+        ],
+        [
+          "q",
+          "f",
+          "No"
+        ],
+        [
+          "d",
+          "e"
+        ],
+        [
+          "e",
+          "f"
+        ],
+        [
+          "f",
+          "g"
+        ],
+        [
+          "g",
+          "h"
+        ],
+        [
+          "h",
+          "i"
+        ],
+        [
+          "i",
+          "z"
+        ]
+      ]
+    }
+  ]
+}

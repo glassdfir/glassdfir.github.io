@@ -1,0 +1,600 @@
+{
+  "name": "Insider Risk",
+  "version": "1.0.0",
+  "description": "Departing employees, privileged misuse and data theft by people with legitimate access. HR and Legal lead.",
+  "plays": [
+    {
+      "id": "INS-001",
+      "phase": "prep",
+      "title": "Set up insider risk governance with HR and Legal",
+      "summary": "Agree in advance who can open an insider case, what monitoring is lawful, and who sees what.",
+      "steps": [
+        "Write a charter naming the case owner, HR and Legal partners, and the approval needed to open a case",
+        "Check monitoring against employment and privacy law in each country, including works council agreements",
+        "Define need-to-know rules and a codename convention for cases",
+        "Decide how to handle a case involving security staff or executives"
+      ],
+      "roles": [
+        "Legal",
+        "HR",
+        "Privacy",
+        "IR Lead"
+      ],
+      "tags": [
+        "insider",
+        "governance",
+        "privacy"
+      ],
+      "time": "1w"
+    },
+    {
+      "id": "INS-002",
+      "phase": "prep",
+      "title": "Deploy lawful activity monitoring and DLP",
+      "summary": "Collect the signals you will need, within policy, before a case happens.",
+      "steps": [
+        "Turn on DLP for USB, cloud sync, personal webmail and printing on managed devices",
+        "Log large downloads and sharing changes in SharePoint, Google Drive and code repositories",
+        "Feed HR events (resignations, terminations) to the insider risk tool through an agreed process",
+        "Tell employees about monitoring as the law and your policy require"
+      ],
+      "tools": [
+        "Microsoft Purview Insider Risk",
+        "DLP",
+        "EDR"
+      ],
+      "roles": [
+        "Security Engineering",
+        "Privacy"
+      ],
+      "tags": [
+        "insider",
+        "dlp",
+        "monitoring"
+      ],
+      "time": "1w"
+    },
+    {
+      "id": "INS-010",
+      "phase": "ident",
+      "title": "Open an insider case confidentially",
+      "summary": "Insider cases leak easily and can hurt an innocent employee. Keep the circle small from the first minute.",
+      "steps": [
+        "Get the case approved as your charter requires and assign a codename",
+        "Limit the team to named people from Security, HR and Legal",
+        "Do not message the subject's manager or team until HR and Legal agree",
+        "Record the allegation, its source and the scope you are authorized to investigate"
+      ],
+      "roles": [
+        "IR Lead",
+        "HR",
+        "Legal"
+      ],
+      "tags": [
+        "insider",
+        "confidential",
+        "governance"
+      ],
+      "time": "1h"
+    },
+    {
+      "id": "INS-011",
+      "phase": "ident",
+      "title": "Review data movement by a departing employee",
+      "summary": "Check whether someone leaving took data they should not have.",
+      "steps": [
+        "Pull 90 days of activity before the resignation date and everything since",
+        "Look at USB writes, uploads to personal cloud storage, mail to personal addresses and printing",
+        "Look at bulk downloads from SharePoint, Drive, CRM and code repositories, and new repository clones",
+        "Compare against the person's normal baseline and their peers, not against zero",
+        "Hash and preserve anything you find"
+      ],
+      "tools": [
+        "DLP",
+        "EDR",
+        "Purview Audit",
+        "CASB"
+      ],
+      "roles": [
+        "Insider Risk Analyst"
+      ],
+      "tags": [
+        "insider",
+        "departing-employee",
+        "exfiltration"
+      ],
+      "attack": [
+        "T1052",
+        "T1567.002",
+        "T1048",
+        "T1114.003",
+        "T1213"
+      ],
+      "time": "4h"
+    },
+    {
+      "id": "INS-012",
+      "phase": "ident",
+      "title": "Review privileged user misuse",
+      "summary": "An administrator may have used their access outside their job: snooping, sabotage, or creating access for later.",
+      "steps": [
+        "Compare admin actions against change tickets for the period",
+        "Look for access to HR, executive or customer records with no business reason",
+        "Look for new accounts, keys, scheduled tasks or forwarding rules they created",
+        "Have someone outside the subject's team pull the logs"
+      ],
+      "tools": [
+        "SIEM",
+        "PAM"
+      ],
+      "roles": [
+        "Insider Risk Analyst",
+        "IR Lead"
+      ],
+      "tags": [
+        "insider",
+        "privileged",
+        "sabotage"
+      ],
+      "attack": [
+        "T1078",
+        "T1136",
+        "T1098",
+        "T1053"
+      ],
+      "time": "4h"
+    },
+    {
+      "id": "INS-013",
+      "phase": "ident",
+      "title": "Preserve the subject's data and devices",
+      "summary": "Place holds before anyone wipes, reissues or deprovisions anything.",
+      "steps": [
+        "Place legal holds on the mailbox, OneDrive or Drive, chat and code accounts",
+        "Tell IT not to wipe or reissue the laptop and phone; collect them at return",
+        "Image the devices and log chain of custody",
+        "Hold badge, VPN and printer logs past their normal retention"
+      ],
+      "tools": [
+        "Purview eDiscovery",
+        "Google Vault",
+        "FTK Imager"
+      ],
+      "roles": [
+        "Forensics",
+        "Legal"
+      ],
+      "tags": [
+        "insider",
+        "legal-hold",
+        "preservation"
+      ],
+      "time": "2h"
+    },
+    {
+      "id": "INS-014",
+      "phase": "ident",
+      "title": "Interview the subject with HR and counsel",
+      "summary": "Interviews are HR-led and planned with counsel. Security supplies facts, not accusations.",
+      "steps": [
+        "Prepare the evidence summary and the questions with HR and Legal",
+        "Decide the meeting time with access removal in mind",
+        "Have HR lead, with a witness present; follow local rules on representation",
+        "Record answers and any admissions or returned materials"
+      ],
+      "roles": [
+        "HR",
+        "Legal"
+      ],
+      "tags": [
+        "insider",
+        "interview"
+      ],
+      "time": "2h"
+    },
+    {
+      "id": "INS-020",
+      "phase": "contain",
+      "title": "Remove access in step with HR",
+      "summary": "Remove every access path at the moment HR chooses, not before and not after.",
+      "steps": [
+        "List every account: SSO, local, SaaS outside SSO, VPN, cloud consoles, code hosting, shared accounts",
+        "Disable them at the agreed time, revoke sessions and tokens, and collect hardware keys",
+        "Disable the badge and retrieve keys",
+        "Remove corporate data from personal devices with MDM selective wipe",
+        "Rotate shared passwords the person knew"
+      ],
+      "tools": [
+        "IdP",
+        "MDM",
+        "PAM"
+      ],
+      "roles": [
+        "Identity",
+        "HR",
+        "Facilities"
+      ],
+      "tags": [
+        "insider",
+        "offboarding",
+        "access"
+      ],
+      "time": "1h"
+    },
+    {
+      "id": "INS-021",
+      "phase": "contain",
+      "title": "Recover data and get written certification",
+      "summary": "Get company data back and get a signed statement that no copies remain.",
+      "steps": [
+        "Have counsel send a demand for return of company data",
+        "Collect devices and media containing company data",
+        "Where agreed, have a third party examine personal devices or accounts",
+        "Get a signed certification of deletion and non-retention"
+      ],
+      "roles": [
+        "Legal",
+        "HR"
+      ],
+      "tags": [
+        "insider",
+        "legal",
+        "data-recovery"
+      ],
+      "time": "1w"
+    },
+    {
+      "id": "INS-030",
+      "phase": "erad",
+      "title": "Remove access the insider created",
+      "summary": "Find accounts, keys and automations the person left behind.",
+      "steps": [
+        "Search for accounts, API tokens and SSH keys they created or that were issued to them",
+        "Remove mail forwarding rules, delegated access and shared-link grants they set up",
+        "Review scheduled tasks, cron jobs, CI pipelines and scripts they owned",
+        "Reassign ownership of systems they ran"
+      ],
+      "roles": [
+        "Identity",
+        "Platform Engineering"
+      ],
+      "tags": [
+        "insider",
+        "persistence"
+      ],
+      "attack": [
+        "T1136",
+        "T1098",
+        "T1053",
+        "T1114.003"
+      ],
+      "time": "4h"
+    },
+    {
+      "id": "INS-040",
+      "phase": "recover",
+      "title": "Assess and limit the business impact",
+      "summary": "Work out who is affected by the data that left and what you owe them.",
+      "steps": [
+        "Classify the data: trade secrets, customer data, personal data, regulated data",
+        "With counsel, decide on notification, injunctions or law enforcement referral",
+        "Tell affected business owners and help them plan",
+        "Watch for the data turning up in competitors' products or online"
+      ],
+      "roles": [
+        "Legal",
+        "Privacy",
+        "Business Owners"
+      ],
+      "tags": [
+        "insider",
+        "impact",
+        "notification"
+      ],
+      "time": "1w"
+    },
+    {
+      "id": "INS-050",
+      "phase": "lessons",
+      "title": "Close joiner-mover-leaver and least-privilege gaps",
+      "summary": "Most insider cases expose access nobody needed.",
+      "steps": [
+        "Check how much of the subject's access was still needed for their job",
+        "Fix the offboarding steps that were slow or missed",
+        "Tighten DLP rules and alert thresholds using what you saw",
+        "Keep the review blameless and protect the subject's privacy in the write-up"
+      ],
+      "roles": [
+        "IR Lead",
+        "Identity",
+        "HR"
+      ],
+      "tags": [
+        "insider",
+        "lessons",
+        "least-privilege"
+      ],
+      "time": "4h"
+    }
+  ],
+  "templates": [
+    {
+      "id": "departing",
+      "name": "Departing employee data theft",
+      "description": "DLP or a manager raises concern that a leaver took sensitive data.",
+      "nodes": [
+        [
+          "s",
+          "start",
+          "Concern about a leaver's data handling",
+          "ident"
+        ],
+        [
+          "a",
+          "play",
+          "INS-010"
+        ],
+        [
+          "b",
+          "play",
+          "INS-013"
+        ],
+        [
+          "c",
+          "play",
+          "INS-011"
+        ],
+        [
+          "q",
+          "decision",
+          "Evidence of data taken?",
+          "ident"
+        ],
+        [
+          "fp",
+          "end",
+          "Close; record the reasons",
+          "ident"
+        ],
+        [
+          "d",
+          "play",
+          "INS-014"
+        ],
+        [
+          "e",
+          "play",
+          "INS-020"
+        ],
+        [
+          "f",
+          "play",
+          "INS-021"
+        ],
+        [
+          "g",
+          "play",
+          "INS-030"
+        ],
+        [
+          "h",
+          "play",
+          "INS-040"
+        ],
+        [
+          "i",
+          "play",
+          "INS-050"
+        ],
+        [
+          "z",
+          "end",
+          "Case closed",
+          "lessons"
+        ]
+      ],
+      "edges": [
+        [
+          "s",
+          "a"
+        ],
+        [
+          "a",
+          "b"
+        ],
+        [
+          "b",
+          "c"
+        ],
+        [
+          "c",
+          "q"
+        ],
+        [
+          "q",
+          "fp",
+          "No"
+        ],
+        [
+          "q",
+          "d",
+          "Yes"
+        ],
+        [
+          "d",
+          "e"
+        ],
+        [
+          "e",
+          "f"
+        ],
+        [
+          "f",
+          "g"
+        ],
+        [
+          "g",
+          "h"
+        ],
+        [
+          "h",
+          "i"
+        ],
+        [
+          "i",
+          "z"
+        ]
+      ]
+    },
+    {
+      "id": "priv-insider",
+      "name": "Privileged insider misuse",
+      "description": "An administrator is suspected of misusing access, from snooping to sabotage.",
+      "nodes": [
+        [
+          "s",
+          "start",
+          "Suspicious admin activity",
+          "ident"
+        ],
+        [
+          "a",
+          "play",
+          "INS-010"
+        ],
+        [
+          "b",
+          "play",
+          "INS-012"
+        ],
+        [
+          "c",
+          "play",
+          "INS-013"
+        ],
+        [
+          "q",
+          "decision",
+          "Sabotage risk right now?",
+          "ident"
+        ],
+        [
+          "d",
+          "play",
+          "INS-020"
+        ],
+        [
+          "n",
+          "note",
+          "Immediate risk: counsel and HR approve removing access before the interview.",
+          "contain"
+        ],
+        [
+          "e",
+          "play",
+          "INS-014"
+        ],
+        [
+          "e2",
+          "play",
+          "INS-014"
+        ],
+        [
+          "d2",
+          "play",
+          "INS-020"
+        ],
+        [
+          "f",
+          "play",
+          "INS-030"
+        ],
+        [
+          "g",
+          "play",
+          "CON-009"
+        ],
+        [
+          "h",
+          "play",
+          "INS-040"
+        ],
+        [
+          "i",
+          "play",
+          "INS-050"
+        ],
+        [
+          "z",
+          "end",
+          "Case closed",
+          "lessons"
+        ]
+      ],
+      "edges": [
+        [
+          "s",
+          "a"
+        ],
+        [
+          "a",
+          "b"
+        ],
+        [
+          "b",
+          "c"
+        ],
+        [
+          "c",
+          "q"
+        ],
+        [
+          "q",
+          "n",
+          "Yes"
+        ],
+        [
+          "q",
+          "e2",
+          "No"
+        ],
+        [
+          "n",
+          "d"
+        ],
+        [
+          "d",
+          "e"
+        ],
+        [
+          "e",
+          "f"
+        ],
+        [
+          "e2",
+          "d2"
+        ],
+        [
+          "d2",
+          "f"
+        ],
+        [
+          "f",
+          "g"
+        ],
+        [
+          "g",
+          "h"
+        ],
+        [
+          "h",
+          "i"
+        ],
+        [
+          "i",
+          "z"
+        ]
+      ]
+    }
+  ]
+}

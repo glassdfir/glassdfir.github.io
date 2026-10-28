@@ -35,7 +35,7 @@ document.write(a.split(' ').join(''));<br />
 <p>One of the coolest features of CarbonBlack was the ability to visualize/map the process creation over time. So I set out to make something that gave me this functionality using the Sysmon logs. I experimented with a few different graphing technologies and I have currently landed on using <a href="https://developers.google.com/chart/interactive/docs/gallery/orgchart">Google's Org Chart API</a> to do the mapping. I know there are other and probably better ways to do this but I was looking for something high speed/low drag that didn't require installing something.</p>
 <p>With this goal in mind, I threw together <a href="https://github.com/glassdfir/SysmonMapper" target="_blank">SysmonMapper</a>. Again, this is some pretty rough PowerShell but it gets the job done.</p>
 <p><strong>PS C:\Users\user\Desktop&gt; .\SysmonMapper.ps1 -StartDate "08/28/2014 21:40" -StopDate "08/28/2014 21:50" -P 4332</strong></p>
-<p><a href="{{ site.baseurl }}/images/sysmonmap-300x236.png"><img class="alignnone size-medium wp-image-44" src="{{ site.baseurl }}/images/sysmonmap-300x236.png" alt="sysmonmap" width="300" height="236" /></a></p>
+<p><a href="{{ site.baseurl }}/images/sysmonmap-300x236.png"><img class="alignnone size-medium wp-image-44" src="{{ site.baseurl }}/images/sysmonmap-300x236.png" alt="sysmonmap" /></a></p>
 <p>Here is another example of sysmonmapper in action: <a href="http://Jon.Glass/wp-content/uploads/2014/08/sysmonmap.html" target="_blank">example</a>.</p>
 <p>In the next few weeks I am going to throw together some posts that will highlight the functionality of this script and show some use cases that demonstrate the  power of visualizing sysmon logs.</p>
 <p>&nbsp;</p>

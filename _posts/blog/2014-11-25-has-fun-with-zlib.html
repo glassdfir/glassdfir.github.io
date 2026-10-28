@@ -15,13 +15,13 @@ redirect_from:
 <p>Now that we have our functions, let's try them out.<br />
 <script src="https://gist.github.com/glassdfir/8e3b23f7d9213892ccf9.js"></script><br />
 To verify that zlib created the same deflated content as the Windows standard compression, I zipped the uncompressed.txt through the Explorer.<br />
-<a href="{{ site.baseurl }}/images/makezipfile-300x202.png"><img class="alignnone size-medium wp-image-183" src="{{ site.baseurl }}/images/makezipfile-300x202.png" alt="makezipfile" width="300" height="202" /></a><br />
+<a href="{{ site.baseurl }}/images/makezipfile-300x202.png"><img class="alignnone size-medium wp-image-183" src="{{ site.baseurl }}/images/makezipfile-300x202.png" alt="makezipfile" /></a><br />
 Then I compared the compressed.bin file with the uncompressed.zip in a hex editor.<br />
-<a href="{{ site.baseurl }}/images/comparefiles-300x226.png"><img class="alignnone size-medium wp-image-184" src="{{ site.baseurl }}/images/comparefiles-300x226.png" alt="comparefiles" width="300" height="226" /></a><a href="{{ site.baseurl }}/images/makezipfile-300x202.png"><br />
+<a href="{{ site.baseurl }}/images/comparefiles-300x226.png"><img class="alignnone size-medium wp-image-184" src="{{ site.baseurl }}/images/comparefiles-300x226.png" alt="comparefiles" /></a><a href="{{ site.baseurl }}/images/makezipfile-300x202.png"><br />
 </a><br />
 The File Data in the zip is the same as the data created by zlib. Now that we have raw deflated data that is exactly like what we would find in a broken zip file, let's inflate it and recover the contents.</p>
 <p>Here is the entire script:<br />
 <script src="https://gist.github.com/glassdfir/d586620cff6e18b37597.js"></script><br />
 And Voila!</p>
-<p><a href="{{ site.baseurl }}/images/zipfilesrule-300x226.png"><img class="alignnone size-medium wp-image-187" src="{{ site.baseurl }}/images/zipfilesrule-300x226.png" alt="zipfilesrule" width="300" height="226" /></a><br />
+<p><a href="{{ site.baseurl }}/images/zipfilesrule-300x226.png"><img class="alignnone size-medium wp-image-187" src="{{ site.baseurl }}/images/zipfilesrule-300x226.png" alt="zipfilesrule" /></a><br />
 You can see the inflated file is the same as the original file. What does this mean? This means we can still recover Zip file contents even if the headers and footers are corrupt or missing.</p>

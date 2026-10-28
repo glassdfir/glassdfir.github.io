@@ -1,6 +1,6 @@
 {
   "name": "Huddle Core",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Built-in DFIR plays organized by the PICERL incident response lifecycle.",
   "phases": [
     {
@@ -1227,7 +1227,7 @@
       "steps": [
         "Confirm AD replication is healthy",
         "Reset the KRBTGT password once",
-        "Wait for full replication (at least the maximum ticket lifetime)",
+        "Wait until the reset has replicated to every DC and at least the maximum ticket lifetime has passed (10 hours by default)",
         "Reset it a second time and monitor for authentication errors"
       ],
       "tools": [
@@ -1596,7 +1596,7 @@
       "steps": [
         "Require MFA for all affected users",
         "Move privileged users to FIDO2 or certificate-based MFA",
-        "Enable number matching for push MFA",
+        "Turn on number matching for push MFA where it is not already enforced",
         "Block MFA registration from untrusted locations"
       ],
       "tools": [
@@ -2002,6 +2002,188 @@
       ],
       "attack": [],
       "time": "2h",
+      "refs": []
+    },
+    {
+      "id": "IDN-025",
+      "phase": "ident",
+      "title": "Investigate a software supply chain compromise",
+      "summary": "A vendor update, package or build pipeline you trust may have shipped malicious code.",
+      "steps": [
+        "Identify the affected product, versions and hashes from the vendor advisory or your own analysis",
+        "Find every host that installed an affected version, and when",
+        "Hunt for the reported post-install behavior: child processes, outbound domains, new services",
+        "Check your own build systems and package mirrors for the same dependency"
+      ],
+      "tools": [
+        "EDR console",
+        "SBOM tooling",
+        "SIEM"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Threat Hunter",
+        "AppSec"
+      ],
+      "tags": [
+        "supply-chain",
+        "third-party",
+        "software"
+      ],
+      "attack": [
+        "T1195.002",
+        "T1072"
+      ],
+      "time": "4h",
+      "refs": []
+    },
+    {
+      "id": "IDN-026",
+      "phase": "ident",
+      "title": "Handle an extortion or leak-site claim",
+      "summary": "An attacker claims to hold your data, by email or on a leak site, with or without encryption.",
+      "steps": [
+        "Do not reply or negotiate until counsel and leadership decide how to proceed",
+        "Preserve the message, headers, leak-site posts and any samples",
+        "Verify the samples against your data to judge whether the claim is real",
+        "Run sanctions screening with counsel before any payment discussion (in the US, OFAC)",
+        "Scope how the data was taken using the exfiltration plays"
+      ],
+      "tools": [],
+      "artifacts": [],
+      "roles": [
+        "Legal",
+        "IR Lead",
+        "CTI"
+      ],
+      "tags": [
+        "extortion",
+        "leak-site",
+        "data-theft"
+      ],
+      "attack": [
+        "T1657"
+      ],
+      "time": "2h",
+      "refs": []
+    },
+    {
+      "id": "IDN-027",
+      "phase": "ident",
+      "title": "Respond to a lost or stolen device",
+      "summary": "A laptop or phone with company data is missing. Work out what it held and whether it was protected.",
+      "steps": [
+        "Confirm the device, owner, time and place it went missing",
+        "Check MDM for disk encryption status, last check-in and passcode compliance",
+        "List the data and cached credentials it could hold",
+        "Decide on remote lock or wipe with the owner and counsel"
+      ],
+      "tools": [
+        "MDM",
+        "Intune",
+        "Jamf"
+      ],
+      "artifacts": [],
+      "roles": [
+        "IT",
+        "Privacy"
+      ],
+      "tags": [
+        "lost-device",
+        "endpoint",
+        "privacy"
+      ],
+      "attack": [],
+      "time": "1h",
+      "refs": []
+    },
+    {
+      "id": "CON-016",
+      "phase": "contain",
+      "title": "Mitigate a DDoS attack",
+      "summary": "Keep services available under a denial-of-service attack.",
+      "steps": [
+        "Confirm it is an attack, not a traffic spike or failure, with network and app metrics",
+        "Engage your DDoS protection provider or ISP and turn on emergency mitigation",
+        "Apply rate limits, geo or ASN blocks, and caching at the edge",
+        "Watch for a second attack using the DDoS as cover"
+      ],
+      "tools": [
+        "CDN / WAF",
+        "DDoS protection service"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Network",
+        "SRE"
+      ],
+      "tags": [
+        "ddos",
+        "availability",
+        "network"
+      ],
+      "attack": [
+        "T1498",
+        "T1499"
+      ],
+      "time": "1h",
+      "refs": []
+    },
+    {
+      "id": "CON-017",
+      "phase": "contain",
+      "title": "Block an untrusted software update",
+      "summary": "Stop a compromised update or package from spreading further.",
+      "steps": [
+        "Block the affected hashes and update domains in EDR and the proxy",
+        "Pause automatic updates for the product and pin known-good versions",
+        "Isolate hosts showing post-install malicious behavior",
+        "Follow the vendor's guidance, but verify their indicators yourself"
+      ],
+      "tools": [
+        "EDR console",
+        "Proxy",
+        "Software deployment"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Endpoint",
+        "IT"
+      ],
+      "tags": [
+        "supply-chain",
+        "containment"
+      ],
+      "attack": [
+        "T1195.002"
+      ],
+      "time": "1h",
+      "refs": []
+    },
+    {
+      "id": "REC-008",
+      "phase": "recover",
+      "title": "Communicate with customers and partners",
+      "summary": "Tell the people affected what happened, what it means for them and what to do.",
+      "steps": [
+        "Agree the facts, the message and the timing with counsel and communications",
+        "Prepare FAQs, a help line or mailbox, and support team scripts",
+        "Notify regulators and individuals in the windows your assessment found",
+        "Publish updates on a predictable schedule until closure"
+      ],
+      "tools": [],
+      "artifacts": [],
+      "roles": [
+        "Communications",
+        "Legal",
+        "Customer Support"
+      ],
+      "tags": [
+        "communications",
+        "notification"
+      ],
+      "attack": [],
+      "time": "1d",
       "refs": []
     }
   ],
@@ -2953,6 +3135,287 @@
         [
           "n",
           "e2"
+        ]
+      ]
+    },
+    {
+      "id": "extortion",
+      "name": "Data Theft Extortion",
+      "description": "An attacker claims to have stolen data and demands payment, with no encryption.",
+      "nodes": [
+        [
+          "s",
+          "start",
+          "Extortion email or leak-site post",
+          "ident"
+        ],
+        [
+          "a",
+          "play",
+          "IDN-026"
+        ],
+        [
+          "b",
+          "play",
+          "IDN-002"
+        ],
+        [
+          "c",
+          "play",
+          "IDN-004"
+        ],
+        [
+          "d",
+          "play",
+          "IDN-005"
+        ],
+        [
+          "q",
+          "decision",
+          "Samples are genuine?",
+          "ident"
+        ],
+        [
+          "fp",
+          "end",
+          "Likely bluff: monitor and close",
+          "ident"
+        ],
+        [
+          "e",
+          "play",
+          "IDN-018"
+        ],
+        [
+          "f",
+          "play",
+          "IDN-017"
+        ],
+        [
+          "g",
+          "play",
+          "IDN-006"
+        ],
+        [
+          "h",
+          "play",
+          "CON-004"
+        ],
+        [
+          "i",
+          "play",
+          "ERA-004"
+        ],
+        [
+          "j",
+          "play",
+          "REC-008"
+        ],
+        [
+          "k",
+          "play",
+          "LES-002"
+        ],
+        [
+          "z",
+          "end",
+          "Incident closed",
+          "lessons"
+        ]
+      ],
+      "edges": [
+        [
+          "s",
+          "a"
+        ],
+        [
+          "a",
+          "b"
+        ],
+        [
+          "b",
+          "c"
+        ],
+        [
+          "c",
+          "d"
+        ],
+        [
+          "d",
+          "q"
+        ],
+        [
+          "q",
+          "fp",
+          "No"
+        ],
+        [
+          "q",
+          "e",
+          "Yes"
+        ],
+        [
+          "e",
+          "f"
+        ],
+        [
+          "f",
+          "g"
+        ],
+        [
+          "f",
+          "h"
+        ],
+        [
+          "h",
+          "i"
+        ],
+        [
+          "g",
+          "j"
+        ],
+        [
+          "i",
+          "j"
+        ],
+        [
+          "j",
+          "k"
+        ],
+        [
+          "k",
+          "z"
+        ]
+      ]
+    },
+    {
+      "id": "supply-chain",
+      "name": "Software Supply Chain Compromise",
+      "description": "A trusted vendor update or package turns out to be malicious.",
+      "nodes": [
+        [
+          "s",
+          "start",
+          "Vendor advisory or detection",
+          "ident"
+        ],
+        [
+          "a",
+          "play",
+          "IDN-025"
+        ],
+        [
+          "b",
+          "play",
+          "CON-017"
+        ],
+        [
+          "q",
+          "decision",
+          "Post-install activity seen?",
+          "ident"
+        ],
+        [
+          "c",
+          "play",
+          "CON-002"
+        ],
+        [
+          "d",
+          "play",
+          "IDN-008"
+        ],
+        [
+          "e",
+          "play",
+          "IDN-010"
+        ],
+        [
+          "f",
+          "play",
+          "CON-009"
+        ],
+        [
+          "g",
+          "play",
+          "ERA-002"
+        ],
+        [
+          "h",
+          "play",
+          "ERA-006"
+        ],
+        [
+          "i",
+          "play",
+          "REC-006"
+        ],
+        [
+          "j",
+          "play",
+          "LES-005"
+        ],
+        [
+          "z",
+          "end",
+          "Incident closed",
+          "lessons"
+        ]
+      ],
+      "edges": [
+        [
+          "s",
+          "a"
+        ],
+        [
+          "a",
+          "b"
+        ],
+        [
+          "b",
+          "q"
+        ],
+        [
+          "q",
+          "c",
+          "Yes"
+        ],
+        [
+          "q",
+          "h",
+          "No"
+        ],
+        [
+          "c",
+          "d"
+        ],
+        [
+          "d",
+          "e"
+        ],
+        [
+          "e",
+          "f"
+        ],
+        [
+          "f",
+          "g"
+        ],
+        [
+          "g",
+          "h"
+        ],
+        [
+          "h",
+          "i"
+        ],
+        [
+          "i",
+          "j"
+        ],
+        [
+          "j",
+          "z"
         ]
       ]
     }

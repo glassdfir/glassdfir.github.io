@@ -70,7 +70,7 @@ with open(in_filename, 'rb+') as in_file, open(in_filename, 'rb+') as out_file:
 {% endhighlight %}
 So we are reading a chunk of the file, encrypting it, then overwriting the chunk with encrypted data until we get to the end of the file.<br />
 Does this really work you ask? Of course it does.<br />
-<a href="{{ site.baseurl }}/images/openssl.png"><img src="{{ site.baseurl }}/images/openssl.png" alt="openssl" width="780" height="491" class="aligncenter size-large wp-image-690" /></a><br />
+<a href="{{ site.baseurl }}/images/openssl.png"><img src="{{ site.baseurl }}/images/openssl.png" alt="openssl" class="alignnone size-large wp-image-690" /></a><br />
 Don't know why this feels like a magic trick but TA DA!<br />
 This doesn't fix all of my issues with moving huge files around but this does encrypt it locally before it is sent over the network without needing double the space.<br />
 Big thanks to <a href="http://stackoverflow.com/users/1163893/thijs-van-dien" target="_blank">Thijs van Dien</a> for putting this solution out there.</p>
