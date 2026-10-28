@@ -1,0 +1,20 @@
+# Tools listed on /tools/. Add a new entry here to add a tool to the page.
+- name: Spoke
+  url: /spoke/
+  post: /blogsabout/spoke/
+  tagline: See the relationships in your CSVs.
+  description: >-
+    Turn rows like who → did what → to what into an interactive graph.
+    Load a CSV or Excel export, map the columns, then filter, follow process
+    chains or insider risk webs, and export what you find.
+  good_for: Process trees, insider risk, EDR exports, anything that's really a graph pretending to be a spreadsheet.
+
+- name: Huddle
+  url: /huddle/
+  post: /blogsabout/building-dfir-playbooks-with-huddle/
+  tagline: Build and run DFIR playbooks.
+  description: >-
+    Drag incident response plays into the lifecycle phases, connect them with
+    decisions, and export a runbook or work it as a timestamped checklist.
+    Includes templates and an AI-Assisted SOC play library.
+  good_for: Writing playbooks before the incident and following them during it.
