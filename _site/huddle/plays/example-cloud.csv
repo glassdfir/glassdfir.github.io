@@ -1,6 +1,0 @@
-id,title,phase,summary,steps,tools,tags,attack,time
-AWS-001,Check GuardDuty findings,Identification,Review GuardDuty findings for the affected account and region.,Filter findings by account and time window|Export high-severity findings|Pivot on principal and source IP,GuardDuty|Security Hub,aws|cloud,T1078.004,30m
-AWS-002,Quarantine EC2 instance,Containment,Apply an isolation security group and snapshot volumes.,Snapshot all EBS volumes|Detach from Auto Scaling group|Apply deny-all security group|Tag instance as quarantined,EC2|EBS,aws|isolation,,30m
-AWS-003,Disable IAM access keys,Containment,Deactivate keys used by the attacker without deleting them.,List keys for the principal|Set compromised keys to Inactive|Attach an explicit deny policy,IAM,aws|iam,T1098.001,15m
-AWS-004,Query CloudTrail with Athena,Identification,Hunt across CloudTrail at scale with SQL.,Create the Athena table over the CloudTrail bucket|Query by accessKeyId and sourceIPAddress|Save queries to the case,Athena|CloudTrail,aws|hunting,,1h
-AWS-005,Review S3 data events,Identification,Check object-level access to sensitive buckets.,Confirm data events were enabled|Query GetObject volume by principal|Compare to baseline,CloudTrail|S3,aws|exfiltration,T1530,1h
