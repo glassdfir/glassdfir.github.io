@@ -1,0 +1,2960 @@
+{
+  "name": "Huddle Core",
+  "version": "1.0.0",
+  "description": "Built-in DFIR plays organized by the PICERL incident response lifecycle.",
+  "phases": [
+    {
+      "id": "prep",
+      "name": "Preparation",
+      "short": "PREP",
+      "color": "#4c8dff"
+    },
+    {
+      "id": "ident",
+      "name": "Identification",
+      "short": "IDENT",
+      "color": "#f2a93b"
+    },
+    {
+      "id": "contain",
+      "name": "Containment",
+      "short": "CONTAIN",
+      "color": "#ef5b5b"
+    },
+    {
+      "id": "erad",
+      "name": "Eradication",
+      "short": "ERAD",
+      "color": "#a879ff"
+    },
+    {
+      "id": "recover",
+      "name": "Recovery",
+      "short": "RECOVER",
+      "color": "#3ecf8e"
+    },
+    {
+      "id": "lessons",
+      "name": "Lessons Learned",
+      "short": "LESSONS",
+      "color": "#2bc4c4"
+    }
+  ],
+  "plays": [
+    {
+      "id": "PRE-001",
+      "phase": "prep",
+      "title": "Confirm IR roles and call tree",
+      "summary": "Make sure everyone knows who leads, who decides, and how to reach them, including after hours.",
+      "steps": [
+        "Identify the incident commander and a deputy",
+        "Confirm technical leads for endpoint, identity, network and cloud",
+        "Verify the executive, legal, HR and communications contacts",
+        "Test the call tree and update stale numbers"
+      ],
+      "tools": [],
+      "artifacts": [],
+      "roles": [
+        "IR Lead"
+      ],
+      "tags": [
+        "governance",
+        "contacts"
+      ],
+      "attack": [],
+      "time": "1h",
+      "refs": []
+    },
+    {
+      "id": "PRE-002",
+      "phase": "prep",
+      "title": "Establish out-of-band communications",
+      "summary": "Assume corporate email and chat may be watched by the attacker. Stand up a separate channel.",
+      "steps": [
+        "Pick a channel outside the corporate identity provider (e.g. Signal group or separate tenant)",
+        "Share a bridge line or meeting link that does not rely on compromised accounts",
+        "Agree a codename for the incident",
+        "Tell responders not to discuss the incident on corporate channels"
+      ],
+      "tools": [],
+      "artifacts": [],
+      "roles": [
+        "IR Lead"
+      ],
+      "tags": [
+        "comms",
+        "opsec"
+      ],
+      "attack": [],
+      "time": "30m",
+      "refs": []
+    },
+    {
+      "id": "PRE-003",
+      "phase": "prep",
+      "title": "Verify logging coverage and retention",
+      "summary": "Confirm the telemetry you will need exists and is retained long enough to investigate.",
+      "steps": [
+        "Check EDR deployment coverage against the asset inventory",
+        "Confirm Windows Security, PowerShell and Sysmon logs forward to the SIEM",
+        "Confirm identity provider, email and cloud audit logs are enabled",
+        "Extend retention on relevant sources before they roll over"
+      ],
+      "tools": [
+        "SIEM",
+        "EDR console"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Detection Engineering"
+      ],
+      "tags": [
+        "logging",
+        "telemetry"
+      ],
+      "attack": [],
+      "time": "2h",
+      "refs": []
+    },
+    {
+      "id": "PRE-004",
+      "phase": "prep",
+      "title": "Validate offline and immutable backups",
+      "summary": "Know that clean, restorable backups exist before you need them.",
+      "steps": [
+        "Confirm at least one copy is offline or immutable",
+        "Check backup console credentials are not domain-joined or shared",
+        "Test-restore a representative system",
+        "Record backup schedules and the latest known-good restore points"
+      ],
+      "tools": [],
+      "artifacts": [],
+      "roles": [
+        "Infrastructure"
+      ],
+      "tags": [
+        "backups",
+        "ransomware"
+      ],
+      "attack": [],
+      "time": "2h",
+      "refs": []
+    },
+    {
+      "id": "PRE-005",
+      "phase": "prep",
+      "title": "Stage forensic jump kit",
+      "summary": "Have collection tools, storage and write blockers ready before an incident.",
+      "steps": [
+        "Stage triage collectors (KAPE, Velociraptor) and memory capture tools",
+        "Prepare encrypted, wiped external storage",
+        "Confirm hardware write blockers work",
+        "Keep chain-of-custody forms and hashing utilities with the kit"
+      ],
+      "tools": [
+        "KAPE",
+        "Velociraptor",
+        "FTK Imager",
+        "WinPmem",
+        "Magnet RAM Capture"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Forensics"
+      ],
+      "tags": [
+        "forensics",
+        "toolkit"
+      ],
+      "attack": [],
+      "time": "2h",
+      "refs": []
+    },
+    {
+      "id": "PRE-006",
+      "phase": "prep",
+      "title": "Maintain crown-jewel asset inventory",
+      "summary": "Know which systems and data matter most so you can prioritize scoping and recovery.",
+      "steps": [
+        "List critical business systems and their owners",
+        "Map where sensitive and regulated data lives",
+        "Document dependencies (identity, DNS, backups)",
+        "Agree recovery priority order with the business"
+      ],
+      "tools": [],
+      "artifacts": [],
+      "roles": [
+        "IR Lead",
+        "Business Owners"
+      ],
+      "tags": [
+        "assets",
+        "scoping"
+      ],
+      "attack": [],
+      "time": "4h",
+      "refs": []
+    },
+    {
+      "id": "PRE-007",
+      "phase": "prep",
+      "title": "Activate IR retainer",
+      "summary": "Engage an outside incident response firm early when the incident exceeds internal capacity.",
+      "steps": [
+        "Contact the retainer firm through the agreed process",
+        "Route the engagement through counsel where privilege matters",
+        "Share scope, timeline and access requirements",
+        "Agree reporting cadence and deliverables"
+      ],
+      "tools": [],
+      "artifacts": [],
+      "roles": [
+        "IR Lead",
+        "Legal"
+      ],
+      "tags": [
+        "third-party",
+        "retainer"
+      ],
+      "attack": [],
+      "time": "1h",
+      "refs": []
+    },
+    {
+      "id": "IDN-001",
+      "phase": "ident",
+      "title": "Triage the initial alert",
+      "summary": "Decide whether the alert is a true positive and how serious it looks.",
+      "steps": [
+        "Review the alert details, the affected host and user",
+        "Pull surrounding telemetry for 24 hours either side",
+        "Check whether indicators match known threat intelligence",
+        "Record your finding: false positive, benign true positive, or incident"
+      ],
+      "tools": [
+        "SIEM",
+        "EDR console"
+      ],
+      "artifacts": [],
+      "roles": [
+        "SOC Analyst"
+      ],
+      "tags": [
+        "triage",
+        "alert"
+      ],
+      "attack": [],
+      "time": "30m",
+      "refs": []
+    },
+    {
+      "id": "IDN-002",
+      "phase": "ident",
+      "title": "Declare incident and assign severity",
+      "summary": "Formally declare the incident so the right people, budget and authority come into play.",
+      "steps": [
+        "Apply your severity matrix (impact × scope × data sensitivity)",
+        "Name the incident commander",
+        "Kick off the out-of-band bridge",
+        "Set the first update time for leadership"
+      ],
+      "tools": [],
+      "artifacts": [],
+      "roles": [
+        "IR Lead"
+      ],
+      "tags": [
+        "governance",
+        "severity"
+      ],
+      "attack": [],
+      "time": "15m",
+      "refs": []
+    },
+    {
+      "id": "IDN-003",
+      "phase": "ident",
+      "title": "Open case record and evidence log",
+      "summary": "Start the running record of decisions, actions and evidence from the first minute.",
+      "steps": [
+        "Create the case ticket with a unique incident ID",
+        "Start a timestamped action log (UTC)",
+        "Start a chain-of-custody log for every evidence item",
+        "Store hashes for all collected evidence"
+      ],
+      "tools": [],
+      "artifacts": [],
+      "roles": [
+        "IR Lead",
+        "Forensics"
+      ],
+      "tags": [
+        "documentation",
+        "chain-of-custody"
+      ],
+      "attack": [],
+      "time": "15m",
+      "refs": []
+    },
+    {
+      "id": "IDN-004",
+      "phase": "ident",
+      "title": "Engage legal counsel",
+      "summary": "Bring in counsel early to protect privilege and guide notification decisions.",
+      "steps": [
+        "Notify in-house or outside counsel",
+        "Decide whether the investigation runs under privilege",
+        "Agree how findings are written and shared",
+        "Flag any contractual notification clauses"
+      ],
+      "tools": [],
+      "artifacts": [],
+      "roles": [
+        "Legal",
+        "IR Lead"
+      ],
+      "tags": [
+        "legal",
+        "privilege"
+      ],
+      "attack": [],
+      "time": "30m",
+      "refs": []
+    },
+    {
+      "id": "IDN-005",
+      "phase": "ident",
+      "title": "Notify cyber insurance carrier",
+      "summary": "Many policies require prompt notice and approval of vendors before costs are covered.",
+      "steps": [
+        "Locate the policy and the claims hotline",
+        "Report the incident within the policy notice window",
+        "Confirm which IR, legal and negotiation vendors are pre-approved",
+        "Track all incident costs from the start"
+      ],
+      "tools": [],
+      "artifacts": [],
+      "roles": [
+        "Legal",
+        "Finance"
+      ],
+      "tags": [
+        "insurance"
+      ],
+      "attack": [],
+      "time": "30m",
+      "refs": []
+    },
+    {
+      "id": "IDN-006",
+      "phase": "ident",
+      "title": "Assess notification obligations",
+      "summary": "Work out which regulators, customers and partners may need to be told, and by when.",
+      "steps": [
+        "Identify the data types and jurisdictions involved",
+        "List regulatory clocks (e.g. GDPR 72 hours after awareness; SEC 8-K Item 1.05 within four business days of a materiality determination)",
+        "Review customer and partner contract obligations",
+        "Document the decision and its reasoning with counsel"
+      ],
+      "tools": [],
+      "artifacts": [],
+      "roles": [
+        "Legal",
+        "Privacy",
+        "Compliance"
+      ],
+      "tags": [
+        "notification",
+        "regulatory"
+      ],
+      "attack": [],
+      "time": "2h",
+      "refs": []
+    },
+    {
+      "id": "IDN-007",
+      "phase": "ident",
+      "title": "Capture volatile memory",
+      "summary": "Collect RAM before rebooting or isolating so in-memory malware, keys and connections are preserved.",
+      "steps": [
+        "Run a memory capture tool from external media",
+        "Hash the image and log it in chain of custody",
+        "Collect running processes and network connections as a quick fallback",
+        "Analyze with Volatility for injected code, network artifacts and credentials"
+      ],
+      "tools": [
+        "WinPmem",
+        "Magnet RAM Capture",
+        "AVML",
+        "Volatility 3"
+      ],
+      "artifacts": [
+        "Memory image"
+      ],
+      "roles": [
+        "Forensics"
+      ],
+      "tags": [
+        "forensics",
+        "memory",
+        "volatile"
+      ],
+      "attack": [],
+      "time": "1h",
+      "refs": []
+    },
+    {
+      "id": "IDN-008",
+      "phase": "ident",
+      "title": "Run triage collection",
+      "summary": "Pull high-value artifacts quickly from affected endpoints without a full image.",
+      "steps": [
+        "Run a triage target set across the affected hosts",
+        "Include event logs, registry hives, $MFT, $UsnJrnl, Prefetch, Amcache, SRUM, browser and LNK files",
+        "Hash and store collections centrally",
+        "Parse with standard tooling for timeline analysis"
+      ],
+      "tools": [
+        "KAPE",
+        "Velociraptor",
+        "CyLR",
+        "EZ Tools"
+      ],
+      "artifacts": [
+        "$MFT",
+        "Event logs",
+        "Registry hives",
+        "Prefetch",
+        "Amcache",
+        "SRUM"
+      ],
+      "roles": [
+        "Forensics"
+      ],
+      "tags": [
+        "forensics",
+        "triage",
+        "collection"
+      ],
+      "attack": [],
+      "time": "1h",
+      "refs": []
+    },
+    {
+      "id": "IDN-009",
+      "phase": "ident",
+      "title": "Acquire full disk image",
+      "summary": "Create a forensically sound copy when deep analysis or legal action is likely.",
+      "steps": [
+        "Decide physical vs. logical image based on encryption and urgency",
+        "Use a write blocker for physical media; snapshot for VMs and cloud disks",
+        "Verify image hashes match the source",
+        "Record acquisition in chain of custody"
+      ],
+      "tools": [
+        "FTK Imager",
+        "dc3dd",
+        "Cloud snapshots"
+      ],
+      "artifacts": [
+        "Disk image (E01/raw)"
+      ],
+      "roles": [
+        "Forensics"
+      ],
+      "tags": [
+        "forensics",
+        "imaging",
+        "legal"
+      ],
+      "attack": [],
+      "time": "4h",
+      "refs": []
+    },
+    {
+      "id": "IDN-010",
+      "phase": "ident",
+      "title": "Hunt for lateral movement",
+      "summary": "Find where the attacker moved and which credentials they used to get there.",
+      "steps": [
+        "Review logons 4624 (types 3 and 10), 4648, 4672 and 4776",
+        "Look for new services (7045) and scheduled tasks (4698)",
+        "Check RDP, SMB, WinRM, WMI and PsExec activity between hosts",
+        "Map source → destination host pairs into a graph"
+      ],
+      "tools": [
+        "SIEM",
+        "Hayabusa",
+        "Chainsaw",
+        "Spoke"
+      ],
+      "artifacts": [
+        "Security.evtx",
+        "System.evtx",
+        "RDP logs"
+      ],
+      "roles": [
+        "Forensics",
+        "Threat Hunter"
+      ],
+      "tags": [
+        "lateral-movement",
+        "windows",
+        "event-logs"
+      ],
+      "attack": [
+        "T1021",
+        "T1550",
+        "T1569.002"
+      ],
+      "time": "3h",
+      "refs": []
+    },
+    {
+      "id": "IDN-011",
+      "phase": "ident",
+      "title": "Build incident timeline",
+      "summary": "Merge evidence into one timeline so the story of the intrusion is clear.",
+      "steps": [
+        "Generate a super timeline from triage and disk artifacts",
+        "Pivot on known-bad times, users, files and hosts",
+        "Mark key events: initial access, execution, persistence, movement, impact",
+        "Keep the timeline in UTC and cite the source of every row"
+      ],
+      "tools": [
+        "Plaso",
+        "Timesketch",
+        "Timeline Explorer"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Forensics"
+      ],
+      "tags": [
+        "timeline",
+        "analysis"
+      ],
+      "attack": [],
+      "time": "4h",
+      "refs": []
+    },
+    {
+      "id": "IDN-012",
+      "phase": "ident",
+      "title": "Review persistence mechanisms",
+      "summary": "Find every way the attacker could come back after a reboot or password reset.",
+      "steps": [
+        "Check Run/RunOnce keys, services, scheduled tasks and startup folders",
+        "Check WMI event subscriptions and COM hijacks",
+        "Review new or modified local and domain accounts",
+        "Compare autoruns against a known-good baseline"
+      ],
+      "tools": [
+        "Autoruns",
+        "Velociraptor",
+        "EDR console"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Forensics"
+      ],
+      "tags": [
+        "persistence",
+        "windows"
+      ],
+      "attack": [
+        "T1547",
+        "T1053",
+        "T1543",
+        "T1546.003",
+        "T1136"
+      ],
+      "time": "2h",
+      "refs": []
+    },
+    {
+      "id": "IDN-013",
+      "phase": "ident",
+      "title": "Review identity provider sign-ins",
+      "summary": "Look for account takeover in cloud identity logs.",
+      "steps": [
+        "Pull sign-in logs for the affected users (Entra ID / Okta / Google)",
+        "Look for impossible travel, new devices, anonymizing IPs and legacy protocols",
+        "Check for MFA fatigue patterns and newly registered MFA methods",
+        "Identify every IP and session tied to the attacker"
+      ],
+      "tools": [
+        "Entra ID sign-in logs",
+        "Okta System Log",
+        "SIEM"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Identity",
+        "SOC Analyst"
+      ],
+      "tags": [
+        "identity",
+        "cloud",
+        "account-takeover"
+      ],
+      "attack": [
+        "T1078",
+        "T1621",
+        "T1098.005"
+      ],
+      "time": "2h",
+      "refs": []
+    },
+    {
+      "id": "IDN-014",
+      "phase": "ident",
+      "title": "Investigate mailbox activity",
+      "summary": "Work out what an attacker did inside a compromised mailbox.",
+      "steps": [
+        "Search the unified audit log for the affected mailbox",
+        "List inbox rules, forwarding settings and delegates",
+        "Review MailItemsAccessed / Send events to see what was read and sent",
+        "Check for OAuth applications granted by the user"
+      ],
+      "tools": [
+        "Microsoft Purview audit",
+        "Google Workspace audit",
+        "Hawk"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Messaging",
+        "SOC Analyst"
+      ],
+      "tags": [
+        "email",
+        "bec",
+        "cloud"
+      ],
+      "attack": [
+        "T1114",
+        "T1564.008",
+        "T1534"
+      ],
+      "time": "2h",
+      "refs": []
+    },
+    {
+      "id": "IDN-015",
+      "phase": "ident",
+      "title": "Analyze suspicious file",
+      "summary": "Understand what a malicious file does and pull out indicators.",
+      "steps": [
+        "Hash the sample and check reputation services",
+        "Run static triage: strings, imports, signatures, packing",
+        "Detonate in an isolated sandbox",
+        "Extract IOCs: domains, IPs, mutexes, dropped files, registry changes"
+      ],
+      "tools": [
+        "VirusTotal",
+        "CAPA",
+        "FLOSS",
+        "Sandbox",
+        "CyberChef"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Malware Analyst"
+      ],
+      "tags": [
+        "malware",
+        "analysis",
+        "ioc"
+      ],
+      "attack": [],
+      "time": "3h",
+      "refs": []
+    },
+    {
+      "id": "IDN-016",
+      "phase": "ident",
+      "title": "Review network telemetry",
+      "summary": "Use network logs to find command-and-control traffic and data leaving the environment.",
+      "steps": [
+        "Search firewall, proxy and DNS logs for known indicators",
+        "Look for beaconing (regular intervals, consistent sizes)",
+        "Look for large outbound transfers and unusual destinations",
+        "Identify every internal host talking to attacker infrastructure"
+      ],
+      "tools": [
+        "Firewall logs",
+        "Proxy logs",
+        "Zeek",
+        "RITA",
+        "NetFlow"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Network",
+        "Threat Hunter"
+      ],
+      "tags": [
+        "network",
+        "c2",
+        "exfiltration"
+      ],
+      "attack": [
+        "T1071",
+        "T1041",
+        "T1048"
+      ],
+      "time": "3h",
+      "refs": []
+    },
+    {
+      "id": "IDN-017",
+      "phase": "ident",
+      "title": "Determine data exfiltration scope",
+      "summary": "Figure out what data may have been taken, which drives notification and extortion response.",
+      "steps": [
+        "Look for staging (archives, rclone, MEGA, cloud storage tools)",
+        "Correlate outbound volumes with the timeline",
+        "Identify file shares and databases the attacker accessed",
+        "Document what was confirmed vs. what is possible"
+      ],
+      "tools": [
+        "Proxy logs",
+        "EDR console",
+        "File server audit logs"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Forensics",
+        "Legal"
+      ],
+      "tags": [
+        "exfiltration",
+        "data",
+        "notification"
+      ],
+      "attack": [
+        "T1567",
+        "T1560",
+        "T1074"
+      ],
+      "time": "4h",
+      "refs": []
+    },
+    {
+      "id": "IDN-018",
+      "phase": "ident",
+      "title": "Identify initial access vector",
+      "summary": "Find how the attacker got in so the door can be closed.",
+      "steps": [
+        "Work backwards on the timeline to the earliest malicious event",
+        "Check phishing, exposed services, VPN and stolen credentials",
+        "Review vulnerability scans for exploitable internet-facing systems",
+        "Confirm the vector with at least two independent evidence sources"
+      ],
+      "tools": [],
+      "artifacts": [],
+      "roles": [
+        "Forensics",
+        "IR Lead"
+      ],
+      "tags": [
+        "initial-access",
+        "root-cause"
+      ],
+      "attack": [
+        "T1566",
+        "T1190",
+        "T1133",
+        "T1078"
+      ],
+      "time": "4h",
+      "refs": []
+    },
+    {
+      "id": "IDN-019",
+      "phase": "ident",
+      "title": "Review cloud control-plane logs",
+      "summary": "Look for attacker actions against your cloud accounts and resources.",
+      "steps": [
+        "Pull CloudTrail, Azure Activity / Entra audit, or GCP audit logs",
+        "Look for new IAM users, keys, roles and policy changes",
+        "Look for unusual regions, instance launches and storage access",
+        "Identify all access keys and principals the attacker used"
+      ],
+      "tools": [
+        "AWS CloudTrail",
+        "Azure Activity Log",
+        "GCP Cloud Audit Logs"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Cloud"
+      ],
+      "tags": [
+        "cloud",
+        "iam"
+      ],
+      "attack": [
+        "T1078.004",
+        "T1098",
+        "T1530"
+      ],
+      "time": "3h",
+      "refs": []
+    },
+    {
+      "id": "IDN-020",
+      "phase": "ident",
+      "title": "Hunt for credential dumping",
+      "summary": "Check whether the attacker harvested passwords or hashes, which widens the reset scope.",
+      "steps": [
+        "Look for LSASS access and dumps (procdump, comsvcs.dll MiniDump)",
+        "Look for NTDS.dit extraction or DCSync (4662 with replication GUIDs)",
+        "Check for Kerberoasting (4769 with RC4)",
+        "List every account whose credentials may be exposed"
+      ],
+      "tools": [
+        "EDR console",
+        "SIEM"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Threat Hunter",
+        "Identity"
+      ],
+      "tags": [
+        "credentials",
+        "active-directory"
+      ],
+      "attack": [
+        "T1003",
+        "T1003.006",
+        "T1558.003"
+      ],
+      "time": "2h",
+      "refs": []
+    },
+    {
+      "id": "IDN-021",
+      "phase": "ident",
+      "title": "Extract and share IOCs",
+      "summary": "Package indicators so blocking, hunting and partners can use them.",
+      "steps": [
+        "Collect hashes, domains, IPs, file paths, user agents and account names",
+        "Remove false positives and internal infrastructure",
+        "Load indicators into the TIP/MISP with context and confidence",
+        "Push to blocking and hunting teams"
+      ],
+      "tools": [
+        "MISP",
+        "OpenCTI",
+        "STIX"
+      ],
+      "artifacts": [],
+      "roles": [
+        "CTI"
+      ],
+      "tags": [
+        "ioc",
+        "threat-intel"
+      ],
+      "attack": [],
+      "time": "1h",
+      "refs": []
+    },
+    {
+      "id": "IDN-022",
+      "phase": "ident",
+      "title": "Identify ransomware variant",
+      "summary": "Knowing the family tells you its usual behavior, leak site and whether a decryptor exists.",
+      "steps": [
+        "Collect the ransom note and an encrypted sample file",
+        "Identify the family (ID Ransomware, vendor reports)",
+        "Check No More Ransom for a free decryptor",
+        "Check the group's leak site for victim posting"
+      ],
+      "tools": [
+        "ID Ransomware",
+        "No More Ransom"
+      ],
+      "artifacts": [],
+      "roles": [
+        "CTI",
+        "Malware Analyst"
+      ],
+      "tags": [
+        "ransomware",
+        "threat-intel"
+      ],
+      "attack": [
+        "T1486"
+      ],
+      "time": "1h",
+      "refs": []
+    },
+    {
+      "id": "IDN-023",
+      "phase": "ident",
+      "title": "Review web server logs and hunt web shells",
+      "summary": "Find exploitation of a public-facing application and any web shells left behind.",
+      "steps": [
+        "Search access logs for exploit patterns and unusual POSTs to static paths",
+        "List recently created or modified files in web roots",
+        "Look for web server processes spawning shells",
+        "Compare deployed code to source control"
+      ],
+      "tools": [
+        "Web server logs",
+        "EDR console",
+        "YARA"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Forensics",
+        "App Owner"
+      ],
+      "tags": [
+        "web",
+        "web-shell"
+      ],
+      "attack": [
+        "T1190",
+        "T1505.003"
+      ],
+      "time": "3h",
+      "refs": []
+    },
+    {
+      "id": "IDN-024",
+      "phase": "ident",
+      "title": "Review user activity for insider risk",
+      "summary": "Investigate possible malicious or negligent insider activity carefully and with HR and legal.",
+      "steps": [
+        "Confirm authorization with HR and legal before searching",
+        "Review DLP, file access and USB/cloud upload activity",
+        "Correlate with access badges and HR events (resignation, PIP)",
+        "Keep the investigation need-to-know"
+      ],
+      "tools": [
+        "DLP console",
+        "UEBA",
+        "Spoke"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Insider Risk",
+        "HR",
+        "Legal"
+      ],
+      "tags": [
+        "insider-risk",
+        "dlp"
+      ],
+      "attack": [],
+      "time": "4h",
+      "refs": []
+    },
+    {
+      "id": "CON-001",
+      "phase": "contain",
+      "title": "Preserve evidence before containment",
+      "summary": "Some containment steps destroy evidence. Capture it first when time allows.",
+      "steps": [
+        "Snapshot affected VMs and cloud disks",
+        "Capture memory on key hosts",
+        "Export logs that may roll over",
+        "Record exactly what will be changed and when"
+      ],
+      "tools": [
+        "Cloud snapshots",
+        "WinPmem"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Forensics"
+      ],
+      "tags": [
+        "forensics",
+        "evidence"
+      ],
+      "attack": [],
+      "time": "1h",
+      "refs": []
+    },
+    {
+      "id": "CON-002",
+      "phase": "contain",
+      "title": "Isolate host with EDR",
+      "summary": "Cut a compromised endpoint off from the network while keeping EDR access for investigation.",
+      "steps": [
+        "Confirm the host and its business owner",
+        "Trigger EDR network containment",
+        "Verify isolation (no outbound except the EDR cloud)",
+        "Record the isolation time in the case log"
+      ],
+      "tools": [
+        "EDR console"
+      ],
+      "artifacts": [],
+      "roles": [
+        "SOC Analyst"
+      ],
+      "tags": [
+        "endpoint",
+        "isolation"
+      ],
+      "attack": [],
+      "time": "15m",
+      "refs": []
+    },
+    {
+      "id": "CON-003",
+      "phase": "contain",
+      "title": "Disable compromised accounts",
+      "summary": "Stop the attacker from using known-compromised user and service accounts.",
+      "steps": [
+        "Disable the accounts in AD and the cloud identity provider",
+        "Coordinate with service owners before disabling service accounts",
+        "Notify the affected users through a verified channel",
+        "Record every account action"
+      ],
+      "tools": [],
+      "artifacts": [],
+      "roles": [
+        "Identity"
+      ],
+      "tags": [
+        "identity",
+        "accounts"
+      ],
+      "attack": [
+        "T1078"
+      ],
+      "time": "30m",
+      "refs": []
+    },
+    {
+      "id": "CON-004",
+      "phase": "contain",
+      "title": "Reset credentials and revoke sessions",
+      "summary": "A password reset alone leaves stolen tokens working. Revoke sessions too.",
+      "steps": [
+        "Reset passwords for the affected accounts",
+        "Revoke refresh tokens and active sessions (e.g. Revoke-MgUserSignInSession, Okta clear sessions)",
+        "Remove attacker-registered MFA methods and devices",
+        "Monitor for re-authentication from attacker IPs"
+      ],
+      "tools": [
+        "Entra ID",
+        "Okta",
+        "Google Admin"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Identity"
+      ],
+      "tags": [
+        "identity",
+        "tokens",
+        "cloud"
+      ],
+      "attack": [
+        "T1550.001",
+        "T1539"
+      ],
+      "time": "30m",
+      "refs": []
+    },
+    {
+      "id": "CON-005",
+      "phase": "contain",
+      "title": "Block IOCs at controls",
+      "summary": "Push confirmed indicators to every control that can block them.",
+      "steps": [
+        "Block domains and IPs at the firewall, proxy and DNS",
+        "Add file hashes to EDR block lists",
+        "Block sender domains and URLs at the email gateway",
+        "Set alerts for any further hits"
+      ],
+      "tools": [
+        "Firewall",
+        "Proxy",
+        "DNS sinkhole",
+        "EDR console",
+        "Email gateway"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Network",
+        "SOC Analyst"
+      ],
+      "tags": [
+        "ioc",
+        "blocking"
+      ],
+      "attack": [],
+      "time": "1h",
+      "refs": []
+    },
+    {
+      "id": "CON-006",
+      "phase": "contain",
+      "title": "Remove malicious mail rules and purge phishing",
+      "summary": "Clean the attacker's mailbox changes and pull the phishing email from every inbox.",
+      "steps": [
+        "Delete malicious inbox rules, forwarding and delegates",
+        "Search all mailboxes for the phishing message",
+        "Purge matching messages tenant-wide",
+        "Identify users who clicked or replied"
+      ],
+      "tools": [
+        "Microsoft Defender for Office 365",
+        "Purview content search",
+        "Google Workspace"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Messaging"
+      ],
+      "tags": [
+        "email",
+        "phishing",
+        "bec"
+      ],
+      "attack": [
+        "T1564.008",
+        "T1566"
+      ],
+      "time": "1h",
+      "refs": []
+    },
+    {
+      "id": "CON-007",
+      "phase": "contain",
+      "title": "Revoke malicious OAuth consent",
+      "summary": "Remove third-party apps the attacker used to keep access without a password.",
+      "steps": [
+        "List enterprise applications and user consents for the affected users",
+        "Revoke grants for suspicious apps",
+        "Disable the service principal tenant-wide",
+        "Restrict user consent to verified publishers"
+      ],
+      "tools": [
+        "Entra ID",
+        "Google Admin"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Identity"
+      ],
+      "tags": [
+        "oauth",
+        "cloud",
+        "persistence"
+      ],
+      "attack": [
+        "T1550.001",
+        "T1528"
+      ],
+      "time": "30m",
+      "refs": []
+    },
+    {
+      "id": "CON-008",
+      "phase": "contain",
+      "title": "Restrict lateral movement paths",
+      "summary": "Limit the attacker's ability to spread between systems.",
+      "steps": [
+        "Block SMB, RDP and WinRM between workstations",
+        "Restrict admin access to jump hosts only",
+        "Segment critical servers with temporary firewall rules",
+        "Monitor denied connections for attacker activity"
+      ],
+      "tools": [
+        "Firewall",
+        "GPO",
+        "EDR console"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Network",
+        "Infrastructure"
+      ],
+      "tags": [
+        "segmentation",
+        "lateral-movement"
+      ],
+      "attack": [
+        "T1021"
+      ],
+      "time": "2h",
+      "refs": []
+    },
+    {
+      "id": "CON-009",
+      "phase": "contain",
+      "title": "Rotate privileged and service account credentials",
+      "summary": "Assume privileged credentials are exposed once the attacker has admin rights.",
+      "steps": [
+        "Rotate domain admin, enterprise admin and tier-0 credentials",
+        "Rotate service account passwords with owners",
+        "Rotate local admin passwords (LAPS)",
+        "Rotate secrets in vaults and CI/CD"
+      ],
+      "tools": [
+        "LAPS",
+        "Secrets vault"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Identity",
+        "Infrastructure"
+      ],
+      "tags": [
+        "credentials",
+        "active-directory"
+      ],
+      "attack": [],
+      "time": "4h",
+      "refs": []
+    },
+    {
+      "id": "CON-010",
+      "phase": "contain",
+      "title": "Reset KRBTGT twice",
+      "summary": "Invalidate forged Kerberos tickets (golden tickets) after domain compromise.",
+      "steps": [
+        "Confirm AD replication is healthy",
+        "Reset the KRBTGT password once",
+        "Wait for full replication (at least the maximum ticket lifetime)",
+        "Reset it a second time and monitor for authentication errors"
+      ],
+      "tools": [
+        "Microsoft KRBTGT reset script"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Identity"
+      ],
+      "tags": [
+        "active-directory",
+        "kerberos"
+      ],
+      "attack": [
+        "T1558.001"
+      ],
+      "time": "12h",
+      "refs": []
+    },
+    {
+      "id": "CON-011",
+      "phase": "contain",
+      "title": "Protect backups from the attacker",
+      "summary": "Attackers target backups to force payment. Lock them down immediately.",
+      "steps": [
+        "Disconnect or lock the backup infrastructure",
+        "Rotate backup console credentials",
+        "Enable immutability where possible",
+        "Verify the latest clean restore points still exist"
+      ],
+      "tools": [],
+      "artifacts": [],
+      "roles": [
+        "Infrastructure"
+      ],
+      "tags": [
+        "backups",
+        "ransomware"
+      ],
+      "attack": [
+        "T1490"
+      ],
+      "time": "1h",
+      "refs": []
+    },
+    {
+      "id": "CON-012",
+      "phase": "contain",
+      "title": "Cut internet egress",
+      "summary": "A last-resort step to stop exfiltration or encryption spreading through C2.",
+      "steps": [
+        "Get executive approval with business impact noted",
+        "Block outbound at the perimeter except approved IR tooling",
+        "Keep EDR and logging channels open",
+        "Plan staged restoration of egress"
+      ],
+      "tools": [
+        "Firewall"
+      ],
+      "artifacts": [],
+      "roles": [
+        "IR Lead",
+        "Network"
+      ],
+      "tags": [
+        "network",
+        "egress",
+        "ransomware"
+      ],
+      "attack": [],
+      "time": "30m",
+      "refs": []
+    },
+    {
+      "id": "CON-013",
+      "phase": "contain",
+      "title": "Disable unauthorized remote access paths",
+      "summary": "Close the remote access the attacker used or could use.",
+      "steps": [
+        "Block attacker IPs on VPN and disable affected VPN accounts",
+        "Remove internet exposure of RDP and other admin services",
+        "Block unapproved RMM tools (AnyDesk, ScreenConnect, etc.)",
+        "Require MFA on all remaining remote access"
+      ],
+      "tools": [
+        "VPN",
+        "Firewall",
+        "EDR console"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Network"
+      ],
+      "tags": [
+        "remote-access",
+        "vpn"
+      ],
+      "attack": [
+        "T1133",
+        "T1219"
+      ],
+      "time": "1h",
+      "refs": []
+    },
+    {
+      "id": "CON-014",
+      "phase": "contain",
+      "title": "Rotate cloud access keys and secrets",
+      "summary": "Deactivate keys the attacker used and rotate anything they could have read.",
+      "steps": [
+        "Deactivate compromised access keys and service principal secrets",
+        "Rotate secrets in parameter stores and key vaults",
+        "Remove attacker-created IAM users, roles and policies",
+        "Apply SCPs or conditional access to block attacker regions or IPs"
+      ],
+      "tools": [
+        "AWS IAM",
+        "Azure Key Vault",
+        "GCP IAM"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Cloud"
+      ],
+      "tags": [
+        "cloud",
+        "iam",
+        "secrets"
+      ],
+      "attack": [],
+      "time": "2h",
+      "refs": []
+    },
+    {
+      "id": "CON-015",
+      "phase": "contain",
+      "title": "Take vulnerable application offline or virtual-patch",
+      "summary": "Stop ongoing exploitation of a public-facing application.",
+      "steps": [
+        "Apply a WAF rule or take the service offline",
+        "Put up a maintenance page and notify stakeholders",
+        "Preserve logs and a disk snapshot first",
+        "Track the exposure window for scoping"
+      ],
+      "tools": [
+        "WAF",
+        "Load balancer"
+      ],
+      "artifacts": [],
+      "roles": [
+        "App Owner",
+        "Network"
+      ],
+      "tags": [
+        "web",
+        "vulnerability"
+      ],
+      "attack": [
+        "T1190"
+      ],
+      "time": "1h",
+      "refs": []
+    },
+    {
+      "id": "ERA-001",
+      "phase": "erad",
+      "title": "Remove malware and persistence",
+      "summary": "Remove every malicious file and persistence mechanism found during analysis.",
+      "steps": [
+        "Delete malicious binaries, scripts and web shells",
+        "Remove malicious services, tasks, run keys and WMI subscriptions",
+        "Remove attacker-created accounts",
+        "Document every removal with path and hash"
+      ],
+      "tools": [
+        "EDR console",
+        "Velociraptor"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Forensics",
+        "Infrastructure"
+      ],
+      "tags": [
+        "malware",
+        "persistence"
+      ],
+      "attack": [],
+      "time": "2h",
+      "refs": []
+    },
+    {
+      "id": "ERA-002",
+      "phase": "erad",
+      "title": "Reimage compromised hosts",
+      "summary": "When in doubt, rebuild. Reimaging is more reliable than cleaning.",
+      "steps": [
+        "Confirm evidence collection is complete",
+        "Wipe and reimage from a known-good gold image",
+        "Patch fully before reconnecting",
+        "Restore user data from clean sources only"
+      ],
+      "tools": [],
+      "artifacts": [],
+      "roles": [
+        "Infrastructure",
+        "Desktop Support"
+      ],
+      "tags": [
+        "rebuild",
+        "endpoint"
+      ],
+      "attack": [],
+      "time": "4h",
+      "refs": []
+    },
+    {
+      "id": "ERA-003",
+      "phase": "erad",
+      "title": "Patch the exploited vulnerability",
+      "summary": "Close the vulnerability that allowed initial access or escalation.",
+      "steps": [
+        "Confirm the CVE and affected versions",
+        "Apply the vendor patch or mitigation",
+        "Scan to confirm the fix",
+        "Check for other systems with the same exposure"
+      ],
+      "tools": [
+        "Vulnerability scanner"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Infrastructure",
+        "App Owner"
+      ],
+      "tags": [
+        "vulnerability",
+        "patching"
+      ],
+      "attack": [],
+      "time": "4h",
+      "refs": []
+    },
+    {
+      "id": "ERA-004",
+      "phase": "erad",
+      "title": "Remove unauthorized access",
+      "summary": "Clean up any access the attacker granted themselves.",
+      "steps": [
+        "Audit privileged groups for unexpected members",
+        "Remove rogue accounts, keys, certificates and app registrations",
+        "Review GPO and conditional access changes during the intrusion window",
+        "Review delegated and federated trust changes"
+      ],
+      "tools": [],
+      "artifacts": [],
+      "roles": [
+        "Identity",
+        "Cloud"
+      ],
+      "tags": [
+        "identity",
+        "access"
+      ],
+      "attack": [
+        "T1098",
+        "T1136",
+        "T1484"
+      ],
+      "time": "2h",
+      "refs": []
+    },
+    {
+      "id": "ERA-005",
+      "phase": "erad",
+      "title": "Remove unauthorized remote access tools",
+      "summary": "Uninstall the RMM and tunneling tools attackers commonly leave behind.",
+      "steps": [
+        "Inventory remote access software across the fleet",
+        "Uninstall anything not on the approved list",
+        "Remove tunnels (ngrok, Cloudflared, Chisel) and proxies",
+        "Add application control rules to prevent reinstall"
+      ],
+      "tools": [
+        "EDR console",
+        "Software inventory"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Infrastructure"
+      ],
+      "tags": [
+        "remote-access",
+        "rmm"
+      ],
+      "attack": [
+        "T1219",
+        "T1572"
+      ],
+      "time": "2h",
+      "refs": []
+    },
+    {
+      "id": "ERA-006",
+      "phase": "erad",
+      "title": "Validate eradication with a fleet sweep",
+      "summary": "Prove the attacker is gone before you start recovery.",
+      "steps": [
+        "Re-sweep all hosts for every known IOC and TTP",
+        "Run YARA and hunting queries across the fleet",
+        "Confirm no new C2 traffic for an agreed quiet period",
+        "Get IR lead sign-off to move to recovery"
+      ],
+      "tools": [
+        "EDR console",
+        "Velociraptor",
+        "YARA",
+        "SIEM"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Threat Hunter",
+        "IR Lead"
+      ],
+      "tags": [
+        "validation",
+        "hunting"
+      ],
+      "attack": [],
+      "time": "4h",
+      "refs": []
+    },
+    {
+      "id": "ERA-007",
+      "phase": "erad",
+      "title": "Harden exploited configurations",
+      "summary": "Fix the weak settings the attacker relied on.",
+      "steps": [
+        "Disable legacy authentication protocols",
+        "Remove excessive admin rights and local admin from users",
+        "Enable credential protections (LSA protection, Credential Guard)",
+        "Apply attack surface reduction rules"
+      ],
+      "tools": [
+        "GPO",
+        "Intune",
+        "Conditional Access"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Infrastructure",
+        "Identity"
+      ],
+      "tags": [
+        "hardening"
+      ],
+      "attack": [],
+      "time": "1d",
+      "refs": []
+    },
+    {
+      "id": "ERA-008",
+      "phase": "erad",
+      "title": "Enforce phishing-resistant MFA",
+      "summary": "Upgrade MFA for affected and privileged users so stolen passwords and push fatigue stop working.",
+      "steps": [
+        "Require MFA for all affected users",
+        "Move privileged users to FIDO2 or certificate-based MFA",
+        "Enable number matching for push MFA",
+        "Block MFA registration from untrusted locations"
+      ],
+      "tools": [
+        "Entra ID",
+        "Okta"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Identity"
+      ],
+      "tags": [
+        "mfa",
+        "identity"
+      ],
+      "attack": [
+        "T1621"
+      ],
+      "time": "1d",
+      "refs": []
+    },
+    {
+      "id": "REC-001",
+      "phase": "recover",
+      "title": "Restore from clean backups",
+      "summary": "Bring systems back from backups taken before the compromise.",
+      "steps": [
+        "Pick restore points that predate the earliest attacker activity",
+        "Restore to an isolated network first",
+        "Scan restored systems for IOCs before reconnecting",
+        "Restore in the agreed business priority order"
+      ],
+      "tools": [],
+      "artifacts": [],
+      "roles": [
+        "Infrastructure"
+      ],
+      "tags": [
+        "backups",
+        "restore",
+        "ransomware"
+      ],
+      "attack": [],
+      "time": "1d",
+      "refs": []
+    },
+    {
+      "id": "REC-002",
+      "phase": "recover",
+      "title": "Recover Active Directory",
+      "summary": "When AD itself is untrustworthy, recover it in a controlled way.",
+      "steps": [
+        "Choose between targeted cleanup and full forest recovery",
+        "Restore a DC from a clean backup in isolation",
+        "Seize roles, clean metadata and reset tier-0 credentials",
+        "Rebuild other DCs from the recovered one"
+      ],
+      "tools": [
+        "Microsoft AD Forest Recovery guide"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Identity",
+        "Infrastructure"
+      ],
+      "tags": [
+        "active-directory",
+        "rebuild"
+      ],
+      "attack": [],
+      "time": "2d",
+      "refs": []
+    },
+    {
+      "id": "REC-003",
+      "phase": "recover",
+      "title": "Use vendor decryptor",
+      "summary": "If a reliable decryptor exists, test it carefully before wide use.",
+      "steps": [
+        "Get the decryptor from a trusted source (No More Ransom, vendor)",
+        "Test on copies of encrypted files first",
+        "Check decrypted files for integrity",
+        "Rebuild the host anyway once data is recovered"
+      ],
+      "tools": [
+        "No More Ransom"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Infrastructure",
+        "Malware Analyst"
+      ],
+      "tags": [
+        "ransomware",
+        "decryption"
+      ],
+      "attack": [],
+      "time": "1d",
+      "refs": []
+    },
+    {
+      "id": "REC-004",
+      "phase": "recover",
+      "title": "Staged return to production",
+      "summary": "Reconnect in stages so a missed foothold is caught quickly.",
+      "steps": [
+        "Reconnect the highest-priority systems first",
+        "Watch each stage for an agreed period before the next",
+        "Restore internet egress last if it was cut",
+        "Keep a rollback plan for each stage"
+      ],
+      "tools": [],
+      "artifacts": [],
+      "roles": [
+        "IR Lead",
+        "Infrastructure"
+      ],
+      "tags": [
+        "restore",
+        "change"
+      ],
+      "attack": [],
+      "time": "1d",
+      "refs": []
+    },
+    {
+      "id": "REC-005",
+      "phase": "recover",
+      "title": "Validate business functionality",
+      "summary": "Have business owners confirm systems work before declaring recovery.",
+      "steps": [
+        "Run owner-defined acceptance checks",
+        "Confirm data integrity and the last good transaction",
+        "Confirm integrations and dependencies",
+        "Get written sign-off from each owner"
+      ],
+      "tools": [],
+      "artifacts": [],
+      "roles": [
+        "Business Owners",
+        "App Owner"
+      ],
+      "tags": [
+        "validation",
+        "business"
+      ],
+      "attack": [],
+      "time": "4h",
+      "refs": []
+    },
+    {
+      "id": "REC-006",
+      "phase": "recover",
+      "title": "Enhanced monitoring period",
+      "summary": "Watch closely for re-entry for weeks after recovery.",
+      "steps": [
+        "Add detections for every observed TTP and IOC",
+        "Lower alert thresholds on the affected systems and accounts",
+        "Schedule daily hunts for the next 30 days",
+        "Watch leak sites and credential dumps for your organization"
+      ],
+      "tools": [
+        "SIEM",
+        "EDR console",
+        "Threat intel feeds"
+      ],
+      "artifacts": [],
+      "roles": [
+        "SOC Analyst",
+        "Threat Hunter"
+      ],
+      "tags": [
+        "monitoring",
+        "detection"
+      ],
+      "attack": [],
+      "time": "30d",
+      "refs": []
+    },
+    {
+      "id": "REC-007",
+      "phase": "recover",
+      "title": "Restore user access and communicate",
+      "summary": "Bring people back to work with clear instructions.",
+      "steps": [
+        "Issue new credentials through a verified process",
+        "Tell users what happened at an appropriate level",
+        "Give instructions for reporting anything suspicious",
+        "Staff the help desk for the expected volume"
+      ],
+      "tools": [],
+      "artifacts": [],
+      "roles": [
+        "Communications",
+        "Help Desk"
+      ],
+      "tags": [
+        "comms",
+        "users"
+      ],
+      "attack": [],
+      "time": "4h",
+      "refs": []
+    },
+    {
+      "id": "LES-001",
+      "phase": "lessons",
+      "title": "Hold post-incident review",
+      "summary": "Run a blameless review while memories are fresh, ideally within two weeks.",
+      "steps": [
+        "Invite responders, owners and leadership",
+        "Walk the timeline: what happened, what went well, what didn't",
+        "Identify root causes and contributing factors",
+        "Agree concrete actions with owners and dates"
+      ],
+      "tools": [],
+      "artifacts": [],
+      "roles": [
+        "IR Lead"
+      ],
+      "tags": [
+        "review",
+        "process"
+      ],
+      "attack": [],
+      "time": "2h",
+      "refs": []
+    },
+    {
+      "id": "LES-002",
+      "phase": "lessons",
+      "title": "Write final incident report",
+      "summary": "Produce the record of the incident for leadership, auditors and future responders.",
+      "steps": [
+        "Executive summary with impact and root cause",
+        "Detailed timeline with evidence references",
+        "Actions taken by phase",
+        "Recommendations and their status"
+      ],
+      "tools": [],
+      "artifacts": [],
+      "roles": [
+        "IR Lead",
+        "Legal"
+      ],
+      "tags": [
+        "documentation",
+        "report"
+      ],
+      "attack": [],
+      "time": "1d",
+      "refs": []
+    },
+    {
+      "id": "LES-003",
+      "phase": "lessons",
+      "title": "Turn findings into detections",
+      "summary": "Make sure the same attack would be caught earlier next time.",
+      "steps": [
+        "Write detections for each observed TTP",
+        "Test them against the incident evidence",
+        "Map coverage to MITRE ATT&CK",
+        "Add regression tests to the detection pipeline"
+      ],
+      "tools": [
+        "SIEM",
+        "Sigma",
+        "ATT&CK Navigator"
+      ],
+      "artifacts": [],
+      "roles": [
+        "Detection Engineering"
+      ],
+      "tags": [
+        "detection",
+        "attack"
+      ],
+      "attack": [],
+      "time": "2d",
+      "refs": []
+    },
+    {
+      "id": "LES-004",
+      "phase": "lessons",
+      "title": "Track remediation to closure",
+      "summary": "Recommendations only matter if they get done.",
+      "steps": [
+        "Log each action in the work tracker",
+        "Assign owners and due dates",
+        "Review progress at a regular cadence",
+        "Escalate overdue high-risk items"
+      ],
+      "tools": [],
+      "artifacts": [],
+      "roles": [
+        "IR Lead",
+        "Risk"
+      ],
+      "tags": [
+        "remediation",
+        "process"
+      ],
+      "attack": [],
+      "time": "ongoing",
+      "refs": []
+    },
+    {
+      "id": "LES-005",
+      "phase": "lessons",
+      "title": "Update playbooks and IR plan",
+      "summary": "Feed what you learned back into your playbooks, including this one.",
+      "steps": [
+        "Update steps that were missing, wrong or slow",
+        "Update contacts and vendor details",
+        "Re-export and re-share the updated Huddle playbook",
+        "Schedule a tabletop to test the changes"
+      ],
+      "tools": [
+        "Huddle"
+      ],
+      "artifacts": [],
+      "roles": [
+        "IR Lead"
+      ],
+      "tags": [
+        "process",
+        "playbook"
+      ],
+      "attack": [],
+      "time": "4h",
+      "refs": []
+    },
+    {
+      "id": "LES-006",
+      "phase": "lessons",
+      "title": "Archive evidence per retention policy",
+      "summary": "Keep evidence as long as legal and regulatory needs require, then dispose of it properly.",
+      "steps": [
+        "Confirm legal hold requirements with counsel",
+        "Move evidence to secure, access-controlled storage",
+        "Verify hashes after transfer",
+        "Record the retention date and disposal method"
+      ],
+      "tools": [],
+      "artifacts": [],
+      "roles": [
+        "Forensics",
+        "Legal"
+      ],
+      "tags": [
+        "evidence",
+        "retention"
+      ],
+      "attack": [],
+      "time": "2h",
+      "refs": []
+    },
+    {
+      "id": "LES-007",
+      "phase": "lessons",
+      "title": "Capture incident metrics",
+      "summary": "Measure response so you can show improvement over time.",
+      "steps": [
+        "Record time to detect, contain, eradicate and recover",
+        "Record dwell time and the systems affected",
+        "Record total cost including third parties",
+        "Compare against previous incidents"
+      ],
+      "tools": [],
+      "artifacts": [],
+      "roles": [
+        "IR Lead"
+      ],
+      "tags": [
+        "metrics"
+      ],
+      "attack": [],
+      "time": "1h",
+      "refs": []
+    },
+    {
+      "id": "LES-008",
+      "phase": "lessons",
+      "title": "Share intelligence with peers",
+      "summary": "Help others defend against the same actor.",
+      "steps": [
+        "Get legal approval for what can be shared",
+        "Sanitize indicators and TTPs",
+        "Share with your ISAC or trusted partners",
+        "Consider reporting to law enforcement (e.g. FBI IC3)"
+      ],
+      "tools": [
+        "MISP",
+        "ISAC portal"
+      ],
+      "artifacts": [],
+      "roles": [
+        "CTI",
+        "Legal"
+      ],
+      "tags": [
+        "threat-intel",
+        "sharing"
+      ],
+      "attack": [],
+      "time": "2h",
+      "refs": []
+    }
+  ],
+  "templates": [
+    {
+      "id": "ransomware",
+      "name": "Ransomware",
+      "description": "Encryption event across endpoints and servers, possible data theft.",
+      "nodes": [
+        [
+          "s",
+          "start",
+          "Ransomware detected",
+          "ident"
+        ],
+        [
+          "a",
+          "play",
+          "IDN-001"
+        ],
+        [
+          "b",
+          "play",
+          "IDN-002"
+        ],
+        [
+          "c",
+          "play",
+          "IDN-003"
+        ],
+        [
+          "d",
+          "play",
+          "IDN-004"
+        ],
+        [
+          "e",
+          "play",
+          "IDN-005"
+        ],
+        [
+          "f",
+          "play",
+          "IDN-022"
+        ],
+        [
+          "g",
+          "play",
+          "CON-001"
+        ],
+        [
+          "h",
+          "play",
+          "CON-002"
+        ],
+        [
+          "i",
+          "play",
+          "CON-011"
+        ],
+        [
+          "q",
+          "decision",
+          "Encryption still spreading?",
+          "contain"
+        ],
+        [
+          "j",
+          "play",
+          "CON-012"
+        ],
+        [
+          "k",
+          "play",
+          "CON-008"
+        ],
+        [
+          "l",
+          "play",
+          "IDN-008"
+        ],
+        [
+          "m",
+          "play",
+          "IDN-010"
+        ],
+        [
+          "n",
+          "play",
+          "IDN-020"
+        ],
+        [
+          "o",
+          "play",
+          "IDN-017"
+        ],
+        [
+          "p",
+          "play",
+          "CON-009"
+        ],
+        [
+          "p2",
+          "play",
+          "CON-010"
+        ],
+        [
+          "r",
+          "play",
+          "ERA-002"
+        ],
+        [
+          "t",
+          "play",
+          "ERA-005"
+        ],
+        [
+          "u",
+          "play",
+          "ERA-006"
+        ],
+        [
+          "q2",
+          "decision",
+          "Free decryptor available?",
+          "recover"
+        ],
+        [
+          "v",
+          "play",
+          "REC-003"
+        ],
+        [
+          "w",
+          "play",
+          "REC-001"
+        ],
+        [
+          "x",
+          "play",
+          "REC-004"
+        ],
+        [
+          "y",
+          "play",
+          "REC-006"
+        ],
+        [
+          "z",
+          "play",
+          "LES-001"
+        ],
+        [
+          "z2",
+          "play",
+          "LES-002"
+        ],
+        [
+          "e2",
+          "end",
+          "Incident closed",
+          "lessons"
+        ]
+      ],
+      "edges": [
+        [
+          "s",
+          "a"
+        ],
+        [
+          "a",
+          "b"
+        ],
+        [
+          "b",
+          "c"
+        ],
+        [
+          "b",
+          "d"
+        ],
+        [
+          "d",
+          "e"
+        ],
+        [
+          "b",
+          "f"
+        ],
+        [
+          "c",
+          "g"
+        ],
+        [
+          "g",
+          "h"
+        ],
+        [
+          "h",
+          "i"
+        ],
+        [
+          "i",
+          "q"
+        ],
+        [
+          "q",
+          "j",
+          "Yes"
+        ],
+        [
+          "q",
+          "k",
+          "No"
+        ],
+        [
+          "j",
+          "l"
+        ],
+        [
+          "k",
+          "l"
+        ],
+        [
+          "l",
+          "m"
+        ],
+        [
+          "m",
+          "n"
+        ],
+        [
+          "n",
+          "o"
+        ],
+        [
+          "o",
+          "p"
+        ],
+        [
+          "p",
+          "p2"
+        ],
+        [
+          "p2",
+          "r"
+        ],
+        [
+          "r",
+          "t"
+        ],
+        [
+          "t",
+          "u"
+        ],
+        [
+          "u",
+          "q2"
+        ],
+        [
+          "q2",
+          "v",
+          "Yes"
+        ],
+        [
+          "q2",
+          "w",
+          "No"
+        ],
+        [
+          "v",
+          "x"
+        ],
+        [
+          "w",
+          "x"
+        ],
+        [
+          "x",
+          "y"
+        ],
+        [
+          "y",
+          "z"
+        ],
+        [
+          "z",
+          "z2"
+        ],
+        [
+          "z2",
+          "e2"
+        ]
+      ]
+    },
+    {
+      "id": "bec",
+      "name": "Business Email Compromise",
+      "description": "Mailbox takeover used for fraud, invoice redirection or internal phishing.",
+      "nodes": [
+        [
+          "s",
+          "start",
+          "Suspicious mailbox activity",
+          "ident"
+        ],
+        [
+          "a",
+          "play",
+          "IDN-001"
+        ],
+        [
+          "b",
+          "play",
+          "IDN-013"
+        ],
+        [
+          "c",
+          "play",
+          "IDN-014"
+        ],
+        [
+          "q",
+          "decision",
+          "Fraudulent payment sent?",
+          "ident"
+        ],
+        [
+          "f",
+          "note",
+          "Call the bank immediately to request a recall; file at IC3 for possible fund recovery.",
+          "ident"
+        ],
+        [
+          "d",
+          "play",
+          "CON-004"
+        ],
+        [
+          "e",
+          "play",
+          "CON-006"
+        ],
+        [
+          "g",
+          "play",
+          "CON-007"
+        ],
+        [
+          "h",
+          "play",
+          "CON-005"
+        ],
+        [
+          "i",
+          "play",
+          "IDN-006"
+        ],
+        [
+          "j",
+          "play",
+          "ERA-008"
+        ],
+        [
+          "k",
+          "play",
+          "ERA-007"
+        ],
+        [
+          "l",
+          "play",
+          "REC-006"
+        ],
+        [
+          "m",
+          "play",
+          "LES-001"
+        ],
+        [
+          "e2",
+          "end",
+          "Incident closed",
+          "lessons"
+        ]
+      ],
+      "edges": [
+        [
+          "s",
+          "a"
+        ],
+        [
+          "a",
+          "b"
+        ],
+        [
+          "b",
+          "c"
+        ],
+        [
+          "c",
+          "q"
+        ],
+        [
+          "q",
+          "f",
+          "Yes"
+        ],
+        [
+          "q",
+          "d",
+          "No"
+        ],
+        [
+          "f",
+          "d"
+        ],
+        [
+          "d",
+          "e"
+        ],
+        [
+          "e",
+          "g"
+        ],
+        [
+          "g",
+          "h"
+        ],
+        [
+          "h",
+          "i"
+        ],
+        [
+          "i",
+          "j"
+        ],
+        [
+          "j",
+          "k"
+        ],
+        [
+          "k",
+          "l"
+        ],
+        [
+          "l",
+          "m"
+        ],
+        [
+          "m",
+          "e2"
+        ]
+      ]
+    },
+    {
+      "id": "account",
+      "name": "Compromised Credentials",
+      "description": "A user or service account is confirmed in attacker hands.",
+      "nodes": [
+        [
+          "s",
+          "start",
+          "Credential compromise reported",
+          "ident"
+        ],
+        [
+          "a",
+          "play",
+          "IDN-001"
+        ],
+        [
+          "b",
+          "play",
+          "IDN-013"
+        ],
+        [
+          "c",
+          "play",
+          "IDN-019"
+        ],
+        [
+          "q",
+          "decision",
+          "Privileged account?",
+          "ident"
+        ],
+        [
+          "d",
+          "play",
+          "IDN-010"
+        ],
+        [
+          "e",
+          "play",
+          "IDN-020"
+        ],
+        [
+          "f",
+          "play",
+          "CON-004"
+        ],
+        [
+          "g",
+          "play",
+          "CON-003"
+        ],
+        [
+          "h",
+          "play",
+          "CON-009"
+        ],
+        [
+          "i",
+          "play",
+          "ERA-004"
+        ],
+        [
+          "j",
+          "play",
+          "ERA-008"
+        ],
+        [
+          "k",
+          "play",
+          "REC-006"
+        ],
+        [
+          "l",
+          "play",
+          "LES-003"
+        ],
+        [
+          "e2",
+          "end",
+          "Incident closed",
+          "lessons"
+        ]
+      ],
+      "edges": [
+        [
+          "s",
+          "a"
+        ],
+        [
+          "a",
+          "b"
+        ],
+        [
+          "b",
+          "c"
+        ],
+        [
+          "c",
+          "q"
+        ],
+        [
+          "q",
+          "d",
+          "Yes"
+        ],
+        [
+          "q",
+          "f",
+          "No"
+        ],
+        [
+          "d",
+          "e"
+        ],
+        [
+          "e",
+          "g"
+        ],
+        [
+          "g",
+          "h"
+        ],
+        [
+          "h",
+          "f"
+        ],
+        [
+          "f",
+          "i"
+        ],
+        [
+          "i",
+          "j"
+        ],
+        [
+          "j",
+          "k"
+        ],
+        [
+          "k",
+          "l"
+        ],
+        [
+          "l",
+          "e2"
+        ]
+      ]
+    },
+    {
+      "id": "malware",
+      "name": "Malware on Endpoint",
+      "description": "EDR or AV detection of malicious code on a workstation or server.",
+      "nodes": [
+        [
+          "s",
+          "start",
+          "Malware alert",
+          "ident"
+        ],
+        [
+          "a",
+          "play",
+          "IDN-001"
+        ],
+        [
+          "q",
+          "decision",
+          "True positive?",
+          "ident"
+        ],
+        [
+          "fp",
+          "end",
+          "Close as false positive; tune the detection",
+          "ident"
+        ],
+        [
+          "b",
+          "play",
+          "IDN-007"
+        ],
+        [
+          "c",
+          "play",
+          "CON-002"
+        ],
+        [
+          "d",
+          "play",
+          "IDN-008"
+        ],
+        [
+          "e",
+          "play",
+          "IDN-015"
+        ],
+        [
+          "f",
+          "play",
+          "IDN-021"
+        ],
+        [
+          "g",
+          "play",
+          "CON-005"
+        ],
+        [
+          "h",
+          "play",
+          "IDN-012"
+        ],
+        [
+          "q2",
+          "decision",
+          "Spread to other hosts?",
+          "contain"
+        ],
+        [
+          "i",
+          "play",
+          "IDN-010"
+        ],
+        [
+          "j",
+          "play",
+          "ERA-002"
+        ],
+        [
+          "k",
+          "play",
+          "ERA-006"
+        ],
+        [
+          "l",
+          "play",
+          "REC-006"
+        ],
+        [
+          "m",
+          "play",
+          "LES-003"
+        ],
+        [
+          "e2",
+          "end",
+          "Incident closed",
+          "lessons"
+        ]
+      ],
+      "edges": [
+        [
+          "s",
+          "a"
+        ],
+        [
+          "a",
+          "q"
+        ],
+        [
+          "q",
+          "fp",
+          "No"
+        ],
+        [
+          "q",
+          "b",
+          "Yes"
+        ],
+        [
+          "b",
+          "c"
+        ],
+        [
+          "c",
+          "d"
+        ],
+        [
+          "d",
+          "e"
+        ],
+        [
+          "e",
+          "f"
+        ],
+        [
+          "f",
+          "g"
+        ],
+        [
+          "d",
+          "h"
+        ],
+        [
+          "h",
+          "q2"
+        ],
+        [
+          "g",
+          "q2"
+        ],
+        [
+          "q2",
+          "i",
+          "Yes"
+        ],
+        [
+          "q2",
+          "j",
+          "No"
+        ],
+        [
+          "i",
+          "j"
+        ],
+        [
+          "j",
+          "k"
+        ],
+        [
+          "k",
+          "l"
+        ],
+        [
+          "l",
+          "m"
+        ],
+        [
+          "m",
+          "e2"
+        ]
+      ]
+    },
+    {
+      "id": "webapp",
+      "name": "Web Application Compromise",
+      "description": "Exploitation of an internet-facing application, possibly with a web shell.",
+      "nodes": [
+        [
+          "s",
+          "start",
+          "Exploitation suspected",
+          "ident"
+        ],
+        [
+          "a",
+          "play",
+          "IDN-001"
+        ],
+        [
+          "b",
+          "play",
+          "CON-001"
+        ],
+        [
+          "c",
+          "play",
+          "CON-015"
+        ],
+        [
+          "d",
+          "play",
+          "IDN-023"
+        ],
+        [
+          "e",
+          "play",
+          "IDN-018"
+        ],
+        [
+          "f",
+          "play",
+          "IDN-016"
+        ],
+        [
+          "g",
+          "play",
+          "IDN-017"
+        ],
+        [
+          "q",
+          "decision",
+          "Sensitive data accessed?",
+          "ident"
+        ],
+        [
+          "h",
+          "play",
+          "IDN-006"
+        ],
+        [
+          "i",
+          "play",
+          "ERA-003"
+        ],
+        [
+          "j",
+          "play",
+          "ERA-001"
+        ],
+        [
+          "k",
+          "play",
+          "ERA-006"
+        ],
+        [
+          "l",
+          "play",
+          "REC-005"
+        ],
+        [
+          "m",
+          "play",
+          "REC-006"
+        ],
+        [
+          "n",
+          "play",
+          "LES-001"
+        ],
+        [
+          "e2",
+          "end",
+          "Incident closed",
+          "lessons"
+        ]
+      ],
+      "edges": [
+        [
+          "s",
+          "a"
+        ],
+        [
+          "a",
+          "b"
+        ],
+        [
+          "b",
+          "c"
+        ],
+        [
+          "c",
+          "d"
+        ],
+        [
+          "d",
+          "e"
+        ],
+        [
+          "e",
+          "f"
+        ],
+        [
+          "f",
+          "g"
+        ],
+        [
+          "g",
+          "q"
+        ],
+        [
+          "q",
+          "h",
+          "Yes"
+        ],
+        [
+          "q",
+          "i",
+          "No"
+        ],
+        [
+          "h",
+          "i"
+        ],
+        [
+          "i",
+          "j"
+        ],
+        [
+          "j",
+          "k"
+        ],
+        [
+          "k",
+          "l"
+        ],
+        [
+          "l",
+          "m"
+        ],
+        [
+          "m",
+          "n"
+        ],
+        [
+          "n",
+          "e2"
+        ]
+      ]
+    }
+  ]
+}
