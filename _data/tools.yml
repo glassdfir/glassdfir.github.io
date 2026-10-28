@@ -19,12 +19,12 @@
     Includes templates and an AI-Assisted SOC play library.
   good_for: Writing playbooks before the incident and following them during it.
 
-- name: Sundial
-  url: /sundial/
+- name: Mill
+  url: /mill/
   tagline: Merge your logs into one timeline.
   description: >-
-    Drop in CSV, TSV or JSON exports from different tools and Sundial finds
+    Drop in CSV, TSV or JSON exports from different tools and Mill finds
     the timestamps, merges everything in UTC, and charts it. Zoom into bursts,
     filter, tag the key events with ATT&CK-style phases, and export the story.
   good_for: Event logs, Sysmon, proxy, $MFT and EDR exports from the same incident, side by side.
-  try: /sundial/?sample=1
+  try: /mill/?sample=1

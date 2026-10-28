@@ -7,7 +7,7 @@ modified: 2026-10-27T13:00:00-04:00
 
 I'm Jon Glass, and I work in digital forensics and incident response (DFIR).
 
-This blog started in 2013 as a place to write down things worth doing twice. Over the years that has meant Windows forensic artifacts, Sysmon and process mapping, malware analysis, remote collection with PowerShell and Python, and more recently automating Microsoft Defender for Endpoint and building small tools like [Spoke]({{ site.baseurl }}/spoke/), [Huddle]({{ site.baseurl }}/huddle/) and [Sundial]({{ site.baseurl }}/sundial/). They're all on the [Tools]({{ site.baseurl }}/tools/) page.
+This blog started in 2013 as a place to write down things worth doing twice. Over the years that has meant Windows forensic artifacts, Sysmon and process mapping, malware analysis, remote collection with PowerShell and Python, and more recently automating Microsoft Defender for Endpoint and building small tools like [Spoke]({{ site.baseurl }}/spoke/), [Huddle]({{ site.baseurl }}/huddle/) and [Mill]({{ site.baseurl }}/mill/). They're all on the [Tools]({{ site.baseurl }}/tools/) page.
 
 The name comes from the Lincoln line about spending the first four hours sharpening the axe. Here, it's the ACKs.
 
