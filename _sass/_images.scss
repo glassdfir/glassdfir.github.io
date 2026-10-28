@@ -1,0 +1,88 @@
+/* ==========================================================================
+   Post images: depth, zoom affordance, captions, lightbox
+   Works with assets/js/image-enhance.js
+   ========================================================================== */
+
+.entry-content {
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  a.image-popup {
+    display: inline-block;
+    max-width: 100%;
+    border-bottom: 0;
+    cursor: zoom-in;
+    line-height: 0;
+
+    img {
+      border-radius: 6px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, .12), 0 4px 14px rgba(0, 0, 0, .10);
+      transition: transform .2s ease, box-shadow .2s ease;
+      opacity: 1;   /* the theme dims linked figure images; don't */
+      transform: none;
+    }
+
+    &:hover img,
+    &:focus img {
+      transform: translateY(-3px);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, .14), 0 10px 26px rgba(0, 0, 0, .16);
+      opacity: 1;
+    }
+
+    &:focus { outline: none; }
+    &:focus-visible img { outline: 2px solid currentColor; outline-offset: 3px; }
+  }
+
+  figure.post-figure {
+    margin: 1.75em 0;
+    padding: 0;
+    text-align: center;
+
+    img { margin: 0 auto; }
+  }
+
+  figcaption,
+  .img-caption {
+    display: block;
+    margin-top: .6em;
+    padding: 0;
+    font-size: 14px;
+    line-height: 1.4;
+    font-style: italic;
+    color: #666;
+    text-align: center;
+  }
+}
+
+/* Lightbox */
+.mfp-bg { background: #0b0c0f; }
+.mfp-fade.mfp-bg.mfp-ready { opacity: .92; }
+.mfp-figure:after { box-shadow: 0 10px 40px rgba(0, 0, 0, .6); border-radius: 6px; }
+img.mfp-img { border-radius: 6px; }
+.mfp-title { font-size: 15px; line-height: 1.4; padding-right: 70px; color: #e8e8e8; }
+.mfp-counter { font-size: 13px; color: #aaa; }
+.mfp-image-holder .mfp-close,
+.mfp-arrow { opacity: .75; }
+.mfp-image-holder .mfp-close:hover,
+.mfp-arrow:hover { opacity: 1; }
+
+/* Dark theme */
+html:not(.theme-light) .entry-content {
+  a.image-popup img {
+    box-shadow: 0 0 0 1px #343944, 0 6px 18px rgba(0, 0, 0, .45);
+  }
+  a.image-popup:hover img,
+  a.image-popup:focus img {
+    box-shadow: 0 0 0 1px #4a5060, 0 12px 30px rgba(0, 0, 0, .6);
+  }
+  figcaption, .img-caption { color: #9aa1ac; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .entry-content a.image-popup img { transition: none; }
+  .entry-content a.image-popup:hover img,
+  .entry-content a.image-popup:focus img { transform: none; }
+}
