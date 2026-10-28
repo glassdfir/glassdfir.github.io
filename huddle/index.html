@@ -419,6 +419,10 @@ a.tag:hover { border-color: var(--accent); }
 :root[data-theme="light"] .actor-n.agent { color: #6d3fd6; }
 :root[data-theme="light"] .actor-n.human { color: #13865a; }
 
+/* Arrow-key navigation cursor in the library */
+.card.nav-focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.phase-group-h.nav-focus { outline: 2px solid var(--accent); outline-offset: -2px; color: var(--text); }
+
 </style>
 </head>
 <body>
@@ -2037,7 +2041,7 @@ a.tag:hover { border-color: var(--accent); }
         const ph = H.phase(p.phase);
         const closed = !searching && isCollapsed(ph.id);
         out.push(el('button.phase-group-h' + (closed ? '.closed' : ''), {
-          type: 'button', 'aria-expanded': String(!closed),
+          type: 'button', 'data-phase': ph.id, 'aria-expanded': String(!closed),
           title: searching ? 'Groups stay open while searching' : (closed ? 'Expand ' : 'Collapse ') + ph.name,
           onclick: () => { if (!searching) toggleGroup(ph.id); },
         }, el('span.chev', '▾'), el('span.dot', { style: { background: ph.color } }), ph.name, el('span.gc', String(perPhase[ph.id]))));
@@ -2923,6 +2927,181 @@ a.tag:hover { border-color: var(--accent); }
 
 </script>
   <script>
+/* Navigate plays with the arrow keys. */
+(function () {
+  const H = window.H, U = H.U, S = H.S;
+  const $ = (id) => document.getElementById(id);
+  S.navZone = 'library';   // 'library' | 'canvas'
+  S.libCursor = null;      // { kind: 'phase' | 'play', id }
+
+  /* ---------------- Library ---------------- */
+  function libItems() {
+    // While searching, every group is open, so skip the headers and step through plays only.
+    const sel = (S.filter.q || '').trim() ? '.card' : '.phase-group-h, .card';
+    return [...$('play-list').querySelectorAll(sel)].map((e) =>
+      e.classList.contains('card') ? { kind: 'play', id: e.dataset.play, el: e } : { kind: 'phase', id: e.dataset.phase, el: e });
+  }
+  const same = (a, b) => !!(a && b && a.kind === b.kind && a.id === b.id);
+  function paintLib() {
+    const items = libItems();
+    let cur = null;
+    items.forEach((it) => {
+      const on = S.navZone === 'library' && same(it, S.libCursor);
+      it.el.classList.toggle('nav-focus', on);
+      if (on) cur = it;
+    });
+    if (cur) cur.el.scrollIntoView({ block: 'nearest' });
+  }
+  const baseRender = H.renderLibrary;
+  H.renderLibrary = function () { baseRender(); paintLib(); };
+
+  function setLib(it) {
+    S.navZone = 'library';
+    S.libCursor = { kind: it.kind, id: it.id };
+    if (it.kind === 'play') { S.sel = { type: 'play', id: it.id }; H.renderInspector(); }
+    H.renderLibrary();
+  }
+  function libMove(d) {
+    const items = libItems();
+    if (!items.length) return;
+    let i = items.findIndex((it) => same(it, S.libCursor));
+    if (i < 0 && S.sel && S.sel.type === 'play') i = items.findIndex((it) => it.kind === 'play' && it.id === S.sel.id);
+    if (i < 0) i = d > 0 ? -1 : items.length;
+    setLib(items[Math.max(0, Math.min(items.length - 1, i + d))]);
+  }
+  function libHoriz(d) {
+    const cur = libItems().find((it) => same(it, S.libCursor));
+    if (!cur) return libMove(1);
+    if (cur.kind === 'phase') {
+      const open = cur.el.getAttribute('aria-expanded') === 'true';
+      if ((d > 0 && !open) || (d < 0 && open)) cur.el.click();   // expand / collapse
+      else if (d > 0) libMove(1);                                 // step into an open group
+      return;
+    }
+    if (d < 0) { const p = H.getPlay(cur.id); if (p) setLib({ kind: 'phase', id: p.phase }); }
+    else focusCanvas();
+  }
+  function libActivate() {
+    const cur = libItems().find((it) => same(it, S.libCursor));
+    if (!cur) return libMove(1);
+    if (cur.kind === 'phase') { cur.el.click(); return; }
+    H.addNode({ type: 'play', playId: cur.id });
+    S.navZone = 'library';
+    H.renderLibrary();
+    const p = H.getPlay(cur.id);
+    U.toast('Added ' + (p ? p.title : cur.id));
+  }
+  function focusLibrary() {
+    S.navZone = 'library';
+    if (!S.libCursor || !libItems().some((it) => same(it, S.libCursor))) {
+      const first = libItems()[0];
+      S.libCursor = first ? { kind: first.kind, id: first.id } : null;
+    }
+    if (S.libCursor && S.libCursor.kind === 'play') S.sel = { type: 'play', id: S.libCursor.id };
+    H.changed({ soft: true });
+  }
+
+  /* ---------------- Canvas ---------------- */
+  const selNode = () => (S.sel && S.sel.type === 'node' ? H.node(S.sel.id) : null);
+  function center(n) { return { x: n.x + H.nodeWidth(n) / 2, y: n.y + (H.measure(n.id) || 90) / 2 }; }
+  function ensureVisible(n) {
+    const r = $('canvas').getBoundingClientRect(), v = S.view, m = 40;
+    const sx = n.x * v.k + v.x, sy = n.y * v.k + v.y;
+    const ex = sx + H.nodeWidth(n) * v.k, ey = sy + (H.measure(n.id) || 90) * v.k;
+    if (sx < m) v.x += m - sx; else if (ex > r.width - m) v.x -= ex - (r.width - m);
+    if (sy < m) v.y += m - sy; else if (ey > r.height - m) v.y -= ey - (r.height - m);
+    H.applyView();
+  }
+  function selectNode(n) {
+    S.navZone = 'canvas';
+    S.sel = { type: 'node', id: n.id };
+    H.changed({ soft: true });
+    ensureVisible(n);
+  }
+  function focusCanvas() {
+    const nodes = S.pb.nodes;
+    if (!nodes.length) { U.toast('The playbook is empty. Press Enter on a play to add it.'); return; }
+    let n = selNode();
+    if (!n && S.libCursor && S.libCursor.kind === 'play') n = nodes.find((x) => x.playId === S.libCursor.id);
+    if (!n) n = nodes.find((x) => x.type === 'start') || nodes.slice().sort((a, b) => H.laneOf(a) - H.laneOf(b) || a.y - b.y)[0];
+    selectNode(n);
+  }
+  function nearest(pred, c, wx, wy) {
+    let best = null, bd = Infinity;
+    S.pb.nodes.forEach((n) => {
+      if (!pred(n)) return;
+      const p = center(n), d = Math.abs(p.x - c.x) * wx + Math.abs(p.y - c.y) * wy;
+      if (d < bd) { bd = d; best = n; }
+    });
+    return best;
+  }
+  /* Right/Left follow the flow (Yes branch first); Up/Down move within a lane. */
+  function canvasMove(dir) {
+    const cur = selNode();
+    if (!cur) return focusCanvas();
+    const c = center(cur), lane = H.laneOf(cur);
+    let target = null;
+    if (dir === 'right' || dir === 'left') {
+      const linked = S.pb.edges
+        .filter((e) => (dir === 'right' ? e.from === cur.id : e.to === cur.id))
+        .map((e) => ({ n: H.node(dir === 'right' ? e.to : e.from), port: e.port }))
+        .filter((x) => x.n)
+        .sort((a, b) => (b.port === 'yes') - (a.port === 'yes') || Math.abs(center(a.n).y - c.y) - Math.abs(center(b.n).y - c.y));
+      target = linked.length ? linked[0].n : nearest((n) => (dir === 'right' ? H.laneOf(n) > lane : H.laneOf(n) < lane), c, 1, 1);
+    } else {
+      const down = dir === 'down';
+      const inLane = S.pb.nodes.filter((n) => n !== cur && H.laneOf(n) === lane && (down ? n.y > cur.y : n.y < cur.y))
+        .sort((a, b) => (down ? a.y - b.y : b.y - a.y));
+      target = inLane[0] || nearest((n) => n !== cur && (down ? center(n).y > c.y : center(n).y < c.y), c, 1, 2);
+    }
+    if (target) selectNode(target);
+  }
+
+  /* ---------------- Actions ---------------- */
+  function act(a) {
+    if (a === 'library') return focusLibrary();
+    if (a === 'canvas') return focusCanvas();
+    if (S.navZone === 'canvas') {
+      if (a === 'enter') { H.focusInspector(); return; }
+      return canvasMove(a);
+    }
+    if (a === 'up') return libMove(-1);
+    if (a === 'down') return libMove(1);
+    if (a === 'left') return libHoriz(-1);
+    if (a === 'right') return libHoriz(1);
+    if (a === 'enter') return libActivate();
+  }
+
+  const KEYS = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right', Enter: 'enter', '[': 'library', ']': 'canvas' };
+  function onKey(e) {
+    const t = e.target;
+    if (t && t.id === 'search' && e.key === 'ArrowDown') {
+      e.preventDefault(); t.blur(); S.libCursor = null; S.navZone = 'library'; libMove(1); return;
+    }
+    if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (t && t.closest && t.closest('input, textarea, select, [contenteditable]')) return;
+    if (!$('run').hidden || document.querySelector('.modal-back')) return;
+    const a = KEYS[e.key];
+    if (!a) return;
+    if (a === 'enter' && t && t.closest && t.closest('button, a')) return; // let focused buttons work normally
+    e.preventDefault();
+    act(a);
+  }
+
+  H.initNav = function () {
+    document.addEventListener('keydown', onKey);
+    $('library').addEventListener('pointerdown', (e) => {
+      S.navZone = 'library';
+      const card = e.target.closest('.card'), hd = e.target.closest('.phase-group-h');
+      if (card) S.libCursor = { kind: 'play', id: card.dataset.play };
+      else if (hd) S.libCursor = { kind: 'phase', id: hd.dataset.phase };
+    }, true);
+    $('canvas').addEventListener('pointerdown', () => { S.navZone = 'canvas'; }, true);
+  };
+})();
+
+</script>
+  <script>
 /* Boot, toolbar, menus, keyboard shortcuts, URL handling. */
 (function () {
   const H = window.H, U = H.U, S = H.S, el = U.el;
@@ -3094,7 +3273,14 @@ a.tag:hover { border-color: var(--accent); }
         el('table',
           row('/', 'Search plays'), row('Delete', 'Delete selection'), row('Ctrl+Z / Ctrl+Shift+Z', 'Undo / redo'),
           row('Ctrl+D', 'Duplicate node'), row('Ctrl+S', 'Save to My playbooks'), row('F', 'Fit diagram'),
-          row('Scroll / Ctrl+scroll', 'Pan / zoom'), row('Alt while dragging', 'Free placement (no lane snap)'), row('Esc', 'Deselect / close'))),
+          row('Scroll / Ctrl+scroll', 'Pan / zoom'), row('Alt while dragging', 'Free placement (no lane snap)'), row('Esc', 'Deselect / close')),
+        el('h4', 'Arrow-key navigation'),
+        el('table',
+          row('↑ / ↓', 'Library: move through plays and phase groups. Canvas: move up or down within a lane'),
+          row('← / →', 'Library: collapse / expand a group (→ on a play jumps to the canvas). Canvas: follow the flow back / forward'),
+          row('Enter', 'Library: add the play to the playbook, or open/close a group. Canvas: edit the selected node'),
+          row('[ / ]', 'Switch to the library / the canvas'),
+          row('↓ in search', 'Jump from the search box into the results'))),
       buttons: [{ label: 'Close', primary: true }],
     });
   }
@@ -3111,6 +3297,7 @@ a.tag:hover { border-color: var(--accent); }
     initMenus();
     initKeys();
     H.initPlaybooks();
+    H.initNav();
     S.pb = H.newPlaybook();
 
     const abs = (u) => { try { return new URL(u, location.href).href; } catch (e) { return u; } };
