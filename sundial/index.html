@@ -1,0 +1,1619 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sundial · DFIR Timeline Viewer</title>
+  <meta name="description" content="Merge timestamped logs into one timeline, zoom in on bursts, tag key events and export the story.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23141a24'/%3E%3Ccircle cx='16' cy='16' r='10' fill='none' stroke='%23f2a93b' stroke-width='2'/%3E%3Cpath d='M16 16 L16 8' stroke='%23e6ebf2' stroke-width='2.4' stroke-linecap='round'/%3E%3Cpath d='M16 16 L21 19' stroke='%234c8dff' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E">
+  <style>
+:root {
+  --bg: #0e131b; --panel: #141a24; --panel-2: #1a2230; --raise: #212b3b;
+  --line: #2a3546; --line-2: #364357; --text: #e6ebf2; --muted: #8b97a8;
+  --accent: #4c8dff; --accent-ink: #fff; --danger: #ef5b5b; --ok: #3ecf8e; --warn: #f2a93b;
+  --row-sel: rgba(76, 141, 255, 0.16); --row-hover: rgba(255, 255, 255, 0.03);
+  --shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+:root[data-theme="light"] {
+  --bg: #eef1f5; --panel: #fff; --panel-2: #f6f8fb; --raise: #eef2f7;
+  --line: #dbe1ea; --line-2: #c8d0dc; --text: #17202c; --muted: #5f6b7c; --accent: #2563eb;
+  --row-sel: rgba(37, 99, 235, 0.1); --row-hover: rgba(15, 30, 60, 0.03); --shadow: 0 6px 24px rgba(20, 30, 50, 0.12);
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--bg); color: var(--text); font: 13px/1.45 var(--sans); display: flex; flex-direction: column; overflow: hidden; }
+button, input, select, textarea { font: inherit; color: inherit; }
+.muted { color: var(--muted); }
+.small { font-size: 11.5px; }
+[hidden] { display: none !important; }
+.kbd { font-family: var(--mono); font-size: 10.5px; background: var(--raise); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; }
+
+/* Top bar */
+#topbar { height: 48px; flex: none; display: flex; align-items: center; gap: 12px; padding: 0 12px; background: var(--panel); border-bottom: 1px solid var(--line); }
+.brand { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+.logo { width: 22px; height: 22px; border-radius: 6px; background: var(--raise); position: relative; }
+.logo::before { content: ""; position: absolute; inset: 4px; border: 2px solid var(--warn); border-radius: 50%; }
+.logo::after { content: ""; position: absolute; left: 10px; top: 5px; width: 2px; height: 7px; background: var(--text); border-radius: 1px; transform-origin: bottom; }
+.brand-name { font-size: 15px; }
+.case-name { flex: 1; min-width: 120px; max-width: 380px; background: transparent; border: 1px solid transparent; border-radius: 6px; padding: 5px 8px; font-weight: 600; }
+.case-name:hover { border-color: var(--line); }
+.case-name:focus { outline: none; border-color: var(--accent); background: var(--panel-2); }
+.actions { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+.sep { width: 1px; height: 22px; background: var(--line); margin: 0 4px; }
+.btn { background: var(--raise); border: 1px solid var(--line); border-radius: 6px; padding: 5px 10px; cursor: pointer; white-space: nowrap; line-height: 1.3; }
+.btn:hover { border-color: var(--line-2); background: var(--panel-2); }
+.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+.btn.danger { color: var(--danger); }
+.btn.icon { width: 30px; padding: 5px 0; text-align: center; }
+.btn.small { padding: 2px 8px; font-size: 12px; }
+select.btn { padding-right: 6px; }
+.menu { position: relative; }
+.menu-list { display: none; position: absolute; right: 0; top: calc(100% + 4px); z-index: 50; min-width: 240px; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow); padding: 4px; }
+.menu.open .menu-list { display: block; }
+.menu-list button { display: block; width: 100%; text-align: left; background: none; border: 0; padding: 7px 10px; border-radius: 5px; cursor: pointer; }
+.menu-list button:hover { background: var(--raise); }
+.menu-label { padding: 6px 10px 2px; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+
+/* Layout */
+#layout { flex: 1; display: grid; grid-template-columns: 250px 1fr 360px; min-height: 0; }
+#side { background: var(--panel); border-right: 1px solid var(--line); overflow-y: auto; padding: 12px; }
+#side h4, #detail h4 { margin: 0 0 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
+#side section { margin-bottom: 18px; }
+#detail { background: var(--panel); border-left: 1px solid var(--line); overflow-y: auto; padding: 14px; }
+#center { display: flex; flex-direction: column; min-width: 0; min-height: 0; position: relative; }
+
+/* Sources */
+.src { display: flex; align-items: center; gap: 7px; padding: 6px 4px; border-radius: 6px; }
+.src:hover { background: var(--raise); }
+.src input { margin: 0; accent-color: var(--accent); }
+.src .dot { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.src .nm { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.src .n { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.src .ic { background: none; border: 0; color: var(--muted); cursor: pointer; padding: 0 3px; font-size: 13px; }
+.src .ic:hover { color: var(--text); }
+.src.off .nm { color: var(--muted); text-decoration: line-through; }
+.src-warn { font-size: 11px; color: var(--warn); padding: 0 4px 4px 25px; }
+
+/* Tags */
+.tagrow { display: flex; align-items: center; gap: 7px; width: 100%; padding: 5px 4px; border-radius: 6px; background: none; border: 0; cursor: pointer; text-align: left; }
+.tagrow:hover { background: var(--raise); }
+.tagrow.on { background: var(--raise); outline: 1px solid var(--line-2); }
+.tagrow .k { font-family: var(--mono); font-size: 10.5px; color: var(--muted); width: 12px; }
+.tagrow .nm { flex: 1; }
+.tagrow .n { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.tdot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.check { display: flex; align-items: center; gap: 7px; margin-top: 8px; cursor: pointer; }
+.check input { accent-color: var(--accent); }
+.stats { display: grid; grid-template-columns: 1fr auto; gap: 3px 8px; font-size: 12px; }
+.stats b { font-family: var(--mono); font-weight: 500; text-align: right; }
+
+/* Toolbar */
+.toolbar { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-bottom: 1px solid var(--line); background: var(--panel); flex-wrap: wrap; }
+#search { flex: 1; min-width: 220px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 6px 9px; font-family: var(--mono); font-size: 12.5px; }
+#search:focus { outline: none; border-color: var(--accent); }
+#search.bad { border-color: var(--danger); }
+.range { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+.range .chip { background: var(--raise); border: 1px solid var(--line-2); border-radius: 999px; padding: 2px 10px; font-family: var(--mono); font-size: 11.5px; }
+.count { font-size: 12px; white-space: nowrap; }
+
+/* Histogram */
+#hist-wrap { position: relative; height: 132px; flex: none; border-bottom: 1px solid var(--line); background: var(--panel); }
+#hist { width: 100%; height: 100%; display: block; cursor: crosshair; }
+.hist-tip { position: absolute; top: 6px; pointer-events: none; background: var(--panel-2); border: 1px solid var(--line-2); border-radius: 6px; padding: 4px 8px; font-size: 11.5px; box-shadow: var(--shadow); white-space: nowrap; z-index: 2; }
+
+/* Table */
+.thead, .row { display: grid; grid-template-columns: 30px 196px 84px 170px minmax(0, 1fr); align-items: center; }
+.thead { flex: none; height: 28px; padding: 0 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); border-bottom: 1px solid var(--line); background: var(--panel); }
+#rows { flex: 1; overflow-y: auto; position: relative; outline: none; }
+#rows-inner { position: relative; }
+.row { position: absolute; left: 0; right: 0; height: 28px; padding: 0 6px; border-bottom: 1px solid color-mix(in srgb, var(--line) 55%, transparent); cursor: pointer; white-space: nowrap; }
+.row:hover { background: var(--row-hover); }
+.row.sel { background: var(--row-sel); box-shadow: inset 3px 0 0 var(--accent); }
+.row > span { overflow: hidden; text-overflow: ellipsis; padding-right: 10px; }
+.row .t { font-family: var(--mono); font-size: 12px; }
+.row .d { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.row .d.gap { color: var(--warn); font-weight: 600; }
+.row .s { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); }
+.row .s i { width: 8px; height: 8px; border-radius: 2px; flex: none; }
+.row .m { font-size: 12.5px; }
+.row .m small { color: var(--muted); font-size: 11px; margin-right: 6px; }
+.row .g { display: flex; justify-content: center; }
+.row.tagged .m { font-weight: 600; }
+mark { background: rgba(242, 169, 59, 0.35); color: inherit; border-radius: 2px; }
+
+.empty { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 20px; background: var(--bg); }
+.drop { max-width: 520px; text-align: center; border: 2px dashed var(--line-2); border-radius: 14px; padding: 30px; background: var(--panel); }
+.drop h2 { margin: 0 0 8px; font-size: 19px; }
+.drop p { color: var(--muted); margin: 0 0 14px; }
+.btn-row { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 12px; }
+.drop-overlay { position: fixed; inset: 0; z-index: 90; background: rgba(76, 141, 255, 0.12); border: 3px dashed var(--accent); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 600; pointer-events: none; }
+
+/* Detail panel */
+.d-kicker { display: flex; align-items: center; gap: 6px; font-size: 11.5px; color: var(--muted); }
+.d-time { font-family: var(--mono); font-size: 15px; margin: 4px 0 2px; }
+.d-sum { font-weight: 600; font-size: 14px; margin: 6px 0 10px; word-break: break-word; }
+.d-section { margin: 14px 0; }
+.tagbtns { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+.tagbtn { display: flex; align-items: center; gap: 6px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 4px 8px; cursor: pointer; font-size: 12px; text-align: left; }
+.tagbtn:hover { border-color: var(--line-2); }
+.tagbtn.on { border-color: var(--tc); background: color-mix(in srgb, var(--tc) 18%, var(--panel-2)); font-weight: 600; }
+.tagbtn .k { margin-left: auto; font-family: var(--mono); font-size: 10.5px; color: var(--muted); }
+#detail textarea { width: 100%; min-height: 60px; resize: vertical; background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; }
+#detail textarea:focus { outline: none; border-color: var(--accent); }
+.fields { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
+.fields td { border-bottom: 1px solid var(--line); padding: 4px 4px; vertical-align: top; }
+.fields td:first-child { color: var(--muted); width: 36%; word-break: break-word; }
+.fields td:last-child { font-family: var(--mono); font-size: 11.5px; word-break: break-all; }
+.fields tr.time td:last-child { color: var(--warn); }
+.fields a.val { color: inherit; text-decoration: none; border-bottom: 1px dotted var(--line-2); cursor: pointer; }
+.fields a.val:hover { color: var(--accent); border-color: var(--accent); }
+.ctx { display: flex; flex-wrap: wrap; gap: 4px; }
+.d-empty { color: var(--muted); }
+.d-empty ol { padding-left: 18px; }
+.d-empty li { margin: 5px 0; }
+
+/* Modal / toast (shared helpers) */
+.modal-back { position: fixed; inset: 0; background: rgba(5, 8, 14, 0.55); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.modal { width: min(640px, 100%); max-height: 90vh; display: flex; flex-direction: column; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); }
+.modal.wide { width: min(860px, 100%); }
+.modal-h { display: flex; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.modal-h h3 { margin: 0; font-size: 15px; flex: 1; }
+.modal-b { padding: 14px 16px; overflow-y: auto; }
+.modal-f { display: flex; justify-content: flex-end; gap: 8px; padding: 10px 16px; border-top: 1px solid var(--line); }
+.modal pre { background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 10px; font: 12px/1.45 var(--mono); white-space: pre-wrap; max-height: 50vh; overflow: auto; margin: 0; }
+.modal table { border-collapse: collapse; width: 100%; font-size: 12px; }
+.modal td, .modal th { border-bottom: 1px solid var(--line); padding: 5px 6px; text-align: left; vertical-align: top; }
+.modal th { color: var(--muted); font-weight: 600; }
+.modal code { font-family: var(--mono); font-size: 12px; background: var(--raise); padding: 0 4px; border-radius: 3px; }
+.field { display: flex; flex-direction: column; gap: 3px; margin: 8px 0; }
+.field label { font-size: 11px; color: var(--muted); }
+.field input, .field select { width: 100%; background: var(--panel-2); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; }
+.field .hint { font-size: 11px; color: var(--muted); }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.colpick { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 12px; max-height: 210px; overflow-y: auto; border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; background: var(--panel-2); }
+.colpick label { display: flex; gap: 6px; align-items: center; font-size: 12px; cursor: pointer; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.colpick .ex { color: var(--muted); font-family: var(--mono); font-size: 10.5px; overflow: hidden; text-overflow: ellipsis; }
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); opacity: 0; pointer-events: none; background: var(--text); color: var(--bg); padding: 8px 14px; border-radius: 8px; font-weight: 600; transition: all 0.2s; z-index: 200; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.err { background: var(--danger); color: #fff; }
+
+@media (max-width: 1200px) {
+  #layout { grid-template-columns: 220px 1fr 300px; }
+  .thead, .row { grid-template-columns: 26px 176px 70px 120px minmax(0, 1fr); }
+}
+@media (max-width: 860px) {
+  #layout { grid-template-columns: 1fr; }
+  #side, #detail { display: none; }
+  .brand-name, #btn-sample, #btn-new { display: none; }
+}
+.colpick input { width: auto; margin: 0; flex: none; accent-color: var(--accent); }
+.colpick label { color: var(--text); font-size: 12px; justify-content: flex-start; }
+.colpick .ex { margin-left: 2px; }
+
+</style>
+</head>
+<body>
+  <header id="topbar">
+    <div class="brand"><span class="logo" aria-hidden="true"></span><span class="brand-name">Sundial</span></div>
+    <input id="case-name" class="case-name" spellcheck="false" aria-label="Case name">
+    <nav class="actions">
+      <button class="btn primary" id="btn-add">+ Add data</button>
+      <button class="btn" id="btn-sample" title="Load a sample phishing-to-exfiltration case">Sample case</button>
+      <div class="menu" data-menu="export">
+        <button class="btn">Export ▾</button>
+        <div class="menu-list">
+          <button data-export="story">Story (Markdown, tagged events)</button>
+          <button data-export="csv">CSV of filtered events</button>
+          <button data-export="tagged">CSV of tagged events</button>
+          <button data-export="case">Case file (.sundial.json)</button>
+          <div class="menu-label">Open filtered events in</div>
+          <button data-export="spoke">Spoke</button>
+          <button data-export="cyberchef">CyberChef</button>
+        </div>
+      </div>
+      <button class="btn" id="btn-new" title="Clear everything and start a new case">New case</button>
+      <span class="sep"></span>
+      <select id="zone" class="btn" title="Display times in" aria-label="Display time zone">
+        <option value="utc">UTC</option>
+        <option value="local">Local time</option>
+      </select>
+      <button class="btn icon" id="btn-theme" title="Toggle theme">◐</button>
+      <button class="btn icon" id="btn-help" title="Help">?</button>
+    </nav>
+  </header>
+
+  <main id="layout">
+    <aside id="side" aria-label="Sources and tags">
+      <section>
+        <h4>Sources</h4>
+        <div id="sources"></div>
+      </section>
+      <section>
+        <h4>Tags</h4>
+        <div id="tags"></div>
+        <label class="check"><input type="checkbox" id="tagged-only"> Tagged events only <span class="kbd">T</span></label>
+      </section>
+      <section>
+        <h4>In view</h4>
+        <div id="stats" class="stats"></div>
+      </section>
+    </aside>
+
+    <section id="center">
+      <div class="toolbar">
+        <input id="search" type="search" placeholder='Filter: powershell   -chrome   user:jsmith   /\.(iso|rar)$/   ( / )' autocomplete="off" spellcheck="false">
+        <span id="range" class="range"></span>
+        <span id="count" class="muted count"></span>
+      </div>
+      <div id="hist-wrap">
+        <canvas id="hist"></canvas>
+        <div id="hist-tip" class="hist-tip" hidden></div>
+      </div>
+      <div class="thead"><span></span><span>Time</span><span>Δ</span><span>Source</span><span>Event</span></div>
+      <div id="rows" tabindex="0" aria-label="Events"><div id="rows-inner"></div></div>
+      <div id="empty" class="empty">
+        <div class="drop">
+          <h2>Build a timeline</h2>
+          <p>Drop CSV, TSV, JSON or JSON Lines files here, one per log source. Sundial finds the timestamp column, merges everything in time order and lets you zoom, filter and tag.</p>
+          <div class="btn-row">
+            <button class="btn primary" id="empty-add">Choose files</button>
+            <button class="btn" id="empty-sample">Load sample case</button>
+          </div>
+          <p class="muted small">Files stay in your browser. Nothing is uploaded.</p>
+        </div>
+      </div>
+    </section>
+
+    <aside id="detail" aria-label="Event details"></aside>
+  </main>
+
+  <div id="drop-overlay" class="drop-overlay" hidden><div>Drop files to add them to the timeline</div></div>
+  <div id="modal-root"></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <input type="file" id="file-input" multiple accept=".csv,.tsv,.txt,.json,.jsonl,.ndjson,.log" hidden>
+
+  <script>
+/* Small helpers (shared with Huddle). */
+(function () {
+  const H = (window.SD = window.SD || {});
+  const U = (H.U = {});
+
+  /** Create an element: el('div.cls#id', {attrs}, children...) */
+  U.el = function (sel, attrs, ...kids) {
+    const m = sel.match(/^([a-z0-9-]+)?((?:[.#][\w-]+)*)$/i);
+    const node = document.createElement((m && m[1]) || 'div');
+    if (m && m[2]) {
+      m[2].replace(/([.#])([\w-]+)/g, (_, t, v) => {
+        if (t === '.') node.classList.add(v); else node.id = v;
+      });
+    }
+    if (attrs && (typeof attrs !== 'object' || attrs instanceof Node || Array.isArray(attrs))) { kids.unshift(attrs); attrs = null; }
+    for (const k in attrs || {}) {
+      const v = attrs[k];
+      if (v == null || v === false) continue;
+      if (k.startsWith('on') && typeof v === 'function') node.addEventListener(k.slice(2), v);
+      else if (k === 'style' && typeof v === 'object') Object.assign(node.style, v);
+      else if (k === 'html') node.innerHTML = v;
+      else if (k === 'text') node.textContent = v;
+      else if (k in node && typeof v !== 'string') node[k] = v;
+      else node.setAttribute(k, v === true ? '' : v);
+    }
+    for (const k of kids.flat(Infinity)) {
+      if (k == null || k === false) continue;
+      node.append(k instanceof Node ? k : document.createTextNode(String(k)));
+    }
+    return node;
+  };
+
+  U.esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  U.uid = (p = 'n') => p + Math.random().toString(36).slice(2, 8) + Date.now().toString(36).slice(-3);
+  U.clone = (o) => JSON.parse(JSON.stringify(o));
+  U.debounce = (fn, ms) => { let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), ms); }; };
+  U.slug = (s) => String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'item';
+  U.lines = (s) => String(s || '').split(/\r?\n/).map((x) => x.trim()).filter(Boolean);
+  U.list = (v) => {
+    if (Array.isArray(v)) return v.map((x) => String(x).trim()).filter(Boolean);
+    if (v == null || v === '') return [];
+    return String(v).split(/\s*[|;\n]\s*/).map((x) => x.trim()).filter(Boolean);
+  };
+  U.nowIso = () => new Date().toISOString();
+  U.fmtTs = (iso) => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    return d.toISOString().replace('T', ' ').slice(0, 16) + 'Z';
+  };
+
+  U.attackUrl = (id) => {
+    const m = String(id).toUpperCase().match(/^(T\d{4})(?:\.(\d{3}))?$/);
+    if (!m) return null;
+    return 'https://attack.mitre.org/techniques/' + m[1] + '/' + (m[2] ? m[2] + '/' : '');
+  };
+
+  /* ---------- Storage (guarded) ---------- */
+  U.store = {
+    get(k, fallback) {
+      try { const v = localStorage.getItem(k); return v == null ? fallback : JSON.parse(v); } catch (e) { return fallback; }
+    },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } },
+    del(k) { try { localStorage.removeItem(k); } catch (e) { /* ignore */ } },
+  };
+
+  /* ---------- Compact URL codec (deflate + base64url), CyberChef-style ---------- */
+  function b64urlEncode(bytes) {
+    let s = '';
+    for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  function b64urlDecode(str) {
+    str = str.replace(/-/g, '+').replace(/_/g, '/');
+    while (str.length % 4) str += '=';
+    const bin = atob(str);
+    const out = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+    return out;
+  }
+  async function pipe(bytes, stream) {
+    const resp = new Response(new Blob([bytes]).stream().pipeThrough(stream));
+    return new Uint8Array(await resp.arrayBuffer());
+  }
+  U.encodeState = async function (obj) {
+    const raw = new TextEncoder().encode(JSON.stringify(obj));
+    if (typeof CompressionStream !== 'undefined') {
+      try { return 'z' + b64urlEncode(await pipe(raw, new CompressionStream('deflate-raw'))); } catch (e) { /* fall through */ }
+    }
+    return 'j' + b64urlEncode(raw);
+  };
+  U.decodeState = async function (str) {
+    const kind = str[0];
+    const bytes = b64urlDecode(str.slice(1));
+    let raw = bytes;
+    if (kind === 'z') raw = await pipe(bytes, new DecompressionStream('deflate-raw'));
+    return JSON.parse(new TextDecoder().decode(raw));
+  };
+
+  /* ---------- CSV ---------- */
+  U.parseCSV = function (text) {
+    const rows = []; let row = []; let cell = ''; let q = false;
+    text = text.replace(/^﻿/, '');
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (q) {
+        if (c === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else q = false; }
+        else cell += c;
+      } else if (c === '"') q = true;
+      else if (c === ',') { row.push(cell); cell = ''; }
+      else if (c === '\n' || c === '\r') {
+        if (c === '\r' && text[i + 1] === '\n') i++;
+        row.push(cell); rows.push(row); row = []; cell = '';
+      } else cell += c;
+    }
+    if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
+    const nonEmpty = rows.filter((r) => r.some((x) => x.trim() !== ''));
+    if (!nonEmpty.length) return [];
+    const head = nonEmpty[0].map((h) => h.trim().toLowerCase());
+    return nonEmpty.slice(1).map((r) => Object.fromEntries(head.map((h, i) => [h, (r[i] || '').trim()])));
+  };
+  U.toCSV = function (rows, cols) {
+    const q = (v) => { v = v == null ? '' : String(v); return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+    return [cols.map(q).join(','), ...rows.map((r) => cols.map((c) => q(r[c])).join(','))].join('\r\n');
+  };
+
+  /* ---------- Files ---------- */
+  U.download = function (name, text, type) {
+    const blob = new Blob([text], { type: type || 'text/plain' });
+    const a = U.el('a', { href: URL.createObjectURL(blob), download: name });
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  };
+  U.copy = async function (text) {
+    try { await navigator.clipboard.writeText(text); return true; } catch (e) {
+      const ta = U.el('textarea', { style: { position: 'fixed', opacity: '0' } }); ta.value = text;
+      document.body.append(ta); ta.select();
+      let ok = false; try { ok = document.execCommand('copy'); } catch (e2) { ok = false; }
+      ta.remove(); return ok;
+    }
+  };
+
+  /* ---------- Toast & modal ---------- */
+  let toastTimer;
+  U.toast = function (msg, err) {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = 'toast show' + (err ? ' err' : '');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => (t.className = 'toast'), err ? 4200 : 2200);
+  };
+
+  U.modal = function ({ title, body, buttons = [], wide = false, onClose }) {
+    const root = document.getElementById('modal-root');
+    const close = () => { back.remove(); document.removeEventListener('keydown', onKey, true); onClose && onClose(); };
+    const onKey = (e) => { if (e.key === 'Escape') { e.stopPropagation(); close(); } };
+    const foot = U.el('div.modal-f', buttons.map((b) => U.el('button.btn' + (b.primary ? '.primary' : '') + (b.danger ? '.danger' : ''), {
+      onclick: async () => { const r = b.onClick ? await b.onClick() : true; if (r !== false) close(); },
+    }, b.label)));
+    const back = U.el('div.modal-back', { onmousedown: (e) => { if (e.target === back) close(); } },
+      U.el('div.modal' + (wide ? '.wide' : ''), { role: 'dialog', 'aria-modal': 'true', 'aria-label': title },
+        U.el('div.modal-h', U.el('h3', title), U.el('button.btn.icon', { onclick: close, 'aria-label': 'Close' }, '×')),
+        U.el('div.modal-b', body),
+        buttons.length ? foot : null));
+    root.append(back);
+    document.addEventListener('keydown', onKey, true);
+    const first = back.querySelector('input, textarea, select');
+    if (first) setTimeout(() => first.focus(), 30);
+    return { close, el: back };
+  };
+
+  U.field = function (label, input, hint) {
+    return U.el('div.field', U.el('label', label), input, hint ? U.el('div.hint', hint) : null);
+  };
+})();
+
+</script>
+  <script>
+/* File parsing, timestamp parsing and column detection. */
+(function () {
+  const SD = (window.SD = window.SD || {});
+  const P = (SD.P = {});
+
+  /* ---------------- Delimited text ---------------- */
+  P.detectDelimiter = function (text) {
+    const line = (text.split(/\r?\n/, 1)[0] || '');
+    const counts = { ',': 0, '\t': 0, ';': 0, '|': 0 };
+    let q = false;
+    for (const ch of line) {
+      if (ch === '"') q = !q;
+      else if (!q && ch in counts) counts[ch]++;
+    }
+    const best = Object.entries(counts).sort((a, b) => b[1] - a[1])[0];
+    return best[1] > 0 ? best[0] : ',';
+  };
+
+  P.parseDelimited = function (text, delim) {
+    text = text.replace(/^﻿/, '');
+    delim = delim || P.detectDelimiter(text);
+    const rows = [];
+    let row = [], cell = '', q = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (q) {
+        if (c === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else q = false; }
+        else cell += c;
+      } else if (c === '"' && cell === '') q = true;
+      else if (c === delim) { row.push(cell); cell = ''; }
+      else if (c === '\n' || c === '\r') {
+        if (c === '\r' && text[i + 1] === '\n') i++;
+        row.push(cell); rows.push(row); row = []; cell = '';
+      } else cell += c;
+    }
+    if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
+    const nonEmpty = rows.filter((r) => r.length > 1 || (r[0] || '').trim() !== '');
+    if (!nonEmpty.length) throw new Error('The file is empty');
+    const headers = uniqueHeaders(nonEmpty[0]);
+    return { headers, rows: nonEmpty.slice(1).map((r) => headers.map((_, i) => (r[i] == null ? '' : r[i]))) };
+  };
+
+  function uniqueHeaders(raw) {
+    const seen = {};
+    return raw.map((h, i) => {
+      let name = String(h || '').trim() || 'column ' + (i + 1);
+      if (seen[name]) name = name + '_' + ++seen[name]; else seen[name] = 1;
+      return name;
+    });
+  }
+
+  /* ---------------- JSON / JSON Lines ---------------- */
+  function flatten(obj, prefix, out, depth) {
+    for (const k in obj) {
+      const v = obj[k], key = prefix ? prefix + '.' + k : k;
+      if (v && typeof v === 'object' && !Array.isArray(v) && depth < 3) flatten(v, key, out, depth + 1);
+      else out[key] = v == null ? '' : typeof v === 'object' ? JSON.stringify(v) : String(v);
+    }
+    return out;
+  }
+  P.parseJSON = function (text) {
+    let records = null;
+    const t = text.trim();
+    try {
+      const data = JSON.parse(t);
+      if (Array.isArray(data)) records = data;
+      else if (data && typeof data === 'object') {
+        const key = ['records', 'events', 'data', 'hits', 'results', 'items', 'value'].find((k) => Array.isArray(data[k]));
+        records = key ? data[key] : [data];
+        if (data.hits && Array.isArray(data.hits.hits)) records = data.hits.hits.map((h) => h._source || h);
+      }
+    } catch (e) {
+      records = t.split(/\r?\n/).filter((l) => l.trim()).map((l, i) => {
+        try { return JSON.parse(l); } catch (e2) { throw new Error('Line ' + (i + 1) + ' is not valid JSON'); }
+      });
+    }
+    const flat = records.filter((r) => r && typeof r === 'object').map((r) => flatten(r, '', {}, 0));
+    const headers = [];
+    const seen = new Set();
+    flat.forEach((r) => Object.keys(r).forEach((k) => { if (!seen.has(k) && headers.length < 300) { seen.add(k); headers.push(k); } }));
+    if (!headers.length) throw new Error('No records found');
+    return { headers, rows: flat.map((r) => headers.map((h) => (r[h] == null ? '' : r[h]))) };
+  };
+
+  P.parseText = function (name, text) {
+    const t = text.trim();
+    if (/\.(json|jsonl|ndjson)$/i.test(name) || t.startsWith('[') || t.startsWith('{')) return P.parseJSON(text);
+    return P.parseDelimited(text, /\.tsv$/i.test(name) ? '\t' : null);
+  };
+
+  /* ---------------- Timestamps ----------------
+   * Returns epoch milliseconds (UTC) or NaN. `tz` is the source's offset in
+   * minutes, applied only when the value has no zone of its own. */
+  const MONTHS = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12 };
+  function build(Y, M, D, h, mi, sec, frac, ampm, zone, tz) {
+    if (M < 1 || M > 12 || D < 1 || D > 31) return NaN;
+    let H = h ? +h : 0;
+    if (ampm) { const pm = /pm/i.test(ampm); if (H === 12) H = pm ? 12 : 0; else if (pm) H += 12; }
+    if (H > 23 || (mi && +mi > 59) || (sec && +sec > 60)) return NaN;
+    const ms = frac ? Math.floor(Number('0.' + frac) * 1000) : 0;
+    const t = Date.UTC(Y, M - 1, D, H, mi ? +mi : 0, sec ? +sec : 0, ms);
+    if (zone) {
+      if (/^(Z|UTC|GMT)$/i.test(zone)) return t;
+      const z = zone.replace(':', '');
+      const sign = z[0] === '-' ? -1 : 1;
+      return t - sign * (+z.slice(1, 3) * 60 + +z.slice(3, 5)) * 60000;
+    }
+    return t - (tz || 0) * 60000;
+  }
+  const ZONE = '\\s*(Z|UTC|GMT|[+-]\\d{2}:?\\d{2})?';
+  const RE_ISO = new RegExp('^(\\d{4})[-/.](\\d{1,2})[-/.](\\d{1,2})(?:[T\\s]+(\\d{1,2}):(\\d{2})(?::(\\d{2})(?:[.,](\\d+))?)?)?' + ZONE + '$', 'i');
+  const RE_US = new RegExp('^(\\d{1,2})/(\\d{1,2})/(\\d{4})(?:[\\s,T]+(\\d{1,2}):(\\d{2})(?::(\\d{2})(?:[.,](\\d+))?)?\\s*(AM|PM)?)?' + ZONE + '$', 'i');
+  const RE_TEXT = new RegExp('^(?:[A-Za-z]{3},?\\s+)?(\\d{1,2})?\\s*([A-Za-z]{3})[a-z]*\\.?\\s+(\\d{1,2})?,?\\s*(\\d{4})[\\s,T]+(\\d{1,2}):(\\d{2})(?::(\\d{2})(?:[.,](\\d+))?)?\\s*(AM|PM)?' + ZONE + '$', 'i');
+
+  P.parseTime = function (v, tz) {
+    if (v == null) return NaN;
+    const s = String(v).trim();
+    if (!s) return NaN;
+    if (/^\d+(\.\d+)?$/.test(s)) {
+      const intLen = s.split('.')[0].length;
+      const n = Number(s);
+      if (intLen === 17 || intLen === 18) return Math.round(n / 1e4 - 11644473600000); // Windows FILETIME
+      if (intLen === 19) return Math.round(n / 1e6);   // nanoseconds
+      if (intLen === 16) return Math.round(n / 1e3);   // microseconds
+      if (intLen === 13) return Math.round(n);          // milliseconds
+      if (intLen === 10) return Math.round(n * 1000);   // seconds
+      return NaN;
+    }
+    let m = s.match(RE_ISO);
+    if (m) return build(+m[1], +m[2], +m[3], m[4], m[5], m[6], m[7], null, m[8], tz);
+    m = s.match(RE_US);
+    if (m) return build(+m[3], +m[1], +m[2], m[4], m[5], m[6], m[7], m[8], m[9], tz);
+    m = s.match(RE_TEXT);
+    if (m) {
+      const mon = MONTHS[m[2].toLowerCase().slice(0, 3)];
+      const day = m[1] || m[3];
+      if (mon && day) return build(+m[4], mon, +day, m[5], m[6], m[7], m[8], m[9], m[10], tz);
+    }
+    return NaN;
+  };
+  const MIN_T = Date.UTC(1990, 0, 1), MAX_T = Date.UTC(2100, 0, 1);
+  P.plausible = (t) => t >= MIN_T && t < MAX_T;
+
+  /* ---------------- Column detection ---------------- */
+  const TIME_NAME = /(time|date|timestamp|^ts$|_ts$|created|modified|accessed|changed|written|utc|when|logged|0x10|0x30)/i;
+  P.timeColumns = function (headers, rows) {
+    const step = Math.max(1, Math.floor(rows.length / 300));
+    const out = [];
+    headers.forEach((h, i) => {
+      let n = 0, ok = 0, numeric = 0;
+      for (let r = 0; r < rows.length && n < 300; r += step) {
+        const v = rows[r][i];
+        if (v == null || String(v).trim() === '') continue;
+        n++;
+        if (/^\d+(\.\d+)?$/.test(String(v).trim())) numeric++;
+        const t = P.parseTime(v, 0);
+        if (!isNaN(t) && P.plausible(t)) ok++;
+      }
+      if (!n) return;
+      const rate = ok / n;
+      const named = TIME_NAME.test(h);
+      if (rate < 0.8) return;
+      if (numeric / n > 0.5 && !named) return; // bare numbers only count when the column is named like a time
+      out.push({ i, h, rate, named });
+    });
+    return out.sort((a, b) => (b.named - a.named) || (b.rate - a.rate) || (a.i - b.i));
+  };
+
+  const MSG_NAMES = ['message', 'description', 'msg', 'summary', 'details', 'commandline', 'command_line', 'cmdline', 'url', 'uri', 'request', 'query',
+    'filename', 'file_name', 'fullpath', 'full_path', 'path', 'name', 'title', 'activity', 'action', 'operation', 'event'];
+  const ID_NAMES = /^(event_?id|eventid|event\.code|id)$/i;
+  P.summaryColumns = function (headers, timeIdx) {
+    const lower = headers.map((h) => h.toLowerCase().replace(/[\s-]/g, ''));
+    const cols = [];
+    const id = headers.findIndex((h, i) => ID_NAMES.test(h) && !timeIdx.includes(i));
+    if (id >= 0 && headers[id].toLowerCase() !== 'id') cols.push(id);
+    for (const name of MSG_NAMES) {
+      const i = lower.findIndex((h, j) => !timeIdx.includes(j) && !cols.includes(j) && (h === name || h.endsWith('.' + name) || h.endsWith(name)));
+      if (i >= 0) {
+        // A bare file name reads better with its folder in front of it.
+        const parent = /^file_?name$/.test(lower[i]) ? lower.findIndex((h) => /^(parent_?path|parentpath|directory|folder)$/.test(h)) : -1;
+        if (parent >= 0) cols.push(parent);
+        cols.push(i);
+        break;
+      }
+    }
+    return cols;
+  };
+
+  /* ---------------- Formatting ---------------- */
+  const pad = (n, w) => String(n).padStart(w || 2, '0');
+  P.fmt = function (t, zone, parts) {
+    if (isNaN(t)) return '';
+    const d = new Date(t);
+    const L = zone === 'local';
+    const Y = L ? d.getFullYear() : d.getUTCFullYear(), M = (L ? d.getMonth() : d.getUTCMonth()) + 1, D = L ? d.getDate() : d.getUTCDate();
+    const h = L ? d.getHours() : d.getUTCHours(), mi = L ? d.getMinutes() : d.getUTCMinutes(), s = L ? d.getSeconds() : d.getUTCSeconds();
+    const ms = L ? d.getMilliseconds() : d.getUTCMilliseconds();
+    if (parts === 'date') return Y + '-' + pad(M) + '-' + pad(D);
+    if (parts === 'hm') return pad(h) + ':' + pad(mi);
+    if (parts === 'hms') return pad(h) + ':' + pad(mi) + ':' + pad(s);
+    if (parts === 'mdhm') return pad(M) + '-' + pad(D) + ' ' + pad(h) + ':' + pad(mi);
+    return Y + '-' + pad(M) + '-' + pad(D) + ' ' + pad(h) + ':' + pad(mi) + ':' + pad(s) + '.' + pad(ms, 3);
+  };
+  P.fmtDelta = function (ms) {
+    if (ms == null || isNaN(ms)) return '';
+    const a = Math.abs(ms);
+    if (a < 1000) return '+' + a + 'ms';
+    if (a < 60000) return '+' + (a / 1000).toFixed(a < 10000 ? 1 : 0) + 's';
+    if (a < 3600000) return '+' + Math.floor(a / 60000) + 'm ' + Math.floor((a % 60000) / 1000) + 's';
+    if (a < 86400000) return '+' + Math.floor(a / 3600000) + 'h ' + Math.floor((a % 3600000) / 60000) + 'm';
+    return '+' + Math.floor(a / 86400000) + 'd ' + Math.floor((a % 86400000) / 3600000) + 'h';
+  };
+  P.fmtSpan = function (ms) { return P.fmtDelta(ms).replace('+', ''); };
+})();
+
+</script>
+  <script>
+/* Sample case: phishing to exfiltration on WS-0142, 14 Oct 2026.
+ * Generated in the browser so the app stays one small file. Four sources in
+ * four different timestamp styles, with benign noise around the attack. */
+(function () {
+  const SD = (window.SD = window.SD || {});
+
+  function rng(seed) {
+    return function () {
+      seed |= 0; seed = (seed + 0x6d2b79f5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  const T = (hms) => { const [h, m, s] = hms.split(':').map(Number); return Date.UTC(2026, 9, 14, h, m, s); };
+  const pad = (n, w) => String(n).padStart(w || 2, '0');
+  const iso = (t) => new Date(t).toISOString().slice(0, 19);
+  const q = (v) => { v = String(v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
+  const csv = (cols, rows, d) => [cols.join(d || ','), ...rows.map((r) => cols.map((c) => (d === '\t' ? String(r[c] == null ? '' : r[c]) : q(r[c] == null ? '' : r[c]))).join(d || ','))].join('\n');
+
+  SD.sampleCase = function () {
+    const R = rng(1014);
+    const pick = (a) => a[Math.floor(R() * a.length)];
+    const START = T('12:30:00'), END = T('14:30:00');
+
+    /* ---------- Windows Security (ISO 8601, 7-digit fraction, Z) ---------- */
+    const sec = [];
+    const secTime = (t) => iso(t) + '.' + pad(Math.floor(R() * 1e7), 7) + 'Z';
+    const S = (t, id, comp, user, type, ip, ws, msg) => sec.push({ TimeCreated: secTime(t), EventID: id, Computer: comp, TargetUserName: user, LogonType: type, IpAddress: ip, WorkstationName: ws, Message: msg });
+    for (let t = START; t < END; t += 40000 + R() * 160000) {
+      const u = pick(['akumar', 'lchen', 'mrossi', 'tnguyen', 'bwalsh']);
+      const host = pick(['WS-0117', 'WS-0203', 'WS-0088', 'WS-0150']);
+      if (R() < 0.6) S(t, 4624, 'DC-01.acme.local', u, 3, '10.10.4.' + (10 + Math.floor(R() * 200)), host, 'An account was successfully logged on.');
+      else S(t, 4634, 'DC-01.acme.local', u, 3, '', host, 'An account was logged off.');
+    }
+    S(T('12:41:10'), 4624, 'WS-0142.acme.local', 'jsmith', 2, '127.0.0.1', 'WS-0142', 'An account was successfully logged on.');
+    S(T('13:04:03'), 4698, 'WS-0142.acme.local', 'jsmith', '', '', 'WS-0142', 'A scheduled task was created. Task Name: \\OneDrive Updater');
+    S(T('13:27:31'), 4624, 'FS-01.acme.local', 'svc_backup', 3, '10.10.4.142', 'WS-0142', 'An account was successfully logged on.');
+    S(T('13:27:31'), 4672, 'FS-01.acme.local', 'svc_backup', '', '', 'WS-0142', 'Special privileges assigned to new logon.');
+    S(T('13:28:44'), 5140, 'FS-01.acme.local', 'svc_backup', '', '10.10.4.142', 'WS-0142', 'A network share object was accessed. Share Name: \\\\*\\Finance');
+    S(T('13:53:02'), 1102, 'WS-0142.acme.local', 'jsmith', '', '', 'WS-0142', 'The audit log was cleared.');
+
+    /* ---------- Sysmon process creation (no zone, millisecond fraction) ---------- */
+    const sys = [];
+    let pid = 4100;
+    const P = (t, image, cmd, parent, user) => sys.push({
+      UtcTime: iso(t).replace('T', ' ') + '.' + pad(Math.floor(R() * 1000), 3), Computer: 'WS-0142.acme.local', EventID: 1,
+      Image: image, CommandLine: cmd, ParentImage: parent, User: user || 'ACME\\jsmith', ProcessId: pid += 4 + Math.floor(R() * 60),
+    });
+    const benign = [
+      ['C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', '"chrome.exe" --type=renderer --lang=en-US', 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'],
+      ['C:\\Users\\jsmith\\AppData\\Local\\Microsoft\\Teams\\current\\Teams.exe', '"Teams.exe" --type=gpu-process', 'C:\\Users\\jsmith\\AppData\\Local\\Microsoft\\Teams\\current\\Teams.exe'],
+      ['C:\\Windows\\System32\\svchost.exe', 'C:\\Windows\\system32\\svchost.exe -k netsvcs -p -s Schedule', 'C:\\Windows\\System32\\services.exe'],
+      ['C:\\Windows\\System32\\conhost.exe', '\\??\\C:\\Windows\\system32\\conhost.exe 0xffffffff -ForceV1', 'C:\\Windows\\System32\\svchost.exe'],
+      ['C:\\Program Files\\Microsoft Office\\root\\Office16\\OUTLOOK.EXE', '"OUTLOOK.EXE" /recycle', 'C:\\Windows\\explorer.exe'],
+    ];
+    for (let t = T('12:41:30'); t < END; t += 50000 + R() * 220000) { const b = pick(benign); P(t, b[0], b[1], b[2]); }
+    const X = 'C:\\Windows\\explorer.exe', CMD = 'C:\\Windows\\System32\\cmd.exe', RD = 'C:\\Windows\\System32\\rundll32.exe', PS = 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe';
+    P(T('13:03:09'), CMD, 'cmd.exe /c start rundll32.exe D:\\data\\lib.dll,DllRegisterServer', X);
+    P(T('13:03:10'), RD, 'rundll32.exe D:\\data\\lib.dll,DllRegisterServer', CMD);
+    P(T('13:03:44'), PS, 'powershell.exe -nop -w hidden -enc SQBFAFgAIAAoAE4AZQB3AC0ATwBiAGoAZQBjAHQAIABOAGUAdAAuAFcAZQBiAEMAbABpAGUAbgB0ACkA', RD);
+    P(T('13:04:02'), 'C:\\Windows\\System32\\schtasks.exe', 'schtasks.exe /create /tn "OneDrive Updater" /tr "rundll32.exe C:\\Users\\jsmith\\AppData\\Roaming\\Microsoft\\Updater\\updsvc.dll,Start" /sc onlogon /f', PS);
+    P(T('13:12:05'), 'C:\\Windows\\System32\\whoami.exe', 'whoami.exe /all', PS);
+    P(T('13:12:20'), 'C:\\Windows\\System32\\net.exe', 'net.exe group "domain admins" /domain', PS);
+    P(T('13:13:02'), 'C:\\Windows\\System32\\nltest.exe', 'nltest.exe /dclist:acme.local', PS);
+    P(T('13:18:40'), RD, 'rundll32.exe C:\\Windows\\System32\\comsvcs.dll, MiniDump 712 C:\\Users\\Public\\m.dmp full', PS, 'NT AUTHORITY\\SYSTEM');
+    P(T('13:27:29'), 'C:\\Windows\\System32\\net.exe', 'net.exe use \\\\FS-01\\Finance /user:ACME\\svc_backup', PS);
+    P(T('13:35:10'), 'C:\\Users\\Public\\rar.exe', 'rar.exe a -hpInvoice2026 -m5 C:\\Users\\Public\\fin.rar \\\\FS-01\\Finance\\*', PS);
+    P(T('13:52:40'), CMD, 'cmd.exe /c del /f /q C:\\Users\\Public\\m.dmp C:\\Users\\Public\\rar.exe', PS);
+    P(T('13:52:58'), 'C:\\Windows\\System32\\wevtutil.exe', 'wevtutil.exe cl Security', PS);
+
+    /* ---------- Proxy log (TSV, epoch seconds) ---------- */
+    const px = [];
+    const W = (t, method, host, url, status, out, inn, cat) => px.push({
+      ts: (t / 1000).toFixed(3), client_ip: '10.10.4.142', user: 'jsmith', method, host, url, status, bytes_out: out, bytes_in: inn, category: cat,
+    });
+    const sites = [['outlook.office.com', '/mail/inbox', 'Business'], ['teams.microsoft.com', '/api/chatsvc/messages', 'Business'], ['github.com', '/acme/tools/pulls', 'Technology'],
+      ['www.bbc.com', '/news/technology', 'News'], ['cdn.jsdelivr.net', '/npm/chart.js', 'Technology'], ['acme.sharepoint.com', '/sites/finance/Shared Documents', 'Business']];
+    for (let t = T('12:42:00'); t < END; t += 15000 + R() * 75000) { const s = pick(sites); W(t, 'GET', s[0], 'https://' + s[0] + s[1], 200, 400 + Math.floor(R() * 1500), 2000 + Math.floor(R() * 80000), s[2]); }
+    W(T('13:02:14'), 'GET', 'docusign-invoice-review.com', 'https://docusign-invoice-review.com/view?id=AC-88213', 200, 612, 18420, 'Uncategorized');
+    W(T('13:02:40'), 'GET', 'docusign-invoice-review.com', 'https://docusign-invoice-review.com/download/Invoice_10-14.iso', 200, 590, 1245184, 'Uncategorized');
+    for (let t = T('13:04:30'); t < T('14:21:00'); t += 58000 + R() * 5000) W(t, 'POST', '185.220.101.47', 'https://185.220.101.47/api/v2/check', 200, 380 + Math.floor(R() * 60), 220, 'Uncategorized');
+    [['13:44:12', 212000000], ['13:45:40', 214000000], ['13:47:05', 213500000], ['13:48:31', 211500000]].forEach(([h, b]) =>
+      W(T(h), 'POST', 'gfs270n182.userstorage.mega.co.nz', 'https://gfs270n182.userstorage.mega.co.nz/ul/Fq8x', 200, b, 340, 'File Sharing'));
+
+    /* ---------- $MFT (MFTECmd style, two timestamp columns) ---------- */
+    const mft = [];
+    let entry = 81200;
+    const F = (created, modified, parent, name, size) => {
+      const f = (t) => iso(t).replace('T', ' ') + '.' + pad(Math.floor(R() * 1e7), 7);
+      mft.push({ EntryNumber: entry += 1 + Math.floor(R() * 40), ParentPath: parent, FileName: name, Extension: (name.match(/\.[^.]+$/) || [''])[0], FileSize: size, Created0x10: f(created), LastModified0x10: f(modified) });
+    };
+    const temp = '.\\Users\\jsmith\\AppData\\Local\\Temp';
+    for (let t = T('12:44:00'); t < END; t += 120000 + R() * 300000) {
+      const n = pick(['~DF' + Math.floor(R() * 9e4).toString(16).toUpperCase() + '.TMP', 'chrome_' + Math.floor(R() * 1e6) + '.tmp', 'Teams_cache_' + Math.floor(R() * 1e4) + '.dat']);
+      F(t, t + Math.floor(R() * 30000), temp, n, Math.floor(R() * 90000));
+    }
+    F(T('13:02:41'), T('13:02:44'), '.\\Users\\jsmith\\Downloads', 'Invoice_10-14.iso', 1245184);
+    F(T('13:03:51'), T('13:03:51'), '.\\Users\\jsmith\\AppData\\Roaming\\Microsoft\\Updater', 'updsvc.dll', 318976);
+    F(T('13:18:42'), T('13:18:49'), '.\\Users\\Public', 'm.dmp', 52428800);
+    F(T('13:34:58'), T('13:34:58'), '.\\Users\\Public', 'rar.exe', 640512);
+    F(T('13:35:12'), T('13:41:55'), '.\\Users\\Public', 'fin.rar', 851443712);
+
+    return [
+      { name: 'Security.csv', text: csv(['TimeCreated', 'EventID', 'Computer', 'TargetUserName', 'LogonType', 'IpAddress', 'WorkstationName', 'Message'], sec) },
+      { name: 'Sysmon-ProcessCreate.csv', text: csv(['UtcTime', 'Computer', 'EventID', 'Image', 'CommandLine', 'ParentImage', 'User', 'ProcessId'], sys) },
+      { name: 'proxy.tsv', text: csv(['ts', 'client_ip', 'user', 'method', 'host', 'url', 'status', 'bytes_out', 'bytes_in', 'category'], px, '\t') },
+      { name: 'MFT.csv', text: csv(['EntryNumber', 'ParentPath', 'FileName', 'Extension', 'FileSize', 'Created0x10', 'LastModified0x10'], mft), timeCols: ['Created0x10', 'LastModified0x10'] },
+    ];
+  };
+})();
+
+</script>
+  <script>
+/* Sundial: merge timestamped logs into one timeline, zoom, filter, tag, export. */
+(function () {
+  const SD = window.SD, U = SD.U, P = SD.P, el = U.el;
+  const $ = (id) => document.getElementById(id);
+  const ROW = 28;
+  const COLORS = ['#4c8dff', '#f2a93b', '#3ecf8e', '#a879ff', '#ef5b5b', '#2bc4c4', '#e86fb0', '#c9b03a', '#7fa7ff', '#ff8a4c'];
+  const TAGS = [
+    { id: 'access', name: 'Initial access', color: '#ef5b5b' },
+    { id: 'exec', name: 'Execution', color: '#f2a93b' },
+    { id: 'persist', name: 'Persistence', color: '#d9c34a' },
+    { id: 'cred', name: 'Credential access', color: '#e86fb0' },
+    { id: 'lateral', name: 'Lateral movement', color: '#a879ff' },
+    { id: 'exfil', name: 'Exfiltration', color: '#2bc4c4' },
+    { id: 'key', name: 'Key event', color: '#4c8dff' },
+  ];
+  const TAG = Object.fromEntries(TAGS.map((t) => [t.id, t]));
+
+  const S = (SD.S = {
+    name: 'Untitled case', sources: [], events: [], base: [], view: [],
+    q: '', terms: [], tagsOnly: false, tagFilter: null,
+    range: null, rangeStack: [], selId: null, zone: 'utc',
+    marks: new Map(), // event id -> { tag, note }
+    gap: Infinity,
+  });
+
+  /* ======================= Sources & events ======================= */
+  const srcIndex = () => Object.fromEntries(S.sources.map((s, i) => [s.id, i]));
+  function nextColor() {
+    const used = new Set(S.sources.map((s) => s.color));
+    return COLORS.find((c) => !used.has(c)) || COLORS[S.sources.length % COLORS.length];
+  }
+  function summarize(src, row) {
+    if (src.sumCols.length) {
+      let out = '';
+      src.sumCols.forEach((ci, k) => {
+        let v = String(row[ci] == null ? '' : row[ci]).trim();
+        if (!v) return;
+        if (/^(event_?id|eventid|event\.code)$/i.test(src.headers[ci]) && v.length < 3) v = 'EID ' + v;
+        const prev = k > 0 ? src.headers[src.sumCols[k - 1]] : '';
+        if (out && /path|directory|folder/i.test(prev) && /file_?name/i.test(src.headers[ci])) out = out.replace(/[\\/]+$/, '') + '\\' + v;
+        else out += (out ? ' · ' : '') + v;
+      });
+      if (out) return out;
+    }
+    const parts = [];
+    for (let i = 0; i < src.headers.length && parts.length < 4; i++) {
+      if (src.timeCols.includes(i)) continue;
+      const v = String(row[i] == null ? '' : row[i]).trim();
+      if (v) parts.push(src.headers[i] + '=' + v);
+    }
+    return parts.join('  ');
+  }
+  function buildSourceEvents(src) {
+    const out = [];
+    src.bad = 0;
+    src.rows.forEach((row, ri) => {
+      const sum = summarize(src, row);
+      let any = false;
+      src.timeCols.forEach((ci) => {
+        const t = P.parseTime(row[ci], src.tz);
+        if (isNaN(t)) return;
+        any = true;
+        out.push({ id: src.id + ':' + ri + ':' + ci, s: src, ri, ci, t, sum });
+      });
+      if (!any) src.bad++;
+    });
+    src.events = out;
+  }
+  function rebuildEvents() {
+    const order = srcIndex();
+    S.events = [].concat(...S.sources.map((s) => s.events));
+    S.events.sort((a, b) => a.t - b.t || order[a.s.id] - order[b.s.id] || a.ri - b.ri || a.ci - b.ci);
+    byId = null;
+  }
+
+  function addSource(file, data, opts) {
+    opts = opts || {};
+    const cands = P.timeColumns(data.headers, data.rows);
+    let timeCols = (opts.timeCols || []).map((h) => data.headers.indexOf(h)).filter((i) => i >= 0);
+    if (!timeCols.length && cands.length) timeCols = [cands[0].i];
+    if (!timeCols.length) {
+      U.toast('No timestamp column found in ' + file + '. Is the first row a header?', true);
+      return null;
+    }
+    const src = {
+      id: opts.id || 's' + Math.random().toString(36).slice(2, 8),
+      name: opts.name || file.replace(/\.(csv|tsv|txt|json|jsonl|ndjson|log)$/i, ''),
+      file, color: opts.color || nextColor(), headers: data.headers, rows: data.rows,
+      timeCols, sumCols: opts.sumCols || P.summaryColumns(data.headers, timeCols), tz: opts.tz || 0,
+      visible: opts.visible !== false, cands: cands.map((c) => c.i),
+    };
+    buildSourceEvents(src);
+    S.sources.push(src);
+    return src;
+  }
+
+  async function addFiles(files) {
+    let added = 0, events = 0;
+    for (const f of files) {
+      try {
+        if (f.size > 300 * 1024 * 1024) { U.toast(f.name + ' is over 300 MB. Split or filter it first.', true); continue; }
+        const text = await f.text();
+        if (/\.sundial\.json$/i.test(f.name) || /^\s*\{\s*"sundial"/.test(text)) { await loadCase(JSON.parse(text)); U.toast('Opened case ' + S.name); continue; }
+        const src = addSource(f.name, P.parseText(f.name, text));
+        if (src) { added++; events += src.events.length; }
+      } catch (e) {
+        U.toast('Could not read ' + f.name + ': ' + e.message, true);
+      }
+    }
+    if (added) {
+      rebuildEvents(); refresh(true);
+      U.toast('Added ' + added + ' source' + (added > 1 ? 's' : '') + ', ' + events.toLocaleString() + ' events');
+    }
+  }
+  function loadSample() {
+    if (S.sources.length && !confirm('Replace the current case with the sample case?')) return;
+    clearCase(true);
+    S.name = 'Phishing to exfiltration on WS-0142';
+    SD.sampleCase().forEach((f) => addSource(f.name, P.parseText(f.name, f.text), { timeCols: f.timeCols }));
+    rebuildEvents(); refresh(true);
+    U.toast('Loaded the sample case: 4 sources');
+  }
+  function clearCase(silent) {
+    S.sources = []; S.events = []; S.marks = new Map(); S.range = null; S.rangeStack = []; S.selId = null;
+    S.q = ''; S.terms = []; S.tagFilter = null; S.tagsOnly = false; S.name = 'Untitled case';
+    $('search').value = ''; $('tagged-only').checked = false;
+    if (!silent) refresh(true);
+  }
+
+  /* ======================= Filtering ======================= */
+  function tokenize(q) { return q.match(/-?"[^"]*"|-?\/(?:\\.|[^/])+\/[a-z]*|-?[\w.@#-]+:"[^"]*"|\S+/g) || []; }
+  function parseQuery(q) {
+    const terms = [];
+    const fields = new Set(['src', 'source', 'tag', 'note']);
+    S.sources.forEach((s) => s.headers.forEach((h) => fields.add(h.toLowerCase())));
+    for (let tok of tokenize(q)) {
+      const neg = tok.length > 1 && tok[0] === '-';
+      if (neg) tok = tok.slice(1);
+      let field = null;
+      const fm = tok.match(/^([\w.@#-]+):(.+)$/);
+      if (fm && fields.has(fm[1].toLowerCase())) { field = fm[1].toLowerCase(); tok = fm[2]; }
+      let re = null;
+      const rm = tok.match(/^\/(.+)\/([a-z]*)$/);
+      if (rm) re = new RegExp(rm[1], rm[2].includes('i') ? rm[2] : rm[2] + 'i');
+      else tok = tok.replace(/^"|"$/g, '');
+      if (!tok && !re) continue;
+      terms.push({ neg, field, re, text: tok.toLowerCase() });
+    }
+    return terms;
+  }
+  function hay(e) {
+    if (e.h == null) e.h = (e.s.name + '\u0001' + e.sum + '\u0001' + e.s.rows[e.ri].join('\u0001')).toLowerCase();
+    return e.h;
+  }
+  function fieldValue(e, field) {
+    if (field === 'src' || field === 'source') return e.s.name;
+    const m = S.marks.get(e.id);
+    if (field === 'tag') return m && m.tag ? m.tag + ' ' + TAG[m.tag].name : '';
+    if (field === 'note') return (m && m.note) || '';
+    const i = e.s.headers.findIndex((h) => h.toLowerCase() === field);
+    return i < 0 ? null : String(e.s.rows[e.ri][i]);
+  }
+  function termHit(e, term) {
+    if (term.field) {
+      const v = fieldValue(e, term.field);
+      if (v == null) return false;
+      return term.re ? term.re.test(v) : v.toLowerCase().includes(term.text);
+    }
+    if (term.re) {
+      if (term.re.test(e.sum)) return true;
+      const m = S.marks.get(e.id);
+      return e.s.rows[e.ri].some((v) => term.re.test(v)) || !!(m && m.note && term.re.test(m.note));
+    }
+    if (hay(e).includes(term.text)) return true;
+    const m = S.marks.get(e.id);
+    return !!(m && m.note && m.note.toLowerCase().includes(term.text));
+  }
+  const lowerBound = (arr, t) => { let lo = 0, hi = arr.length; while (lo < hi) { const mid = (lo + hi) >> 1; if (arr[mid].t < t) lo = mid + 1; else hi = mid; } return lo; };
+  const upperBound = (arr, t) => { let lo = 0, hi = arr.length; while (lo < hi) { const mid = (lo + hi) >> 1; if (arr[mid].t <= t) lo = mid + 1; else hi = mid; } return lo; };
+
+  function applyFilter() {
+    const vis = new Set(S.sources.filter((s) => s.visible).map((s) => s.id));
+    const terms = S.terms;
+    S.base = S.events.filter((e) => {
+      if (!vis.has(e.s.id)) return false;
+      if (S.tagsOnly || S.tagFilter) {
+        const m = S.marks.get(e.id);
+        if (S.tagFilter ? !(m && m.tag === S.tagFilter) : !(m && (m.tag || m.note))) return false;
+      }
+      for (const term of terms) if (termHit(e, term) === term.neg) return false;
+      return true;
+    });
+    S.view = S.range ? S.base.slice(lowerBound(S.base, S.range[0]), upperBound(S.base, S.range[1])) : S.base;
+    // A gap is a pause much longer than usual between neighbouring events.
+    const deltas = [];
+    const step = Math.max(1, Math.floor(S.view.length / 2000));
+    for (let i = step; i < S.view.length; i += step) deltas.push(S.view[i].t - S.view[i - 1].t);
+    deltas.sort((a, b) => a - b);
+    const med = deltas.length ? deltas[deltas.length >> 1] : 0;
+    S.gap = Math.max(60000, med * 25);
+  }
+
+  /* ======================= Rendering ======================= */
+  let rowsEl, innerEl;
+  function refresh(full) {
+    applyFilter();
+    $('empty').hidden = S.sources.length > 0;
+    if (document.activeElement !== $('case-name')) $('case-name').value = S.name;
+    document.title = (S.name && S.sources.length ? S.name + ' · ' : '') + 'Sundial';
+    renderSide();
+    renderToolbar();
+    drawHist();
+    renderRows(true);
+    renderDetail();
+    if (full) save();
+  }
+  SD.refresh = refresh;
+
+  function selIndex() { return S.selId == null ? -1 : S.view.findIndex((e) => e.id === S.selId); }
+  function selEvent() { return S.selId == null ? null : S.events.find((e) => e.id === S.selId) || null; }
+
+  function renderSide() {
+    const counts = {};
+    S.base.forEach((e) => (counts[e.s.id] = (counts[e.s.id] || 0) + 1));
+    $('sources').replaceChildren(...(S.sources.length ? S.sources.flatMap((s) => {
+      const cb = el('input', { type: 'checkbox', checked: s.visible, 'aria-label': 'Show ' + s.name });
+      cb.onchange = () => { s.visible = cb.checked; refresh(true); };
+      const out = [el('div.src' + (s.visible ? '' : '.off'), { title: s.file + ' · ' + s.events.length.toLocaleString() + ' events' },
+        cb, el('span.dot', { style: { background: s.color } }), el('span.nm', s.name),
+        el('span.n', (counts[s.id] || 0).toLocaleString()),
+        el('button.ic', { title: 'Source settings', onclick: () => openSourceSettings(s) }, '⚙'),
+        el('button.ic', { title: 'Remove source', onclick: () => { if (confirm('Remove ' + s.name + ' from the timeline?')) { S.sources = S.sources.filter((x) => x !== s); rebuildEvents(); refresh(true); } } }, '×'))];
+      if (s.bad) out.push(el('div.src-warn', s.bad.toLocaleString() + ' row' + (s.bad > 1 ? 's have' : ' has') + ' no readable time'));
+      return out;
+    }) : [el('div.muted.small', 'No sources yet.')]));
+
+    const tc = {};
+    S.marks.forEach((m, id) => { if (m.tag) tc[m.tag] = (tc[m.tag] || 0) + 1; });
+    $('tags').replaceChildren(...TAGS.map((t, i) => el('button.tagrow' + (S.tagFilter === t.id ? '.on' : ''), {
+      title: S.tagFilter === t.id ? 'Show all tags' : 'Show only ' + t.name,
+      onclick: () => { S.tagFilter = S.tagFilter === t.id ? null : t.id; refresh(); },
+    }, el('span.k', String(i + 1)), el('span.tdot', { style: { background: t.color } }), el('span.nm', t.name), el('span.n', tc[t.id] ? String(tc[t.id]) : ''))));
+    $('tagged-only').checked = S.tagsOnly;
+
+    const v = S.view;
+    const stat = (k, val) => [el('span.muted', k), el('b', val)];
+    $('stats').replaceChildren(...(v.length ? [
+      ...stat('Events', v.length.toLocaleString()),
+      ...stat('First', P.fmt(v[0].t, S.zone).slice(0, 19)),
+      ...stat('Last', P.fmt(v[v.length - 1].t, S.zone).slice(0, 19)),
+      ...stat('Span', P.fmtSpan(v[v.length - 1].t - v[0].t) || '0s'),
+      ...stat('Tagged', String([...S.marks.values()].filter((m) => m.tag).length)),
+    ] : [el('span.muted', 'Nothing in view')]));
+  }
+
+  function renderToolbar() {
+    const r = $('range');
+    if (S.range) {
+      r.replaceChildren(el('span.chip', { title: 'Time window' }, P.fmt(S.range[0], S.zone).slice(0, 19) + ' → ' + P.fmt(S.range[1], S.zone).slice(11, 19) + '  (' + P.fmtSpan(S.range[1] - S.range[0]) + ')'),
+        el('button.btn.small', { onclick: zoomOut, title: 'Back to the previous window (Shift+Z)' }, 'Zoom out'),
+        el('button.btn.small', { onclick: resetRange, title: 'Show the full timeline (R)' }, 'Reset'));
+    } else r.replaceChildren(S.base.length ? el('span.muted.small', 'Drag on the chart to zoom') : '');
+    $('count').textContent = S.events.length ? S.view.length.toLocaleString() + ' of ' + S.events.length.toLocaleString() + ' events' : '';
+  }
+
+  function highlight(text) {
+    let s = U.esc(text);
+    const words = S.terms.filter((t) => !t.neg && !t.field && !t.re && t.text.length > 1).map((t) => t.text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    if (words.length) s = s.replace(new RegExp('(' + words.map(U.esc).join('|') + ')', 'gi'), '<mark>$1</mark>');
+    return s;
+  }
+
+  let lastRange = '';
+  function renderRows(force) {
+    const v = S.view;
+    innerEl.style.height = v.length * ROW + 'px';
+    const top = rowsEl.scrollTop, h = rowsEl.clientHeight || 600;
+    const a = Math.max(0, Math.floor(top / ROW) - 8), b = Math.min(v.length, Math.ceil((top + h) / ROW) + 8);
+    const key = a + ':' + b + ':' + v.length;
+    if (!force && key === lastRange) return;
+    lastRange = key;
+    const frag = document.createDocumentFragment();
+    for (let i = a; i < b; i++) {
+      const e = v[i], m = S.marks.get(e.id), prev = i > 0 ? v[i - 1] : null;
+      const dt = prev ? e.t - prev.t : null;
+      const multi = e.s.timeCols.length > 1;
+      frag.append(el('div.row' + (e.id === S.selId ? '.sel' : '') + (m && m.tag ? '.tagged' : ''), { style: { top: i * ROW + 'px' }, 'data-i': i },
+        el('span.g', m && m.tag ? el('span.tdot', { style: { background: TAG[m.tag].color }, title: TAG[m.tag].name }) : m && m.note ? el('span.muted', { title: 'Has a note' }, '✎') : ''),
+        el('span.t', P.fmt(e.t, S.zone)),
+        el('span.d' + (dt != null && dt >= S.gap ? '.gap' : ''), { title: dt != null && dt >= S.gap ? 'Long gap before this event' : '' }, dt == null ? '' : P.fmtDelta(dt)),
+        el('span.s', el('i', { style: { background: e.s.color } }), e.s.name + (multi ? ' · ' + e.s.headers[e.ci] : '')),
+        el('span.m', { html: highlight(e.sum) + (m && m.note ? ' <small>✎ ' + U.esc(m.note.split('\n')[0]) + '</small>' : '') })));
+    }
+    innerEl.replaceChildren(frag);
+  }
+
+  function ensureVisible(i) {
+    if (i < 0) return;
+    const top = i * ROW, h = rowsEl.clientHeight;
+    if (top < rowsEl.scrollTop) rowsEl.scrollTop = top - ROW;
+    else if (top + ROW > rowsEl.scrollTop + h) rowsEl.scrollTop = top - h + ROW * 2;
+  }
+  function select(i, opts) {
+    const e = S.view[i];
+    if (!e) return;
+    S.selId = e.id;
+    if (!opts || opts.scroll !== false) ensureVisible(i);
+    renderRows(true); renderDetail(); drawHist();
+  }
+
+  /* ---------------- Detail panel ---------------- */
+  function renderDetail() {
+    const box = $('detail');
+    const e = selEvent();
+    if (!e) {
+      box.replaceChildren(el('div.d-empty',
+        el('h4', 'How to use it'),
+        el('ol',
+          el('li', 'Add one file per log source. Sundial finds the timestamp column; use ⚙ to change it, add a time zone, or pick the summary columns.'),
+          el('li', 'Drag across the chart to zoom into a burst. Click a bar to jump to it.'),
+          el('li', 'Filter with words, -exclusions, field:value or /regex/.'),
+          el('li', 'Select an event and press 1–7 to tag it. Tags build the story you export.'),
+          el('li', 'Press Z to see everything within 5 minutes of the selected event.')),
+        S.sources.length ? el('p', 'Select an event to see all of its fields.') : null));
+      return;
+    }
+    const m = S.marks.get(e.id) || {};
+    const row = e.s.rows[e.ri];
+    const other = S.zone === 'utc' ? 'local' : 'utc';
+    const note = el('textarea', { placeholder: 'Notes: what this means, evidence IDs, who found it…', 'aria-label': 'Note' });
+    note.value = m.note || '';
+    note.addEventListener('input', U.debounce(() => { setMark(e.id, { note: note.value }); renderRows(true); renderSide(); }, 300));
+    box.replaceChildren(
+      el('div.d-kicker', el('span.tdot', { style: { background: e.s.color, borderRadius: '3px' } }), e.s.name, e.s.timeCols.length > 1 ? el('span', '· ' + e.s.headers[e.ci]) : null),
+      el('div.d-time', P.fmt(e.t, S.zone) + (S.zone === 'utc' ? ' UTC' : '')),
+      el('div.muted.small', P.fmt(e.t, other) + (other === 'utc' ? ' UTC' : ' local') + ' · raw: ' + row[e.ci]),
+      el('div.d-sum', e.sum),
+      el('div.d-section', el('h4', 'Tag'), el('div.tagbtns', TAGS.map((t, i) => el('button.tagbtn' + (m.tag === t.id ? '.on' : ''), {
+        style: { '--tc': t.color }, onclick: () => toggleTag(e.id, t.id),
+      }, el('span.tdot', { style: { background: t.color } }), t.name, el('span.k', String(i + 1)))))),
+      el('div.d-section', el('h4', 'Note'), note),
+      el('div.d-section', el('h4', 'Context'), el('div.ctx',
+        el('button.btn.small', { onclick: () => zoomAround(e.t, 60000) }, '±1 min'),
+        el('button.btn.small', { onclick: () => zoomAround(e.t, 300000), title: 'Z' }, '±5 min'),
+        el('button.btn.small', { onclick: () => zoomAround(e.t, 3600000) }, '±1 hour'),
+        el('button.btn.small', { onclick: () => U.copy(JSON.stringify(Object.fromEntries(e.s.headers.map((h, i) => [h, row[i]])), null, 2)).then(() => U.toast('Copied as JSON')) }, 'Copy as JSON'))),
+      el('div.d-section', el('h4', 'Fields'), el('table.fields', e.s.headers.map((hd, i) => {
+        const v = row[i] == null ? '' : String(row[i]);
+        return el('tr' + (i === e.ci ? '.time' : ''),
+          el('td', hd),
+          el('td', v ? el('a.val', { title: 'Filter on this value', onclick: () => addFilter(hd, v) }, v) : el('span.muted', '—')));
+      }))));
+  }
+
+  function addFilter(field, value) {
+    const q = /[\s"]/.test(value) ? field + ':"' + value.replace(/"/g, '') + '"' : field + ':' + value;
+    const s = $('search');
+    s.value = (s.value.trim() + ' ' + (/\s/.test(field) ? '"' + value.replace(/"/g, '') + '"' : q)).trim();
+    onSearch();
+  }
+
+  /* ---------------- Tags & notes ---------------- */
+  function setMark(id, patch) {
+    const m = Object.assign({}, S.marks.get(id), patch);
+    if (!m.tag) delete m.tag;
+    if (!m.note) delete m.note;
+    if (m.tag || m.note) S.marks.set(id, m); else S.marks.delete(id);
+    save();
+  }
+  function toggleTag(id, tag) {
+    const cur = (S.marks.get(id) || {}).tag;
+    setMark(id, { tag: cur === tag ? null : tag });
+    refresh();
+  }
+
+  /* ---------------- Time window ---------------- */
+  function setRange(r) {
+    if (S.range) S.rangeStack.push(S.range);
+    S.range = r;
+    const keep = S.selId;
+    refresh();
+    const i = keep ? selIndex() : -1;
+    if (i >= 0) ensureVisible(i); else rowsEl.scrollTop = 0;
+  }
+  function zoomAround(t, ms) { setRange([t - ms, t + ms]); }
+  function zoomOut() { S.range = S.rangeStack.pop() || null; refresh(); const i = selIndex(); if (i >= 0) ensureVisible(i); }
+  function resetRange() { S.range = null; S.rangeStack = []; refresh(); const i = selIndex(); if (i >= 0) ensureVisible(i); }
+
+  /* ======================= Histogram ======================= */
+  const IV = [1e3, 5e3, 15e3, 3e4, 6e4, 3e5, 9e5, 18e5, 36e5, 108e5, 216e5, 432e5, 864e5, 6048e5, 2592e6, 31536e6];
+  let H = null; // geometry of the last draw
+  let brush = null;
+  function cssVar(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+
+  function drawHist() {
+    const cv = $('hist'), wrap = $('hist-wrap');
+    const dpr = window.devicePixelRatio || 1;
+    const W = wrap.clientWidth, Ht = wrap.clientHeight;
+    cv.width = W * dpr; cv.height = Ht * dpr;
+    const g = cv.getContext('2d');
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g.clearRect(0, 0, W, Ht);
+    const base = S.base;
+    if (!base.length) { H = null; return; }
+    let d0 = S.range ? S.range[0] : base[0].t, d1 = S.range ? S.range[1] : base[base.length - 1].t;
+    if (d1 - d0 < 2000) { d0 -= 30000; d1 += 30000; }
+    if (!S.range) { const pad = (d1 - d0) * 0.01; d0 -= pad; d1 += pad; }
+    const L = 46, R = 12, T = 10, B = 24, MK = 12;
+    const pw = W - L - R, ph = Ht - T - B - MK;
+    const target = Math.max(20, Math.floor(pw / 7));
+    const iv = IV.find((x) => (d1 - d0) / x <= target) || IV[IV.length - 1];
+    const b0 = Math.floor(d0 / iv) * iv;
+    const nb = Math.max(1, Math.ceil((d1 - b0) / iv));
+    const dom0 = b0, dom1 = b0 + nb * iv;
+    const xOf = (t) => L + ((t - dom0) / (dom1 - dom0)) * pw;
+    const idx = srcIndex();
+    const counts = S.sources.map(() => new Uint32Array(nb));
+    const total = new Uint32Array(nb);
+    for (let i = lowerBound(base, dom0), n = upperBound(base, dom1); i < n; i++) {
+      const e = base[i], k = Math.min(nb - 1, Math.floor((e.t - dom0) / iv));
+      counts[idx[e.s.id]][k]++; total[k]++;
+    }
+    let max = 1;
+    for (let k = 0; k < nb; k++) if (total[k] > max) max = total[k];
+    const line = cssVar('--line'), muted = cssVar('--muted');
+
+    // grid + y labels
+    g.font = '10px ' + cssVar('--mono');
+    g.fillStyle = muted; g.strokeStyle = line; g.lineWidth = 1;
+    [0, 0.5, 1].forEach((f) => {
+      const y = Math.round(T + ph - f * ph) + 0.5;
+      g.beginPath(); g.moveTo(L, y); g.lineTo(W - R, y); g.stroke();
+      g.textAlign = 'right'; g.fillText(String(Math.round(f * max)), L - 6, y + 3);
+    });
+    // stacked bars
+    const bw = Math.max(1, pw / nb - (pw / nb > 4 ? 1 : 0));
+    for (let k = 0; k < nb; k++) {
+      if (!total[k]) continue;
+      let y = T + ph;
+      const x = xOf(dom0 + k * iv);
+      S.sources.forEach((s, si) => {
+        const c = counts[si][k];
+        if (!c) return;
+        const hgt = Math.max(1, (c / max) * ph);
+        g.fillStyle = s.color; g.fillRect(x, y - hgt, bw, hgt);
+        y -= hgt;
+      });
+    }
+    // tag markers
+    const vis = new Set(S.sources.filter((s) => s.visible).map((s) => s.id));
+    S.marks.forEach((m, id) => {
+      if (!m.tag) return;
+      const e = eventById(id);
+      if (!e || !vis.has(e.s.id) || e.t < dom0 || e.t > dom1) return;
+      const x = xOf(e.t), y = T + ph + 3;
+      g.fillStyle = TAG[m.tag].color;
+      g.beginPath(); g.moveTo(x, y); g.lineTo(x - 4, y + 8); g.lineTo(x + 4, y + 8); g.closePath(); g.fill();
+    });
+    // x labels
+    g.fillStyle = muted; g.textAlign = 'center';
+    const fmt = iv < 6e4 ? 'hms' : iv < 864e5 ? (d1 - d0 > 864e5 ? 'mdhm' : 'hm') : 'date';
+    const every = Math.max(1, Math.ceil(80 / (pw / nb)));
+    for (let k = 0; k <= nb; k += every) {
+      const t = dom0 + k * iv, x = xOf(t);
+      if (x > W - R - 10) break;
+      g.fillText(P.fmt(t, S.zone, fmt), x, Ht - 7);
+      g.fillRect(Math.round(x), T + ph + MK - 1, 1, 4);
+    }
+    // selected event
+    const sel = selEvent();
+    if (sel && sel.t >= dom0 && sel.t <= dom1) {
+      g.fillStyle = cssVar('--accent'); g.fillRect(Math.round(xOf(sel.t)) - 1, T - 4, 2, ph + 6);
+    }
+    // brush
+    if (brush && Math.abs(brush.x1 - brush.x0) > 2) {
+      g.fillStyle = 'rgba(76,141,255,0.18)'; g.strokeStyle = cssVar('--accent');
+      const x = Math.min(brush.x0, brush.x1), w = Math.abs(brush.x1 - brush.x0);
+      g.fillRect(x, T, w, ph); g.strokeRect(x + 0.5, T + 0.5, w - 1, ph - 1);
+    }
+    H = { L, R, T, pw, ph, dom0, dom1, iv, nb, counts, total, W };
+  }
+  let byId = null, byIdLen = -1;
+  function eventById(id) {
+    if (!byId || byIdLen !== S.events.length) { byId = new Map(S.events.map((e) => [e.id, e])); byIdLen = S.events.length; }
+    return byId.get(id);
+  }
+  const tOfX = (x) => H.dom0 + ((Math.max(H.L, Math.min(H.L + H.pw, x)) - H.L) / H.pw) * (H.dom1 - H.dom0);
+
+  function bindHist() {
+    const cv = $('hist'), tip = $('hist-tip');
+    const xy = (ev) => { const r = cv.getBoundingClientRect(); return { x: ev.clientX - r.left, y: ev.clientY - r.top }; };
+    cv.addEventListener('pointerdown', (ev) => {
+      if (!H) return;
+      cv.setPointerCapture(ev.pointerId);
+      const { x } = xy(ev);
+      brush = { x0: x, x1: x };
+    });
+    cv.addEventListener('pointermove', (ev) => {
+      if (!H) return;
+      const { x } = xy(ev);
+      if (brush) { brush.x1 = x; drawHist(); }
+      const k = Math.floor((tOfX(x) - H.dom0) / H.iv);
+      if (x < H.L || x > H.L + H.pw || k < 0 || k >= H.nb) { tip.hidden = true; return; }
+      const t0 = H.dom0 + k * H.iv;
+      const per = S.sources.map((s, si) => [s, H.counts[si][k]]).filter(([, c]) => c);
+      tip.replaceChildren(el('div', el('b', P.fmt(t0, S.zone).slice(0, 19)), el('span.muted', ' + ' + P.fmtSpan(H.iv))),
+        el('div', H.total[k].toLocaleString() + ' event' + (H.total[k] === 1 ? '' : 's')),
+        ...per.map(([s, c]) => el('div.small', el('span.tdot', { style: { background: s.color, width: '8px', height: '8px', borderRadius: '2px', marginRight: '5px' } }), s.name + ': ' + c)));
+      tip.hidden = false;
+      const tw = tip.offsetWidth;
+      tip.style.left = Math.min(H.W - tw - 4, Math.max(4, x + 12)) + 'px';
+    });
+    cv.addEventListener('pointerleave', () => { tip.hidden = true; });
+    const end = (ev) => {
+      if (!brush || !H) { brush = null; return; }
+      const { x0, x1 } = brush;
+      brush = null;
+      if (Math.abs(x1 - x0) > 4) {
+        const a = tOfX(Math.min(x0, x1)), b = tOfX(Math.max(x0, x1));
+        setRange([Math.floor(a), Math.ceil(b)]);
+      } else {
+        // Click: jump to the first event at or after this time
+        const t = tOfX(x0);
+        const i = Math.min(S.view.length - 1, lowerBound(S.view, t));
+        if (i >= 0) { select(i, { scroll: false }); rowsEl.scrollTop = Math.max(0, i * ROW - rowsEl.clientHeight / 3); renderRows(true); }
+        else drawHist();
+      }
+    };
+    cv.addEventListener('pointerup', end);
+    cv.addEventListener('pointercancel', () => { brush = null; drawHist(); });
+    cv.addEventListener('dblclick', () => { if (S.range) zoomOut(); });
+  }
+
+  /* ======================= Source settings ======================= */
+  function openSourceSettings(src) {
+    const name = el('input', { value: src.name });
+    const color = el('input', { type: 'color', value: src.color, style: { height: '32px', padding: '2px' } });
+    const tz = el('select');
+    for (let m = -720; m <= 840; m += 30) {
+      const sign = m < 0 ? '−' : '+', a = Math.abs(m);
+      tz.append(el('option', { value: m }, m === 0 ? 'UTC (no offset)' : 'UTC' + sign + String(Math.floor(a / 60)).padStart(2, '0') + ':' + String(a % 60).padStart(2, '0')));
+    }
+    tz.value = String(src.tz);
+    const sample = (i) => { const r = src.rows.find((row) => String(row[i] || '').trim()); return r ? String(r[i]).slice(0, 40) : ''; };
+    const timeBoxes = src.headers.map((h, i) => {
+      const cb = el('input', { type: 'checkbox', checked: src.timeCols.includes(i), value: i });
+      return { cb, label: el('label', { title: sample(i) }, cb, h, src.cands.includes(i) ? el('span.ex', '⏱') : null) };
+    });
+    const sumBoxes = src.headers.map((h, i) => {
+      const cb = el('input', { type: 'checkbox', checked: src.sumCols.includes(i), value: i });
+      return { cb, label: el('label', { title: sample(i) }, cb, h) };
+    });
+    U.modal({
+      title: 'Source settings: ' + src.file, wide: true,
+      body: el('div',
+        el('div.row2', U.field('Name', name), U.field('Color', color)),
+        U.field('Timestamps without a zone are in', tz, 'Applies only to values with no Z or +hh:mm of their own. Most forensic tools export UTC.'),
+        U.field('Timestamp columns', el('div.colpick', timeBoxes.map((b) => b.label)), '⏱ marks columns that look like times. Pick more than one (e.g. Created and Modified) to get one event per timestamp.'),
+        U.field('Summary columns', el('div.colpick', sumBoxes.map((b) => b.label)), 'Shown in the Event column, in this order. Leave all unchecked to show the first few fields.')),
+      buttons: [{ label: 'Cancel' }, {
+        label: 'Apply', primary: true, onClick: () => {
+          const tcs = timeBoxes.filter((b) => b.cb.checked).map((b) => +b.cb.value);
+          if (!tcs.length) { U.toast('Pick at least one timestamp column', true); return false; }
+          src.name = name.value.trim() || src.name; src.color = color.value; src.tz = +tz.value;
+          src.timeCols = tcs; src.sumCols = sumBoxes.filter((b) => b.cb.checked).map((b) => +b.cb.value);
+          buildSourceEvents(src); rebuildEvents();
+          if (src.bad) U.toast(src.bad + ' rows in ' + src.name + ' have no readable time in the chosen columns', true);
+          refresh(true);
+        },
+      }],
+    });
+  }
+
+  /* ======================= Export ======================= */
+  const mdCell = (s) => String(s == null ? '' : s).replace(/\|/g, '\\|').replace(/\r?\n/g, ' ');
+  function markedEvents() {
+    return S.events.filter((e) => { const m = S.marks.get(e.id); return m && (m.tag || m.note); });
+  }
+  function storyMarkdown() {
+    const ev = markedEvents();
+    const zl = S.zone === 'utc' ? 'UTC' : 'local time';
+    const L = ['# ' + S.name, '', '_' + ev.length + ' marked events. Times in ' + zl + '. Exported ' + P.fmt(Date.now(), S.zone).slice(0, 16) + '._', ''];
+    if (!ev.length) { L.push('No events are tagged yet. Select an event and press 1–7 to tag it.'); return L.join('\n'); }
+    const tagged = ev.filter((e) => S.marks.get(e.id).tag);
+    if (tagged.length) {
+      L.push('## Summary', '');
+      TAGS.forEach((t) => {
+        const xs = tagged.filter((e) => S.marks.get(e.id).tag === t.id);
+        if (xs.length) L.push('- **' + t.name + ':** ' + xs.length + ' event' + (xs.length > 1 ? 's' : '') + ', first at ' + P.fmt(xs[0].t, S.zone).slice(0, 19));
+      });
+      const span = tagged[tagged.length - 1].t - tagged[0].t;
+      L.push('- **Span:** ' + P.fmt(tagged[0].t, S.zone).slice(0, 19) + ' to ' + P.fmt(tagged[tagged.length - 1].t, S.zone).slice(0, 19) + ' (' + P.fmtSpan(span) + ')', '');
+    }
+    L.push('## Timeline', '', '| Time (' + zl + ') | Tag | Source | Event | Notes |', '|---|---|---|---|---|');
+    ev.forEach((e) => {
+      const m = S.marks.get(e.id);
+      L.push('| ' + [P.fmt(e.t, S.zone), m.tag ? TAG[m.tag].name : '', e.s.name, '`' + mdCell(e.sum).replace(/`/g, "'") + '`', mdCell(m.note)].join(' | ') + ' |');
+    });
+    L.push('', '_Built with Sundial._');
+    return L.join('\n');
+  }
+  function eventsCSV(list) {
+    const vis = S.sources.filter((s) => list.some((e) => e.s === s));
+    const extra = [];
+    vis.forEach((s) => s.headers.forEach((h) => { if (!extra.includes(h)) extra.push(h); }));
+    const rows = list.map((e) => {
+      const m = S.marks.get(e.id) || {};
+      const o = { time_utc: new Date(e.t).toISOString(), source: e.s.name, time_column: e.s.headers[e.ci], tag: m.tag ? TAG[m.tag].name : '', note: m.note || '', event: e.sum };
+      e.s.headers.forEach((h, i) => { if (!(h in o)) o[h] = e.s.rows[e.ri][i]; });
+      return o;
+    });
+    return U.toCSV(rows, ['time_utc', 'source', 'time_column', 'tag', 'note', 'event', ...extra.filter((h) => !['time_utc', 'source', 'time_column', 'tag', 'note', 'event'].includes(h))]);
+  }
+  function b64(text) {
+    const bytes = new TextEncoder().encode(text);
+    let s = '';
+    for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    return btoa(s);
+  }
+  const slug = () => U.slug(S.name || 'timeline');
+  function doExport(kind) {
+    if (!S.events.length) { U.toast('Add some data first', true); return; }
+    if (kind === 'story') {
+      const md = storyMarkdown();
+      U.modal({
+        title: 'Story', wide: true, body: el('pre', md),
+        buttons: [{ label: 'Copy', onClick: async () => { U.toast((await U.copy(md)) ? 'Copied' : 'Copy failed'); return false; } },
+          { label: 'Download', primary: true, onClick: () => { U.download(slug() + '-story.md', md, 'text/markdown'); return false; } }],
+      });
+    } else if (kind === 'csv') { U.download(slug() + '-filtered.csv', eventsCSV(S.view), 'text/csv'); U.toast(S.view.length.toLocaleString() + ' events exported'); }
+    else if (kind === 'tagged') {
+      const ev = markedEvents();
+      if (!ev.length) { U.toast('No tagged events yet', true); return; }
+      U.download(slug() + '-tagged.csv', eventsCSV(ev), 'text/csv');
+    } else if (kind === 'case') U.download(slug() + '.sundial.json', JSON.stringify(caseData()), 'application/json');
+    else if (kind === 'spoke' || kind === 'cyberchef') {
+      if (S.view.length > 50000) { U.toast('Too many events for a link. Filter or zoom to under 50,000 first.', true); return; }
+      const data = encodeURIComponent(b64(eventsCSV(S.view)));
+      if (data.length > 1.8e6) { U.toast('That is too much data for a link (' + (data.length / 1e6).toFixed(1) + ' MB). Filter or zoom in first.', true); return; }
+      const url = kind === 'spoke' ? 'https://jon.glass/spoke/#input=' + data : 'https://gchq.github.io/CyberChef/#input=' + data;
+      window.open(url, '_blank', 'noopener');
+    }
+  }
+
+  /* ======================= Persistence ======================= */
+  const DB = {
+    open() {
+      return new Promise((res, rej) => {
+        const r = indexedDB.open('sundial', 1);
+        r.onupgradeneeded = () => r.result.createObjectStore('kv');
+        r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+      });
+    },
+    async get(k) {
+      try { const db = await this.open(); return await new Promise((res) => { const q = db.transaction('kv').objectStore('kv').get(k); q.onsuccess = () => res(q.result); q.onerror = () => res(null); }); }
+      catch (e) { return null; }
+    },
+    async set(k, v) { try { const db = await this.open(); db.transaction('kv', 'readwrite').objectStore('kv').put(v, k); } catch (e) { /* storage unavailable */ } },
+  };
+  function caseData() {
+    return {
+      sundial: 1, name: S.name, zone: S.zone,
+      sources: S.sources.map((s) => ({ id: s.id, name: s.name, file: s.file, color: s.color, headers: s.headers, rows: s.rows, timeCols: s.timeCols.map((i) => s.headers[i]), sumCols: s.sumCols, tz: s.tz, visible: s.visible })),
+      marks: [...S.marks.entries()],
+    };
+  }
+  async function loadCase(c) {
+    if (!c || !Array.isArray(c.sources)) throw new Error('Not a Sundial case file');
+    clearCase(true);
+    S.name = c.name || 'Untitled case';
+    if (c.zone) S.zone = c.zone;
+    c.sources.forEach((s) => addSource(s.file || s.name, { headers: s.headers, rows: s.rows }, s));
+    S.marks = new Map(c.marks || []);
+    rebuildEvents();
+    $('zone').value = S.zone;
+    refresh(false);
+  }
+  const save = U.debounce(() => DB.set('case', caseData()), 800);
+
+  /* ======================= Wiring ======================= */
+  const onSearch = U.debounce(() => {
+    const s = $('search');
+    S.q = s.value;
+    try { S.terms = parseQuery(S.q); s.classList.remove('bad'); }
+    catch (e) { s.classList.add('bad'); return; }
+    refresh();
+    const i = selIndex();
+    if (i >= 0) ensureVisible(i); else rowsEl.scrollTop = 0;
+  }, 150);
+
+  function moveSel(d) {
+    if (!S.view.length) return;
+    let i = selIndex();
+    if (i < 0) i = d > 0 ? Math.floor(rowsEl.scrollTop / ROW) - 1 : Math.floor(rowsEl.scrollTop / ROW) + 1;
+    select(Math.max(0, Math.min(S.view.length - 1, i + d)));
+  }
+
+  function bindKeys() {
+    document.addEventListener('keydown', (ev) => {
+      const t = ev.target;
+      const typing = t.closest && t.closest('input, textarea, select');
+      if (ev.key === 'Escape') {
+        if (typing) { t.blur(); return; }
+        if (document.querySelector('.modal-back')) return;
+        if (S.selId) { S.selId = null; renderRows(true); renderDetail(); drawHist(); }
+        return;
+      }
+      if (typing || document.querySelector('.modal-back') || ev.ctrlKey || ev.metaKey || ev.altKey) return;
+      const k = ev.key;
+      const page = Math.max(1, Math.floor(rowsEl.clientHeight / ROW) - 2);
+      if (k === 'ArrowDown' || k === 'j') { ev.preventDefault(); moveSel(1); }
+      else if (k === 'ArrowUp' || k === 'k') { ev.preventDefault(); moveSel(-1); }
+      else if (k === 'PageDown') { ev.preventDefault(); moveSel(page); }
+      else if (k === 'PageUp') { ev.preventDefault(); moveSel(-page); }
+      else if (k === 'Home') { ev.preventDefault(); select(0); }
+      else if (k === 'End') { ev.preventDefault(); select(S.view.length - 1); }
+      else if (k === '/') { ev.preventDefault(); $('search').focus(); $('search').select(); }
+      else if (/^[1-7]$/.test(k) && S.selId) { toggleTag(S.selId, TAGS[+k - 1].id); }
+      else if (k === '0' && S.selId) { setMark(S.selId, { tag: null }); refresh(); }
+      else if (k === 'n' && S.selId) { ev.preventDefault(); const n = document.querySelector('#detail textarea'); if (n) n.focus(); }
+      else if (k === 't' || k === 'T') { S.tagsOnly = !S.tagsOnly; refresh(); }
+      else if (k === 'z' && S.selId) { const e = selEvent(); if (e) zoomAround(e.t, 300000); }
+      else if (k === 'Z') zoomOut();
+      else if (k === 'r') resetRange();
+    });
+  }
+
+  function showHelp() {
+    const row = (a, b) => el('tr', el('td', el('code', a)), el('td', b));
+    U.modal({
+      title: 'Sundial help', wide: true,
+      body: el('div',
+        el('p', 'Sundial merges timestamped logs from different tools into one timeline. Everything runs in your browser and is saved locally in this browser only.'),
+        el('h4', 'Files'),
+        el('p.muted', 'CSV, TSV and other delimited text (the delimiter is detected), JSON arrays, JSON Lines, and Elasticsearch-style hits. One file per source works best. The first row of a CSV must be the header.'),
+        el('h4', 'Timestamps it understands'),
+        el('table',
+          row('2026-10-14T13:05:22.123Z', 'ISO 8601, with or without T, fractions, Z or ±hh:mm'),
+          row('2026-10-14 13:05:22.1234567', 'Forensic tool style (MFTECmd, EvtxECmd, Plaso). No zone means UTC unless you set one in ⚙'),
+          row('10/14/2026 1:05:22 PM', 'US month/day/year, 12- or 24-hour'),
+          row('14 Oct 2026 13:05:22 +0200', 'Written months, RFC 2822 style'),
+          row('1791982934 / 1791982934120', 'Unix epoch seconds or milliseconds (also µs and ns)'),
+          row('133419856510000000', 'Windows FILETIME')),
+        el('h4', 'Filtering'),
+        el('table',
+          row('powershell rundll32', 'Events containing both words'),
+          row('-chrome', 'Exclude events containing a word'),
+          row('user:jsmith   EventID:4624', 'Match a specific column (any column name works)'),
+          row('src:proxy   tag:exec   note:dll', 'Match source, tag or note'),
+          row('/\\.(iso|rar|7z)\\b/', 'Regular expression (case-insensitive)'),
+          row('"net use"', 'Exact phrase')),
+        el('h4', 'Keys'),
+        el('table',
+          row('↑ ↓ / j k', 'Move through events'), row('PgUp PgDn Home End', 'Jump'), row('1–7', 'Tag the selected event (press again to remove)'),
+          row('0', 'Remove the tag'), row('n', 'Write a note'), row('z', 'Zoom to ±5 minutes around the selected event'),
+          row('Shift+Z / r', 'Zoom out / reset the time window'), row('t', 'Tagged events only'), row('/', 'Filter'), row('Esc', 'Deselect')),
+        el('h4', 'URL options'),
+        el('table', row('?sample=1', 'Open with the sample case'), row('?src=<url>', 'Load a file from a URL (repeatable; the host must allow CORS)'))),
+      buttons: [{ label: 'Close', primary: true }],
+    });
+  }
+
+  function bindUI() {
+    rowsEl = $('rows'); innerEl = $('rows-inner');
+    let raf = 0;
+    rowsEl.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; renderRows(false); }); });
+    rowsEl.addEventListener('click', (ev) => { const r = ev.target.closest('.row'); if (r) select(+r.dataset.i, { scroll: false }); });
+    rowsEl.addEventListener('dblclick', (ev) => { const r = ev.target.closest('.row'); if (r) zoomAround(S.view[+r.dataset.i].t, 300000); });
+    window.addEventListener('resize', U.debounce(() => { drawHist(); renderRows(true); }, 100));
+
+    $('search').addEventListener('input', onSearch);
+    $('search').addEventListener('keydown', (ev) => { if (ev.key === 'ArrowDown' || ev.key === 'Enter') { ev.preventDefault(); ev.target.blur(); if (S.view.length) select(Math.max(0, selIndex())); } });
+    $('tagged-only').addEventListener('change', (ev) => { S.tagsOnly = ev.target.checked; refresh(); });
+    $('case-name').addEventListener('input', (ev) => { S.name = ev.target.value; document.title = S.name + ' · Sundial'; save(); });
+    $('case-name').addEventListener('keydown', (ev) => { if (ev.key === 'Enter') ev.target.blur(); });
+    $('zone').addEventListener('change', (ev) => { S.zone = ev.target.value; refresh(true); });
+
+    const pick = () => $('file-input').click();
+    $('btn-add').onclick = pick; $('empty-add').onclick = pick;
+    $('file-input').addEventListener('change', (ev) => { addFiles([...ev.target.files]); ev.target.value = ''; });
+    $('btn-sample').onclick = loadSample; $('empty-sample').onclick = loadSample;
+    $('btn-new').onclick = () => { if (!S.sources.length || confirm('Clear the current case? Export a case file first if you want to keep it.')) { clearCase(); U.toast('Started a new case'); } };
+    $('btn-help').onclick = showHelp;
+    $('btn-theme').onclick = () => {
+      const t = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.dataset.theme = t; U.store.set('sundial.theme', t); drawHist();
+    };
+
+    document.querySelectorAll('.menu > .btn').forEach((b) => b.addEventListener('click', (e) => { e.stopPropagation(); b.parentElement.classList.toggle('open'); }));
+    document.addEventListener('click', () => document.querySelectorAll('.menu.open').forEach((m) => m.classList.remove('open')));
+    document.querySelectorAll('[data-export]').forEach((b) => b.addEventListener('click', () => doExport(b.dataset.export)));
+
+    // Drag and drop files anywhere
+    let depth = 0;
+    const ov = $('drop-overlay');
+    window.addEventListener('dragenter', (e) => { if (e.dataTransfer.types.includes('Files')) { depth++; ov.hidden = false; } });
+    window.addEventListener('dragleave', () => { if (--depth <= 0) { depth = 0; ov.hidden = true; } });
+    window.addEventListener('dragover', (e) => { if (e.dataTransfer.types.includes('Files')) e.preventDefault(); });
+    window.addEventListener('drop', (e) => { depth = 0; ov.hidden = true; if (e.dataTransfer.files.length) { e.preventDefault(); addFiles([...e.dataTransfer.files]); } });
+
+    bindHist();
+    bindKeys();
+  }
+
+  async function boot() {
+    const params = new URLSearchParams(location.search);
+    const theme = params.get('theme') || U.store.get('sundial.theme', null) || (matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    document.documentElement.dataset.theme = theme === 'light' ? 'light' : 'dark';
+    bindUI();
+    if (params.get('sample')) loadSample();
+    else {
+      const saved = await DB.get('case');
+      if (saved && saved.sources && saved.sources.length) { try { await loadCase(saved); } catch (e) { /* ignore a bad save */ } }
+    }
+    const urls = params.getAll('src');
+    for (const u of urls) {
+      try {
+        const res = await fetch(u);
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const name = decodeURIComponent(new URL(u, location.href).pathname.split('/').pop() || 'remote.csv');
+        addSource(name, P.parseText(name, await res.text()));
+      } catch (e) { U.toast('Could not load ' + u + ': ' + e.message, true); }
+    }
+    if (urls.length) rebuildEvents();
+    $('zone').value = S.zone;
+    refresh(urls.length > 0);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot); else boot();
+})();
+
+</script>
+</body>
+</html>

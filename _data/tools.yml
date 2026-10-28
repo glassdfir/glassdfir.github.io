@@ -18,3 +18,13 @@
     decisions, and export a runbook or work it as a timestamped checklist.
     Includes templates and an AI-Assisted SOC play library.
   good_for: Writing playbooks before the incident and following them during it.
+
+- name: Sundial
+  url: /sundial/
+  tagline: Merge your logs into one timeline.
+  description: >-
+    Drop in CSV, TSV or JSON exports from different tools and Sundial finds
+    the timestamps, merges everything in UTC, and charts it. Zoom into bursts,
+    filter, tag the key events with ATT&CK-style phases, and export the story.
+  good_for: Event logs, Sysmon, proxy, $MFT and EDR exports from the same incident, side by side.
+  try: /sundial/?sample=1
