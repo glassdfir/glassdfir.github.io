@@ -1,0 +1,158 @@
+/* ==========================================================================
+   Dark mode (site default)
+   Readers can switch to the original light theme with the menu toggle,
+   which adds .theme-light to <html>. Everything here is scoped so the
+   light theme renders exactly as before.
+   ========================================================================== */
+
+$dm-bg          : #16181d;
+$dm-surface     : #1e2128;
+$dm-surface-2   : #262a33;
+$dm-border      : #343944;
+$dm-text        : #d4d7dd;
+$dm-heading     : #f2f3f5;
+$dm-muted       : #9aa1ac;
+$dm-link        : #8ab4f8;
+$dm-link-hover  : #b3cdfb;
+
+html:not(.theme-light) {
+  color-scheme: dark;
+
+  body {
+    background-color: $dm-bg;
+    color: $dm-text;
+    border-top-color: $dm-surface-2;
+  }
+
+  ::selection      { background-color: #3b4a66; color: $dm-heading; }
+  ::-moz-selection { background-color: #3b4a66; color: $dm-heading; }
+
+  h1, h2, h3, h4, h5, h6 { color: $dm-heading; }
+
+  a { color: $dm-link; }
+  a:visited { color: $dm-link; }
+  a:hover, a:focus, a:active { color: $dm-link-hover; }
+
+  .site-title a,
+  .entry-title a,
+  .post-title a { color: $dm-heading; }
+  .site-description { color: $dm-muted; }
+
+  /* Logo border was white; soften it on a dark background */
+  .site-logo img { border-color: $dm-surface-2; }
+
+  /* Navigation bar is already dark; lift it a touch off the page */
+  #site-nav,
+  .navigation-wrapper { background-color: #0f1115; }
+  #site-nav a { color: $dm-heading; }
+
+  hr {
+    border-top-color: $dm-border;
+    border-bottom-color: transparent;
+  }
+
+  blockquote {
+    border-left-color: $dm-border;
+    color: $dm-muted;
+  }
+
+  /* Rules between posts, entry headers, archive lists */
+  .entry-header,
+  .post-list li,
+  .entry-content h1, .entry-content h2 {
+    border-bottom-color: $dm-border;
+  }
+  .entry-meta, .entry-meta a, .post-list .excerpt,
+  .entry-reading-time, .entry-date, .footer-wrapper, .footer-wrapper a,
+  span.entry-tags, .tag-heading {
+    color: $dm-muted;
+  }
+
+  /* Inline code */
+  p code, li code, td code {
+    background-color: $dm-surface-2;
+    border-color: $dm-border;
+    color: #e6e6e6;
+  }
+
+  /* Tables, including plain Markdown tables */
+  table th, .table th {
+    background-color: $dm-surface-2;
+    border-bottom-color: $dm-border;
+    color: $dm-heading;
+  }
+  table td, .table td { border-bottom-color: $dm-border; }
+  table tbody tr:hover > td, .table tbody tr:hover > td { background-color: $dm-surface; }
+
+  #markdown-toc {
+    border-color: $dm-border;
+    li { border-bottom-color: $dm-border; }
+    h6 { background: $dm-surface-2; }
+    a:hover, a:focus { background: $dm-surface; }
+  }
+
+  /* Notices and wells */
+  .notice, .well, .archive-wrap .page-title + * {
+    background-color: $dm-surface;
+    border-color: $dm-border;
+    color: $dm-text;
+  }
+
+  /* Buttons were black on white; invert them */
+  .btn {
+    background-color: $dm-heading;
+    color: $dm-bg;
+    border-color: $dm-heading !important;
+    &:visited { color: $dm-bg; }
+    &:hover { background-color: transparent; color: $dm-heading; }
+  }
+
+  /* Forms and search */
+  input, textarea, select {
+    background-color: $dm-surface;
+    border-color: $dm-border;
+    color: $dm-text;
+  }
+
+  /* Screenshots with white backgrounds get a subtle edge */
+  .entry-content img { box-shadow: 0 0 0 1px $dm-border; }
+
+  /* ---- Code blocks (Rouge), GitHub-dark-style palette ---- */
+  .highlight {
+    background-color: $dm-surface;
+    color: #e6edf3;
+    border: 1px solid $dm-border;
+
+    .lineno { color: #6e7681; }
+    .hll { background-color: #2d333b; }
+    .c, .cm, .c1, .cs, .cp { color: #8b949e; }
+    .err { color: #ffa198; background-color: transparent; }
+    .k, .kc, .kd, .kn, .kp, .kr, .ow { color: #ff7b72; }
+    .o { color: #e6edf3; }
+    .kt, .nc { color: #ffa657; }
+    .m, .mf, .mh, .mi, .mo, .il { color: #79c0ff; }
+    .s, .sb, .sc, .sd, .s2, .se, .sh, .si, .sx, .s1 { color: #a5d6ff; }
+    .sr { color: #7ee787; }
+    .ss { color: #79c0ff; }
+    .na, .no, .nv, .vc, .vg, .vi { color: #79c0ff; }
+    .nb, .bp { color: #ffa657; }
+    .nd { color: #d2a8ff; }
+    .ni, .ne, .nf, .nl { color: #d2a8ff; }
+    .nn { color: #e6edf3; }
+    .nt { color: #7ee787; }
+    .w { color: #6e7681; }
+    .gd { color: #ffa198; background-color: #490202; }
+    .gi { color: #7ee787; background-color: #04260f; }
+    .ge, .gr, .gh, .go, .gp, .gu, .gt { color: #8b949e; }
+  }
+  .CodeRay {
+    background-color: $dm-surface;
+    color: #e6edf3;
+    .line-numbers, .no { background-color: $dm-surface-2; color: #6e7681; }
+  }
+}
+
+/* Menu toggle */
+.theme-toggle {
+  cursor: pointer;
+}
