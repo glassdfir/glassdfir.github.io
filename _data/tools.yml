@@ -40,3 +40,13 @@
     sends results straight to Mill or Spoke. Starts with six recipes for
     EvtxECmd, Hayabusa, PECmd and MFTECmd output.
   good_for: Triage on EZTools and Hayabusa CSVs, and learning pandas one step at a time.
+
+- name: Scrimmage
+  url: /scrimmage/
+  tagline: Pressure-test red vs. blue on one clock.
+  description: >-
+    Launch attacker moves and defender responses on a shared timeline, under
+    fog of war: blue only acts on what its logging has detected, so quiet moves
+    slip through. Investigate with malware analysis and forensics, then see
+    whether you actually reached containment — or just isolated the first box.
+  good_for: Tabletops, training new analysts, and showing why isolating one host isn't containment.

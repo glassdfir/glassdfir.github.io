@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Red-team vs blue-team intrusion simulator on a shared clock, under fog of war. Launch attacker moves and defender response and watch whether the org actually reaches containment.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 3l-11 4v8c0 7 4.5 11.5 11 14z' fill='%23c6303a'/%3E%3Cpath d='M16 3l11 4v8c0 7-4.5 11.5-11 14z' fill='%231f6fb2'/%3E%3C/svg%3E">
+<script>try{var t=localStorage.getItem('scrimmage-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;}catch(e){}</script>
+<title>Scrimmage</title>
+<style>
+  /* Layout: two-column action benches (red left, blue right) flanking a central org-state + shared-timeline column; stacks to one column on phones. */
+  :root {
+    --bg: #f4f5f7;
+    --surface: #ffffff;
+    --surface-2: #eceef2;
+    --ink: #1a1c21;
+    --ink-soft: #565b66;
+    --ink-faint: #8a909c;
+    --line: #d9dce2;
+    --line-soft: #e7e9ee;
+    --red: #c6303a;
+    --red-soft: #f7dde0;
+    --red-ink: #8f1f27;
+    --blue: #1f6fb2;
+    --blue-soft: #d7e8f5;
+    --blue-ink: #16517f;
+    --ok: #2f8f5b;
+    --ok-soft: #d6efe0;
+    --warn: #c98a16;
+    --warn-soft: #f6e8c8;
+    --crit: #c6303a;
+    --crit-soft: #f7dde0;
+    --accent: #6b4fc9;
+    --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+    --font-body: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14161a;
+      --surface: #1d2027;
+      --surface-2: #262a33;
+      --ink: #e8eaef;
+      --ink-soft: #a7adb9;
+      --ink-faint: #6f7682;
+      --line: #343944;
+      --line-soft: #2a2e37;
+      --red: #e85c66;
+      --red-soft: #3a2024;
+      --red-ink: #f0909a;
+      --blue: #58a6e0;
+      --blue-soft: #16293a;
+      --blue-ink: #8cc5ee;
+      --ok: #52c285;
+      --ok-soft: #16301f;
+      --warn: #e0ad4e;
+      --warn-soft: #332a14;
+      --crit: #e85c66;
+      --crit-soft: #3a2024;
+      --accent: #9d86e8;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14161a;
+    --surface: #1d2027;
+    --surface-2: #262a33;
+    --ink: #e8eaef;
+    --ink-soft: #a7adb9;
+    --ink-faint: #6f7682;
+    --line: #343944;
+    --line-soft: #2a2e37;
+    --red: #e85c66;
+    --red-soft: #3a2024;
+    --red-ink: #f0909a;
+    --blue: #58a6e0;
+    --blue-soft: #16293a;
+    --blue-ink: #8cc5ee;
+    --ok: #52c285;
+    --ok-soft: #16301f;
+    --warn: #e0ad4e;
+    --warn-soft: #332a14;
+    --crit: #e85c66;
+    --crit-soft: #3a2024;
+    --accent: #9d86e8;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    line-height: 1.45;
+    margin: 0;
+  }
+  h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
+  .wrap {
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 18px 40px;
+    max-width: 1320px;
+    margin: 0 auto;
+  }
+
+  header.top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+  .brand h1 { font-size: 1.9rem; letter-spacing: -0.02em; }
+  .brand .tag { color: var(--ink-soft); font-size: 0.86rem; margin-top: 2px; max-width: 54ch; }
+  .modebar { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .modebar .lbl { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-faint); margin-right: 2px; }
+
+  button { font-family: inherit; cursor: pointer; }
+  .btn {
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+    border-radius: 8px; padding: 7px 12px; font-size: 0.82rem; font-weight: 500;
+    display: inline-flex; align-items: center; gap: 6px; transition: background .12s, border-color .12s;
+  }
+  .btn:hover { background: var(--surface-2); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover { filter: brightness(1.07); }
+  .btn.sm { padding: 4px 9px; font-size: 0.74rem; border-radius: 6px; }
+  .btn.tiny { padding: 3px 8px; font-size: 0.68rem; border-radius: 6px; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .clockbar {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 12px;
+    padding: 12px 16px; margin-bottom: 16px;
+  }
+  .clock { font-family: var(--font-mono); font-size: 1.5rem; font-weight: 600; font-variant-numeric: tabular-nums; min-width: 92px; }
+  .clock .u { font-size: 0.8rem; color: var(--ink-faint); margin-left: 3px; }
+  .clockctl { display: flex; gap: 6px; }
+  .vis-ctl { display: flex; align-items: center; gap: 7px; margin-left: auto; }
+  .vis-ctl .lbl { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-faint); }
+  .clockbar .posture-inline { display: flex; align-items: center; gap: 10px; }
+  .status-pill {
+    font-family: var(--font-display); font-weight: 600; font-size: 0.82rem;
+    padding: 5px 12px; border-radius: 999px; display: inline-flex; align-items: center; gap: 7px;
+  }
+  .status-pill .dot { width: 9px; height: 9px; border-radius: 50%; background: currentColor; }
+  .s-contained { background: var(--ok-soft); color: var(--ok); }
+  .s-partial { background: var(--warn-soft); color: var(--warn); }
+  .s-breached { background: var(--crit-soft); color: var(--crit); }
+
+  .board { display: grid; grid-template-columns: 1fr 1.25fr 1fr; gap: 16px; align-items: stretch; }
+  @media (max-width: 920px) { .board { grid-template-columns: 1fr; } }
+
+  .col { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  /* square off the three columns: shorter ones grow their last panel to the tallest column's height */
+  .col > .panel:last-child { flex: 1 1 auto; }
+  .bench-red, .bench-blue { display: flex; flex-direction: column; }
+  .bench-red > #redBench, .bench-blue > #blueBench { flex: 1 1 auto; }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .panel > .phead {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    padding: 10px 14px; border-bottom: 1px solid var(--line-soft);
+  }
+  .phead h2 { font-size: 0.95rem; letter-spacing: -0.01em; }
+  .phead .sub { font-size: 0.72rem; color: var(--ink-faint); text-transform: uppercase; letter-spacing: 0.07em; }
+
+  .bench-red .phead { background: var(--red-soft); }
+  .bench-red .phead h2 { color: var(--red-ink); }
+  .bench-blue .phead { background: var(--blue-soft); }
+  .bench-blue .phead h2 { color: var(--blue-ink); }
+
+  .tactic { border-bottom: 1px solid var(--line-soft); }
+  .tactic:last-child { border-bottom: 0; }
+  .tactic-h { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.09em; color: var(--ink-faint); padding: 6px 14px 3px; font-weight: 600; }
+  .action {
+    display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+    padding: 6px 14px; border: 0; background: transparent; color: var(--ink);
+  }
+  .action:hover:not(:disabled) { background: var(--surface-2); }
+  .action:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+  .action .meta { flex: 1; min-width: 0; }
+  .action .nm { font-size: 0.84rem; font-weight: 500; }
+  .action .ds { font-size: 0.72rem; color: var(--ink-soft); line-height: 1.25; }
+  .action .dur {
+    font-family: var(--font-mono); font-size: 0.72rem; font-variant-numeric: tabular-nums;
+    color: var(--ink-faint); white-space: nowrap; padding: 2px 6px; border-radius: 5px; background: var(--surface-2);
+  }
+  .bench-red .action:hover:not(:disabled) .dur { color: var(--red-ink); }
+  .bench-blue .action:hover:not(:disabled) .dur { color: var(--blue-ink); }
+  .action:disabled { opacity: .4; cursor: not-allowed; }
+  .action .tagwrap { display: flex; gap: 3px; flex-wrap: wrap; margin-top: 3px; align-items: center; }
+  .minitag { font-family: var(--font-mono); font-size: 0.62rem; padding: 1px 5px; border-radius: 4px; background: var(--surface-2); color: var(--ink-faint); }
+  .noisetag { font-size: 0.62rem; padding: 1px 6px; border-radius: 4px; font-weight: 600; }
+  .noise-loud { background: var(--crit-soft); color: var(--crit); }
+  .noise-med { background: var(--warn-soft); color: var(--warn); }
+  .noise-quiet { background: var(--surface-2); color: var(--ink-faint); }
+
+  .recipe-row { display: flex; gap: 6px; padding: 10px 14px; border-top: 1px solid var(--line-soft); flex-wrap: wrap; }
+  .recipe-row .lbl { width: 100%; font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-faint); }
+
+  .assets { display: flex; flex-direction: column; gap: 0; }
+  .asset { display: flex; align-items: center; gap: 10px; padding: 9px 14px; border-bottom: 1px solid var(--line-soft); }
+  .asset:last-child { border-bottom: 0; }
+  .asset .ico { width: 26px; height: 26px; border-radius: 6px; display: grid; place-items: center; font-size: 0.72rem; font-weight: 700; font-family: var(--font-mono); flex: none; }
+  .asset .nm { flex: 1; min-width: 0; font-size: 0.85rem; font-weight: 500; }
+  .asset .nm small { display: block; font-weight: 400; color: var(--ink-faint); font-size: 0.7rem; }
+  .asset .st { font-size: 0.66rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
+  .st-clean { background: var(--ok-soft); color: var(--ok); }
+  .st-comp { background: var(--crit-soft); color: var(--crit); }
+  .st-contained { background: var(--blue-soft); color: var(--blue-ink); }
+  .st-undet { background: var(--crit-soft); color: var(--crit); border: 1px dashed var(--crit); }
+  .asset.is-comp .ico { background: var(--crit-soft); color: var(--crit); }
+  .asset.is-clean .ico { background: var(--surface-2); color: var(--ink-faint); }
+  .asset.is-contained .ico { background: var(--blue-soft); color: var(--blue-ink); }
+  .asset.is-undet .ico { background: var(--crit-soft); color: var(--crit); border: 1px dashed var(--crit); }
+  .asset.is-undet { background: repeating-linear-gradient(135deg, transparent, transparent 7px, var(--crit-soft) 7px, var(--crit-soft) 8px); }
+
+  .foothold-grp { padding: 10px 14px; border-bottom: 1px solid var(--line-soft); }
+  .foothold-grp:last-child { border-bottom: 0; }
+  .foothold-grp h3 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-faint); margin-bottom: 6px; }
+  .chips { display: flex; gap: 5px; flex-wrap: wrap; }
+  .chip { font-family: var(--font-mono); font-size: 0.72rem; padding: 3px 8px; border-radius: 6px; background: var(--crit-soft); color: var(--crit); display: inline-flex; align-items: center; gap: 5px; }
+  .chip.c2 { background: var(--warn-soft); color: var(--warn); }
+  .chip.ghost { background: transparent; border: 1px dashed var(--crit); color: var(--crit); }
+  .chip.none { background: var(--surface-2); color: var(--ink-faint); font-family: var(--font-body); }
+
+  .posture { padding: 14px; }
+  .posture .big { font-family: var(--font-display); font-size: 1.15rem; font-weight: 600; margin-bottom: 4px; }
+  .posture .why { font-size: 0.8rem; color: var(--ink-soft); }
+  .posture .why b { color: var(--ink); font-weight: 600; }
+  .believed { margin-top: 10px; padding: 9px 11px; border-radius: 9px; background: var(--surface-2); font-size: 0.78rem; }
+  .believed .k { text-transform: uppercase; letter-spacing: 0.07em; font-size: 0.62rem; color: var(--ink-faint); font-weight: 600; display: block; margin-bottom: 2px; }
+  .believed.gap { background: var(--warn-soft); color: var(--warn); }
+  .believed.gap .k { color: var(--warn); }
+  .believed.gap b { color: var(--warn); font-weight: 700; }
+
+  .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line-soft); border-top: 1px solid var(--line-soft); }
+  .metric { background: var(--surface); padding: 10px 14px; }
+  .metric .v { font-family: var(--font-mono); font-size: 1.3rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .metric .v small { font-size: .7rem; color: var(--ink-faint); }
+  .metric .k { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-faint); }
+  .metric.alarm .v { color: var(--crit); }
+
+  .debrief { padding: 14px; }
+  .debrief .verdict { font-family: var(--font-display); font-size: 0.92rem; font-weight: 600; margin-bottom: 11px; text-wrap: balance; line-height: 1.35; }
+  .dfgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--line-soft); border: 1px solid var(--line-soft); border-radius: 9px; overflow: hidden; }
+  .dfstat { background: var(--surface); padding: 9px 12px; }
+  .dfstat .k { font-size: 0.63rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-faint); }
+  .dfstat .v { font-family: var(--font-mono); font-size: 1.05rem; font-weight: 600; font-variant-numeric: tabular-nums; margin-top: 2px; }
+  .dfstat.good .v { color: var(--ok); }
+  .dfstat.bad .v { color: var(--crit); }
+
+  .timeline { padding: 6px 0; max-height: 360px; overflow-y: auto; }
+  .tl-empty { padding: 24px 14px; text-align: center; color: var(--ink-faint); font-size: 0.82rem; }
+  .ev { display: grid; grid-template-columns: 54px 20px 1fr; gap: 8px; align-items: start; padding: 6px 14px; }
+  .ev .t { font-family: var(--font-mono); font-size: 0.72rem; color: var(--ink-faint); font-variant-numeric: tabular-nums; text-align: right; padding-top: 1px; }
+  .ev .rail { display: flex; justify-content: center; position: relative; }
+  .ev .rail::before { content: ""; position: absolute; top: 0; bottom: -12px; width: 2px; background: var(--line-soft); }
+  .ev:last-child .rail::before { display: none; }
+  .ev .node { width: 11px; height: 11px; border-radius: 50%; margin-top: 2px; z-index: 1; border: 2px solid var(--surface); }
+  .ev.red .node { background: var(--red); }
+  .ev.blue .node { background: var(--blue); }
+  .ev.sys .node { background: var(--ink-faint); }
+  .ev .body { font-size: 0.8rem; min-width: 0; }
+  .ev .body .a { font-weight: 600; }
+  .ev.red .body .a { color: var(--red-ink); }
+  .ev.blue .body .a { color: var(--blue-ink); }
+  .ev .body .d { color: var(--ink-soft); font-size: 0.74rem; }
+  .ev .body .dur { font-family: var(--font-mono); font-size: 0.68rem; color: var(--ink-faint); }
+  .ev .body .det { font-size: 0.64rem; font-weight: 600; padding: 0 5px; border-radius: 4px; }
+  .det-seen { background: var(--blue-soft); color: var(--blue-ink); }
+  .det-blind { background: var(--crit-soft); color: var(--crit); }
+
+  /* Full-width shared timeline: events as time-ordered cards that use the width */
+  .timeline-panel { margin-top: 16px; }
+  .timeline-panel .phead { align-items: center; }
+  .timeline-panel .timeline { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; padding: 12px; max-height: 300px; }
+  .timeline-panel .ev { display: block; grid-template-columns: none; padding: 8px 11px; border-left: 3px solid var(--line); border-radius: 8px; background: var(--surface-2); }
+  .timeline-panel .ev.red { border-left-color: var(--red); }
+  .timeline-panel .ev.blue { border-left-color: var(--blue); }
+  .timeline-panel .ev.sys { border-left-color: var(--ink-faint); }
+  .timeline-panel .ev .rail { display: none; }
+  .timeline-panel .ev .t { text-align: left; margin-bottom: 3px; }
+  .timeline-panel .tl-empty { grid-column: 1 / -1; }
+  .timeline-panel .legend { padding: 0; }
+
+  .legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: 0.72rem; color: var(--ink-soft); padding: 4px 14px; }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .legend .sw { width: 10px; height: 10px; border-radius: 50%; }
+
+  .foot { margin-top: 22px; font-size: 0.74rem; color: var(--ink-faint); max-width: 74ch; line-height: 1.5; }
+  .foot code { font-family: var(--font-mono); background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
+
+  select.sel { font-family: inherit; font-size: 0.76rem; padding: 5px 8px; border-radius: 7px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+</style>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap">
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>Scrimmage</h1>
+      <div class="tag">Red-team actions vs. blue-team response on one clock — under fog of war. Blue only acts on what its logging has detected, so quiet moves slip through. Watch the gap between what blue <em>believes</em> is contained and what actually is.</div>
+    </div>
+    <div class="modebar">
+      <span class="lbl">Load scenario</span>
+      <button class="btn sm" data-scenario="ransomware">Ransomware intrusion</button>
+      <button class="btn sm" data-scenario="phish-lateral">Phish → lateral</button>
+      <button class="btn primary sm" id="resetBtn">Reset</button>
+    </div>
+  </header>
+
+  <div class="clockbar">
+    <div class="clock" id="clock">00:00<span class="u">elapsed</span></div>
+    <div class="posture-inline">
+      <span class="status-pill s-contained" id="statusPill"><span class="dot"></span><span id="statusText">Contained</span></span>
+    </div>
+    <div class="clockctl">
+      <button class="btn sm" id="step5">+5 min</button>
+      <button class="btn sm" id="step15">+15 min</button>
+      <button class="btn sm" id="step60">+1 hr</button>
+    </div>
+    <div class="vis-ctl">
+      <span class="lbl">Logging</span>
+      <select class="sel" id="visSel" title="How much telemetry blue is collecting. Higher logging detects quieter techniques — but only from the moment it's raised.">
+        <option value="1">Low</option>
+        <option value="2" selected>Medium</option>
+        <option value="3">High</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="board">
+    <!-- RED BENCH -->
+    <div class="col">
+      <div class="panel bench-red">
+        <div class="phead"><h2>Red Team</h2><span class="sub">Attacker moves</span></div>
+        <div id="redBench"></div>
+        <div class="recipe-row">
+          <span class="lbl">Inject red recipe (attack chain)</span>
+          <select class="sel" id="redRecipe"><option value="">Choose a chain…</option></select>
+          <button class="btn sm" id="redRecipeGo">Queue</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- CENTER: ORG STATE -->
+    <div class="col">
+      <div class="panel">
+        <div class="phead"><h2>Posture</h2><span class="sub">Actual vs. believed</span></div>
+        <div class="posture">
+          <div class="big" id="postureBig">Organization secure</div>
+          <div class="why" id="postureWhy">No active footholds. The attacker holds nothing.</div>
+          <div class="believed" id="believedBox" hidden><span class="k">What blue believes</span><span id="believedWhy"></span></div>
+        </div>
+        <div class="metrics">
+          <div class="metric"><div class="v" id="mDwell">0<small>m</small></div><div class="k">Red dwell time</div></div>
+          <div class="metric"><div class="v" id="mHosts">0<small>/5</small></div><div class="k">Hosts compromised</div></div>
+          <div class="metric" id="mUndetWrap"><div class="v" id="mUndet">0</div><div class="k">Undetected footholds</div></div>
+          <div class="metric"><div class="v" id="mResponse">0<small>m</small></div><div class="k">Blue response time</div></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="phead">
+          <h2>Estate</h2>
+          <button class="btn tiny" id="truthBtn" title="Reveal ground truth — show compromise blue hasn't detected yet.">Reveal ground truth</button>
+        </div>
+        <div class="assets" id="hostList"></div>
+      </div>
+
+      <div class="panel">
+        <div class="phead"><h2>Attacker holdings</h2><span class="sub" id="holdSub">Footholds</span></div>
+        <div class="foothold-grp"><h3>Credentials held</h3><div class="chips" id="credChips"></div></div>
+        <div class="foothold-grp"><h3>Command &amp; control</h3><div class="chips" id="c2Chips"></div></div>
+        <div class="foothold-grp"><h3>Persistence</h3><div class="chips" id="persistChips"></div></div>
+      </div>
+
+      <div class="panel" id="debriefPanel">
+        <div class="phead"><h2>Debrief</h2><span class="sub">After-action</span></div>
+        <div class="debrief">
+          <div class="verdict" id="dfVerdict"></div>
+          <div class="dfgrid">
+            <div class="dfstat" id="dfTTCwrap"><div class="k">Time to containment</div><div class="v" id="dfTTC">—</div></div>
+            <div class="dfstat"><div class="k">Blue response time</div><div class="v" id="dfResp">—</div></div>
+            <div class="dfstat"><div class="k">Max hosts hit</div><div class="v" id="dfHosts">—</div></div>
+            <div class="dfstat" id="dfImpactWrap"><div class="k">Reached impact</div><div class="v" id="dfImpact">—</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLUE BENCH -->
+    <div class="col">
+      <div class="panel bench-blue">
+        <div class="phead"><h2>Blue Team</h2><span class="sub">Defender response</span></div>
+        <div id="blueBench"></div>
+        <div class="recipe-row">
+          <span class="lbl">Inject blue recipe (playbook)</span>
+          <select class="sel" id="blueRecipe"><option value="">Choose a playbook…</option></select>
+          <button class="btn sm" id="blueRecipeGo">Queue</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel timeline-panel">
+    <div class="phead">
+      <h2>Timeline</h2>
+      <div class="legend">
+        <span><span class="sw" style="background:var(--red)"></span>Red</span>
+        <span><span class="sw" style="background:var(--blue)"></span>Blue</span>
+        <span><span class="sw" style="background:var(--ink-faint)"></span>System</span>
+      </div>
+    </div>
+    <div class="timeline" id="timeline"><div class="tl-empty">No actions yet. Launch a red move or load a scenario to start the clock.</div></div>
+  </div>
+
+  <div class="foot">
+    <strong>Fog-of-war build.</strong> Each red technique has a noise level and a detection threshold; it's spotted only if blue's <code>logging</code> is high enough <em>at the moment it runs</em>. Quiet, valid-credential moves (lateral movement, DC pivot) evade medium logging and stay invisible. Blue acts on its own picture: <code>Isolate all compromised</code> and <code>Reset exposed credentials</code> only touch what's been detected, and <code>Threat hunt</code> is how you reveal the rest. Posture is computed on ground truth; the believed line shows what blue would conclude from its visibility alone. Durations are illustrative — tune them to your environment.
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const HOSTS = [
+    { id: "WKS-01", label: "WKS-01", sub: "Finance workstation" },
+    { id: "WKS-07", label: "WKS-07", sub: "HR workstation" },
+    { id: "FILE-01", label: "FILE-01", sub: "File server" },
+    { id: "DC-01", label: "DC-01", sub: "Domain controller" },
+    { id: "BKP-01", label: "BKP-01", sub: "Backup server" },
+  ];
+
+  // noise -> detectAt: minimum logging level (1 Low, 2 Med, 3 High) to auto-detect on execution.
+  // loud = detected even at Low; quiet = only at High.
+  const RED = [
+    { tactic: "Initial Access", id: "phish", nm: "Phishing email", ds: "User opens a malicious attachment on WKS-01.", dur: 5, tags: ["T1566"], detectAt: 2,
+      apply: s => { compromise(s, "WKS-01"); addC2(s, "https", "WKS-01"); s.campaignActive = true; } },
+    { tactic: "Initial Access", id: "phish2", nm: "Phish more users", ds: "Additional users click the same lure — WKS-07 falls.", dur: 5, tags: ["T1566"], detectAt: 2,
+      needs: s => s.campaignActive && !s.mailScrubbed, apply: s => { compromise(s, "WKS-07"); addC2(s, "https", "WKS-07"); } },
+    { tactic: "Execution / Persistence", id: "persist", nm: "Establish persistence", ds: "Scheduled task + signed implant survives reboot.", dur: 10, tags: ["T1053"], detectAt: 3,
+      needs: s => anyComp(s), apply: s => { addPersist(s, firstComp(s)); } },
+    { tactic: "Credential Access", id: "creddump", nm: "Dump credentials", ds: "Harvest cached creds from a compromised host.", dur: 15, tags: ["T1003"], detectAt: 2,
+      needs: s => anyComp(s), apply: s => { addCred(s, "svc_backup"); addCred(s, "jdoe"); } },
+    { tactic: "Discovery", id: "recon", nm: "Network discovery", ds: "Map reachable hosts and shares.", dur: 10, tags: ["T1046"], detectAt: 3,
+      needs: s => anyComp(s), apply: s => {} },
+    { tactic: "Lateral Movement", id: "lateral", nm: "Lateral movement", ds: "Stolen creds reach file server FILE-01 and peer workstation WKS-07 — normal-looking logons.", dur: 20, tags: ["T1021"], detectAt: 3,
+      needs: s => s.creds.length > 0, apply: s => { compromise(s, "FILE-01"); addC2(s, "https", "FILE-01"); compromise(s, "WKS-07"); addC2(s, "https", "WKS-07"); } },
+    { tactic: "Privilege Escalation", id: "escalate", nm: "Compromise DC-01", ds: "Pivot to the domain controller — domain dominance.", dur: 25, tags: ["T1068"], detectAt: 3,
+      needs: s => s.hosts["FILE-01"] === "comp" && s.creds.some(c => c.name === "svc_backup"),
+      apply: s => { compromise(s, "DC-01"); addCred(s, "DOMAIN\\admin"); addC2(s, "dns", "DC-01"); } },
+    { tactic: "Impact", id: "ransom", nm: "Deploy ransomware", ds: "Encrypt reachable hosts + wipe BKP-01. Impossible to miss.", dur: 15, tags: ["T1486"], detectAt: 1,
+      needs: s => s.hosts["DC-01"] === "comp", apply: s => { compromise(s, "BKP-01"); s.ransomed = true; } },
+  ];
+
+  const BLUE = [
+    { tactic: "Investigate", id: "raiselog", nm: "Raise logging to High", ds: "Deploy EDR / expand telemetry. Catches new moves, not past ones.", dur: 25, tags: ["IR: Identify"],
+      needs: s => s.visLevel < 3, apply: s => { s.visLevel = 3; } },
+    { tactic: "Investigate", id: "hunt", nm: "Threat hunt", ds: "Network-wide sweep — reveals compromised hosts logging missed.", dur: 40, tags: ["IR: Identify"],
+      apply: s => { revealHosts(s); } },
+    { tactic: "Investigate", id: "malware", nm: "Malware analysis", ds: "Reverse the implant for IOCs — exposes C2 and persistence, unlocks cert revocation.", dur: 60, tags: ["IR: Analyze"],
+      needs: s => anyDetectedComp(s), apply: s => { revealMalware(s); } },
+    { tactic: "Investigate", id: "forensics", nm: "Host forensics", ds: "Disk + memory analysis — reconstructs the attack path and exposes stolen credentials.", dur: 90, tags: ["IR: Analyze"],
+      needs: s => anyDetectedComp(s), apply: s => { revealForensics(s); } },
+    { tactic: "Contain", id: "isolate1", nm: "Isolate WKS-01", ds: "Network-isolate the initial endpoint only.", dur: 15, tags: ["IR: Contain"],
+      apply: s => { containHost(s, "WKS-01"); dropC2ForHost(s, "WKS-01"); } },
+    { tactic: "Contain", id: "isolateAll", nm: "Isolate detected hosts", ds: "Isolate every host blue currently knows is compromised.", dur: 45, tags: ["IR: Contain"],
+      apply: s => { Object.keys(s.hosts).forEach(h => { if (s.hosts[h] === "comp" && s.detHosts.has(h)) { containHost(s, h); dropC2ForHost(s, h); } }); } },
+    { tactic: "Contain", id: "scrub", nm: "Scrub phishing email", ds: "Purge the lure from all mailboxes — stops new victims. Won't clean a host already hit.", dur: 15, tags: ["IR: Contain"],
+      apply: s => { s.mailScrubbed = true; } },
+    { tactic: "Contain", id: "proxyblock", nm: "Proxy block (HTTP C2)", ds: "Block the C2 domain at the proxy. HTTPS channels only.", dur: 20, tags: ["IR: Contain"],
+      apply: s => { s.c2 = s.c2.filter(c => c.kind !== "https"); } },
+    { tactic: "Contain", id: "dnssink", nm: "Sinkhole DNS C2", ds: "Null-route the DNS tunneling channel.", dur: 20, tags: ["IR: Contain"],
+      apply: s => { s.c2 = s.c2.filter(c => c.kind !== "dns"); } },
+    { tactic: "Eradicate", id: "revokecreds", nm: "Reset exposed credentials", ds: "Reset every credential blue knows was stolen.", dur: 30, tags: ["IR: Eradicate"],
+      apply: s => { s.creds = s.creds.filter(c => !c.det); } },
+    { tactic: "Eradicate", id: "certblock", nm: "Revoke signing cert (EDR)", ds: "Block the implant's signing cert — kills all persistence. Needs malware analysis first.", dur: 25, tags: ["IR: Eradicate"],
+      needs: s => s.malwareAnalyzed, apply: s => { s.persist = []; } },
+    { tactic: "Recover", id: "reimage", nm: "Reimage contained hosts", ds: "Rebuild isolated hosts from clean images.", dur: 90, tags: ["IR: Recover"],
+      apply: s => { Object.keys(s.hosts).forEach(h => { if (s.hosts[h] === "contained") s.hosts[h] = "clean"; }); } },
+  ];
+
+  const RED_RECIPES = {
+    "smash-grab": { nm: "Smash & grab (phish → dump → lateral)", steps: [["phish",0],["creddump",5],["lateral",20]] },
+    "full-ransom": { nm: "Full ransomware chain", steps: [["phish",0],["persist",5],["creddump",15],["lateral",35],["escalate",60],["ransom",90]] },
+  };
+  const BLUE_RECIPES = {
+    "isolate-only": { nm: "Isolate initial host (weak)", steps: [["isolate1",10]] },
+    "hunt-contain": { nm: "Hunt-led containment", steps: [["raiselog",0],["hunt",10],["malware",15],["forensics",20],["isolateAll",80],["revokecreds",95],["certblock",110]] },
+  };
+
+  const NOISE = { 1: { cls: "noise-loud", label: "loud" }, 2: { cls: "noise-med", label: "noisy" }, 3: { cls: "noise-quiet", label: "quiet" } };
+
+  function fresh() {
+    const hosts = {};
+    HOSTS.forEach(h => hosts[h.id] = "clean");
+    return { t: 0, hosts, detHosts: new Set(), creds: [], c2: [], persist: [], events: [],
+             firstRed: null, firstBlue: null, ransomed: false, campaignActive: false, mailScrubbed: false,
+             malwareAnalyzed: false, scopeEstablished: false,
+             peakHostsComp: 0, reachedImpact: false, everBreached: false, containedAt: null,
+             visLevel: parseInt(document.getElementById("visSel").value, 10) || 2, showTruth: false };
+  }
+  let S;
+
+  // --- mutators; detection decided against s._curDetectAt set before apply ---
+  function detected(s) { return s.visLevel >= (s._curDetectAt || 3); }
+  function compromise(s, h) { if (s.hosts[h] !== undefined && s.hosts[h] !== "comp") { s.hosts[h] = "comp"; if (detected(s)) { s.detHosts.add(h); s._sawSomething = true; } else s._missedSomething = true; } }
+  function containHost(s, h) { if (s.hosts[h] === "comp") s.hosts[h] = "contained"; }
+  function anyComp(s) { return Object.values(s.hosts).some(v => v === "comp"); }
+  function firstComp(s) { return Object.keys(s.hosts).find(h => s.hosts[h] === "comp"); }
+  function addCred(s, name) { if (!s.creds.some(c => c.name === name)) { const d = detected(s); s.creds.push({ name, det: d }); d ? s._sawSomething = true : s._missedSomething = true; } }
+  function addC2(s, kind, host) { if (!s.c2.some(c => c.kind === kind && c.host === host)) { const d = detected(s); s.c2.push({ kind, host, det: d }); d ? s._sawSomething = true : s._missedSomething = true; } }
+  function dropC2ForHost(s, host) { s.c2 = s.c2.filter(c => c.host !== host); }
+  function addPersist(s, h) { if (h && !s.persist.some(p => p.host === h)) { const d = detected(s); s.persist.push({ host: h, det: d }); d ? s._sawSomething = true : s._missedSomething = true; } }
+  function anyDetectedComp(s) { return Object.keys(s.hosts).some(h => s.hosts[h] === "comp" && s.detHosts.has(h)); }
+  // Threat hunt: network picture — which hosts are compromised, and their beacons. Not the deeper artifacts.
+  function revealHosts(s) { Object.keys(s.hosts).forEach(h => { if (s.hosts[h] === "comp") s.detHosts.add(h); }); s.c2.forEach(c => { if (s.detHosts.has(c.host)) c.det = true; }); }
+  // Malware analysis: IOCs from the sample — C2 infrastructure and persistence mechanism; unlocks cert revocation.
+  function revealMalware(s) { s.c2.forEach(c => c.det = true); s.persist.forEach(p => p.det = true); s.malwareAnalyzed = true; }
+  // Host forensics: attack-path reconstruction — exposes which credentials were actually stolen.
+  function revealForensics(s) { Object.keys(s.hosts).forEach(h => { if (s.hosts[h] === "comp") s.detHosts.add(h); }); s.creds.forEach(c => c.det = true); s.scopeEstablished = true; }
+
+  // --- views: ground truth vs. what blue has detected ---
+  function view(s, detectedOnly) {
+    return {
+      comp: Object.keys(s.hosts).filter(h => s.hosts[h] === "comp" && (!detectedOnly || s.detHosts.has(h))),
+      c2: s.c2.filter(c => !detectedOnly || c.det),
+      persist: s.persist.filter(p => !detectedOnly || p.det),
+      creds: s.creds.filter(c => !detectedOnly || c.det),
+    };
+  }
+  function assess(v, everTouched) {
+    const anyFoothold = v.comp.length > 0 || v.c2.length > 0 || v.persist.length > 0;
+    if (!everTouched) return { state: "contained", big: "Organization secure", why: "No active footholds. The attacker holds nothing." };
+    if (!anyFoothold && !v.creds.length) return { state: "contained", big: "Contained & eradicated", why: "Every foothold removed: no live host, C2, persistence, or stolen credential remains." };
+    if (!anyFoothold && v.creds.length) return { state: "partial", big: "Contained, not eradicated", why: `No live access right now, but <b>${v.creds.length} stolen credential${v.creds.length>1?"s are":" is"}</b> still valid — the attacker can walk back in until they're reset.` };
+    const bits = [];
+    if (v.comp.length) bits.push(`<b>${v.comp.length} host${v.comp.length>1?"s":""}</b> compromised (${v.comp.join(", ")})`);
+    if (v.c2.length) bits.push(`<b>${v.c2.length} live C2 channel${v.c2.length>1?"s":""}</b>`);
+    if (v.persist.length) bits.push(`<b>persistence</b> on ${v.persist.map(p=>p.host).join(", ")}`);
+    return { state: "breached", big: "Active breach", why: `Not contained — ${bits.join("; ")}.` };
+  }
+
+  function runAction(side, def) {
+    if (def.needs && !def.needs(S)) return;
+    const start = S.t;
+    S._curDetectAt = def.detectAt || 3; S._sawSomething = false; S._missedSomething = false;
+    def.apply(S);
+    if (side === "red" && S.firstRed === null) S.firstRed = start;
+    if (side === "blue" && S.firstBlue === null) S.firstBlue = start;
+    let detNote = null;
+    if (side === "red") detNote = S._missedSomething && !S._sawSomething ? "blind" : (S._sawSomething ? "seen" : null);
+    S.events.push({ side, t: start, dur: def.dur, nm: def.nm, ds: def.ds, det: detNote });
+    S.t = start + def.dur;
+    render();
+  }
+
+  function advance(mins) { S.t += mins; S.events.push({ side: "sys", t: S.t, dur: 0, nm: `Clock advanced +${mins}m`, ds: "" }); render(); }
+
+  function queueRecipe(side, recipe) {
+    const base = S.t;
+    recipe.steps.forEach(([actId, offset]) => {
+      const def = (side === "red" ? RED : BLUE).find(a => a.id === actId);
+      if (!def || (def.needs && !def.needs(S))) return;
+      S._curDetectAt = def.detectAt || 3; S._sawSomething = false; S._missedSomething = false;
+      def.apply(S);
+      if (side === "red" && S.firstRed === null) S.firstRed = base + offset;
+      if (side === "blue" && S.firstBlue === null) S.firstBlue = base + offset;
+      const detNote = side === "red" ? (S._missedSomething && !S._sawSomething ? "blind" : (S._sawSomething ? "seen" : null)) : null;
+      S.events.push({ side, t: base + offset, dur: def.dur, nm: def.nm, ds: def.ds, det: detNote });
+      S.t = Math.max(S.t, base + offset + def.dur);
+    });
+    S.events.sort((a, b) => a.t - b.t);
+    render();
+  }
+
+  function fmtClock(m) { const h = Math.floor(m/60), mm = m%60; return (h>0 ? h+"h " : "") + String(mm).padStart(2,"0").slice(-2) + (h>0 ? "m" : ""); }
+  function fmtT(m) { const h = Math.floor(m/60), mm = m%60; return h>0 ? `${h}:${String(mm).padStart(2,"0")}` : `${mm}m`; }
+  function fmtDur(m) { const h = Math.floor(m/60), mm = m%60; return h>0 ? `${h}h ${mm}m` : `${mm}m`; }
+
+  function renderBench(el, defs, side) {
+    const byTactic = {};
+    defs.forEach(d => { (byTactic[d.tactic] = byTactic[d.tactic] || []).push(d); });
+    el.innerHTML = Object.entries(byTactic).map(([tac, items]) => `
+      <div class="tactic"><div class="tactic-h">${tac}</div>
+        ${items.map(d => {
+          const gated = d.needs && !d.needs(S);
+          const noise = side === "red" && d.detectAt ? `<span class="noisetag ${NOISE[d.detectAt].cls}">${NOISE[d.detectAt].label}</span>` : "";
+          return `<button class="action" data-side="${side}" data-id="${d.id}" ${gated ? "disabled" : ""}>
+            <div class="meta"><div class="nm">${d.nm}</div><div class="ds">${d.ds}</div>
+              <div class="tagwrap">${d.tags.map(t=>`<span class="minitag">${t}</span>`).join("")}${noise}</div>
+            </div><div class="dur">${d.dur}m</div></button>`;
+        }).join("")}
+      </div>`).join("");
+  }
+
+  function render() {
+    document.getElementById("clock").innerHTML = `${fmtClock(S.t)}<span class="u">elapsed</span>`;
+    document.getElementById("visSel").value = String(S.visLevel);
+
+    const everTouched = S.events.some(e => e.side === "red");
+    const actual = assess(view(S, false), everTouched);
+    const believed = assess(view(S, true), everTouched);
+
+    const pill = document.getElementById("statusPill");
+    pill.className = "status-pill " + (actual.state === "contained" ? "s-contained" : actual.state === "partial" ? "s-partial" : "s-breached");
+    document.getElementById("statusText").textContent = actual.state === "contained" ? "Contained" : actual.state === "partial" ? "Partial" : "Not contained";
+    document.getElementById("postureBig").textContent = actual.big;
+    document.getElementById("postureWhy").innerHTML = actual.why;
+
+    // believed line — only meaningful once red has acted
+    const bBox = document.getElementById("believedBox");
+    if (!everTouched) { bBox.hidden = true; }
+    else {
+      bBox.hidden = false;
+      const gap = believed.state !== actual.state;
+      bBox.className = "believed" + (gap ? " gap" : "");
+      const undet = view(S, false).comp.filter(h => !S.detHosts.has(h));
+      let txt = `<b>${believed.big}.</b> ${believed.why}`;
+      if (gap && undet.length) txt += ` <b>Undetected:</b> ${undet.join(", ")} — logging never caught ${undet.length>1?"them":"it"}.`;
+      else if (gap) txt += ` The real picture is worse — reveal ground truth or run a threat hunt.`;
+      document.getElementById("believedWhy").innerHTML = txt;
+    }
+
+    // metrics (ground truth)
+    const gt = view(S, false);
+    const anyFoot = gt.comp.length || gt.c2.length || gt.persist.length || gt.creds.length;
+    const dwell = S.firstRed === null ? 0 : (anyFoot ? S.t - S.firstRed : 0);
+    document.getElementById("mDwell").innerHTML = `${dwell}<small>m</small>`;
+    document.getElementById("mHosts").innerHTML = `${gt.comp.length}<small>/5</small>`;
+    const undetCount = gt.comp.filter(h=>!S.detHosts.has(h)).length + gt.creds.filter(c=>!c.det).length + gt.c2.filter(c=>!c.det).length + gt.persist.filter(p=>!p.det).length;
+    document.getElementById("mUndet").textContent = undetCount;
+    document.getElementById("mUndetWrap").className = "metric" + (undetCount > 0 ? " alarm" : "");
+    const resp = (S.firstRed !== null && S.firstBlue !== null) ? Math.max(0, S.firstBlue - S.firstRed) : 0;
+    document.getElementById("mResponse").innerHTML = `${resp}<small>m</small>`;
+
+    // milestones for the debrief
+    if (gt.comp.length > S.peakHostsComp) S.peakHostsComp = gt.comp.length;
+    if (S.ransomed) S.reachedImpact = true;
+    if (actual.state === "breached") { S.everBreached = true; S.containedAt = null; }
+    else if (S.everBreached && S.containedAt === null) S.containedAt = S.t;
+
+    // debrief panel — resting state before the first red move, live after
+    if (!everTouched) {
+      document.getElementById("dfVerdict").innerHTML = "No engagement yet — load a scenario or launch a red-team move to open the after-action record.";
+      document.getElementById("dfTTC").textContent = "—"; document.getElementById("dfTTCwrap").className = "dfstat";
+      document.getElementById("dfResp").textContent = "—";
+      document.getElementById("dfHosts").textContent = "0/5";
+      document.getElementById("dfImpact").textContent = "—"; document.getElementById("dfImpactWrap").className = "dfstat";
+    } else {
+      let verdict, ttc, ttcCls;
+      if (S.reachedImpact) { verdict = "Red reached <b>Impact</b> — ransomware detonated across the estate. Whatever containment followed came too late to prevent the damage."; }
+      else if (actual.state === "contained") { verdict = "<b>Clean outcome.</b> The attacker was fully contained and eradicated before reaching Impact — no live access and no stolen credentials remain."; }
+      else if (actual.state === "partial") { verdict = "Active access was cut, but <b>stolen credentials remain valid</b> — the intrusion is contained, not eradicated. Reset them before closing the case."; }
+      else { verdict = "<b>Breach still active.</b> The attacker is operating in the estate right now — the clock is still running against you."; }
+      document.getElementById("dfVerdict").innerHTML = verdict;
+
+      if (S.containedAt !== null && S.firstRed !== null) { ttc = fmtDur(S.containedAt - S.firstRed); ttcCls = S.reachedImpact ? "dfstat" : "dfstat good"; }
+      else { ttc = "Not yet"; ttcCls = "dfstat bad"; }
+      document.getElementById("dfTTC").textContent = ttc;
+      document.getElementById("dfTTCwrap").className = ttcCls;
+      document.getElementById("dfResp").textContent = S.firstBlue !== null ? fmtDur(resp) : "No response";
+      document.getElementById("dfHosts").textContent = `${S.peakHostsComp}/5`;
+      document.getElementById("dfImpact").textContent = S.reachedImpact ? "Yes" : "No";
+      document.getElementById("dfImpactWrap").className = "dfstat " + (S.reachedImpact ? "bad" : "good");
+    }
+
+    // hosts — blue's view unless ground truth revealed
+    document.getElementById("hostList").innerHTML = HOSTS.map(h => {
+      const st = S.hosts[h.id];
+      const known = S.detHosts.has(h.id);
+      let cls, stLabel, stCls, ico;
+      if (st === "comp" && known) { cls="is-comp"; stLabel="Compromised"; stCls="st-comp"; ico="!"; }
+      else if (st === "comp" && !known && S.showTruth) { cls="is-undet"; stLabel="Undetected"; stCls="st-undet"; ico="?"; }
+      else if (st === "comp" && !known) { cls="is-clean"; stLabel="Clean"; stCls="st-clean"; ico="✓"; } // blind spot
+      else if (st === "contained") { cls="is-contained"; stLabel="Isolated"; stCls="st-contained"; ico="◐"; }
+      else { cls="is-clean"; stLabel="Clean"; stCls="st-clean"; ico="✓"; }
+      return `<div class="asset ${cls}"><div class="ico">${ico}</div>
+        <div class="nm">${h.label}<small>${h.sub}</small></div>
+        <div class="st ${stCls}">${stLabel}</div></div>`;
+    }).join("");
+
+    // holdings — detected shown solid; undetected only when ground truth revealed
+    function chipset(items, make, undetMake) {
+      const shown = items.filter(i => i.det || S.showTruth);
+      if (!shown.length) return `<span class="chip none">None</span>`;
+      return shown.map(i => i.det ? make(i) : undetMake(i)).join("");
+    }
+    document.getElementById("credChips").innerHTML = chipset(S.creds,
+      c => `<span class="chip">⚿ ${c.name}</span>`, c => `<span class="chip ghost">⚿ ${c.name}</span>`);
+    document.getElementById("c2Chips").innerHTML = chipset(S.c2,
+      c => `<span class="chip c2">${c.kind.toUpperCase()} · ${c.host}</span>`, c => `<span class="chip ghost">${c.kind.toUpperCase()} · ${c.host}</span>`);
+    document.getElementById("persistChips").innerHTML = chipset(S.persist,
+      p => `<span class="chip">⚙ ${p.host}</span>`, p => `<span class="chip ghost">⚙ ${p.host}</span>`);
+    const hiddenHold = S.creds.some(c=>!c.det) || S.c2.some(c=>!c.det) || S.persist.some(p=>!p.det) || gt.comp.some(h=>!S.detHosts.has(h));
+    document.getElementById("holdSub").textContent = S.showTruth ? "Ground truth" : (hiddenHold ? "Blue's view (incomplete)" : "Footholds");
+
+    // timeline
+    const tl = document.getElementById("timeline");
+    if (!S.events.length) {
+      tl.innerHTML = `<div class="tl-empty">No actions yet. Launch a red move or load a scenario to start the clock.</div>`;
+    } else {
+      tl.innerHTML = [...S.events].sort((a,b)=>a.t-b.t).map(e => {
+        const det = e.det === "seen" ? `<span class="det det-seen">detected</span>` : e.det === "blind" ? `<span class="det det-blind">evaded detection</span>` : "";
+        return `<div class="ev ${e.side}"><div class="t">T+${fmtT(e.t)}</div>
+          <div class="rail"><div class="node"></div></div>
+          <div class="body"><span class="a">${e.nm}</span> ${e.dur?`<span class="dur">(${e.dur}m)</span>`:""} ${det}
+            ${e.ds?`<div class="d">${e.ds}</div>`:""}</div></div>`;
+      }).join("");
+    }
+
+    renderBench(document.getElementById("redBench"), RED, "red");
+    renderBench(document.getElementById("blueBench"), BLUE, "blue");
+    document.getElementById("truthBtn").classList.toggle("on", S.showTruth);
+    document.getElementById("truthBtn").textContent = S.showTruth ? "Hide ground truth" : "Reveal ground truth";
+  }
+
+  function loadScenario(name) {
+    S = fresh();
+    if (name === "ransomware") queueRecipe("red", RED_RECIPES["full-ransom"]);
+    else if (name === "phish-lateral") queueRecipe("red", RED_RECIPES["smash-grab"]);
+  }
+
+  function init() {
+    S = fresh();
+    const rr = document.getElementById("redRecipe");
+    Object.entries(RED_RECIPES).forEach(([k,v]) => rr.add(new Option(v.nm, k)));
+    const br = document.getElementById("blueRecipe");
+    Object.entries(BLUE_RECIPES).forEach(([k,v]) => br.add(new Option(v.nm, k)));
+
+    document.body.addEventListener("click", e => {
+      const act = e.target.closest(".action");
+      if (act && !act.disabled) {
+        const side = act.dataset.side;
+        const def = (side === "red" ? RED : BLUE).find(a => a.id === act.dataset.id);
+        if (def) runAction(side, def);
+      }
+    });
+    document.getElementById("step5").onclick = () => advance(5);
+    document.getElementById("step15").onclick = () => advance(15);
+    document.getElementById("step60").onclick = () => advance(60);
+    document.getElementById("resetBtn").onclick = () => { const v = S.visLevel; S = fresh(); S.visLevel = v; render(); };
+    document.getElementById("visSel").onchange = e => { S.visLevel = parseInt(e.target.value, 10); render(); };
+    document.getElementById("truthBtn").onclick = () => { S.showTruth = !S.showTruth; render(); };
+    document.querySelectorAll("[data-scenario]").forEach(b => b.onclick = () => loadScenario(b.dataset.scenario));
+    document.getElementById("redRecipeGo").onclick = () => { if (rr.value) queueRecipe("red", RED_RECIPES[rr.value]); };
+    document.getElementById("blueRecipeGo").onclick = () => { if (br.value) queueRecipe("blue", BLUE_RECIPES[br.value]); };
+
+    render();
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
