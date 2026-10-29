@@ -28,3 +28,13 @@
     filter, tag the key events with ATT&CK-style phases, and export the story.
   good_for: Event logs, Sysmon, proxy, $MFT and EDR exports from the same incident, side by side.
   try: /mill/?sample=1
+
+- name: Sieve
+  url: /sieve/
+  tagline: Shake raw exports into clean CSVs.
+  description: >-
+    Drop in CSV, TSV or JSON from EZTools, Hayabusa, Sysmon, Security-Datasets
+    or a proxy, and Sieve maps the columns, normalizes time to UTC, removes
+    duplicates (including the same process start logged by Sysmon and 4688),
+    and pulls out IOCs. Send the result straight to Mill or Spoke.
+  good_for: Getting messy evidence into shape before you build a timeline or a graph.

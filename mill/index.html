@@ -1667,6 +1667,21 @@ mark { background: rgba(242, 169, 59, 0.35); color: inherit; border-radius: 2px;
       const saved = await DB.get('case');
       if (saved && saved.sources && saved.sources.length) { try { await loadCase(saved); } catch (e) { /* ignore a bad save */ } }
     }
+    // Handoff from Sieve (same origin): /mill/?from=sieve
+    if (params.get('from') === 'sieve') {
+      try {
+        const raw = localStorage.getItem('sieve.handoff');
+        localStorage.removeItem('sieve.handoff');
+        if (!raw) throw new Error('nothing was waiting. Send it from Sieve again.');
+        const h = JSON.parse(raw);
+        const bytes = Uint8Array.from(atob(h.gz), (c) => c.charCodeAt(0));
+        const text = await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).text();
+        const name = (h.name || 'sieve') + '-timeline.csv';
+        const src = addSource(name, P.parseText(name, text), { name: (h.name || 'sieve') + ' (Sieve)', timeCols: ['timestamp'], tz: 0 });
+        if (src) { rebuildEvents(); refresh(true); U.toast('Received ' + src.events.length.toLocaleString() + ' events from Sieve'); }
+      } catch (e) { U.toast('Could not load from Sieve: ' + e.message, true); }
+      history.replaceState(null, '', location.pathname);
+    }
     const urls = params.getAll('src');
     for (const u of urls) {
       try {
