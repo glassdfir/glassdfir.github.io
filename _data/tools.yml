@@ -31,6 +31,7 @@
 
 - name: Sieve
   url: /sieve/
+  post: /blogsabout/shaping-messy-dfir-data-with-sieve/
   tagline: Shake raw exports into clean CSVs.
   description: >-
     Drop in CSV, TSV or JSON from EZTools, Hayabusa, Sysmon, Security-Datasets
