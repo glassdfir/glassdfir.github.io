@@ -1,0 +1,1883 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230e1218'/%3E%3Cg fill='none' stroke='%237cc4ff' stroke-width='2.4' stroke-linecap='round'%3E%3Crect x='7' y='6' width='18' height='5' rx='1.4'/%3E%3Crect x='7' y='13.5' width='18' height='5' rx='1.4'/%3E%3Crect x='7' y='21' width='18' height='5' rx='1.4'/%3E%3C/g%3E%3C/svg%3E">
+<style>*{box-sizing:border-box}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<title>Shifu · pandas by Blocks</title>
+<meta name="description" content="Build pandas scripts for DFIR by stacking blocks.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+/* Layout: workbench of three columns (block palette | recipe stack | pandas + DataFrame preview); stacks to one column on phones. */
+:root {
+  color-scheme: dark;
+  --bg: #0e1218; --panel: #131922; --raise: #1a212c; --line: #263040; --dot: #1f2733;
+  --fg: #e4e9f0; --muted: #9aa6b6; --accent: #7cc4ff; --accent-ink: #04111f;
+  --bad: #ff8f80; --bad-bg: rgba(255, 120, 100, .13); --good: #6fd6bf;
+  --code-bg: #0b0f14; --code-fg: #c9d1d9; --k: #c4a6ff; --s: #9fe0b0; --n: #f0b37a; --cm: #7f8c9e; --sel-line: rgba(124, 196, 255, .13);
+  --c-source: #1e4fa8; --c-filter: #5b3a9e; --c-transform: #8a4a12; --c-combine: #136e5e; --c-output: #9a2f5a;
+  --f-ui: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --f-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+    --bg: #f3f5f8; --panel: #ffffff; --raise: #edf0f4; --line: #d5dce5; --dot: #dde3ea;
+    --fg: #121821; --muted: #536071; --accent: #0b5fae; --accent-ink: #ffffff;
+    --bad: #b42318; --bad-bg: #fde8e6; --good: #0f7a63;
+    --code-bg: #f7f9fb; --code-fg: #1f2733; --k: #6b3fc4; --s: #1d7a3e; --n: #a3500b; --cm: #667385; --sel-line: rgba(11, 95, 174, .10);
+  }
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f3f5f8; --panel: #ffffff; --raise: #edf0f4; --line: #d5dce5; --dot: #dde3ea;
+  --fg: #121821; --muted: #536071; --accent: #0b5fae; --accent-ink: #ffffff;
+  --bad: #b42318; --bad-bg: #fde8e6; --good: #0f7a63;
+  --code-bg: #f7f9fb; --code-fg: #1f2733; --k: #6b3fc4; --s: #1d7a3e; --n: #a3500b; --cm: #667385; --sel-line: rgba(11, 95, 174, .10);
+}
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--fg); font-family: var(--f-ui); font-size: 14px; }
+* { box-sizing: border-box; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+code, .mono { font-family: var(--f-mono); }
+
+.app { height: 100%; display: flex; flex-direction: column; }
+
+/* header */
+.top { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; padding-block: 10px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); border-bottom: 1px solid var(--line); background: var(--panel); }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand .name { font-weight: 700; font-size: 19px; letter-spacing: .3px; }
+.brand .tag { font-size: 12px; color: var(--muted); border: 1px solid var(--line); border-radius: 999px; padding: 2px 9px; }
+.recipe-name { flex: 1 1 200px; min-width: 0; max-width: 420px; font-size: 15px; font-weight: 500; background: transparent; border: 1px solid transparent; border-radius: 6px; padding: 7px 9px; }
+.recipe-name:hover { border-color: var(--line); }
+.recipe-name:focus { border-color: var(--accent); background: var(--bg); outline: none; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+.btn { display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--raise); font-size: 14px; white-space: nowrap; }
+.btn:hover { border-color: var(--muted); }
+a.btn { text-decoration: none; color: inherit; }
+a.btn.primary { color: var(--accent-ink); }
+.home { color: var(--muted); font-size: 13px; text-decoration: none; }
+.home:hover { color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); font-weight: 600; }
+.btn.small { height: 32px; padding: 0 10px; font-size: 13px; }
+.btn svg { flex: none; }
+
+/* workbench */
+.work { flex: 1; min-height: 0; display: grid; grid-template-columns: 232px minmax(0, 1fr) minmax(360px, 42%); }
+.palette, .canvas, .side { min-height: 0; overflow: auto; }
+
+.palette { background: var(--panel); border-right: 1px solid var(--line); padding: 14px; display: flex; flex-direction: column; gap: 14px; }
+.pal-search { width: 100%; height: 38px; padding: 0 11px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); }
+.pal-search:focus { outline: none; border-color: var(--accent); }
+.pal-group { display: flex; flex-direction: column; gap: 5px; }
+.pal-group h3 { margin: 0 0 2px; font-size: 11.5px; font-weight: 600; letter-spacing: .9px; text-transform: uppercase; color: var(--muted); display: flex; align-items: center; gap: 7px; }
+.pal-group h3::before { content: ""; width: 9px; height: 9px; border-radius: 2px; background: var(--cat); }
+.pal-list { display: flex; flex-direction: column; gap: 5px; }
+.pal-item { display: flex; align-items: center; justify-content: space-between; gap: 8px; width: 100%; min-height: 36px; padding: 7px 10px; border: 0; border-radius: 6px; background: var(--cat); color: #fff; font-size: 13px; text-align: left; cursor: grab; }
+.pal-item:hover { filter: brightness(1.15); }
+.pal-item code { font-size: 11px; color: rgba(255, 255, 255, .78); }
+.pal-hint { margin: 0; font-size: 12.5px; color: var(--muted); line-height: 1.45; }
+
+.canvas { padding: 20px max(20px, env(safe-area-inset-right, 0px)) 40px max(20px, env(safe-area-inset-left, 0px)); background-color: var(--bg); background-image: radial-gradient(var(--dot) 1px, transparent 1px); background-size: 20px 20px; }
+.stack { max-width: 680px; display: flex; flex-direction: column; gap: 4px; }
+.steps { display: flex; flex-direction: column; gap: 4px; min-height: 70px; }
+.steps:empty { border: 1.5px dashed var(--line); border-radius: 10px; }
+.steps:empty::before { content: "Drag a block here, or click one in the palette."; display: block; padding: 24px 16px; text-align: center; color: var(--muted); font-size: 13px; }
+
+.card { background: var(--cat); color: #fff; border-radius: 6px; position: relative; }
+.card.first { border-radius: 10px 10px 6px 6px; }
+.card.sel { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent); }
+.card.blocked { opacity: .5; }
+.card.err { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--bad); }
+.card.sel.err { box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--bad); }
+.sortable-ghost { opacity: .35; }
+.sortable-drag, .sortable-fallback { opacity: .95 !important; box-shadow: 0 10px 30px rgba(0, 0, 0, .35); }
+.head { display: flex; align-items: center; gap: 8px; padding: 8px 8px 0 6px; min-height: 40px; cursor: pointer; }
+.grip { width: 28px; height: 32px; display: grid; place-items: center; border: 0; background: transparent; color: rgba(255, 255, 255, .7); border-radius: 6px; cursor: grab; flex: none; }
+.grip:hover { background: rgba(0, 0, 0, .2); color: #fff; }
+.num { font-family: var(--f-mono); font-size: 12px; color: rgba(255, 255, 255, .7); min-width: 1.4em; }
+.title { font-weight: 600; font-size: 14px; }
+.api { font-size: 11.5px; color: rgba(255, 255, 255, .78); background: rgba(0, 0, 0, .22); padding: 2px 6px; border-radius: 4px; }
+.count { margin-left: auto; font-family: var(--f-mono); font-size: 12px; font-variant-numeric: tabular-nums; background: rgba(0, 0, 0, .28); padding: 3px 8px; border-radius: 999px; white-space: nowrap; }
+.count.down { color: #ffe1b8; }
+.count.bad { background: #fff; color: #9b1c1c; font-weight: 700; }
+.tools { display: flex; gap: 2px; }
+.ibtn { width: 30px; height: 30px; display: grid; place-items: center; border: 0; border-radius: 6px; background: transparent; color: rgba(255, 255, 255, .78); }
+.ibtn:hover { background: rgba(0, 0, 0, .25); color: #fff; }
+.body { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; padding: 8px 12px 12px 42px; }
+.ctl { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; max-width: 100%; }
+.ctl > span { color: rgba(255, 255, 255, .82); }
+.in { height: 32px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, .25); background: rgba(0, 0, 0, .3); color: #fff; padding: 0 8px; font-family: var(--f-mono); font-size: 12.5px; max-width: 100%; }
+.in::placeholder { color: rgba(255, 255, 255, .5); }
+.in:focus { outline: 2px solid #fff; outline-offset: 0; }
+select.in { padding-right: 4px; max-width: 240px; }
+select.in option { background: #1a212c; color: #fff; }
+input.in.text { width: 170px; }
+input.in.wide { width: 260px; }
+input.in.num { width: 64px; }
+.chips { display: inline-flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.chip { display: inline-flex; align-items: center; gap: 2px; height: 28px; padding-left: 8px; border-radius: 6px; background: rgba(0, 0, 0, .32); font-family: var(--f-mono); font-size: 12px; }
+.chip.missing { outline: 1.5px dashed #ffd0c9; }
+.chip button { width: 26px; height: 28px; border: 0; background: transparent; color: rgba(255, 255, 255, .7); border-radius: 0 6px 6px 0; }
+.chip button:hover { color: #fff; background: rgba(0, 0, 0, .25); }
+.pairs { display: flex; flex-direction: column; gap: 6px; }
+.pair { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.btn-in { height: 32px; padding: 0 10px; border-radius: 6px; border: 1px dashed rgba(255, 255, 255, .45); background: transparent; color: #fff; font-size: 12.5px; }
+.btn-in:hover { background: rgba(0, 0, 0, .2); }
+.msg { margin: 0 12px 12px 42px; padding: 8px 10px; border-radius: 6px; background: rgba(0, 0, 0, .35); font-size: 13px; line-height: 1.4; }
+.msg.bad { background: #fff; color: #8a1616; }
+.src-meta { padding: 0 12px 12px 42px; font-size: 12.5px; color: rgba(255, 255, 255, .85); }
+.sample-tag { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; background: #fff; color: #173f88; padding: 1px 6px; border-radius: 4px; margin-right: 6px; }
+.end-hint { margin: 10px 0 0; font-size: 12.5px; color: var(--muted); }
+
+/* side panels */
+.side { background: var(--panel); border-left: 1px solid var(--line); display: flex; flex-direction: column; }
+.panel { border-bottom: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; }
+.panel-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 14px; }
+.panel-head h2 { margin: 0; font-size: 12px; font-weight: 600; letter-spacing: .9px; text-transform: uppercase; color: var(--muted); }
+.panel-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+.code { margin: 0; padding: 12px 14px 16px; background: var(--code-bg); color: var(--code-fg); font-family: var(--f-mono); font-size: 12.5px; line-height: 1.6; overflow: auto; max-height: 40vh; white-space: pre; border-top: 1px solid var(--line); }
+.code .cm { color: var(--cm); } .code .s { color: var(--s); } .code .k { color: var(--k); } .code .n { color: var(--n); }
+.code .hl { background: var(--sel-line); display: inline-block; min-width: 100%; }
+.preview-panel { flex: 1; }
+.pv-sub { padding: 0 14px 10px; font-size: 13px; color: var(--muted); }
+.pv-sub strong { color: var(--fg); font-weight: 600; }
+.pv-err { margin: 0 14px 10px; padding: 9px 11px; border-radius: 6px; background: var(--bad-bg); color: var(--bad); font-size: 13px; line-height: 1.45; }
+.shape { font-family: var(--f-mono); font-size: 12px; color: var(--accent); font-variant-numeric: tabular-nums; }
+.table-wrap { overflow: auto; margin: 0 14px 14px; border: 1px solid var(--line); border-radius: 8px; max-height: 52vh; }
+table.df { border-collapse: collapse; font-family: var(--f-mono); font-size: 12px; font-variant-numeric: tabular-nums; min-width: 100%; }
+table.df th, table.df td { padding: 6px 10px; text-align: left; border-bottom: 1px solid var(--line); white-space: nowrap; max-width: 30ch; overflow: hidden; text-overflow: ellipsis; }
+table.df thead th { position: sticky; top: 0; background: var(--raise); font-weight: 500; z-index: 1; vertical-align: bottom; }
+table.df thead th .dt { display: block; font-size: 10.5px; color: var(--good); font-weight: 400; }
+table.df td.idx, table.df th.idx { color: var(--muted); }
+table.df td .na { color: var(--muted); font-style: italic; }
+table.df tbody tr:hover td { background: var(--raise); }
+.outputs { padding: 0 14px 14px; display: flex; flex-direction: column; gap: 8px; }
+.out { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); }
+.out .fname { font-family: var(--f-mono); font-size: 13px; font-weight: 500; }
+.out .meta { font-size: 12.5px; color: var(--muted); }
+.out .panel-actions { margin-left: auto; }
+.empty-out { margin: 0 14px 14px; font-size: 13px; color: var(--muted); }
+
+.foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 16px; padding-block: 8px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); border-top: 1px solid var(--line); background: var(--panel); font-size: 12px; color: var(--muted); }
+
+/* dialogs */
+dialog { border: 1px solid var(--line); border-radius: 12px; background: var(--panel); color: var(--fg); padding: 0; width: min(860px, calc(100vw - 32px)); max-height: calc(100vh - 48px); }
+dialog::backdrop { background: rgba(5, 8, 12, .6); }
+.dlg-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 18px 6px; }
+.dlg-head h2 { margin: 0; font-size: 18px; }
+.dlg-body { padding: 8px 18px 18px; display: flex; flex-direction: column; gap: 12px; }
+.dlg-body p { margin: 0; color: var(--muted); line-height: 1.5; max-width: 65ch; }
+.rgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.rcard { display: flex; flex-direction: column; gap: 6px; text-align: left; padding: 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); }
+.rcard:hover { border-color: var(--accent); }
+.rcard .flow { font-family: var(--f-mono); font-size: 11.5px; color: var(--accent); }
+.rcard .rname { font-weight: 600; font-size: 15px; }
+.rcard .rabout { font-size: 13px; color: var(--muted); line-height: 1.45; }
+.rcard .rblocks { display: flex; gap: 3px; margin-top: 4px; }
+.rcard .rblocks i { width: 14px; height: 6px; border-radius: 2px; background: var(--cat); }
+textarea.token { width: 100%; min-height: 84px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); padding: 10px; font-family: var(--f-mono); font-size: 12px; resize: vertical; word-break: break-all; }
+textarea.token:focus { outline: none; border-color: var(--accent); }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.toast { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--fg); color: var(--bg); padding: 10px 16px; border-radius: 8px; font-size: 13.5px; max-width: calc(100vw - 32px); z-index: 50; }
+.drop-on { outline: 2px dashed var(--accent); outline-offset: -8px; }
+
+@media (max-width: 1100px) { .work { grid-template-columns: 210px minmax(0, 1fr) minmax(320px, 40%); } }
+@media (max-width: 900px) {
+  html, body { height: auto; }
+  .app { height: auto; min-height: 100%; }
+  .work { display: flex; flex-direction: column; }
+  .palette, .canvas, .side { overflow: visible; }
+  .palette { border-right: 0; border-bottom: 1px solid var(--line); }
+  .pal-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .side { border-left: 0; border-top: 1px solid var(--line); }
+  .code { max-height: 50vh; }
+  .rgrid { grid-template-columns: minmax(0, 1fr); }
+  .body, .msg, .src-meta { padding-left: 12px; margin-left: 0; }
+  .msg { margin-left: 12px; }
+}
+@media (max-width: 520px) { .pal-groups { grid-template-columns: minmax(0, 1fr); } .actions { margin-left: 0; } }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="3" width="16" height="4" rx="1.2"></rect><rect x="4" y="10" width="16" height="4" rx="1.2"></rect><rect x="4" y="17" width="16" height="4" rx="1.2"></rect></svg>
+      <span class="name">Shifu</span>
+      <span class="tag">pandas, by blocks</span>
+    </div>
+    <a class="home" href="/tools/">jon.glass / Tools</a>
+    <label class="sr" for="recipe-name">Recipe name</label>
+    <input id="recipe-name" class="recipe-name" autocomplete="off" spellcheck="false">
+    <div class="actions">
+      <button id="btn-recipes" class="btn" type="button">
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect></svg>Starter recipes</button>
+      <button id="btn-share" class="btn" type="button">
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"></path><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"></path></svg>Share recipe</button>
+      <button id="btn-new" class="btn" type="button">New</button>
+    </div>
+  </header>
+
+  <main class="work">
+    <aside class="palette" aria-label="Blocks">
+      <label class="sr" for="pal-search">Find a block</label>
+      <input id="pal-search" class="pal-search" type="search" placeholder="Find a block: merge, regex…" autocomplete="off">
+      <div id="palette" class="pal-groups"></div>
+      <p class="pal-hint">Drag a block into the recipe, or click it to add after the selected step.</p>
+    </aside>
+
+    <section class="canvas" id="canvas" aria-label="Recipe">
+      <div class="stack">
+        <div id="source"></div>
+        <div id="steps" class="steps"></div>
+        <p id="end-hint" class="end-hint"></p>
+      </div>
+    </section>
+
+    <aside class="side" aria-label="Generated code and data">
+      <section class="panel">
+        <div class="panel-head">
+          <h2>pandas</h2>
+          <div class="panel-actions">
+            <button id="btn-copy-code" class="btn small" type="button">Copy</button>
+            <button id="btn-dl-py" class="btn small" type="button">Download .py</button>
+            <button id="btn-dl-nb" class="btn small" type="button">Notebook</button>
+          </div>
+        </div>
+        <pre id="code" class="code" tabindex="0" aria-label="Generated pandas code"></pre>
+      </section>
+      <section class="panel preview-panel">
+        <div class="panel-head">
+          <h2 id="pv-title">Preview</h2>
+          <span id="pv-shape" class="shape"></span>
+        </div>
+        <div id="pv-sub" class="pv-sub"></div>
+        <div id="pv-err"></div>
+        <div class="table-wrap" id="pv-wrap"><table class="df" id="pv-table"></table></div>
+      </section>
+      <section class="panel">
+        <div class="panel-head"><h2>Files</h2></div>
+        <div id="outputs"></div>
+      </section>
+    </aside>
+  </main>
+
+  <footer class="foot">
+    <span>Runs in your browser. Files you load stay on this machine.</span>
+    <span>Previews are computed by Shifu; run the exported pandas for the record.</span>
+  </footer>
+</div>
+
+<dialog id="dlg-recipes" aria-labelledby="dlg-recipes-title">
+  <div class="dlg-head">
+    <h2 id="dlg-recipes-title">Starter recipes</h2>
+    <button class="ibtn close" type="button" aria-label="Close" data-close style="color: var(--fg)"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+  </div>
+  <div class="dlg-body">
+    <p>Each recipe opens with generated sample data so you can see it work. Load your own tool output into the Read file block to run it for real.</p>
+    <div id="rgrid" class="rgrid"></div>
+  </div>
+</dialog>
+
+<dialog id="dlg-share" aria-labelledby="dlg-share-title">
+  <div class="dlg-head">
+    <h2 id="dlg-share-title">Share recipe</h2>
+    <button class="ibtn close" type="button" aria-label="Close" data-close style="color: var(--fg)"><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+  </div>
+  <div class="dlg-body">
+    <p>The recipe code holds the blocks and settings only. Your data is never included.</p>
+    <label class="sr" for="share-out">Recipe code</label>
+    <textarea id="share-out" class="token" readonly></textarea>
+    <div class="row">
+      <button id="btn-copy-token" class="btn primary" type="button">Copy recipe code</button>
+      <button id="btn-copy-link" class="btn" type="button" hidden>Copy link</button>
+    </div>
+    <label for="share-in" style="font-weight: 600; margin-top: 8px">Open a recipe code</label>
+    <textarea id="share-in" class="token" placeholder="Paste a recipe code that starts with shifu-"></textarea>
+    <div class="row"><button id="btn-open-token" class="btn" type="button">Open recipe</button><span id="share-msg" style="color: var(--bad); font-size: 13px"></span></div>
+  </div>
+</dialog>
+
+<input type="file" id="file-input" hidden accept=".csv,.tsv,.txt,.json,.jsonl,.ndjson">
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+<script>
+/* ===== Shifu engine: a small pandas mirror + pandas code generation ===== */
+
+/* ---------- value helpers ---------- */
+function isNullish(v) {
+  return v === null || v === undefined || v === '' ||
+    (typeof v === 'number' && Number.isNaN(v)) ||
+    (v instanceof Date && Number.isNaN(v.getTime()));
+}
+function pad(n, w) { return String(n).padStart(w || 2, '0'); }
+function fmtTs(d) {
+  if (!(d instanceof Date) || Number.isNaN(d.getTime())) return 'NaT';
+  var s = d.getUTCFullYear() + '-' + pad(d.getUTCMonth() + 1) + '-' + pad(d.getUTCDate()) + ' ' +
+    pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes()) + ':' + pad(d.getUTCSeconds());
+  var ms = d.getUTCMilliseconds();
+  if (ms) s += '.' + pad(ms * 1000, 6);
+  return s + '+00:00';
+}
+/* how a value prints in a CSV / string concat (pandas-ish) */
+function plain(v, type) {
+  if (v instanceof Date) return fmtTs(v);
+  if (isNullish(v)) return type === 'datetime' ? 'NaT' : '';
+  if (typeof v === 'boolean') return v ? 'True' : 'False';
+  return String(v);
+}
+
+var MONTHS_RE = null;
+function parseDate(v) {
+  if (v instanceof Date) return Number.isNaN(v.getTime()) ? null : v;
+  if (isNullish(v)) return null;
+  var s = String(v).trim();
+  var m = /^(\d{4})-(\d{1,2})-(\d{1,2})(?:[T ](\d{1,2}):(\d{2})(?::(\d{2})(?:[.,](\d+))?)?)?\s*(Z|UTC|[+-]\d{2}:?\d{2})?$/i.exec(s);
+  if (m) {
+    var frac = m[7] ? Number(('0.' + m[7]).slice(0, 5)) * 1000 : 0;
+    var t = Date.UTC(+m[1], +m[2] - 1, +m[3], +(m[4] || 0), +(m[5] || 0), +(m[6] || 0), Math.floor(frac));
+    if (m[8] && !/^(z|utc)$/i.test(m[8])) {
+      var tz = m[8].replace(':', '');
+      var sign = tz[0] === '-' ? -1 : 1;
+      var off = sign * (Number(tz.slice(1, 3)) * 60 + Number(tz.slice(3, 5)));
+      t -= off * 60000;
+    }
+    var d = new Date(t);
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
+  m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?)?$/i.exec(s);
+  if (m) {
+    var h = +(m[4] || 0);
+    if (m[7]) { var pm = /pm/i.test(m[7]); if (h === 12) h = pm ? 12 : 0; else if (pm) h += 12; }
+    return new Date(Date.UTC(+m[3], +m[1] - 1, +m[2], h, +(m[5] || 0), +(m[6] || 0)));
+  }
+  var p = Date.parse(s);
+  return Number.isNaN(p) ? null : new Date(p);
+}
+
+/* ---------- frames ---------- */
+function inferTypes(cols, rows) {
+  var types = {};
+  cols.forEach(function (c) {
+    var seen = 0, t = null;
+    for (var i = 0; i < rows.length && seen < 400; i++) {
+      var v = rows[i][c];
+      if (isNullish(v)) continue;
+      seen++;
+      var vt = v instanceof Date ? 'datetime' : typeof v === 'number' ? 'number' : typeof v === 'boolean' ? 'bool' : 'string';
+      if (t === null) t = vt; else if (t !== vt) { t = 'string'; break; }
+    }
+    types[c] = t || 'string';
+  });
+  return types;
+}
+function makeFrame(cols, rows, types) {
+  return { cols: cols.slice(), rows: rows, types: types || inferTypes(cols, rows) };
+}
+function dtypeName(f, c) {
+  var t = f.types[c];
+  if (t === 'datetime') return 'datetime64[ns, UTC]';
+  if (t === 'bool') return 'bool';
+  if (t === 'number') {
+    var hasNull = false;
+    for (var i = 0; i < f.rows.length && i < 2000; i++) {
+      var v = f.rows[i][c];
+      if (isNullish(v)) hasNull = true; else if (!Number.isInteger(v)) return 'float64';
+    }
+    return hasNull ? 'float64' : 'int64';
+  }
+  return 'object';
+}
+function keyOf(v) {
+  if (v instanceof Date) return 'd' + v.getTime();
+  if (isNullish(v)) return '\u0000null';
+  return typeof v + ':' + String(v);
+}
+function needCol(f, c, label) {
+  if (!c) throw new Error('Choose ' + (label || 'a column') + '.');
+  if (f.cols.indexOf(c) < 0) throw new Error('There is no column named "' + c + '" at this step.');
+}
+
+/* ---------- python helpers ---------- */
+function py(s) { return JSON.stringify(String(s)); }
+function pyRaw(s) {
+  s = String(s);
+  if (s.indexOf('"') < 0 && !/\\$/.test(s)) return 'r"' + s + '"';
+  if (s.indexOf("'") < 0 && !/\\$/.test(s)) return "r'" + s + "'";
+  return py(s);
+}
+function pyList(arr) { return '[' + arr.map(py).join(', ') + ']'; }
+function C(c) { return 'df[' + py(c) + ']'; }
+function strOf(f, c) { return f && f.types[c] === 'string' ? C(c) : C(c) + '.astype(str)'; }
+function isNum(s) { return s !== '' && s !== null && !Number.isNaN(Number(s)) && /^\s*-?\d*\.?\d+(e[+-]?\d+)?\s*$/i.test(String(s)); }
+function pyVar(name) {
+  var stem = String(name).replace(/\.[^.]+$/, '').replace(/^sample_/, '').toLowerCase().replace(/[^a-z0-9_]+/g, '_').replace(/^_+|_+$/g, '');
+  if (!stem || /^\d/.test(stem)) stem = 't_' + stem;
+  if (stem === 'df' || stem === 'pd') stem += '_table';
+  return stem;
+}
+function readCall(name) {
+  var ext = String(name).split('.').pop().toLowerCase();
+  if (ext === 'tsv') return 'pd.read_csv(' + py(name) + ', sep="\\t")';
+  if (ext === 'jsonl' || ext === 'ndjson') return 'pd.read_json(' + py(name) + ', lines=True)';
+  if (ext === 'json') return 'pd.read_json(' + py(name) + ')';
+  return 'pd.read_csv(' + py(name) + ')';
+}
+function parseList(s) { return String(s || '').split(',').map(function (x) { return x.trim(); }).filter(Boolean); }
+
+/* ---------- filter tests ---------- */
+var FILTER_OPS = ['==', '!=', '>', '>=', '<', '<=', 'contains', 'does not contain', 'starts with', 'ends with',
+  'matches regex', 'is one of', 'is empty', 'is not empty'];
+function needsValue(op) { return op !== 'is empty' && op !== 'is not empty'; }
+
+function makeRegex(p) {
+  try { return new RegExp(p); } catch (e) { throw new Error('That regex does not parse: ' + e.message.replace(/^Invalid regular expression: /, '')); }
+}
+function makeTest(op, value, t) {
+  if (op === 'is empty') return isNullish;
+  if (op === 'is not empty') return function (v) { return !isNullish(v); };
+  if (value === undefined || value === null || String(value) === '') throw new Error('Enter a value to compare with.');
+  var cmp = { '==': 1, '!=': 1, '>': 1, '>=': 1, '<': 1, '<=': 1 };
+  if (cmp[op]) {
+    var target, norm;
+    if (t === 'number') {
+      if (!isNum(value)) throw new Error('This column holds numbers, so enter a number.');
+      target = Number(value); norm = function (v) { return v; };
+    } else if (t === 'datetime') {
+      var d = parseDate(value);
+      if (!d) throw new Error('Enter a date like 2026-09-15 02:00.');
+      target = d.getTime(); norm = function (v) { return v.getTime(); };
+    } else {
+      target = String(value); norm = function (v) { return String(v); };
+    }
+    return function (v) {
+      if (isNullish(v)) return op === '!=';
+      var x = norm(v);
+      switch (op) {
+        case '==': return x === target; case '!=': return x !== target;
+        case '>': return x > target; case '>=': return x >= target;
+        case '<': return x < target; default: return x <= target;
+      }
+    };
+  }
+  var q = String(value).toLowerCase();
+  if (op === 'contains') return function (v) { return !isNullish(v) && plain(v).toLowerCase().indexOf(q) >= 0; };
+  if (op === 'does not contain') return function (v) { return isNullish(v) || plain(v).toLowerCase().indexOf(q) < 0; };
+  if (op === 'starts with') return function (v) { return !isNullish(v) && plain(v).toLowerCase().indexOf(q) === 0; };
+  if (op === 'ends with') return function (v) { if (isNullish(v)) return false; var s = plain(v).toLowerCase(); return s.slice(s.length - q.length) === q; };
+  if (op === 'matches regex') { var re = makeRegex(value); return function (v) { return !isNullish(v) && re.test(plain(v)); }; }
+  if (op === 'is one of') {
+    var list = parseList(value);
+    if (!list.length) throw new Error('List the values, separated by commas.');
+    var set = new Set(list.map(function (x) { return t === 'number' && isNum(x) ? 'number:' + Number(x) : 'string:' + x; }));
+    return function (v) { return !isNullish(v) && set.has(typeof v + ':' + String(v)); };
+  }
+  throw new Error('Unknown comparison.');
+}
+function filterCode(p, f) {
+  var t = f ? f.types[p.col] : 'string', c = C(p.col), v = p.value;
+  switch (p.op) {
+    case 'is empty': return ['df = df[' + c + '.isna()]'];
+    case 'is not empty': return ['df = df[' + c + '.notna()]'];
+    case 'contains': return ['df = df[' + strOf(f, p.col) + '.str.contains(' + py(v) + ', case=False, regex=False, na=False)]'];
+    case 'does not contain': return ['df = df[~' + strOf(f, p.col) + '.str.contains(' + py(v) + ', case=False, regex=False, na=False)]'];
+    case 'starts with': return ['df = df[' + strOf(f, p.col) + '.str.lower().str.startswith(' + py(String(v).toLowerCase()) + ', na=False)]'];
+    case 'ends with': return ['df = df[' + strOf(f, p.col) + '.str.lower().str.endswith(' + py(String(v).toLowerCase()) + ', na=False)]'];
+    case 'matches regex': return ['df = df[' + strOf(f, p.col) + '.str.contains(' + pyRaw(v) + ', regex=True, na=False)]'];
+    case 'is one of':
+      var items = parseList(v).map(function (x) { return t === 'number' && isNum(x) ? String(Number(x)) : py(x); });
+      return ['df = df[' + c + '.isin([' + items.join(', ') + '])]'];
+    default:
+      var lit = t === 'number' && isNum(v) ? String(Number(v)) : t === 'datetime' ? 'pd.Timestamp(' + py(v) + ', tz="UTC")' : py(v);
+      return ['df = df[' + c + ' ' + p.op + ' ' + lit + ']'];
+  }
+}
+
+/* ---------- blocks ---------- */
+var CATS = [
+  { id: 'filter', label: 'Filter' },
+  { id: 'transform', label: 'Transform' },
+  { id: 'combine', label: 'Combine & summarize' },
+  { id: 'output', label: 'Output' }
+];
+
+function needDatetime(f, c) {
+  needCol(f, c);
+  if (f.types[c] !== 'datetime') throw new Error('"' + c + '" is not a datetime yet. Add a Parse datetime block above this one.');
+}
+
+var BLOCKS = {
+  filter: {
+    cat: 'filter', title: 'Keep rows where', api: 'df[mask]',
+    help: 'Keep only the rows that pass a test.',
+    params: [
+      { k: 'col', t: 'col' },
+      { k: 'op', t: 'select', options: FILTER_OPS },
+      { k: 'value', t: 'text', ph: 'value', show: function (p) { return needsValue(p.op); } }
+    ],
+    defaults: { col: '', op: '==', value: '' },
+    describe: function (p) { return 'Keep rows where ' + p.col + ' ' + p.op + (needsValue(p.op) ? ' ' + p.value : ''); },
+    apply: function (f, p) {
+      needCol(f, p.col);
+      var test = makeTest(p.op, p.value, f.types[p.col]);
+      return makeFrame(f.cols, f.rows.filter(function (r) { return test(r[p.col]); }), f.types);
+    },
+    code: filterCode
+  },
+  dedupe: {
+    cat: 'filter', title: 'Drop duplicates', api: 'drop_duplicates',
+    help: 'Keep the first row of each repeated set. Pick columns to compare, or leave empty to compare whole rows.',
+    params: [{ k: 'cols', t: 'cols', label: 'compare' }],
+    defaults: { cols: [] },
+    describe: function (p) { return 'Drop duplicate rows' + (p.cols.length ? ' by ' + p.cols.join(', ') : ''); },
+    apply: function (f, p) {
+      var cols = p.cols.length ? p.cols : f.cols;
+      cols.forEach(function (c) { needCol(f, c); });
+      var seen = new Set();
+      var rows = f.rows.filter(function (r) {
+        var k = cols.map(function (c) { return keyOf(r[c]); }).join('\u0001');
+        if (seen.has(k)) return false; seen.add(k); return true;
+      });
+      return makeFrame(f.cols, rows, f.types);
+    },
+    code: function (p) { return [p.cols.length ? 'df = df.drop_duplicates(subset=' + pyList(p.cols) + ')' : 'df = df.drop_duplicates()']; }
+  },
+  timewindow: {
+    cat: 'filter', title: 'Time window', api: '.dt',
+    help: 'Filter a datetime column by hour of day (UTC), date range, or weekday.',
+    params: [
+      { k: 'col', t: 'col', types: ['datetime'] },
+      { k: 'mode', t: 'select', options: ['hour outside', 'hour inside', 'between', 'on weekends', 'on weekdays'] },
+      { k: 'from', t: 'number', label: 'from hour', min: 0, max: 23, show: function (p) { return /^hour/.test(p.mode); } },
+      { k: 'to', t: 'number', label: 'to hour', min: 0, max: 24, show: function (p) { return /^hour/.test(p.mode); } },
+      { k: 'start', t: 'text', ph: '2026-09-15 00:00', label: 'from', show: function (p) { return p.mode === 'between'; } },
+      { k: 'end', t: 'text', ph: '2026-09-16 00:00', label: 'to', show: function (p) { return p.mode === 'between'; } }
+    ],
+    defaults: { col: '', mode: 'hour outside', from: 8, to: 18, start: '', end: '' },
+    describe: function (p) {
+      if (/^hour/.test(p.mode)) return 'Keep rows where the hour of ' + p.col + ' is ' + p.mode.replace('hour ', '') + ' ' + p.from + ':00–' + p.to + ':00 UTC';
+      if (p.mode === 'between') return 'Keep rows where ' + p.col + ' is between ' + (p.start || 'the start') + ' and ' + (p.end || 'the end');
+      return 'Keep rows where ' + p.col + ' falls ' + p.mode;
+    },
+    apply: function (f, p) {
+      needDatetime(f, p.col);
+      var c = p.col, test;
+      if (/^hour/.test(p.mode)) {
+        var a = Number(p.from), b = Number(p.to);
+        if (!(a >= 0 && a <= 23 && b >= 0 && b <= 24)) throw new Error('Hours run from 0 to 24.');
+        var inside = a <= b ? function (h) { return h >= a && h < b; } : function (h) { return h >= a || h < b; };
+        var want = p.mode === 'hour inside';
+        test = function (v) { return v instanceof Date && inside(v.getUTCHours()) === want; };
+      } else if (p.mode === 'between') {
+        var s = p.start ? parseDate(p.start) : null, e = p.end ? parseDate(p.end) : null;
+        if (p.start && !s) throw new Error('The start date does not parse. Try 2026-09-15 00:00.');
+        if (p.end && !e) throw new Error('The end date does not parse. Try 2026-09-16 00:00.');
+        if (!s && !e) throw new Error('Enter a start date, an end date, or both.');
+        test = function (v) { if (!(v instanceof Date)) return false; var t = v.getTime(); return (!s || t >= s.getTime()) && (!e || t <= e.getTime()); };
+      } else {
+        var wk = p.mode === 'on weekends';
+        test = function (v) { if (!(v instanceof Date)) return false; var d = v.getUTCDay(); return (d === 0 || d === 6) === wk; };
+      }
+      return makeFrame(f.cols, f.rows.filter(function (r) { return test(r[c]); }), f.types);
+    },
+    code: function (p) {
+      var c = C(p.col);
+      if (/^hour/.test(p.mode)) {
+        var a = Number(p.from), b = Number(p.to), mask;
+        if (a <= b) mask = c + '.dt.hour.between(' + a + ', ' + (b - 1) + ')';
+        else mask = '(' + c + '.dt.hour >= ' + a + ') | (' + c + '.dt.hour < ' + b + ')';
+        if (p.mode === 'hour inside') return ['df = df[' + mask + ']'];
+        return ['df = df[~(' + mask + ')]'];
+      }
+      if (p.mode === 'between') {
+        var parts = [];
+        if (p.start) parts.push('(' + c + ' >= pd.Timestamp(' + py(p.start) + ', tz="UTC"))');
+        if (p.end) parts.push('(' + c + ' <= pd.Timestamp(' + py(p.end) + ', tz="UTC"))');
+        return ['df = df[' + parts.join(' & ') + ']'];
+      }
+      return ['df = df[' + c + '.dt.dayofweek ' + (p.mode === 'on weekends' ? '>= 5' : '< 5') + ']'];
+    }
+  },
+  todatetime: {
+    cat: 'transform', title: 'Parse datetime', api: 'to_datetime',
+    help: 'Turn text or numbers into real UTC timestamps so you can filter and sort by time.',
+    params: [
+      { k: 'col', t: 'col' },
+      { k: 'unit', t: 'select', label: 'from', options: ['text', 'epoch seconds', 'epoch milliseconds', 'FILETIME'] }
+    ],
+    defaults: { col: '', unit: 'text' },
+    describe: function (p) { return 'Parse ' + p.col + ' as a UTC datetime' + (p.unit === 'text' ? '' : ' (' + p.unit + ')'); },
+    apply: function (f, p) {
+      needCol(f, p.col);
+      var c = p.col, conv;
+      if (p.unit === 'text') conv = parseDate;
+      else {
+        conv = function (v) {
+          if (v instanceof Date) return v;
+          var n = Number(v);
+          if (isNullish(v) || Number.isNaN(n)) return null;
+          var ms = p.unit === 'epoch seconds' ? n * 1000 : p.unit === 'epoch milliseconds' ? n : (n - 116444736000000000) / 10000;
+          var d = new Date(ms); return Number.isNaN(d.getTime()) ? null : d;
+        };
+      }
+      var rows = f.rows.map(function (r) { var o = Object.assign({}, r); o[c] = conv(r[c]); return o; });
+      var types = Object.assign({}, f.types); types[c] = 'datetime';
+      return makeFrame(f.cols, rows, types);
+    },
+    code: function (p) {
+      var c = C(p.col);
+      if (p.unit === 'epoch seconds') return [c + ' = pd.to_datetime(' + c + ', unit="s", utc=True, errors="coerce")'];
+      if (p.unit === 'epoch milliseconds') return [c + ' = pd.to_datetime(' + c + ', unit="ms", utc=True, errors="coerce")'];
+      if (p.unit === 'FILETIME') return [c + ' = pd.to_datetime((' + c + ' - 116444736000000000) // 10, unit="us", utc=True, errors="coerce")'];
+      return [c + ' = pd.to_datetime(' + c + ', utc=True, errors="coerce")'];
+    }
+  },
+  select: {
+    cat: 'transform', title: 'Select columns', api: 'df[[...]]',
+    help: 'Keep only these columns, in this order.',
+    params: [{ k: 'cols', t: 'cols', label: 'keep' }],
+    defaults: { cols: [] },
+    describe: function (p) { return 'Keep only ' + (p.cols.join(', ') || 'chosen columns'); },
+    apply: function (f, p) {
+      if (!p.cols.length) throw new Error('Add at least one column to keep.');
+      p.cols.forEach(function (c) { needCol(f, c); });
+      var rows = f.rows.map(function (r) { var o = {}; p.cols.forEach(function (c) { o[c] = r[c]; }); return o; });
+      var types = {}; p.cols.forEach(function (c) { types[c] = f.types[c]; });
+      return makeFrame(p.cols, rows, types);
+    },
+    code: function (p) { return ['df = df[' + pyList(p.cols) + ']']; }
+  },
+  rename: {
+    cat: 'transform', title: 'Rename columns', api: 'rename',
+    help: 'Give columns clearer names.',
+    params: [{ k: 'pairs', t: 'pairs' }],
+    defaults: { pairs: [{ from: '', to: '' }] },
+    describe: function (p) { return 'Rename ' + p.pairs.filter(function (x) { return x.from; }).map(function (x) { return x.from + ' → ' + x.to; }).join(', '); },
+    apply: function (f, p) {
+      var map = {};
+      p.pairs.forEach(function (x) {
+        if (!x.from && !x.to) return;
+        needCol(f, x.from, 'a column to rename');
+        if (!x.to) throw new Error('Give "' + x.from + '" a new name.');
+        map[x.from] = x.to;
+      });
+      if (!Object.keys(map).length) throw new Error('Pick a column to rename.');
+      var cols = f.cols.map(function (c) { return map[c] || c; });
+      var rows = f.rows.map(function (r) { var o = {}; f.cols.forEach(function (c) { o[map[c] || c] = r[c]; }); return o; });
+      var types = {}; f.cols.forEach(function (c) { types[map[c] || c] = f.types[c]; });
+      return makeFrame(cols, rows, types);
+    },
+    code: function (p) {
+      var items = p.pairs.filter(function (x) { return x.from && x.to; }).map(function (x) { return py(x.from) + ': ' + py(x.to); });
+      return ['df = df.rename(columns={' + items.join(', ') + '})'];
+    }
+  },
+  extract: {
+    cat: 'transform', title: 'Regex extract', api: 'str.extract',
+    help: 'Pull part of a text column into a new column. The part in ( ) is what gets kept.',
+    params: [
+      { k: 'col', t: 'col', label: 'from' },
+      { k: 'pattern', t: 'text', label: 'pattern', mono: true, ph: '\\((\\d+\\.\\d+\\.\\d+\\.\\d+)\\)' },
+      { k: 'newcol', t: 'text', label: 'into', ph: 'new column' }
+    ],
+    defaults: { col: '', pattern: '', newcol: '' },
+    describe: function (p) { return 'Extract ' + (p.newcol || 'a new column') + ' from ' + p.col; },
+    apply: function (f, p) {
+      needCol(f, p.col);
+      if (!p.pattern) throw new Error('Enter a pattern.');
+      if (!p.newcol) throw new Error('Name the new column.');
+      var pat = groupedPattern(p.pattern);
+      var re = makeRegex(pat);
+      var groups = new RegExp(pat + '|').exec('').length - 1;
+      if (groups > 1) throw new Error('Use one capture group. Write extra groups as (?:...).');
+      var rows = f.rows.map(function (r) {
+        var o = Object.assign({}, r), v = r[p.col];
+        var m = isNullish(v) ? null : re.exec(plain(v));
+        o[p.newcol] = m ? (m[1] === undefined ? null : m[1]) : null;
+        return o;
+      });
+      var cols = f.cols.indexOf(p.newcol) < 0 ? f.cols.concat([p.newcol]) : f.cols;
+      var types = Object.assign({}, f.types); types[p.newcol] = 'string';
+      return makeFrame(cols, rows, types);
+    },
+    code: function (p, f) { return [C(p.newcol) + ' = ' + strOf(f, p.col) + '.str.extract(' + pyRaw(groupedPattern(p.pattern)) + ', expand=False)']; }
+  },
+  newcol: {
+    cat: 'transform', title: 'New column', api: 'assign',
+    help: 'Join columns into one text column, or add a fixed value.',
+    params: [
+      { k: 'newcol', t: 'text', label: 'name', ph: 'event' },
+      { k: 'mode', t: 'select', label: 'from', options: ['joined columns', 'fixed value'] },
+      { k: 'cols', t: 'cols', label: 'join', show: function (p) { return p.mode === 'joined columns'; } },
+      { k: 'sep', t: 'text', label: 'with', ph: ' | ', mono: true, show: function (p) { return p.mode === 'joined columns'; } },
+      { k: 'value', t: 'text', label: 'value', show: function (p) { return p.mode === 'fixed value'; } }
+    ],
+    defaults: { newcol: '', mode: 'joined columns', cols: [], sep: ' | ', value: '' },
+    describe: function (p) { return 'New column ' + (p.newcol || '?') + (p.mode === 'fixed value' ? ' = ' + p.value : ' from ' + p.cols.join(' + ')); },
+    apply: function (f, p) {
+      if (!p.newcol) throw new Error('Name the new column.');
+      var rows, type;
+      if (p.mode === 'fixed value') {
+        var val = isNum(p.value) ? Number(p.value) : p.value;
+        rows = f.rows.map(function (r) { var o = Object.assign({}, r); o[p.newcol] = val; return o; });
+        type = typeof val === 'number' ? 'number' : 'string';
+      } else {
+        if (!p.cols.length) throw new Error('Add the columns to join.');
+        p.cols.forEach(function (c) { needCol(f, c); });
+        rows = f.rows.map(function (r) {
+          var o = Object.assign({}, r);
+          o[p.newcol] = p.cols.map(function (c) { return plain(r[c], f.types[c]); }).join(p.sep);
+          return o;
+        });
+        type = 'string';
+      }
+      var cols = f.cols.indexOf(p.newcol) < 0 ? f.cols.concat([p.newcol]) : f.cols;
+      var types = Object.assign({}, f.types); types[p.newcol] = type;
+      return makeFrame(cols, rows, types);
+    },
+    code: function (p, f) {
+      if (p.mode === 'fixed value') return [C(p.newcol) + ' = ' + (isNum(p.value) ? String(Number(p.value)) : py(p.value))];
+      var parts = p.cols.map(function (c) { return f && f.types[c] === 'datetime' ? C(c) + '.astype(str)' : C(c) + '.fillna("").astype(str)'; });
+      if (parts.length === 1) return [C(p.newcol) + ' = ' + parts[0]];
+      return [C(p.newcol) + ' = (', '    ' + parts.join('\n    + ' + py(p.sep) + ' + '), ')'];
+    }
+  },
+  merge: {
+    cat: 'combine', title: 'Merge with table', api: 'merge',
+    help: 'Match rows against a second file, such as an IOC list.',
+    params: [
+      { k: 'table', t: 'table' },
+      { k: 'leftOn', t: 'col', label: 'where' },
+      { k: 'rightOn', t: 'tcol', label: 'matches' },
+      { k: 'how', t: 'select', label: 'and', options: ['keep matches only', 'keep all, flag matches', 'drop matches'] }
+    ],
+    defaults: { table: '', leftOn: '', rightOn: '', how: 'keep matches only' },
+    describe: function (p) {
+      var verb = p.how === 'drop matches' ? 'Drop rows whose ' : p.how === 'keep all, flag matches' ? 'Flag rows whose ' : 'Keep rows whose ';
+      return verb + p.leftOn + ' appears in ' + p.table + ' (' + p.rightOn + ')';
+    },
+    apply: function (f, p, ctx) {
+      if (!p.table) throw new Error('Choose or load the second table.');
+      var t = ctx.tables[p.table];
+      if (!t) throw new Error('The table "' + p.table + '" is not loaded. Load it with the button above.');
+      var R = t.frame;
+      needCol(f, p.leftOn, 'the column to match on');
+      if (!p.rightOn) throw new Error('Choose the column in ' + p.table + ' to match against.');
+      if (R.cols.indexOf(p.rightOn) < 0) throw new Error(p.table + ' has no column named "' + p.rightOn + '".');
+      var kv = function (v) { return isNullish(v) ? null : plain(v).trim(); };
+      if (p.how === 'drop matches') {
+        var set = new Set(R.rows.map(function (r) { return kv(r[p.rightOn]); }));
+        return makeFrame(f.cols, f.rows.filter(function (r) { var k = kv(r[p.leftOn]); return k === null || !set.has(k); }), f.types);
+      }
+      var idx = new Map();
+      R.rows.forEach(function (r) { var k = kv(r[p.rightOn]); if (k === null) return; if (!idx.has(k)) idx.set(k, []); idx.get(k).push(r); });
+      var sameKey = p.leftOn === p.rightOn;
+      var rCols = R.cols.filter(function (c) { return !(sameKey && c === p.rightOn); });
+      var lName = {}, rName = {};
+      f.cols.forEach(function (c) { lName[c] = c; });
+      rCols.forEach(function (c) { rName[c] = c; });
+      rCols.forEach(function (c) { if (f.cols.indexOf(c) >= 0 && !(sameKey && c === p.leftOn)) { lName[c] = c + '_x'; rName[c] = c + '_y'; } });
+      var flag = p.how === 'keep all, flag matches';
+      var cols = f.cols.map(function (c) { return lName[c]; }).concat(rCols.map(function (c) { return rName[c]; }));
+      if (flag) cols.push('match');
+      var rows = [];
+      f.rows.forEach(function (l) {
+        var k = kv(l[p.leftOn]);
+        var hits = k === null ? null : idx.get(k);
+        if (!hits) {
+          if (!flag) return;
+          var o = {}; f.cols.forEach(function (c) { o[lName[c]] = l[c]; }); rCols.forEach(function (c) { o[rName[c]] = null; }); o.match = false; rows.push(o);
+          return;
+        }
+        hits.forEach(function (r) {
+          var o = {}; f.cols.forEach(function (c) { o[lName[c]] = l[c]; }); rCols.forEach(function (c) { o[rName[c]] = r[c]; });
+          if (flag) o.match = true; rows.push(o);
+        });
+      });
+      var types = {};
+      f.cols.forEach(function (c) { types[lName[c]] = f.types[c]; });
+      rCols.forEach(function (c) { types[rName[c]] = R.types[c]; });
+      if (flag) types.match = 'bool';
+      return makeFrame(cols, rows, types);
+    },
+    code: function (p) {
+      var v = pyVar(p.table);
+      if (p.how === 'drop matches') return ['df = df[~' + C(p.leftOn) + '.isin(' + v + '[' + py(p.rightOn) + '])]'];
+      var on = p.leftOn === p.rightOn ? 'on=' + py(p.leftOn) : 'left_on=' + py(p.leftOn) + ', right_on=' + py(p.rightOn);
+      if (p.how === 'keep all, flag matches') return [
+        'df = df.merge(' + v + ', ' + on + ', how="left", indicator="match")',
+        'df["match"] = df["match"].eq("both")'
+      ];
+      return ['df = df.merge(' + v + ', ' + on + ', how="inner")'];
+    }
+  },
+  groupcount: {
+    cat: 'combine', title: 'Group & count', api: 'groupby',
+    help: 'Count rows for each combination of values, biggest first.',
+    params: [{ k: 'cols', t: 'cols', label: 'by' }, { k: 'name', t: 'text', label: 'count as', ph: 'count' }],
+    defaults: { cols: [], name: 'count' },
+    describe: function (p) { return 'Count rows by ' + (p.cols.join(', ') || '?'); },
+    apply: function (f, p) {
+      if (!p.cols.length) throw new Error('Add the columns to group by.');
+      p.cols.forEach(function (c) { needCol(f, c); });
+      var name = p.name || 'count';
+      var groups = new Map();
+      f.rows.forEach(function (r) {
+        var k = p.cols.map(function (c) { return keyOf(r[c]); }).join('\u0001');
+        var g = groups.get(k);
+        if (!g) { g = { row: {}, n: 0 }; p.cols.forEach(function (c) { g.row[c] = r[c]; }); groups.set(k, g); }
+        g.n++;
+      });
+      var rows = Array.from(groups.values()).map(function (g) { g.row[name] = g.n; return g.row; });
+      rows.sort(function (a, b) { return b[name] - a[name]; });
+      var types = {}; p.cols.forEach(function (c) { types[c] = f.types[c]; }); types[name] = 'number';
+      return makeFrame(p.cols.concat([name]), rows, types);
+    },
+    code: function (p) {
+      var name = p.name || 'count';
+      return [
+        'df = (df.groupby(' + pyList(p.cols) + ', dropna=False)',
+        '        .size()',
+        '        .reset_index(name=' + py(name) + ')',
+        '        .sort_values(' + py(name) + ', ascending=False))'
+      ];
+    }
+  },
+  sort: {
+    cat: 'combine', title: 'Sort', api: 'sort_values',
+    help: 'Order rows by a column. Empty values go last.',
+    params: [{ k: 'col', t: 'col', label: 'by' }, { k: 'dir', t: 'select', options: ['oldest / smallest first', 'newest / largest first'] }],
+    defaults: { col: '', dir: 'oldest / smallest first' },
+    describe: function (p) { return 'Sort by ' + p.col + (p.dir[0] === 'n' ? ', largest first' : ''); },
+    apply: function (f, p) {
+      needCol(f, p.col);
+      var asc = p.dir[0] !== 'n', c = p.col;
+      var val = function (v) { return v instanceof Date ? v.getTime() : v; };
+      var rows = f.rows.slice().sort(function (a, b) {
+        var x = a[c], y = b[c], nx = isNullish(x), ny = isNullish(y);
+        if (nx || ny) return nx === ny ? 0 : nx ? 1 : -1;
+        x = val(x); y = val(y);
+        if (typeof x !== typeof y) { x = String(x); y = String(y); }
+        var r = x < y ? -1 : x > y ? 1 : 0;
+        return asc ? r : -r;
+      });
+      return makeFrame(f.cols, rows, f.types);
+    },
+    code: function (p) { return ['df = df.sort_values(' + py(p.col) + ', ascending=' + (p.dir[0] !== 'n' ? 'True' : 'False') + ')']; }
+  },
+  head: {
+    cat: 'combine', title: 'First rows', api: 'head',
+    help: 'Keep only the first N rows.',
+    params: [{ k: 'n', t: 'number', label: 'rows', min: 1 }],
+    defaults: { n: 20 },
+    describe: function (p) { return 'Keep the first ' + p.n + ' rows'; },
+    apply: function (f, p) {
+      var n = Math.floor(Number(p.n));
+      if (!(n >= 0)) throw new Error('Enter how many rows to keep.');
+      return makeFrame(f.cols, f.rows.slice(0, n), f.types);
+    },
+    code: function (p) { return ['df = df.head(' + Math.floor(Number(p.n)) + ')']; }
+  },
+  mill: {
+    cat: 'output', title: 'Send to Mill', api: 'timeline',
+    help: 'Shape rows into a timeline CSV for Mill: timestamp, event, then the other columns, oldest first.',
+    params: [{ k: 'time', t: 'col', label: 'time' }, { k: 'label', t: 'col', label: 'event' }],
+    defaults: { time: '', label: '' },
+    describe: function () { return 'Shape a Mill timeline and save mill_timeline.csv'; },
+    apply: function (f, p, ctx) {
+      needCol(f, p.time, 'the time column'); needCol(f, p.label, 'the event column');
+      if (p.time === p.label) throw new Error('Pick different columns for time and event.');
+      var rest = f.cols.filter(function (c) { return c !== p.time && c !== p.label && c !== 'timestamp' && c !== 'event'; });
+      var cols = ['timestamp', 'event'].concat(rest);
+      var rows = f.rows.map(function (r) { var o = { timestamp: r[p.time], event: r[p.label] }; rest.forEach(function (c) { o[c] = r[c]; }); return o; });
+      var types = { timestamp: f.types[p.time], event: f.types[p.label] }; rest.forEach(function (c) { types[c] = f.types[c]; });
+      var out = BLOCKS.sort.apply(makeFrame(cols, rows, types), { col: 'timestamp', dir: 'o' });
+      ctx.outputs.push({ file: 'mill_timeline.csv', frame: out, kind: 'Mill timeline', to: 'mill' });
+      return out;
+    },
+    code: function (p) {
+      return [
+        'df = df.rename(columns={' + py(p.time) + ': "timestamp", ' + py(p.label) + ': "event"})',
+        'df = df.sort_values("timestamp")',
+        'df = df[["timestamp", "event"] + [c for c in df.columns if c not in ("timestamp", "event")]]',
+        'df.to_csv("mill_timeline.csv", index=False)'
+      ];
+    }
+  },
+  spoke: {
+    cat: 'output', title: 'Send to Spoke', api: 'edges',
+    help: 'Shape rows into an edge list for Spoke: source, target, and an optional relationship and count.',
+    params: [
+      { k: 'source', t: 'col', label: 'source' }, { k: 'target', t: 'col', label: 'target' },
+      { k: 'label', t: 'col', label: 'relationship', optional: true }, { k: 'weight', t: 'col', label: 'count', optional: true }
+    ],
+    defaults: { source: '', target: '', weight: '', label: '' },
+    describe: function () { return 'Shape a Spoke edge list and save spoke_edges.csv'; },
+    apply: function (f, p, ctx) {
+      needCol(f, p.source, 'the source column'); needCol(f, p.target, 'the target column');
+      if (p.weight) needCol(f, p.weight); if (p.label) needCol(f, p.label);
+      var map = spokeMap(p);
+      var rows = [];
+      f.rows.forEach(function (r) {
+        if (isNullish(r[p.source]) || isNullish(r[p.target])) return;
+        var o = {}; map.forEach(function (m) { o[m[1]] = r[m[0]]; }); rows.push(o);
+      });
+      var types = {}; map.forEach(function (m) { types[m[1]] = f.types[m[0]]; });
+      var out = makeFrame(map.map(function (m) { return m[1]; }), rows, types);
+      ctx.outputs.push({ file: 'spoke_edges.csv', frame: out, kind: 'Spoke edge list', to: 'spoke' });
+      return out;
+    },
+    code: function (p) {
+      var pairs = spokeMap(p);
+      var map = pairs.map(function (x) { return py(x[0]) + ': ' + py(x[1]); }).join(', ');
+      return [
+        'df = df.rename(columns={' + map + '})[' + pyList(pairs.map(function (x) { return x[1]; })) + ']',
+        'df = df.dropna(subset=["source", "target"])',
+        'df.to_csv("spoke_edges.csv", index=False)'
+      ];
+    }
+  },
+  writecsv: {
+    cat: 'output', title: 'Write CSV', api: 'to_csv',
+    help: 'Save the rows at this point as a CSV file.',
+    params: [{ k: 'file', t: 'text', label: 'file', ph: 'results.csv', mono: true }],
+    defaults: { file: 'results.csv' },
+    describe: function (p) { return 'Save ' + (p.file || 'results.csv'); },
+    apply: function (f, p, ctx) {
+      var name = (p.file || 'results.csv').trim();
+      if (!/\.csv$/i.test(name)) name += '.csv';
+      ctx.outputs.push({ file: name, frame: f, kind: 'CSV' });
+      return f;
+    },
+    code: function (p) { var name = (p.file || 'results.csv').trim(); if (!/\.csv$/i.test(name)) name += '.csv'; return ['df.to_csv(' + py(name) + ', index=False)']; }
+  }
+};
+function spokeMap(p) {
+  var m = [[p.source, 'source'], [p.target, 'target']];
+  if (p.label) m.push([p.label, 'relationship']);
+  if (p.weight) m.push([p.weight, 'count']);
+  return m;
+}
+function groupedPattern(pat) {
+  var hasGroup = /\((?!\?)|\(\?<[a-zA-Z]/.test(String(pat).replace(/\\./g, ''));
+  return hasGroup ? pat : '(' + pat + ')';
+}
+
+/* ---------- pipeline ---------- */
+function runPipeline(state) {
+  var ctx = { tables: state.tables, outputs: [] };
+  var src = state.tables[state.source];
+  var results = [];
+  var f = src ? src.frame : null;
+  var failed = !f;
+  state.steps.forEach(function (s, i) {
+    var B = BLOCKS[s.type];
+    if (failed) { results.push({ ok: false, blocked: true, input: f }); return; }
+    try {
+      var out = B.apply(f, s.params, ctx);
+      results.push({ ok: true, input: f, output: out });
+      f = out;
+    } catch (e) {
+      results.push({ ok: false, input: f, error: e.message || String(e) });
+      failed = true;
+    }
+  });
+  return { results: results, outputs: ctx.outputs, final: failed ? null : f, source: src ? src.frame : null };
+}
+
+/* ---------- code generation ---------- */
+function stepsTables(state) {
+  var names = [];
+  state.steps.forEach(function (s) { if (s.type === 'merge' && s.params.table && names.indexOf(s.params.table) < 0) names.push(s.params.table); });
+  return names;
+}
+function generateCode(state, run) {
+  var lines = ['import pandas as pd', ''];
+  var title = state.name || 'Shifu recipe';
+  lines.unshift('# ' + title + ' (built with Shifu)');
+  lines.push('# Load');
+  lines.push('df = ' + readCall(state.source || 'your_file.csv'));
+  stepsTables(state).forEach(function (t) { lines.push(pyVar(t) + ' = ' + readCall(t)); });
+  state.steps.forEach(function (s, i) {
+    var B = BLOCKS[s.type], r = run && run.results[i];
+    lines.push('');
+    lines.push('# ' + (i + 1) + '. ' + B.describe(s.params));
+    try { B.code(s.params, r && r.input).forEach(function (l) { lines.push(l); }); }
+    catch (e) { lines.push('# (incomplete step)'); }
+  });
+  return lines.join('\n') + '\n';
+}
+function generateNotebook(state, run) {
+  var cells = [];
+  function md(src) { cells.push({ cell_type: 'markdown', metadata: {}, source: src }); }
+  function code(src) { cells.push({ cell_type: 'code', metadata: {}, execution_count: null, outputs: [], source: src }); }
+  md('# ' + (state.name || 'Shifu recipe') + '\nBuilt with Shifu. Each cell is one block.');
+  var load = ['import pandas as pd', '', 'df = ' + readCall(state.source || 'your_file.csv')];
+  stepsTables(state).forEach(function (t) { load.push(pyVar(t) + ' = ' + readCall(t)); });
+  load.push('df.head()');
+  code(load.join('\n'));
+  state.steps.forEach(function (s, i) {
+    var B = BLOCKS[s.type], r = run && run.results[i], body;
+    try { body = B.code(s.params, r && r.input).join('\n'); } catch (e) { body = '# (incomplete step)'; }
+    var tail = B.cat === 'output' ? '' : '\ndf.head()';
+    code('# ' + (i + 1) + '. ' + B.describe(s.params) + '\n' + body + tail);
+  });
+  return JSON.stringify({ cells: cells, metadata: { kernelspec: { display_name: 'Python 3', language: 'python', name: 'python3' } }, nbformat: 4, nbformat_minor: 5 }, null, 1);
+}
+
+/* ---------- sample data (fictional, generated) ---------- */
+function rng(seed) {
+  return function () {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function pick(r, arr) { return arr[Math.floor(r() * arr.length)]; }
+function wpick(r, pairs) {
+  var tot = pairs.reduce(function (a, p) { return a + p[1]; }, 0), x = r() * tot;
+  for (var i = 0; i < pairs.length; i++) { x -= pairs[i][1]; if (x <= 0) return pairs[i][0]; }
+  return pairs[pairs.length - 1][0];
+}
+function tsText(ms, fracDigits) {
+  var d = new Date(ms);
+  var s = d.getUTCFullYear() + '-' + pad(d.getUTCMonth() + 1) + '-' + pad(d.getUTCDate()) + ' ' + pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes()) + ':' + pad(d.getUTCSeconds());
+  if (fracDigits) s += '.' + (pad(d.getUTCMilliseconds(), 3) + '0000000').slice(0, fracDigits);
+  return s;
+}
+var DAY0 = Date.UTC(2026, 8, 14);
+function workTime(r, day) {
+  var h = r() < 0.88 ? 8 + r() * 10 : r() * 24;
+  return DAY0 + day * 86400000 + Math.floor(h * 3600000);
+}
+var HOSTS = ['WS-0142.corp.example', 'WS-0187.corp.example', 'WS-0203.corp.example', 'FS-01.corp.example', 'DC-01.corp.example', 'SQL-02.corp.example'];
+var WS_IP = { 'WS-0142': '10.0.4.23', 'WS-0187': '10.0.4.51', 'WS-0203': '10.0.4.77', 'FS-01': '10.0.2.15', 'JUMP-01': '10.0.1.5' };
+var USERS = ['CORP\\amartin', 'CORP\\bchen', 'CORP\\dpatel', 'CORP\\jlee', 'CORP\\admin.rk', 'CORP\\svc_backup'];
+
+function sampleSecurity() {
+  var r = rng(42), rows = [];
+  for (var i = 0; i < 900; i++) {
+    var day = Math.floor(r() * 3), t = workTime(r, day);
+    var id = wpick(r, [[4624, 45], [4634, 22], [4672, 10], [4625, 9], [4688, 14]]);
+    var user = pick(r, USERS.slice(0, 4).concat(['CORP\\svc_backup']));
+    var comp = pick(r, HOSTS), ws = pick(r, ['WS-0142', 'WS-0187', 'WS-0203', 'JUMP-01']);
+    var lt = user === 'CORP\\svc_backup' ? 5 : wpick(r, [[3, 62], [2, 22], [10, 16]]);
+    var remote = (lt === 3 || lt === 10) ? ws + ' (' + WS_IP[ws] + ')' : '- (-)';
+    rows.push(secRow(t, id, comp, user, lt, remote, r));
+  }
+  /* injected story: brute force, then off-hours RDP from an outside IP, then lateral movement */
+  var b = DAY0 + 86400000 + 1 * 3600000 + 40 * 60000;
+  for (var k = 0; k < 14; k++) rows.push(secRow(b + k * 9000, 4625, 'FS-01.corp.example', 'CORP\\administrator', 10, 'kali (45.137.21.9)', r));
+  var a = DAY0 + 86400000 + 2 * 3600000 + 6 * 60000;
+  rows.push(secRow(a, 4624, 'FS-01.corp.example', 'CORP\\admin.rk', 10, 'DESKTOP-7Q2 (185.220.101.47)', r));
+  rows.push(secRow(a + 2000, 4672, 'FS-01.corp.example', 'CORP\\admin.rk', 10, '- (-)', r));
+  rows.push(secRow(a + 1260000, 4624, 'DC-01.corp.example', 'CORP\\admin.rk', 3, 'FS-01 (10.0.2.15)', r));
+  rows.push(secRow(a + 1500000, 4624, 'SQL-02.corp.example', 'CORP\\admin.rk', 3, 'FS-01 (10.0.2.15)', r));
+  rows.push(secRow(a + 1560000, 4624, 'WS-0187.corp.example', 'CORP\\admin.rk', 3, 'FS-01 (10.0.2.15)', r));
+  rows.push(secRow(a + 3300000, 4624, 'FS-01.corp.example', 'CORP\\admin.rk', 10, 'DESKTOP-7Q2 (185.220.101.47)', r));
+  rows.sort(function (x, y) { return x._t - y._t; });
+  rows.forEach(function (row, n) { row.RecordNumber = 81200 + n; delete row._t; });
+  var cols = ['RecordNumber', 'TimeCreated', 'EventId', 'Level', 'Provider', 'Channel', 'Computer', 'UserName', 'RemoteHost', 'PayloadData1', 'PayloadData2', 'ExecutableInfo', 'MapDescription'];
+  return makeFrame(cols, rows.map(function (o) { var x = {}; cols.forEach(function (c) { x[c] = o[c] === undefined ? null : o[c]; }); return x; }));
+}
+var SEC_DESC = { 4624: 'Successful logon', 4625: 'Failed logon', 4634: 'An account was logged off', 4672: 'Special privileges assigned to new logon', 4688: 'A new process has been created' };
+var PROCS = ['C:\\Windows\\System32\\svchost.exe', 'C:\\Windows\\explorer.exe', 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe', 'C:\\Windows\\System32\\cmd.exe', 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe'];
+function secRow(t, id, comp, user, lt, remote, r) {
+  var logon = id === 4624 || id === 4625;
+  return {
+    _t: t, TimeCreated: tsText(t, 7), EventId: id, Level: id === 4625 ? 'Info' : 'LogAlways',
+    Provider: 'Microsoft-Windows-Security-Auditing', Channel: 'Security', Computer: comp,
+    UserName: user, RemoteHost: logon ? remote : null,
+    PayloadData1: logon ? 'LogonType ' + lt : id === 4688 ? 'Parent: C:\\Windows\\explorer.exe' : null,
+    PayloadData2: logon ? 'LogonId: 0x' + Math.floor(r() * 0xffffff).toString(16).toUpperCase() : null,
+    ExecutableInfo: id === 4688 ? pick(r, PROCS) : null, MapDescription: SEC_DESC[id]
+  };
+}
+function sampleIocs() {
+  var rows = [
+    { ioc: '185.220.101.47', type: 'ipv4', note: 'Tor exit node seen in phishing campaign (example)' },
+    { ioc: '45.137.21.9', type: 'ipv4', note: 'Password spraying source (example)' },
+    { ioc: '203.0.113.66', type: 'ipv4', note: 'C2 server from vendor report (example)' },
+    { ioc: 'rclone.exe', type: 'filename', note: 'Exfiltration tool (example)' }
+  ];
+  return makeFrame(['ioc', 'type', 'note'], rows);
+}
+function sampleHayabusa() {
+  var r = rng(7), rows = [];
+  var rules = [['Logon (Network)', 'info', 4624, 50], ['Logon (Interactive)', 'info', 4624, 20], ['Failed Logon - Incorrect Password', 'low', 4625, 14],
+    ['Scheduled Task Created', 'med', 4698, 4], ['Admin Share Access', 'med', 5140, 4], ['Service Installed', 'med', 7045, 3]];
+  for (var i = 0; i < 260; i++) {
+    var rule = wpick(r, rules.map(function (x) { return [x, x[3]]; }));
+    var t = workTime(r, Math.floor(r() * 3));
+    rows.push({ _t: t, RuleTitle: rule[0], Level: rule[1], Computer: pick(r, HOSTS), EventID: rule[2], user: pick(r, USERS).split('\\')[1] });
+  }
+  var a = DAY0 + 86400000 + 2 * 3600000 + 6 * 60000;
+  [['RDP Logon From Public IP', 'high', 'FS-01.corp.example', 4624, 0], ['Mimikatz Use', 'crit', 'FS-01.corp.example', 4688, 600000],
+    ['Suspicious PowerShell Download', 'high', 'FS-01.corp.example', 4104, 420000], ['PsExec Service Installed', 'high', 'DC-01.corp.example', 7045, 1300000],
+    ['PsExec Service Installed', 'high', 'SQL-02.corp.example', 7045, 1520000], ['Admin Share Access', 'med', 'DC-01.corp.example', 5140, 1290000],
+    ['Event Log Cleared', 'high', 'FS-01.corp.example', 1102, 3400000], ['Mimikatz Use', 'crit', 'DC-01.corp.example', 4688, 1400000],
+    ['Rclone Execution', 'high', 'FS-01.corp.example', 4688, 2900000]].forEach(function (x) {
+    rows.push({ _t: a + x[4], RuleTitle: x[0], Level: x[1], Computer: x[2], EventID: x[3], user: 'admin.rk' });
+  });
+  rows.sort(function (x, y) { return x._t - y._t; });
+  var out = rows.map(function (o, n) {
+    return {
+      Timestamp: tsText(o._t, 3) + ' +00:00', RuleTitle: o.RuleTitle, Level: o.Level, Computer: o.Computer,
+      Channel: o.EventID === 7045 ? 'Sys' : o.EventID === 4104 ? 'PwSh' : 'Sec', EventID: o.EventID, RecordID: 552100 + n,
+      Details: 'User: ' + o.user + ' ¦ LID: 0x' + (n * 7919 % 65535).toString(16)
+    };
+  });
+  return makeFrame(['Timestamp', 'RuleTitle', 'Level', 'Computer', 'Channel', 'EventID', 'RecordID', 'Details'], out);
+}
+function samplePrefetch() {
+  var r = rng(99), rows = [], vol = '\\VOLUME{01dad3e2a9b0c512-7e4c21aa}';
+  var common = [['\\WINDOWS\\SYSTEM32\\SVCHOST.EXE', 30], ['\\WINDOWS\\EXPLORER.EXE', 10], ['\\WINDOWS\\SYSTEM32\\CONHOST.EXE', 12],
+    ['\\PROGRAM FILES\\GOOGLE\\CHROME\\APPLICATION\\CHROME.EXE', 18], ['\\WINDOWS\\SYSTEM32\\TASKHOSTW.EXE', 8],
+    ['\\USERS\\BCHEN\\APPDATA\\LOCAL\\MICROSOFT\\TEAMS\\CURRENT\\TEAMS.EXE', 9], ['\\WINDOWS\\SYSTEM32\\WINDOWSPOWERSHELL\\V1.0\\POWERSHELL.EXE', 4],
+    ['\\PROGRAM FILES\\MICROSOFT OFFICE\\ROOT\\OFFICE16\\OUTLOOK.EXE', 9]];
+  for (var i = 0; i < 230; i++) { var t = workTime(r, Math.floor(r() * 3)); rows.push({ _t: t, p: wpick(r, common) }); }
+  var a = DAY0 + 86400000 + 2 * 3600000 + 9 * 60000;
+  [['\\USERS\\ADMIN.RK\\DOWNLOADS\\ADVANCED_IP_SCANNER.EXE', 0], ['\\WINDOWS\\SYSTEM32\\WINDOWSPOWERSHELL\\V1.0\\POWERSHELL.EXE', 300000],
+    ['\\USERS\\ADMIN.RK\\APPDATA\\LOCAL\\TEMP\\M.EXE', 540000], ['\\PROGRAMDATA\\PSEXEC64.EXE', 1150000],
+    ['\\USERS\\ADMIN.RK\\APPDATA\\LOCAL\\TEMP\\RCLONE.EXE', 2850000], ['\\USERS\\ADMIN.RK\\APPDATA\\LOCAL\\TEMP\\RCLONE.EXE', 3010000],
+    ['\\WINDOWS\\SYSTEM32\\WEVTUTIL.EXE', 3380000]].forEach(function (x) { rows.push({ _t: a + x[1], p: x[0] }); });
+  rows.sort(function (x, y) { return x._t - y._t; });
+  return makeFrame(['RunTime', 'ExecutableName'], rows.map(function (o) { return { RunTime: tsText(o._t, 0), ExecutableName: vol + o.p }; }));
+}
+function sampleMft() {
+  var r = rng(1234), rows = [];
+  var dirs = [['.\\Windows\\System32', ['.dll', '.dll', '.dll', '.exe', '.mui', '.log']], ['.\\Windows\\Temp', ['.tmp', '.log', '.etl']],
+    ['.\\Users\\bchen\\AppData\\Local\\Microsoft\\Teams', ['.json', '.log', '.dat']], ['.\\Users\\amartin\\Documents', ['.docx', '.xlsx', '.pdf']],
+    ['.\\ProgramData\\Microsoft\\Windows Defender\\Scans', ['.bin', '.log']], ['.\\Users\\jlee\\Downloads', ['.zip', '.pdf', '.msi']]];
+  var words = ['update', 'report', 'cache', 'index', 'config', 'session', 'sync', 'scan', 'invoice', 'budget', 'notes', 'driver'];
+  for (var i = 0; i < 520; i++) {
+    var d = pick(r, dirs), ext = pick(r, d[1]);
+    var day = Math.floor(r() * 16) - 13;
+    var t = workTime(r, day);
+    rows.push({ _t: t, ParentPath: d[0], FileName: pick(r, words) + '_' + Math.floor(r() * 900 + 100) + ext, Extension: ext, FileSize: Math.floor(r() * 2e6) });
+  }
+  var a = DAY0 + 86400000 + 2 * 3600000 + 8 * 60000;
+  [['.\\Users\\admin.rk\\Downloads', 'Advanced_IP_Scanner.exe', 0, 21233152], ['.\\Users\\admin.rk\\AppData\\Local\\Temp', 'm.exe', 500000, 1355264],
+    ['.\\Users\\admin.rk\\AppData\\Local\\Temp', 'dl.ps1', 280000, 2412], ['.\\ProgramData', 'PsExec64.exe', 1100000, 833472],
+    ['.\\Windows', 'PSEXESVC.exe', 1150000, 196000], ['.\\Users\\admin.rk\\AppData\\Local\\Temp', 'rclone.exe', 2800000, 54001664],
+    ['.\\Users\\admin.rk\\AppData\\Local\\Temp', 'rclone.conf', 2810000, 412], ['.\\Users\\admin.rk\\AppData\\Local\\Temp', 'clean.bat', 3350000, 198]].forEach(function (x) {
+    var ext = x[1].slice(x[1].lastIndexOf('.'));
+    rows.push({ _t: a + x[2], ParentPath: x[0], FileName: x[1], Extension: ext, FileSize: x[3] });
+  });
+  rows.sort(function (x, y) { return x._t - y._t; });
+  return makeFrame(['EntryNumber', 'ParentPath', 'FileName', 'Extension', 'FileSize', 'Created0x10', 'LastModified0x10'],
+    rows.map(function (o, n) {
+      return { EntryNumber: 104000 + n * 3, ParentPath: o.ParentPath, FileName: o.FileName, Extension: o.Extension, FileSize: o.FileSize,
+        Created0x10: tsText(o._t, 7), LastModified0x10: tsText(o._t + Math.floor(r() * 3600000), 7) };
+    }));
+}
+var SAMPLES = {
+  'sample_evtxecmd_security.csv': { make: sampleSecurity, about: 'EvtxECmd output for a Security log' },
+  'sample_ioc_list.csv': { make: sampleIocs, about: 'IOC list with an ioc column' },
+  'sample_hayabusa.csv': { make: sampleHayabusa, about: 'Hayabusa csv-timeline output' },
+  'sample_pecmd_timeline.csv': { make: samplePrefetch, about: 'PECmd timeline output' },
+  'sample_mftecmd.csv': { make: sampleMft, about: 'MFTECmd $MFT output' }
+};
+
+/* ---------- starter recipes ---------- */
+function st(type, params) { return { type: type, params: Object.assign({}, BLOCKS[type].defaults, params) }; }
+var IP_RE = '\\((\\d{1,3}(?:\\.\\d{1,3}){3})\\)';
+var RECIPES = [
+  {
+    id: 'offhours', name: 'Off-hours logons', flow: 'EvtxECmd → Mill', source: 'sample_evtxecmd_security.csv',
+    about: 'Successful logons outside 08:00–18:00 UTC, with source IP and logon type, as a timeline.',
+    steps: [
+      st('filter', { col: 'EventId', op: '==', value: '4624' }),
+      st('todatetime', { col: 'TimeCreated' }),
+      st('timewindow', { col: 'TimeCreated', mode: 'hour outside', from: 8, to: 18 }),
+      st('extract', { col: 'RemoteHost', pattern: IP_RE, newcol: 'SourceIP' }),
+      st('extract', { col: 'PayloadData1', pattern: 'LogonType (\\d+)', newcol: 'LogonType' }),
+      st('newcol', { newcol: 'event', cols: ['UserName', 'Computer', 'SourceIP', 'LogonType'], sep: ' | ' }),
+      st('select', { cols: ['TimeCreated', 'event', 'UserName', 'Computer', 'SourceIP', 'LogonType'] }),
+      st('mill', { time: 'TimeCreated', label: 'event' })
+    ]
+  },
+  {
+    id: 'lateral', name: 'Lateral movement map', flow: 'EvtxECmd → Spoke', source: 'sample_evtxecmd_security.csv',
+    about: 'Network and RDP logons as source IP → host edges, weighted by how often each pair occurs.',
+    steps: [
+      st('filter', { col: 'EventId', op: '==', value: '4624' }),
+      st('extract', { col: 'PayloadData1', pattern: 'LogonType (\\d+)', newcol: 'LogonType' }),
+      st('filter', { col: 'LogonType', op: 'is one of', value: '3, 10' }),
+      st('extract', { col: 'RemoteHost', pattern: IP_RE, newcol: 'SourceIP' }),
+      st('filter', { col: 'SourceIP', op: 'is not empty' }),
+      st('groupcount', { cols: ['SourceIP', 'Computer'], name: 'logons' }),
+      st('spoke', { source: 'SourceIP', target: 'Computer', weight: 'logons' })
+    ]
+  },
+  {
+    id: 'hayabusa', name: 'Alerts by host', flow: 'Hayabusa → Spoke', source: 'sample_hayabusa.csv',
+    about: 'Medium and higher Hayabusa detections linked to the hosts they fired on.',
+    steps: [
+      st('filter', { col: 'Level', op: 'is one of', value: 'crit, high, med' }),
+      st('groupcount', { cols: ['RuleTitle', 'Computer'], name: 'hits' }),
+      st('spoke', { source: 'RuleTitle', target: 'Computer', weight: 'hits' })
+    ]
+  },
+  {
+    id: 'prefetch', name: 'What ran, and when', flow: 'PECmd → Mill', source: 'sample_pecmd_timeline.csv',
+    about: 'Prefetch executions outside \\WINDOWS\\, one row per run, as a timeline.',
+    steps: [
+      st('todatetime', { col: 'RunTime' }),
+      st('filter', { col: 'ExecutableName', op: 'does not contain', value: '\\WINDOWS\\' }),
+      st('extract', { col: 'ExecutableName', pattern: '([^\\\\]+)$', newcol: 'Program' }),
+      st('newcol', { newcol: 'event', cols: ['Program', 'ExecutableName'], sep: ' — ' }),
+      st('mill', { time: 'RunTime', label: 'event' })
+    ]
+  },
+  {
+    id: 'mft', name: 'Files created in a window', flow: 'MFTECmd → Mill', source: 'sample_mftecmd.csv',
+    about: 'Executables and scripts created during the suspect day, with full paths.',
+    steps: [
+      st('todatetime', { col: 'Created0x10' }),
+      st('timewindow', { col: 'Created0x10', mode: 'between', start: '2026-09-15 00:00', end: '2026-09-16 00:00' }),
+      st('filter', { col: 'Extension', op: 'is one of', value: '.exe, .dll, .ps1, .bat, .vbs, .js' }),
+      st('newcol', { newcol: 'FullPath', cols: ['ParentPath', 'FileName'], sep: '\\' }),
+      st('select', { cols: ['Created0x10', 'FullPath', 'FileSize'] }),
+      st('mill', { time: 'Created0x10', label: 'FullPath' })
+    ]
+  },
+  {
+    id: 'iocsweep', name: 'IOC sweep', flow: 'Any CSV → CSV', source: 'sample_evtxecmd_security.csv',
+    about: 'Match a column against an IOC list and keep only the hits, with the IOC note attached.',
+    steps: [
+      st('extract', { col: 'RemoteHost', pattern: IP_RE, newcol: 'SourceIP' }),
+      st('merge', { table: 'sample_ioc_list.csv', leftOn: 'SourceIP', rightOn: 'ioc', how: 'keep matches only' }),
+      st('select', { cols: ['TimeCreated', 'EventId', 'MapDescription', 'Computer', 'UserName', 'SourceIP', 'note'] }),
+      st('writecsv', { file: 'ioc_hits.csv' })
+    ]
+  }
+];
+
+if (typeof module !== 'undefined') module.exports = { BLOCKS: BLOCKS, RECIPES: RECIPES, SAMPLES: SAMPLES, runPipeline: runPipeline, generateCode: generateCode, generateNotebook: generateNotebook, plain: plain, makeFrame: makeFrame };
+
+/* ===== Shifu UI ===== */
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var CAT_VAR = { source: 'var(--c-source)', filter: 'var(--c-filter)', transform: 'var(--c-transform)', combine: 'var(--c-combine)', output: 'var(--c-output)' };
+  var STORE_KEY = 'shifu.recipe.v1';
+  var IN_ARTIFACT = !!(window.claude && window.claude.use);
+
+  var state = { name: '', source: '', steps: [], tables: {} };
+  var sel = -1, run = null, uid = 0, lastDrag = 0, fileTarget = null, renderTimer = null;
+
+  Object.keys(SAMPLES).forEach(function (k) { state.tables[k] = { frame: SAMPLES[k].make(), sample: true, about: SAMPLES[k].about }; });
+
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  function n(x) { return Number(x).toLocaleString('en-US'); }
+  function mkStep(type, params) { return { id: ++uid, type: type, params: Object.assign(clone(BLOCKS[type].defaults), params ? clone(params) : {}) }; }
+  function slug(s) { return (String(s || 'shifu_recipe').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '') || 'shifu_recipe'); }
+
+  var toastTimer = null;
+  function toast(msg) {
+    var t = $('toast'); t.textContent = msg; t.hidden = false;
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.hidden = true; }, 3200);
+  }
+
+  /* ---------- icons ---------- */
+  var I = {
+    grip: '<svg aria-hidden="true" width="12" height="16" viewBox="0 0 12 16" fill="currentColor"><circle cx="3" cy="3" r="1.5"/><circle cx="9" cy="3" r="1.5"/><circle cx="3" cy="8" r="1.5"/><circle cx="9" cy="8" r="1.5"/><circle cx="3" cy="13" r="1.5"/><circle cx="9" cy="13" r="1.5"/></svg>',
+    up: '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg>',
+    down: '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>',
+    x: '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+    file: '<svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5"/></svg>'
+  };
+
+  /* ---------- palette ---------- */
+  function renderPalette() {
+    var q = $('pal-search').value.trim().toLowerCase();
+    var html = '';
+    CATS.forEach(function (cat) {
+      var items = Object.keys(BLOCKS).filter(function (k) {
+        var B = BLOCKS[k];
+        if (B.cat !== cat.id) return false;
+        return !q || (B.title + ' ' + B.api + ' ' + B.help).toLowerCase().indexOf(q) >= 0;
+      });
+      if (!items.length) return;
+      html += '<div class="pal-group" style="--cat:' + CAT_VAR[cat.id] + '"><h3>' + esc(cat.label) + '</h3><div class="pal-list" data-cat="' + cat.id + '">';
+      items.forEach(function (k) {
+        var B = BLOCKS[k];
+        html += '<button type="button" class="pal-item" data-type="' + k + '" title="' + esc(B.help) + '"><span>' + esc(B.title) + '</span><code>' + esc(B.api) + '</code></button>';
+      });
+      html += '</div></div>';
+    });
+    $('palette').innerHTML = html || '<p class="pal-hint">No block matches that.</p>';
+    Array.prototype.forEach.call(document.querySelectorAll('.pal-list'), function (el) {
+      new Sortable(el, {
+        group: { name: 'blocks', pull: 'clone', put: false }, sort: false, forceFallback: true, fallbackOnBody: true,
+        onStart: function () { lastDrag = Date.now(); }, onEnd: function () { lastDrag = Date.now(); }
+      });
+    });
+  }
+  $('palette').addEventListener('click', function (e) {
+    var b = e.target.closest('.pal-item');
+    if (!b || Date.now() - lastDrag < 400) return;
+    var at = sel >= 0 ? sel + 1 : state.steps.length;
+    insertStep(b.dataset.type, at);
+  });
+  $('pal-search').addEventListener('input', renderPalette);
+
+  function insertStep(type, at) {
+    var s = mkStep(type);
+    prefill(s, at);
+    state.steps.splice(at, 0, s);
+    sel = at;
+    render();
+    var card = document.querySelector('.card[data-i="' + at + '"]');
+    if (card && card.scrollIntoView) card.scrollIntoView({ block: 'nearest' });
+  }
+  /* sensible first guesses so a new block does something right away */
+  function prefill(s, at) {
+    var r = run && at > 0 ? run.results[at - 1] : null;
+    var f = r && r.ok ? r.output : (at === 0 && run ? run.source : null);
+    if (!f) return;
+    var firstDt = f.cols.filter(function (c) { return f.types[c] === 'datetime'; })[0];
+    if (s.type === 'timewindow' && firstDt) s.params.col = firstDt;
+    if (s.type === 'sort' && firstDt) s.params.col = firstDt;
+    if (s.type === 'mill' && firstDt) s.params.time = firstDt;
+    if (s.type === 'todatetime') {
+      var guess = f.cols.filter(function (c) { return f.types[c] !== 'datetime' && /time|date|created|modified|stamp/i.test(c); })[0];
+      if (guess) s.params.col = guess;
+    }
+    if (s.type === 'select' || s.type === 'dedupe') s.params.cols = [];
+    if (s.type === 'merge') {
+      var t = Object.keys(state.tables).filter(function (k) { return k !== state.source; })[0];
+      if (/ioc/i.test(t || '')) { s.params.table = t; s.params.rightOn = state.tables[t].frame.cols[0]; }
+    }
+  }
+
+  /* ---------- source card ---------- */
+  function renderSource() {
+    var t = state.tables[state.source];
+    var opts = Object.keys(state.tables).map(function (k) { return '<option value="' + esc(k) + '"' + (k === state.source ? ' selected' : '') + '>' + esc(k) + '</option>'; }).join('');
+    if (state.source && !t) opts = '<option value="' + esc(state.source) + '" selected>' + esc(state.source) + ' (not loaded)</option>' + opts;
+    if (!state.source) opts = '<option value="" selected>Choose a file</option>' + opts;
+    var meta;
+    if (t) {
+      meta = n(t.frame.rows.length) + ' rows × ' + t.frame.cols.length + ' columns' +
+        (t.sample ? ' · <span class="sample-tag">Sample</span>' + esc(t.about) + ', generated and fictional' : '');
+    } else meta = state.source ? 'Load your copy of ' + esc(state.source) + ' to run this recipe.' : 'Load a CSV or JSON file to start.';
+    $('source').innerHTML =
+      '<div class="card first' + (sel === -1 ? ' sel' : '') + '" data-i="-1" style="--cat:' + CAT_VAR.source + '">' +
+      '<div class="head"><span class="grip" aria-hidden="true" style="cursor:default">' + I.file + '</span><span class="num">0</span><span class="title">Read file</span><code class="api">' + esc(readCall(state.source || 'file.csv').split('(')[0].replace('pd.', '')) + '</code>' +
+      '<span class="count">' + (t ? n(t.frame.rows.length) + ' rows' : 'no data') + '</span></div>' +
+      '<div class="body"><label class="ctl"><span class="sr">File</span><select id="src-select" class="in">' + opts + '</select></label>' +
+      '<button type="button" class="btn-in" data-act="load-source">Load your file…</button></div>' +
+      '<div class="src-meta">' + meta + '</div></div>';
+  }
+  $('source').addEventListener('change', function (e) {
+    if (e.target.id === 'src-select') { state.source = e.target.value; sel = -1; render(); }
+  });
+  $('source').addEventListener('click', function (e) {
+    if (e.target.closest('[data-act="load-source"]')) { pickFile('source'); return; }
+    if (e.target.closest('select,button,input')) return;
+    sel = -1; render();
+  });
+
+  /* ---------- step cards ---------- */
+  function colOptions(cols, value, placeholder) {
+    var h = '<option value=""' + (value ? '' : ' selected') + '>' + esc(placeholder || 'column…') + '</option>';
+    if (value && cols.indexOf(value) < 0) h += '<option value="' + esc(value) + '" selected>' + esc(value) + ' (missing)</option>';
+    cols.forEach(function (c) { h += '<option value="' + esc(c) + '"' + (c === value ? ' selected' : '') + '>' + esc(c) + '</option>'; });
+    return h;
+  }
+  function control(s, i, def, cols) {
+    var p = s.params, id = 's' + s.id + '-' + def.k, v = p[def.k];
+    var lab = def.label ? '<span>' + esc(def.label) + '</span>' : '<span class="sr">' + esc(def.k) + '</span>';
+    var data = ' data-i="' + i + '" data-k="' + def.k + '"';
+    switch (def.t) {
+      case 'col':
+        return '<label class="ctl">' + lab + '<select id="' + id + '" class="in"' + data + '>' + colOptions(cols, v, def.optional ? 'none' : 'column…') + '</select></label>';
+      case 'tcol':
+        var tt = state.tables[p.table];
+        return '<label class="ctl">' + lab + '<select id="' + id + '" class="in"' + data + '>' + colOptions(tt ? tt.frame.cols : [], v) + '</select></label>';
+      case 'select':
+        return '<label class="ctl">' + lab + '<select id="' + id + '" class="in"' + data + '>' + def.options.map(function (o) { return '<option' + (o === v ? ' selected' : '') + '>' + esc(o) + '</option>'; }).join('') + '</select></label>';
+      case 'number':
+        return '<label class="ctl">' + lab + '<input id="' + id + '" class="in num" type="number"' + (def.min !== undefined ? ' min="' + def.min + '"' : '') + (def.max !== undefined ? ' max="' + def.max + '"' : '') + ' value="' + esc(v) + '"' + data + '></label>';
+      case 'text':
+        return '<label class="ctl">' + lab + '<input id="' + id + '" class="in ' + (def.mono || def.k === 'pattern' ? 'wide' : 'text') + '" type="text" spellcheck="false" autocomplete="off" placeholder="' + esc(def.ph || '') + '" value="' + esc(v) + '"' + data + '></label>';
+      case 'cols':
+        var chips = (v || []).map(function (c, j) {
+          return '<span class="chip' + (cols.indexOf(c) < 0 ? ' missing' : '') + '">' + esc(c) + '<button type="button" aria-label="Remove ' + esc(c) + '" data-act="chip-rm" data-i="' + i + '" data-k="' + def.k + '" data-j="' + j + '">' + I.x + '</button></span>';
+        }).join('');
+        var left = cols.filter(function (c) { return (v || []).indexOf(c) < 0; });
+        var add = '<select id="' + id + '" class="in" aria-label="Add a column" data-act="chip-add" data-i="' + i + '" data-k="' + def.k + '"><option value="">+ column</option>' +
+          (left.length > 1 ? '<option value="*all*">+ all remaining</option>' : '') + left.map(function (c) { return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join('') + '</select>';
+        return '<span class="ctl">' + (def.label ? '<span>' + esc(def.label) + '</span>' : '') + '<span class="chips">' + chips + add + '</span></span>';
+      case 'pairs':
+        var rows = (v || []).map(function (pr, j) {
+          return '<div class="pair"><select id="' + id + '-f' + j + '" class="in" aria-label="Column to rename" data-act="pair" data-f="from" data-i="' + i + '" data-j="' + j + '">' + colOptions(cols, pr.from) + '</select>' +
+            '<span aria-hidden="true">→</span><input id="' + id + '-t' + j + '" class="in text" type="text" spellcheck="false" aria-label="New name" placeholder="new name" value="' + esc(pr.to) + '" data-act="pair" data-f="to" data-i="' + i + '" data-j="' + j + '">' +
+            '<button type="button" class="ibtn" aria-label="Remove this rename" data-act="pair-rm" data-i="' + i + '" data-j="' + j + '">' + I.x + '</button></div>';
+        }).join('');
+        return '<div class="pairs">' + rows + '<div><button type="button" class="btn-in" data-act="pair-add" data-i="' + i + '">+ rename another</button></div></div>';
+      case 'table':
+        var names = Object.keys(state.tables).filter(function (k) { return k !== state.source; });
+        var to = '<option value=""' + (v ? '' : ' selected') + '>table…</option>' +
+          (v && !state.tables[v] ? '<option value="' + esc(v) + '" selected>' + esc(v) + ' (not loaded)</option>' : '') +
+          names.map(function (k) { return '<option value="' + esc(k) + '"' + (k === v ? ' selected' : '') + '>' + esc(k) + '</option>'; }).join('');
+        return '<label class="ctl"><span>with</span><select id="' + id + '" class="in"' + data + '>' + to + '</select></label><button type="button" class="btn-in" data-act="load-table" data-i="' + i + '">Load file…</button>';
+    }
+    return '';
+  }
+  function renderSteps() {
+    var html = '';
+    state.steps.forEach(function (s, i) {
+      var B = BLOCKS[s.type], r = run.results[i];
+      var cols = r && r.input ? r.input.cols : [];
+      var cls = 'card' + (i === sel ? ' sel' : '') + (r && r.blocked ? ' blocked' : '') + (r && !r.ok && !r.blocked ? ' err' : '');
+      var count;
+      if (!r || r.blocked) count = '<span class="count">—</span>';
+      else if (!r.ok) count = '<span class="count bad">error</span>';
+      else {
+        var down = r.output.rows.length < r.input.rows.length;
+        count = '<span class="count' + (down ? ' down' : '') + '" title="' + n(r.input.rows.length) + ' rows in">' + n(r.output.rows.length) + ' rows</span>';
+      }
+      var body = B.params.filter(function (d) { return !d.show || d.show(s.params); }).map(function (d) { return control(s, i, d, cols); }).join('');
+      html += '<div class="' + cls + '" data-i="' + i + '" style="--cat:' + CAT_VAR[B.cat] + '">' +
+        '<div class="head"><button type="button" class="grip" aria-label="Drag to reorder step ' + (i + 1) + '">' + I.grip + '</button>' +
+        '<span class="num">' + (i + 1) + '</span><span class="title" title="' + esc(B.help) + '">' + esc(B.title) + '</span><code class="api">' + esc(B.api) + '</code>' + count +
+        '<span class="tools"><button type="button" class="ibtn" data-act="up" data-i="' + i + '" aria-label="Move step up"' + (i === 0 ? ' disabled' : '') + '>' + I.up + '</button>' +
+        '<button type="button" class="ibtn" data-act="down" data-i="' + i + '" aria-label="Move step down"' + (i === state.steps.length - 1 ? ' disabled' : '') + '>' + I.down + '</button>' +
+        '<button type="button" class="ibtn" data-act="del" data-i="' + i + '" aria-label="Remove step">' + I.x + '</button></span></div>' +
+        '<div class="body">' + body + '</div>' +
+        (r && !r.ok && !r.blocked ? '<p class="msg bad">' + esc(r.error) + '</p>' : '') +
+        (r && r.blocked && i === firstBlocked() ? '<p class="msg">Waiting on the step above.</p>' : '') +
+        '</div>';
+    });
+    $('steps').innerHTML = html;
+    var last = run.results[run.results.length - 1];
+    var hasOut = state.steps.some(function (s) { return BLOCKS[s.type].cat === 'output'; });
+    $('end-hint').textContent = !state.steps.length ? '' : hasOut ? '' : (last && last.ok ? 'Add an Output block to save the result, or copy the pandas on the right.' : '');
+  }
+  function firstBlocked() { for (var i = 0; i < run.results.length; i++) if (run.results[i].blocked) return i; return -1; }
+
+  function setParam(i, k, val) {
+    var s = state.steps[i]; if (!s) return;
+    var def = BLOCKS[s.type].params.filter(function (d) { return d.k === k; })[0];
+    if (def && def.t === 'number') val = val === '' ? '' : Number(val);
+    s.params[k] = val;
+    if (def && def.t === 'table') s.params.rightOn = '';
+  }
+  var stepsEl = $('steps');
+  stepsEl.addEventListener('input', function (e) {
+    var t = e.target;
+    if (t.tagName !== 'INPUT') return;
+    if (t.dataset.act === 'pair') state.steps[+t.dataset.i].params.pairs[+t.dataset.j][t.dataset.f] = t.value;
+    else if (t.dataset.k) setParam(+t.dataset.i, t.dataset.k, t.value);
+    else return;
+    clearTimeout(renderTimer); renderTimer = setTimeout(render, 320);
+  });
+  stepsEl.addEventListener('change', function (e) {
+    var t = e.target, i = +t.dataset.i;
+    if (t.tagName === 'INPUT' && t.type === 'text') return; /* already handled on input */
+    if (t.dataset.act === 'chip-add') {
+      if (!t.value) return;
+      var s = state.steps[i], arr = s.params[t.dataset.k];
+      if (t.value === '*all*') { var cols = run.results[i] && run.results[i].input ? run.results[i].input.cols : []; cols.forEach(function (c) { if (arr.indexOf(c) < 0) arr.push(c); }); }
+      else arr.push(t.value);
+      render(); focusId(t.id); return;
+    }
+    if (t.dataset.act === 'pair') { state.steps[i].params.pairs[+t.dataset.j][t.dataset.f] = t.value; render(); return; }
+    if (t.dataset.k) { setParam(i, t.dataset.k, t.value); sel = i; render(); }
+  });
+  stepsEl.addEventListener('click', function (e) {
+    var b = e.target.closest('[data-act]');
+    if (b && b.tagName === 'BUTTON') {
+      var i = +b.dataset.i, s = state.steps[i];
+      switch (b.dataset.act) {
+        case 'del': state.steps.splice(i, 1); if (sel >= state.steps.length) sel = state.steps.length - 1; else if (sel > i) sel--; render(); return;
+        case 'up': move(i, i - 1); return;
+        case 'down': move(i, i + 1); return;
+        case 'chip-rm': s.params[b.dataset.k].splice(+b.dataset.j, 1); render(); return;
+        case 'pair-add': s.params.pairs.push({ from: '', to: '' }); render(); return;
+        case 'pair-rm': s.params.pairs.splice(+b.dataset.j, 1); if (!s.params.pairs.length) s.params.pairs.push({ from: '', to: '' }); render(); return;
+        case 'load-table': pickFile(i); return;
+      }
+    }
+    if (e.target.closest('select,input,button,label,.chip')) return;
+    var card = e.target.closest('.card');
+    if (card) { sel = +card.dataset.i; markSelection(); renderCode(); renderPreview(); }
+  });
+  function move(from, to) {
+    if (to < 0 || to >= state.steps.length) return;
+    var selId = sel >= 0 ? state.steps[sel].id : null;
+    var s = state.steps.splice(from, 1)[0];
+    state.steps.splice(to, 0, s);
+    if (selId !== null) sel = state.steps.findIndex(function (x) { return x.id === selId; });
+    render();
+    var btn = document.querySelector('.card[data-i="' + to + '"] [data-act="' + (to < from ? 'up' : 'down') + '"]');
+    if (btn && !btn.disabled) btn.focus();
+  }
+  function markSelection() {
+    Array.prototype.forEach.call(document.querySelectorAll('.card'), function (c) { c.classList.toggle('sel', +c.dataset.i === sel); });
+  }
+  function focusId(id) { var el = $(id); if (el) el.focus(); }
+
+  new Sortable(stepsEl, {
+    group: { name: 'blocks', pull: false, put: true }, handle: '.grip', animation: 140, forceFallback: true, fallbackOnBody: true, emptyInsertThreshold: 40,
+    onStart: function () { lastDrag = Date.now(); },
+    onAdd: function (evt) {
+      lastDrag = Date.now();
+      var type = evt.item.dataset.type, at = evt.newIndex;
+      evt.item.remove();
+      if (BLOCKS[type]) insertStep(type, at);
+    },
+    onUpdate: function (evt) {
+      lastDrag = Date.now();
+      var selId = sel >= 0 && state.steps[sel] ? state.steps[sel].id : null;
+      var s = state.steps.splice(evt.oldIndex, 1)[0];
+      state.steps.splice(evt.newIndex, 0, s);
+      if (selId !== null) sel = state.steps.findIndex(function (x) { return x.id === selId; });
+      render();
+    }
+  });
+
+  /* ---------- code panel ---------- */
+  function highlight(code, selStep) {
+    var cur = 0, out = [];
+    code.split('\n').forEach(function (line) {
+      var m = /^# (\d+)\. /.exec(line);
+      if (m) cur = +m[1]; else if (line === '' ) cur = cur ? -cur : 0;
+      var h = esc(line).replace(/(#.*$)|(r?&quot;(?:[^&]|&(?!quot;))*?&quot;|r?&#39;(?:[^&]|&(?!#39;))*?&#39;)|\b(import|as|from|for|in|if|not|and|or|True|False|None|lambda)\b|\b(\d+(?:\.\d+)?)\b/g, function (all, cm, s, k, num) {
+        if (cm) return '<span class="cm">' + cm + '</span>';
+        if (s) return '<span class="s">' + s + '</span>';
+        if (k) return '<span class="k">' + k + '</span>';
+        return '<span class="n">' + num + '</span>';
+      });
+      if (selStep > 0 && cur === selStep) h = '<span class="hl">' + (h || ' ') + '</span>';
+      out.push(h);
+    });
+    return out.join('\n');
+  }
+  var lastCode = '';
+  function renderCode() {
+    lastCode = generateCode(state, run);
+    $('code').innerHTML = highlight(lastCode, sel + 1);
+    var hl = $('code').querySelector('.hl');
+    if (hl) {
+      var pre = $('code'), top = hl.offsetTop - pre.offsetTop;
+      if (top < pre.scrollTop || top > pre.scrollTop + pre.clientHeight - 40) pre.scrollTop = Math.max(0, top - 30);
+    }
+  }
+
+  /* ---------- preview ---------- */
+  function cell(v, t) {
+    if (v instanceof Date) return esc(fmtTs(v));
+    if (isNullish(v)) return '<span class="na">' + (t === 'datetime' ? 'NaT' : t === 'number' ? 'NaN' : 'None') + '</span>';
+    if (typeof v === 'boolean') return v ? 'True' : 'False';
+    return esc(v);
+  }
+  function renderTable(f) {
+    var max = 100, rows = f.rows.slice(0, max);
+    var h = '<thead><tr><th class="idx" scope="col"><span class="sr">index</span></th>' + f.cols.map(function (c) {
+      return '<th scope="col">' + esc(c) + '<span class="dt">' + esc(dtypeName(f, c)) + '</span></th>';
+    }).join('') + '</tr></thead><tbody>';
+    rows.forEach(function (r, i) {
+      h += '<tr><td class="idx">' + i + '</td>' + f.cols.map(function (c) {
+        var v = r[c], text = v instanceof Date ? fmtTs(v) : isNullish(v) ? '' : String(v);
+        return '<td' + (text.length > 30 ? ' title="' + esc(text) + '"' : '') + '>' + cell(v, f.types[c]) + '</td>';
+      }).join('') + '</tr>';
+    });
+    if (!rows.length) h += '<tr><td class="idx"></td><td colspan="' + Math.max(1, f.cols.length) + '"><span class="na">No rows.</span></td></tr>';
+    $('pv-table').innerHTML = h + '</tbody>';
+  }
+  function renderPreview() {
+    var title, f = null, sub = '', err = '';
+    if (sel < 0 || !state.steps[sel]) {
+      title = 'Source'; f = run.source;
+      if (!f) sub = 'Load a file to see its rows here.';
+    } else {
+      var r = run.results[sel], B = BLOCKS[state.steps[sel].type];
+      title = 'After step ' + (sel + 1) + ' · ' + B.title;
+      if (r.blocked) sub = 'Fix the step above first.';
+      else if (!r.ok) { err = r.error; f = r.input; sub = 'Rows going into this step:'; }
+      else {
+        f = r.output;
+        var a = r.input.rows.length, b = r.output.rows.length;
+        sub = a === b ? '<strong>' + n(b) + '</strong> rows, unchanged in count.' : (b < a ? 'Kept <strong>' + n(b) + '</strong> of ' + n(a) + ' rows.' : '<strong>' + n(b) + '</strong> rows from ' + n(a) + '.');
+      }
+    }
+    $('pv-title').textContent = title;
+    $('pv-shape').textContent = f ? n(f.rows.length) + ' × ' + f.cols.length : '';
+    $('pv-sub').innerHTML = sub;
+    $('pv-err').innerHTML = err ? '<p class="pv-err">' + esc(err) + '</p>' : '';
+    $('pv-wrap').hidden = !f;
+    if (f) renderTable(f);
+  }
+
+  /* ---------- outputs ---------- */
+  function toCsv(f) {
+    return Papa.unparse({ fields: f.cols, data: f.rows.map(function (r) { return f.cols.map(function (c) { return plain(r[c], f.types[c]) === 'NaT' ? '' : plain(r[c], f.types[c]); }); }) });
+  }
+  function renderOutputs() {
+    if (!run.outputs.length) {
+      $('outputs').innerHTML = '<p class="empty-out">Output blocks (Send to Mill, Send to Spoke, Write CSV) put their files here.</p>';
+      return;
+    }
+    $('outputs').innerHTML = '<div class="outputs">' + run.outputs.map(function (o, j) {
+      var open = '';
+      if (o.to === 'spoke') open = '<a class="btn small primary" data-spoke="' + j + '" target="_blank" rel="noopener" aria-disabled="true">Open in Spoke</a>';
+      if (o.to === 'mill' && !IN_ARTIFACT) open = '<button type="button" class="btn small primary" data-out="mill" data-j="' + j + '">Open in Mill</button>';
+      var meta = esc(o.kind) + ' · ' + n(o.frame.rows.length) + ' rows' + (o.to === 'mill' && IN_ARTIFACT ? ' · open it in Mill from jon.glass/shifu' : '');
+      return '<div class="out"><div><div class="fname">' + esc(o.file) + '</div><div class="meta">' + meta + '</div></div>' +
+        '<div class="panel-actions">' + open + '<button type="button" class="btn small" data-out="dl" data-j="' + j + '">Download</button><button type="button" class="btn small" data-out="copy" data-j="' + j + '">Copy CSV</button></div></div>';
+    }).join('') + '</div>';
+    var token = ++outToken;
+    Array.prototype.forEach.call(document.querySelectorAll('[data-spoke]'), function (a) {
+      var o = run.outputs[+a.dataset.spoke];
+      spokeLink(o).then(function (href) {
+        if (token !== outToken) return;
+        if (!href) { a.textContent = 'Too big for a Spoke link'; return; }
+        a.href = href; a.removeAttribute('aria-disabled');
+      }, function () { a.hidden = true; });
+    });
+  }
+  var outToken = 0;
+  function gzB64(text) {
+    return new Response(new Blob([text]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer().then(function (buf) {
+      var u8 = new Uint8Array(buf), s = '';
+      for (var i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000));
+      return btoa(s);
+    });
+  }
+  function toolBase(tool) { return (IN_ARTIFACT || location.protocol === 'file:' ? 'https://jon.glass' : '') + '/' + tool + '/'; }
+  /* Spoke's own share-link format: #name=…&src=…&tgt=…&rel=…&input=<gzip, base64url> */
+  function spokeLink(o) {
+    if (typeof CompressionStream === 'undefined') return Promise.reject();
+    return gzB64(toCsv(o.frame)).then(function (b) {
+      var enc = b.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+      var h = 'name=' + encodeURIComponent(o.file) + '&src=source&tgt=target' + (o.frame.cols.indexOf('relationship') >= 0 ? '&rel=relationship' : '') + '&input=' + enc;
+      return h.length > 2000000 ? null : toolBase('spoke') + '#' + h;
+    });
+  }
+  /* Mill reads a same-origin localStorage handoff at /mill/?from=shifu, then clears it */
+  function sendToMill(o) {
+    var w = window.open('', '_blank');
+    var go = function (url) { if (w) { w.opener = null; w.location.href = url; } else location.href = url; };
+    gzB64(toCsv(o.frame)).then(function (b) {
+      try { localStorage.setItem('shifu.handoff', JSON.stringify({ v: 1, name: slug(state.name), gz: b, at: Date.now() })); }
+      catch (e) { if (w) w.close(); toast('This timeline is too big to hand off directly. Download the CSV and drop it into Mill.'); return; }
+      go(toolBase('mill') + '?from=shifu');
+    }, function () { if (w) w.close(); toast('This browser cannot hand off to Mill. Download the CSV instead.'); });
+  }
+  $('outputs').addEventListener('click', function (e) {
+    var a = e.target.closest('[data-spoke]');
+    if (a && a.getAttribute('aria-disabled')) { e.preventDefault(); toast('Preparing the Spoke link, try again in a moment.'); return; }
+    var b = e.target.closest('[data-out]'); if (!b) return;
+    var o = run.outputs[+b.dataset.j]; if (!o) return;
+    if (b.dataset.out === 'mill') { sendToMill(o); return; }
+    var csv = toCsv(o.frame);
+    if (b.dataset.out === 'dl') saveFile(o.file, csv); else copyText(csv, 'Copied ' + o.file + ' as CSV.');
+  });
+
+  /* ---------- files in and out ---------- */
+  function pickFile(target) { fileTarget = target; $('file-input').value = ''; $('file-input').click(); }
+  $('file-input').addEventListener('change', function () { var f = this.files && this.files[0]; if (f) ingest(f, fileTarget); });
+  function frameFromObjects(objs) {
+    var cols = [], seen = {};
+    objs.slice(0, 2000).forEach(function (o) { Object.keys(o || {}).forEach(function (k) { if (!seen[k]) { seen[k] = 1; cols.push(k); } }); });
+    var rows = objs.map(function (o) {
+      var x = {}; cols.forEach(function (c) { var v = o ? o[c] : null; x[c] = v !== null && typeof v === 'object' ? JSON.stringify(v) : (v === undefined ? null : v); }); return x;
+    });
+    return makeFrame(cols, rows);
+  }
+  function ingest(file, target) {
+    var name = file.name, ext = name.split('.').pop().toLowerCase();
+    var done = function (frame) {
+      if (!frame.cols.length) { toast(name + ' has no columns Shifu can read.'); return; }
+      state.tables[name] = { frame: frame, sample: false };
+      if (target === 'source' || target === null || target === undefined) { state.source = name; sel = -1; }
+      else if (state.steps[target]) { state.steps[target].params.table = name; state.steps[target].params.rightOn = frame.cols[0]; sel = target; }
+      render();
+      toast('Loaded ' + name + ': ' + n(frame.rows.length) + ' rows.');
+    };
+    var fail = function (msg) { toast('Could not read ' + name + '. ' + msg); };
+    if (ext === 'json' || ext === 'jsonl' || ext === 'ndjson') {
+      file.text().then(function (txt) {
+        try {
+          var objs;
+          if (ext === 'json') { var j = JSON.parse(txt); objs = Array.isArray(j) ? j : (Array.isArray(j.data) ? j.data : [j]); }
+          else objs = txt.split(/\r?\n/).filter(function (l) { return l.trim(); }).map(function (l) { return JSON.parse(l); });
+          done(frameFromObjects(objs));
+        } catch (e) { fail('It is not valid JSON' + (ext === 'json' ? '' : ' lines') + '.'); }
+      });
+      return;
+    }
+    Papa.parse(file, {
+      header: true, dynamicTyping: true, skipEmptyLines: true, delimiter: ext === 'tsv' ? '\t' : '',
+      complete: function (res) {
+        var cols = (res.meta.fields || []).filter(function (c) { return c !== ''; });
+        var rows = res.data.map(function (r) { var x = {}; cols.forEach(function (c) { x[c] = r[c] === undefined || r[c] === '' ? null : r[c]; }); return x; });
+        done(makeFrame(cols, rows));
+      },
+      error: function (e) { fail(e.message || ''); }
+    });
+  }
+  var canvas = $('canvas');
+  canvas.addEventListener('dragover', function (e) { if (e.dataTransfer && Array.prototype.indexOf.call(e.dataTransfer.types, 'Files') >= 0) { e.preventDefault(); canvas.classList.add('drop-on'); } });
+  canvas.addEventListener('dragleave', function (e) { if (e.target === canvas) canvas.classList.remove('drop-on'); });
+  canvas.addEventListener('drop', function (e) {
+    canvas.classList.remove('drop-on');
+    var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) { e.preventDefault(); ingest(f, 'source'); }
+  });
+
+  var dlPromise = null;
+  function downloadsCap() {
+    if (!IN_ARTIFACT) return Promise.resolve(null);
+    if (!dlPromise) dlPromise = window.claude.use('downloads').catch(function () { return null; });
+    return dlPromise;
+  }
+  var ALLOWED = { csv: 1, txt: 1, json: 1, md: 1, html: 1 };
+  function saveFile(name, data) {
+    if (!IN_ARTIFACT) {
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(new Blob([data], { type: 'text/plain' }));
+      a.download = name; document.body.appendChild(a); a.click();
+      setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+      return;
+    }
+    downloadsCap().then(function (dl) {
+      if (!dl) { toast('Downloads are not available here. Use Copy instead.'); return; }
+      var ext = name.split('.').pop().toLowerCase();
+      var fname = ALLOWED[ext] ? name : name + '.txt';
+      return dl.save({ filename: fname, data: data }).then(function () {
+        toast(fname === name ? 'Saved ' + name + '.' : 'Saved ' + fname + '. Remove the .txt ending to use it.');
+      }, function (e) {
+        if (e && e.code === 'declined') return;
+        toast(e && e.code === 'rate_limited' ? 'A save is already waiting for you to confirm.' : 'That file could not be saved here. Use Copy instead.');
+      });
+    });
+  }
+  function copyText(text, okMsg) {
+    var fallback = function () {
+      var ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      var ok = false; try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+      ta.remove(); toast(ok ? okMsg : 'Copy is blocked here. Select the text and copy it by hand.');
+    };
+    try { navigator.clipboard.writeText(text).then(function () { toast(okMsg); }, fallback); } catch (e) { fallback(); }
+  }
+  $('btn-copy-code').addEventListener('click', function () { copyText(lastCode, 'Copied the pandas code.'); });
+  $('btn-dl-py').addEventListener('click', function () { saveFile(slug(state.name) + '.py', lastCode); });
+  $('btn-dl-nb').addEventListener('click', function () { saveFile(slug(state.name) + '.ipynb', generateNotebook(state, run)); });
+
+  /* ---------- recipes and sharing ---------- */
+  function recipeObj() { return { v: 1, name: state.name, source: state.source, steps: state.steps.map(function (s) { return { type: s.type, params: s.params }; }) }; }
+  function applyRecipe(r, keepSource) {
+    if (!r || !Array.isArray(r.steps)) throw new Error('bad recipe');
+    var steps = r.steps.filter(function (s) { return BLOCKS[s.type]; }).map(function (s) { return mkStep(s.type, s.params); });
+    state.name = r.name || 'Untitled recipe';
+    if (!keepSource && r.source) state.source = r.source;
+    state.steps = steps;
+    sel = steps.length - 1;
+  }
+  function hex(bytes) { var s = ''; for (var i = 0; i < bytes.length; i++) s += (bytes[i] < 16 ? '0' : '') + bytes[i].toString(16); return s; }
+  function unhex(s) { var a = new Uint8Array(s.length / 2); for (var i = 0; i < a.length; i++) a[i] = parseInt(s.substr(i * 2, 2), 16); return a; }
+  function streamBytes(bytes, stream) { return new Response(new Blob([bytes]).stream().pipeThrough(stream)).arrayBuffer().then(function (b) { return new Uint8Array(b); }); }
+  function encodeRecipe() {
+    var bytes = new TextEncoder().encode(JSON.stringify(recipeObj()));
+    if (typeof CompressionStream === 'undefined') return Promise.resolve('shifu0-' + hex(bytes));
+    return streamBytes(bytes, new CompressionStream('deflate-raw')).then(function (b) { return 'shifu-' + hex(b); });
+  }
+  function decodeRecipe(token) {
+    token = String(token || '').trim().replace(/^#/, '');
+    var m = /^(shifu0?)-([0-9a-f]+)$/i.exec(token);
+    if (!m) { try { return Promise.resolve(JSON.parse(token)); } catch (e) { return Promise.reject(e); } }
+    var bytes = unhex(m[2]);
+    var p = m[1].toLowerCase() === 'shifu0' || typeof DecompressionStream === 'undefined' ? Promise.resolve(bytes) : streamBytes(bytes, new DecompressionStream('deflate-raw'));
+    return p.then(function (b) { return JSON.parse(new TextDecoder().decode(b)); });
+  }
+  function openDialog(d) { if (d.showModal) d.showModal(); else d.setAttribute('open', ''); }
+  Array.prototype.forEach.call(document.querySelectorAll('dialog'), function (d) {
+    d.addEventListener('click', function (e) { if (e.target === d || e.target.closest('[data-close]')) d.close(); });
+  });
+
+  function renderRecipes() {
+    $('rgrid').innerHTML = RECIPES.map(function (r, j) {
+      var bars = r.steps.map(function (s) { return '<i style="--cat:' + CAT_VAR[BLOCKS[s.type].cat] + '"></i>'; }).join('');
+      return '<button type="button" class="rcard" data-r="' + j + '"><span class="flow">' + esc(r.flow) + '</span><span class="rname">' + esc(r.name) + '</span><span class="rabout">' + esc(r.about) + '</span><span class="rblocks" aria-hidden="true">' + bars + '</span></button>';
+    }).join('');
+  }
+  $('btn-recipes').addEventListener('click', function () { openDialog($('dlg-recipes')); });
+  $('rgrid').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-r]'); if (!b) return;
+    var r = RECIPES[+b.dataset.r];
+    applyRecipe(clone(r));
+    $('dlg-recipes').close();
+    render();
+    toast('Opened ' + r.name + ' with sample data.');
+  });
+  $('btn-new').addEventListener('click', function () {
+    state.steps = []; state.name = 'Untitled recipe'; sel = -1; render();
+    toast('Started a new recipe. Add blocks from the palette.');
+  });
+  $('btn-share').addEventListener('click', function () {
+    $('share-msg').textContent = ''; $('share-in').value = '';
+    $('btn-copy-link').hidden = IN_ARTIFACT;
+    encodeRecipe().then(function (t) { $('share-out').value = t; });
+    openDialog($('dlg-share'));
+  });
+  $('btn-copy-token').addEventListener('click', function () { copyText($('share-out').value, 'Copied the recipe code.'); });
+  $('btn-copy-link').addEventListener('click', function () { copyText(location.href.split('#')[0] + '#' + $('share-out').value, 'Copied a link to this recipe.'); });
+  $('btn-open-token').addEventListener('click', function () {
+    decodeRecipe($('share-in').value).then(function (r) {
+      applyRecipe(r); $('dlg-share').close(); render();
+      toast(state.tables[state.source] ? 'Opened ' + state.name + '.' : 'Opened ' + state.name + '. Load ' + state.source + ' to run it.');
+    }, function () { $('share-msg').textContent = 'That code did not open. Check that it was copied in full.'; });
+  });
+  $('recipe-name').addEventListener('input', function () { state.name = this.value; clearTimeout(renderTimer); renderTimer = setTimeout(render, 400); });
+
+  function saveLocal() { try { localStorage.setItem(STORE_KEY, JSON.stringify(recipeObj())); } catch (e) { /* storage unavailable */ } }
+  function loadLocal() { try { var s = localStorage.getItem(STORE_KEY); return s ? JSON.parse(s) : null; } catch (e) { return null; } }
+
+  /* ---------- render ---------- */
+  function render() {
+    clearTimeout(renderTimer);
+    var a = document.activeElement, fid = a && a.id, ss = null, se = null;
+    try { if (a && a.tagName === 'INPUT') { ss = a.selectionStart; se = a.selectionEnd; } } catch (e) { ss = null; }
+    run = runPipeline(state);
+    if (sel >= state.steps.length) sel = state.steps.length - 1;
+    if (document.activeElement !== $('recipe-name')) $('recipe-name').value = state.name;
+    renderSource(); renderSteps(); renderCode(); renderPreview(); renderOutputs();
+    saveLocal();
+    if (fid && fid !== 'recipe-name') {
+      var el = $(fid);
+      if (el && el !== document.activeElement) { el.focus(); try { if (ss !== null) el.setSelectionRange(ss, se); } catch (e) { /* not a text input */ } }
+    }
+  }
+
+  /* ---------- boot ---------- */
+  renderPalette(); renderRecipes();
+  var hash = (location.hash || '').replace(/^#/, '');
+  var start = /^shifu0?-/.test(hash) ? decodeRecipe(hash) : Promise.reject();
+  start.then(function (r) { applyRecipe(r); }, function () {
+    var saved = loadLocal();
+    if (saved && saved.steps && saved.steps.length) { try { applyRecipe(saved); return; } catch (e) { /* fall through */ } }
+    applyRecipe(clone(RECIPES[0]));
+  }).then(render, render);
+})();
+</script>
+</body>
+</html>

@@ -29,13 +29,14 @@
   good_for: Event logs, Sysmon, proxy, $MFT and EDR exports from the same incident, side by side.
   try: /mill/?sample=1
 
-- name: Sieve
-  url: /sieve/
-  post: /blogsabout/shaping-messy-dfir-data-with-sieve/
-  tagline: Shake raw exports into clean CSVs.
+- name: Shifu
+  url: /shifu/
+  post: /blogsabout/learning-pandas-one-block-at-a-time/
+  tagline: Build pandas scripts by stacking blocks.
   description: >-
-    Drop in CSV, TSV or JSON from EZTools, Hayabusa, Sysmon, Security-Datasets
-    or a proxy, and Sieve maps the columns, normalizes time to UTC, removes
-    duplicates (including the same process start logged by Sysmon and 4688),
-    and pulls out IOCs. Send the result straight to Mill or Spoke.
-  good_for: Getting messy evidence into shape before you build a timeline or a graph.
+    Drag blocks like filter, parse datetime, regex extract, merge and group
+    into a recipe and watch the DataFrame change at every step. Shifu writes
+    the matching pandas as you go, so you can export a .py or a notebook, and
+    sends results straight to Mill or Spoke. Starts with six recipes for
+    EvtxECmd, Hayabusa, PECmd and MFTECmd output.
+  good_for: Triage on EZTools and Hayabusa CSVs, and learning pandas one step at a time.
