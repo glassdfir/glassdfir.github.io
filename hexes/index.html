@@ -506,6 +506,7 @@ textarea.code { width: 100%; min-height: 190px; resize: vertical; background: va
               <button type="button" class="btn ghost small" id="copyHexBtn">Copy as hex</button>
               <button type="button" class="btn ghost small" id="copyTxtBtn">Copy as text</button>
               <button type="button" class="btn ghost small" id="linkBytesBtn" title="A link that carries these bytes. Anyone who opens it sees them in Hexes.">Copy bytes as link</button>
+              <button type="button" class="btn ghost small" id="chefBtn" title="Opens CyberChef with exactly these bytes. They travel after the # in the link, which browsers never send to a server.">Send to CyberChef</button>
               <button type="button" class="btn ghost small" id="linkHereBtn" title="A link to this offset and the file's SHA-256. The file itself stays with you.">Copy link to here</button>
             </div>
           </div>
@@ -1205,6 +1206,17 @@ async function request(path, opts = {}) {
   }
   if (route === 'hash') { const f = need(q.id); return { ...f.hash, size: f.size }; }
 
+  // Bytes leaving Hexes for another tool go in the session log with their hashes
+  if (route === 'sent' && post) {
+    const f = need(body.id);
+    const start = Math.max(0, int(body.start, 0)), end = Math.min(f.size, int(body.end, 0));
+    if (end <= start) throw new Error('Select at least one byte');
+    // hash what was actually sent, which includes any unsaved edits
+    const sent = Uint8Array.from(atob(String(body.data || '')), c => c.charCodeAt(0));
+    const h = await hashOf(new Blob([sent]));
+    audit({ action: 'send', to: String(body.to || '').slice(0, 40), source: f.name, start, end, size: sent.length, ...h });
+    return { ok: true };
+  }
   if (route === 'hashrange') {
     const f = need(q.id);
     const start = Math.max(0, int(q.start, 0)), end = Math.min(f.size, int(q.end, 0));
@@ -2318,7 +2330,7 @@ function renderSelection() {
   const s = selRange();
   const dl = $('#selInfo');
   const has = !!(S.file && s);
-  ['#carveBtn', '#hashSelBtn', '#copyHexBtn', '#copyTxtBtn', '#decRun', '#linkBytesBtn'].forEach(id => ($(id).disabled = !has));
+  ['#carveBtn', '#hashSelBtn', '#copyHexBtn', '#copyTxtBtn', '#decRun', '#linkBytesBtn', '#chefBtn'].forEach(id => ($(id).disabled = !has));
   $('#linkHereBtn').disabled = !S.file;
   $('#decSrc').textContent = has ? `Selection: ${(s[1] - s[0] + 1).toLocaleString()} bytes at ${h0x(s[0])}` : 'No selection';
   if (!has) { dl.innerHTML = '<dt>Selection</dt><dd>None. Drag across bytes or use Shift+arrows.</dd>'; return; }
@@ -2680,6 +2692,21 @@ async function copyBytesLink() {
   const url = `${shareBase()}#name=${encodeURIComponent(name)}&input=${bytesToB64u(z)}`;
   if (url.length > 2000000) return toast(`That link would be ${fmtSize(url.length)}; browsers stop at about 2 MB. Carve the selection to a file instead.`, 7000);
   copyText(url, `a link with these ${src.buf.length.toLocaleString()} bytes (${fmtSize(url.length)})`);
+}
+// CyberChef reads #input as Base64 *text*, which would mangle bytes over 0x7F, so send the bytes as
+// hex with a From Hex step already in the recipe: CyberChef rebuilds them exactly, binary included.
+async function sendToCyberChef() {
+  const w = window.open('', '_blank'); // open now, while the click still counts, or popup blockers step in
+  const fail = msg => { if (w) w.close(); toast(msg, 7000); };
+  let src;
+  try { src = await selectionBytes(); } catch (e) { return fail(e.message); }
+  let hexText = '';
+  for (let i = 0; i < src.buf.length; i++) hexText += HX2[src.buf[i]];
+  const url = "https://gchq.github.io/CyberChef/#recipe=From_Hex('None')&input=" + encodeURIComponent(btoa(hexText));
+  if (url.length > 2000000) return fail(`That is too much for a CyberChef link (${fmtSize(url.length)}; browsers stop at about 2 MB). Select less, or carve the selection to a file and open it in CyberChef.`);
+  try { await api('sent', { method: 'POST', body: { id: activeFile().id, start: src.start, end: src.end, to: 'CyberChef', data: b64encode(src.buf) } }); } catch {}
+  if (w) { w.opener = null; w.location.href = url; } else window.open(url, '_blank', 'noopener');
+  toast(`Sent ${src.buf.length.toLocaleString()} byte${src.buf.length === 1 ? '' : 's'} to CyberChef`);
 }
 function copyHereLink() {
   if (!S.file) return;
@@ -3129,6 +3156,7 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', dra
 renderHead();
 render();
 $('#linkBytesBtn').addEventListener('click', copyBytesLink);
+$('#chefBtn').addEventListener('click', sendToCyberChef);
 $('#linkHereBtn').addEventListener('click', copyHereLink);
 window.addEventListener('hashchange', () => handleLinks(true));
 handleLinks(false);
