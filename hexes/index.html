@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Hexes</title>
-<meta name="description" content="A read-only hex viewer for DFIR that runs in your browser: hashing, signatures, a value inspector, strings, search, entropy, carving, XOR/Base64 decoding and two-file compare.">
+<meta name="description" content="A read-only hex viewer for DFIR that runs in your browser: hashing, signatures, a value inspector, strings, YARA, search, entropy, carving, XOR/Base64 decoding and two-file compare.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314121a'/%3E%3Cpath d='M9 8v16M9 16h7M16 8v16M20 11l6 10M26 11l-6 10' stroke='%23e3a659' stroke-width='2.6' stroke-linecap='round' fill='none'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -133,7 +133,7 @@ kbd { font-size: 11px; border: 1px solid var(--line); border-bottom-width: 2px; 
 .edit-actions { display: inline-flex; gap: 8px; align-items: center; margin-left: auto; color: var(--edited); font-weight: 500; font-size: 13px; }
 
 /* ---------- work area ---------- */
-.work { display: grid; grid-template-columns: minmax(0, 1fr) 360px; min-height: 0; }
+.work { display: grid; grid-template-columns: minmax(0, 1fr) 380px; min-height: 0; }
 .viewer { display: flex; flex-direction: column; min-width: 0; min-height: 0; border-right: 1px solid var(--line); }
 .view-head, .row { font-family: var(--font-mono); font-size: 13px; white-space: pre; }
 .view-head { padding: 6px 0 4px; color: var(--dim); border-bottom: 1px solid var(--line); overflow: hidden; background: var(--surface); }
@@ -191,7 +191,7 @@ body.comparing .as { padding-left: 8px; }
 
 .tools { flex: 1; display: flex; flex-direction: column; min-height: 260px; }
 .tabs { display: flex; gap: 2px; margin-bottom: 10px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
-.tab { flex: none; background: none; border: 0; padding: 6px 6px; margin-bottom: -1px; border-bottom: 2px solid transparent; cursor: pointer; color: var(--dim); font-weight: 500; }
+.tab { flex: none; background: none; border: 0; padding: 6px 5px; font-size: 13px; margin-bottom: -1px; border-bottom: 2px solid transparent; cursor: pointer; color: var(--dim); font-weight: 500; }
 .tab.on { color: var(--fg); border-bottom-color: var(--accent); }
 .tabpane { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
 .stack { display: flex; flex-direction: column; gap: 8px; }
@@ -201,6 +201,7 @@ body.comparing .as { padding-left: 8px; }
 .grow { flex: 1; }
 .check { display: inline-flex; gap: 5px; align-items: center; font-size: 13px; color: var(--dim); }
 .note { font-size: 12.5px; color: var(--dim); margin: 0; }
+.note a { color: var(--accent); }
 .progress { height: 3px; background: var(--sunk); border-radius: 2px; overflow: hidden; }
 .progress span { display: block; height: 100%; width: 0; background: var(--accent); transition: width .2s; }
 .result-head { font-size: 12.5px; color: var(--dim); }
@@ -215,6 +216,13 @@ body.comparing .as { padding-left: 8px; }
 .results .rs { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .results li.more { justify-content: center; color: var(--accent); font-family: var(--font-ui); }
 .num { width: 4.5em; }
+textarea.code { width: 100%; min-height: 190px; resize: vertical; background: var(--sunk); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 9px; font-family: var(--font-mono); font-size: 12px; line-height: 1.45; tab-size: 2; color: inherit; white-space: pre; overflow-wrap: normal; overflow-x: auto; }
+.results li.grp { cursor: default; flex-wrap: wrap; background: var(--sunk); color: var(--fg); font-family: var(--font-ui); }
+.results li.grp:hover { background: var(--sunk); }
+.results li.grp b { font-family: var(--font-mono); }
+.results .tag { font-size: 11px; padding: 0 6px; border: 1px solid var(--line); border-radius: 999px; color: var(--dim); }
+.results .rid { color: var(--fg); flex: none; }
+.dec-block.err pre { color: var(--edited); }
 .dec-out, .sel-out { display: flex; flex-direction: column; gap: 8px; }
 .dec-block { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
 .dec-block header { display: flex; align-items: center; gap: 8px; padding: 5px 8px; background: var(--sunk); font-size: 12px; color: var(--dim); }
@@ -354,6 +362,7 @@ body.comparing .as { padding-left: 8px; }
         <div class="tabs" role="tablist">
           <button role="tab" class="tab on" data-tab="search" aria-selected="true">Search</button>
           <button role="tab" class="tab" data-tab="strings" aria-selected="false">Strings</button>
+          <button role="tab" class="tab" data-tab="yara" aria-selected="false">YARA</button>
           <button role="tab" class="tab" data-tab="decode" aria-selected="false">Decode</button>
           <button role="tab" class="tab" data-tab="sel" aria-selected="false">Selection</button>
           <button role="tab" class="tab" data-tab="cmp" aria-selected="false">Compare</button>
@@ -404,10 +413,34 @@ body.comparing .as { padding-left: 8px; }
           <div class="progress" id="strProg" hidden><span></span></div>
           <div class="row2">
             <span class="result-head grow" id="strHead"></span>
+            <button type="button" class="btn ghost small" id="strYara" hidden title="Adds the string you clicked to the YARA rule">Add to YARA</button>
             <button type="button" class="btn ghost small" id="strCsv" hidden>Save as CSV</button>
           </div>
           <ol class="results" id="strResults"></ol>
           <div id="strOut" class="sel-out"></div>
+        </div>
+
+        <div class="tabpane" data-pane="yara" hidden>
+          <p class="note">Rules run in this browser with <a href="https://virustotal.github.io/yara-x/" target="_blank" rel="noopener">YARA-X</a>. The engine (about 2 MB) downloads once from jsDelivr and is checked against a pinned hash. Your file and rules stay here.</p>
+          <label for="yaraRules" class="sr">YARA rules</label>
+          <textarea id="yaraRules" class="code" rows="11" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+          <div class="btn-row">
+            <input id="yaraFile" type="file" accept=".yar,.yara,.txt" class="sr" tabindex="-1">
+            <label for="yaraFile" class="btn ghost small" tabindex="0" role="button">Load .yar…</label>
+            <button type="button" class="btn ghost small" id="yaraSave">Save .yar</button>
+            <button type="button" class="btn ghost small" id="yaraAdd" title="Adds the selected bytes as a string in the last rule">Add selection</button>
+          </div>
+          <div class="row2">
+            <label for="yaraScope" class="sr">What to scan</label>
+            <select id="yaraScope">
+              <option value="file">Scan the whole file</option>
+              <option value="sel">Scan the selection only</option>
+            </select>
+            <button type="button" class="btn small" id="yaraRun">Scan</button>
+          </div>
+          <div class="result-head" id="yaraHead"></div>
+          <div id="yaraMsgs" class="dec-out"></div>
+          <ol class="results" id="yaraResults"></ol>
         </div>
 
         <div class="tabpane" data-pane="decode" hidden>
@@ -826,6 +859,92 @@ onmessage = async e => {
 };
 
 </script>
+<script type="text/js-worker" id="yara-worker-src">
+// Hexes YARA worker: runs YARA-X (WebAssembly) over bytes from the evidence file.
+// The engine is downloaded on first use, checked against pinned SHA-256 hashes, then run from those exact bytes.
+const MAX_PER_PATTERN = 1000, TIMEOUT_MS = 60000;
+let loading = null;
+
+const text = e => (e instanceof Error ? e.message : typeof e === 'string' ? e : JSON.stringify(e));
+async function sha256(buf) {
+  const d = new Uint8Array(await crypto.subtle.digest('SHA-256', buf));
+  return Array.from(d, b => b.toString(16).padStart(2, '0')).join('');
+}
+async function fetchPinned(url, hash) {
+  let res;
+  try { res = await fetch(url, { credentials: 'omit' }); }
+  catch (e) { throw new Error(`Could not download the YARA engine (${text(e)}). Check your connection and try again.`); }
+  if (!res.ok) throw new Error(`Could not download the YARA engine (HTTP ${res.status}).`);
+  const buf = await res.arrayBuffer();
+  if (await sha256(buf) !== hash) throw new Error('The downloaded YARA engine does not match its pinned SHA-256, so Hexes will not run it.');
+  return buf;
+}
+function engine(cfg) {
+  return loading || (loading = (async () => {
+    const [js, wasm] = await Promise.all([fetchPinned(cfg.js, cfg.jsSha256), fetchPinned(cfg.wasm, cfg.wasmSha256)]);
+    const url = URL.createObjectURL(new Blob([js], { type: 'text/javascript' }));
+    try {
+      const m = await import(url);
+      await m.default({ module_or_path: wasm });
+      return m;
+    } finally { URL.revokeObjectURL(url); }
+  })().catch(e => { loading = null; throw e; }));
+}
+
+// A short readable preview of a hit: UTF-16LE text when it looks like it, else printable ASCII
+function preview(u8, off, len) {
+  const b = u8.subarray(off, off + Math.min(len, 64));
+  const ok = c => c >= 0x20 && c < 0x7f;
+  let wide = b.length >= 4 && b.length % 2 === 0;
+  for (let i = 0; wide && i < b.length; i += 2) wide = ok(b[i]) && b[i + 1] === 0;
+  let s = '';
+  if (wide) for (let i = 0; i < b.length; i += 2) s += String.fromCharCode(b[i]);
+  else for (const c of b) s += ok(c) ? String.fromCharCode(c) : '·';
+  return s + (len > 64 ? '…' : '');
+}
+
+async function scan({ engine: cfg, rules: src, blob, base }) {
+  const m = await engine(cfg);
+  const compiler = new m.Compiler();
+  let rules = null, scanner = null;
+  try {
+    try { compiler.addSource(src); }
+    catch (e) { return { errors: [text(e)], warnings: compiler.warnings.map(String) }; }
+    const warnings = compiler.warnings.map(String);
+    rules = compiler.build();
+    scanner = rules.scanner();
+    scanner.setMaxMatchesPerPattern(MAX_PER_PATTERN);
+    scanner.setTimeoutMs(TIMEOUT_MS);
+    const data = new Uint8Array(await blob.arrayBuffer());
+    const t0 = performance.now();
+    let res;
+    try { res = scanner.scan(data); }
+    catch (e) { return { errors: ['The scan stopped: ' + text(e)], warnings }; }
+    const ms = Math.round(performance.now() - t0);
+    const matches = (res.matches || []).map(r => ({
+      rule: r.identifier, namespace: r.namespace, tags: r.tags || [],
+      meta: (r.metadata || []).map(x => [x.identifier, String(x.value)]),
+      patterns: (r.patterns || []).filter(p => p.matches && p.matches.length).map(p => ({
+        id: p.identifier, capped: p.matches.length >= MAX_PER_PATTERN,
+        hits: p.matches.map(h => [base + h.offset, h.length, preview(data, h.offset, h.length)]),
+      })),
+    }));
+    return { matches, warnings: warnings.concat((res.warnings || []).map(String)), ms };
+  } finally {
+    if (scanner) scanner.free();
+    if (rules) rules.free();
+    compiler.free();
+  }
+}
+
+onmessage = async e => {
+  const { id, op } = e.data;
+  try {
+    if (op !== 'scan') throw new Error('Unknown operation ' + op);
+    postMessage({ id, result: await scan(e.data) });
+  } catch (err) { postMessage({ id, error: text(err) }); }
+};
+</script>
 <script src="/assets/suite/handoff.js"></script>
 <script>
 // Magic number table: [offset, hex bytes ("??" = any), label]
@@ -933,6 +1052,37 @@ function run(op, args, onProgress) {
   return { id, promise };
 }
 const cancel = id => worker.postMessage({ op: 'cancel', args: { target: id } });
+
+// ---------- YARA: YARA-X in its own worker, started on first scan ----------
+// jsDelivr serves the npm package byte for byte; the hashes are of @virustotal/yara-x@1.21.0's pkg/ files.
+const YARA_ENGINE = {
+  js: 'https://cdn.jsdelivr.net/npm/@virustotal/yara-x@1.21.0/pkg/yara_x_js.js',
+  jsSha256: 'ab43aa3b288de52b41a32ae86b4dd6ab66ec4a6bbfe4a5e3ffc0638e62864446',
+  wasm: 'https://cdn.jsdelivr.net/npm/@virustotal/yara-x@1.21.0/pkg/yara_x_js_bg.wasm',
+  wasmSha256: '29d1a1049a824423848567a166e384ce3a1dbae192e04e4df128d36295e9bc9e',
+};
+const YARA_MAX = 256 << 20; // bytes per scan: the engine holds them all in memory
+let yaraWorker = null, yaraSeq = 0;
+const yaraPending = new Map();
+function yaraRun(args) {
+  if (!yaraWorker) {
+    const src = document.getElementById('yara-worker-src').textContent;
+    yaraWorker = new Worker(URL.createObjectURL(new Blob([src], { type: 'text/javascript' })), { type: 'module' });
+    yaraWorker.onmessage = e => {
+      const p = yaraPending.get(e.data.id);
+      if (!p) return;
+      yaraPending.delete(e.data.id);
+      if (e.data.error) p.reject(new Error(e.data.error)); else p.resolve(e.data.result);
+    };
+    yaraWorker.onerror = e => {
+      for (const p of yaraPending.values()) p.reject(new Error('The YARA worker stopped' + (e.message ? ': ' + e.message : '')));
+      yaraPending.clear();
+      yaraWorker = null;
+    };
+  }
+  const id = ++yaraSeq;
+  return new Promise((resolve, reject) => { yaraPending.set(id, { resolve, reject }); yaraWorker.postMessage({ id, ...args }); });
+}
 const rid = n => Array.from(crypto.getRandomValues(new Uint8Array(n)), b => b.toString(16).padStart(2, '0')).join('');
 const hex = n => '0x' + n.toString(16).toUpperCase();
 
@@ -1094,6 +1244,20 @@ async function request(path, opts = {}) {
     return { state: j.state, done: j.done, total: j.total, count: j.strings.length, truncated: j.truncated, error: j.error, strings: j.strings.slice(since) };
   }
 
+  if (route === 'yara' && post) {
+    const f = need(body.id);
+    const rules = String(body.rules || '');
+    if (!rules.trim()) throw new Error('Write or load a rule first');
+    const start = Math.max(0, int(body.start, 0)), end = Math.min(f.size, int(body.end, f.size));
+    if (end <= start) throw new Error('There are no bytes to scan');
+    if (end - start > YARA_MAX) throw new Error(`YARA scans up to ${YARA_MAX / 1048576} MiB at a time. Select a smaller range and scan the selection.`);
+    const r = await yaraRun({ op: 'scan', engine: YARA_ENGINE, rules, blob: f.file.slice(start, end), base: start });
+    if (r.matches) {
+      const h = await hashOf(new Blob([rules]));
+      audit({ action: 'yara', file: f.name, start, end, rulesSha256: h.sha256, engine: 'yara-x 1.21.0', matched: r.matches.map(m => m.rule) });
+    }
+    return { ...r, start, end };
+  }
   if (route === 'compare' && post) {
     const a = slots.a, b = slots.b;
     if (!a || !b) throw new Error('Open both an A file and a B file to compare');
@@ -1252,7 +1416,7 @@ const S = {
   ent: null, magic: null, hash: null,
   hits: [], hitIdx: -1, match: null, job: null,
   wheel: 0, dragFrom: null,
-  side: 'a', B: null, cmp: null, runs: [], diffIdx: -1, jobFile: null, str: null,
+  side: 'a', B: null, cmp: null, runs: [], diffIdx: -1, jobFile: null, str: null, yara: null,
 };
 
 // ---------------------------------------------------------------- utils
@@ -1410,6 +1574,10 @@ function loadFile(f) {
   $('#searchHead').textContent = '';
   S.str = null;
   renderStrings();
+  S.yara = null;
+  $('#yaraResults').innerHTML = '';
+  $('#yaraMsgs').innerHTML = '';
+  $('#yaraHead').textContent = '';
   $('#strOut').innerHTML = '';
   $('#strProg').hidden = true;
   $('#strCancel').hidden = true;
@@ -1914,6 +2082,7 @@ function renderStrings() {
   if (st.state === 'error') msg = 'Strings failed: ' + st.error;
   $('#strHead').textContent = msg;
   $('#strCsv').hidden = !v || st.state === 'running';
+  $('#strYara').hidden = st.on === null;
   const show = st.view.slice(0, st.shown), rest = v - show.length;
   ol.innerHTML = show.map((x, i) =>
     `<li data-i="${i}"${x[0] === st.on ? ' class="on"' : ''} title="${esc(x[3])}"><span class="ro">${hexOff(x[0])}</span>` +
@@ -1934,6 +2103,7 @@ function gotoString(i) {
   document.querySelectorAll('#strResults li.on').forEach(li => li.classList.remove('on'));
   const li = $(`#strResults li[data-i="${i}"]`);
   if (li) li.classList.add('on');
+  $('#strYara').hidden = false;
   render();
 }
 
@@ -1961,6 +2131,135 @@ function autoStrings() {
   if (!S.file || $('[data-pane="strings"]').hidden || (S.str && S.str.fid === S.file.id)) return;
   if (S.size <= STR_AUTO) runStrings();
   else $('#strHead').textContent = `This file is ${fmtSize(S.size)}. Press Find strings to scan all of it.`;
+}
+
+// ---------------------------------------------------------------- yara
+const YARA_KEY = 'hexes.yara.rules';
+let yaraReady = false; // the engine has loaded once, so scans skip the download
+const YARA_STARTER = `// Starter rule for the sample file.
+// "Add selection" adds selected bytes.
+// Ctrl+Enter scans.
+rule hexes_sample_beacon : demo
+{
+  meta:
+    description = "Hard-coded C2, Base64 PowerShell and an XOR-hidden pipe name"
+  strings:
+    $c2 = "203.0.113.66"
+    $ps = "powershell" base64wide
+    $pipe = "\\\\\\\\.\\\\pipe\\\\" xor(1-255)
+  condition:
+    uint16(0) == 0x5A4D and $c2 and any of ($ps, $pipe)
+}
+`;
+
+function loadRules() {
+  let t = null;
+  try { t = localStorage.getItem(YARA_KEY); } catch {}
+  $('#yaraRules').value = t || YARA_STARTER;
+}
+function keepRules() { try { localStorage.setItem(YARA_KEY, $('#yaraRules').value); } catch {} }
+
+async function runYara() {
+  if (!S.file) return toast('Open a file first');
+  const sel = selRange();
+  if ($('#yaraScope').value === 'sel' && !sel) return toast('Select some bytes first, or scan the whole file');
+  const [start, end] = $('#yaraScope').value === 'sel' ? [sel[0], sel[1] + 1] : [0, S.size];
+  const fid = S.file.id, token = (S.yara = { fid, hits: [], on: -1 });
+  $('#yaraRun').disabled = true;
+  $('#yaraMsgs').innerHTML = '';
+  $('#yaraResults').innerHTML = '';
+  $('#yaraHead').textContent = yaraReady ? 'Scanning…' : 'Loading the YARA engine and scanning…';
+  let r;
+  try { r = await api('yara', { method: 'POST', body: { id: fid, rules: $('#yaraRules').value, start, end } }); }
+  catch (e) { if (S.yara === token) { $('#yaraHead').textContent = ''; showYaraMsgs([e.message], []); } return; }
+  finally { if (S.yara === token) $('#yaraRun').disabled = false; }
+  if (S.yara !== token) return;
+  yaraReady = true;
+  showYaraMsgs(r.errors || [], r.warnings || []);
+  if (r.errors) { $('#yaraHead').textContent = 'The rules did not compile'; return; }
+  renderYara(r);
+}
+
+function showYaraMsgs(errors, warnings) {
+  const block = (cls, title, list) => list.length ? `<div class="dec-block ${cls}"><header><b>${title}</b></header><pre>${esc(list.join('\n\n'))}</pre></div>` : '';
+  $('#yaraMsgs').innerHTML = block('err', errors.length === 1 ? 'Error' : 'Errors', errors) + block('', warnings.length === 1 ? 'Warning' : 'Warnings', warnings);
+}
+
+function renderYara(r) {
+  const st = S.yara, rows = [];
+  const n = r.matches.length, where = r.start === 0 && r.end === S.size ? '' : ` in ${h0x(r.start)}–${h0x(r.end - 1)}`;
+  $('#yaraHead').textContent = `${n ? n.toLocaleString() : 'No'} rule${n === 1 ? '' : 's'} matched${where} · ${r.ms.toLocaleString()} ms`;
+  for (const m of r.matches) {
+    const tags = m.tags.map(t => `<span class="tag">${esc(t)}</span>`).join('');
+    const desc = (m.meta.find(([k]) => k === 'description') || [])[1];
+    rows.push(`<li class="grp"><b>${esc(m.rule)}</b>${tags}${desc ? `<span class="rp">${esc(desc)}</span>` : ''}</li>`);
+    if (!m.patterns.length) rows.push('<li class="grp"><span class="rp">Matched on its condition alone, no string hits to show</span></li>');
+    for (const p of m.patterns) {
+      for (const h of p.hits) {
+        const i = st.hits.push(h) - 1;
+        rows.push(`<li data-i="${i}" title="${esc(p.id + ' · ' + h[1] + ' bytes')}"><span class="ro">${hexOff(h[0])}</span><span class="rid">${esc(p.id)}</span><span class="rs">${esc(h[2])}</span></li>`);
+      }
+      if (p.capped) rows.push(`<li class="grp"><span class="rp">${esc(p.id)}: showing the first 1,000 hits</span></li>`);
+    }
+  }
+  $('#yaraResults').innerHTML = rows.join('');
+}
+
+function gotoYaraHit(i) {
+  const h = S.yara && S.yara.hits[i];
+  if (!h || !S.file || S.yara.fid !== S.file.id) return;
+  const [o, len] = h;
+  S.cur = o; S.anchor = len > 1 ? o + len - 1 : null; S.nib = null; S.match = null;
+  const row = Math.floor(o / ROW);
+  if (row < S.top || row >= S.top + S.rows) centerOn(o);
+  document.querySelectorAll('#yaraResults li.on').forEach(li => li.classList.remove('on'));
+  const li = $(`#yaraResults li[data-i="${i}"]`);
+  if (li) li.classList.add('on');
+  render();
+}
+
+// The selected bytes as a YARA string: text, wide text, or a hex string
+function yaraString(b) {
+  const ok = c => c >= 0x20 && c < 0x7f;
+  const q = t => '"' + t.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"';
+  let wide = b.length >= 4 && b.length % 2 === 0;
+  for (let i = 0; wide && i < b.length; i += 2) wide = ok(b[i]) && b[i + 1] === 0;
+  if (wide) { let t = ''; for (let i = 0; i < b.length; i += 2) t += String.fromCharCode(b[i]); return q(t) + ' wide'; }
+  if (b.length >= 3 && b.every(ok)) return q(String.fromCharCode(...b));
+  return '{ ' + b.map(x => HX2[x]).join(' ') + ' }';
+}
+
+// Put `$sN = <def>` into the last rule's strings section, adding the section or a whole rule if needed
+function addToRules(def) {
+  const ta = $('#yaraRules');
+  let t = ta.value, n = 1;
+  while (new RegExp('\\$s' + n + '\\b').test(t)) n++;
+  const line = `    $s${n} = ${def}\n`;
+  const conds = [...t.matchAll(/^[ \t]*condition[ \t]*:/gm)];
+  if (!conds.length) {
+    t = t.replace(/\s*$/, '\n\n') + `rule from_hexes\n{\n  strings:\n${line}  condition:\n    any of them\n}\n`;
+  } else {
+    const at = conds[conds.length - 1].index;
+    const ruleAt = t.lastIndexOf('rule ', at);
+    const hasStrings = /^[ \t]*strings[ \t]*:/m.test(t.slice(Math.max(0, ruleAt), at));
+    t = t.slice(0, at) + (hasStrings ? '' : '  strings:\n') + line + t.slice(at);
+  }
+  ta.value = t;
+  keepRules();
+  return '$s' + n;
+}
+
+async function addSelectionToRules() {
+  const sel = selRange();
+  if (!S.file || !sel) return toast('Select some bytes first: click a string, a search hit, or drag in the grid');
+  const len = sel[1] - sel[0] + 1;
+  if (len > 256) return toast(`That selection is ${len.toLocaleString()} bytes. Select 256 or fewer for a rule string.`);
+  let bytes;
+  try { bytes = Array.from(await api(`read?id=${S.file.id}&offset=${sel[0]}&length=${len}`)); }
+  catch (e) { return toast(e.message); }
+  const id = addToRules(yaraString(bytes));
+  switchTab('yara');
+  toast(`Added ${id} to the rule`);
 }
 
 // ---------------------------------------------------------------- selection, decode, carve
@@ -2610,6 +2909,28 @@ $('#strResults').addEventListener('click', e => {
   gotoString(+li.dataset.i);
 });
 $('#strCsv').addEventListener('click', saveStringsCsv);
+$('#strYara').addEventListener('click', addSelectionToRules);
+loadRules();
+$('#yaraRules').addEventListener('input', () => { clearTimeout(keepRules.t); keepRules.t = setTimeout(keepRules, 400); });
+$('#yaraRun').addEventListener('click', runYara);
+$('#yaraAdd').addEventListener('click', addSelectionToRules);
+$('#yaraSave').addEventListener('click', () => {
+  const url = URL.createObjectURL(new Blob([$('#yaraRules').value], { type: 'text/plain' }));
+  const a = document.createElement('a'); a.href = url; a.download = 'hexes-rules.yar'; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+});
+$('#yaraFile').addEventListener('change', async e => {
+  const f = e.target.files && e.target.files[0];
+  e.target.value = '';
+  if (!f) return;
+  if (f.size > 2 << 20) return toast('That rules file is over 2 MB');
+  $('#yaraRules').value = await f.text();
+  keepRules();
+  toast(`Loaded ${f.name}`);
+});
+$('#yaraResults').addEventListener('click', e => { const li = e.target.closest('li[data-i]'); if (li) gotoYaraHit(+li.dataset.i); });
+// Ctrl+Enter in the editor scans
+$('#yaraRules').addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); runYara(); } });
 $('#decRun').addEventListener('click', runDecode);
 $('#decMode').addEventListener('change', e => { $('#decKey').hidden = e.target.value !== 'xor'; });
 $('#decKey').hidden = true;
