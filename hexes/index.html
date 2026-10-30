@@ -84,6 +84,11 @@ label.btn { display: inline-flex; align-items: center; }
 .home { color: var(--dim); font-size: 13px; text-decoration: none; white-space: nowrap; }
 .home:hover { color: var(--accent); }
 .w-sub { font-size: 12.5px; }
+.w-pending { color: var(--accent); font-weight: 500; }
+.link-list { list-style: none; margin: 0 0 16px; padding: 0; display: grid; gap: 6px; }
+.link-list li { display: flex; gap: 8px; align-items: baseline; }
+.link-list b { font-size: 12px; }
+.link-list code { font-size: 12px; word-break: break-all; background: var(--sunk); padding: 4px 6px; border-radius: 4px; flex: 1; }
 body.dragging .grid-wrap::after { content: 'Drop to open'; position: absolute; inset: 10px; border: 2px dashed var(--accent); border-radius: 10px; display: grid; place-items: center; font-size: 18px; color: var(--accent); background: color-mix(in srgb, var(--bg) 80%, transparent); z-index: 5; pointer-events: none; }
 .out-card button { justify-self: start; }
 input[type=text], select { background: var(--sunk); border: 1px solid var(--line); border-radius: var(--radius); padding: 6px 9px; }
@@ -325,6 +330,7 @@ body.comparing .as { padding-left: 8px; }
         <div id="welcome" class="welcome">
           <p class="w-title">Open an evidence file to begin.</p>
           <p>Choose a file, drop one here, or open the sample to try things out. Nothing is uploaded: Hexes reads the file in your browser, read-only, and hashes it as soon as it loads.</p>
+          <p class="w-pending" id="pendingNote" hidden></p>
           <p class="w-sub">Disk images work too. Hexes only reads the parts you look at, so a multi-gigabyte file opens instantly.</p>
         </div>
         <canvas id="track" class="track" aria-label="Entropy and difference map. Click to jump."></canvas>
@@ -401,6 +407,8 @@ body.comparing .as { padding-left: 8px; }
             <button type="button" class="btn ghost small" id="hashSelBtn">Hash selection</button>
             <button type="button" class="btn ghost small" id="copyHexBtn">Copy as hex</button>
             <button type="button" class="btn ghost small" id="copyTxtBtn">Copy as text</button>
+            <button type="button" class="btn ghost small" id="linkBytesBtn" title="A link that carries these bytes. Anyone who opens it sees them in Hexes.">Copy bytes as link</button>
+            <button type="button" class="btn ghost small" id="linkHereBtn" title="A link to this offset and the file's SHA-256. The file itself stays with you.">Copy link to here</button>
           </div>
           <div id="selOut" class="sel-out"></div>
         </div>
@@ -447,6 +455,18 @@ body.comparing .as { padding-left: 8px; }
     <div class="btn-row end">
       <button type="button" class="btn ghost" id="modalNo">Keep sealed</button>
       <button type="button" class="btn danger" id="modalYes">Unseal</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="linkModal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="linkTitle">
+    <h3 id="linkTitle">Download a file from another site?</h3>
+    <p>This link asks Hexes to download the file below and open it read-only. Only continue if you trust where the link came from. The download stays in this browser.</p>
+    <ul class="link-list" id="linkList"></ul>
+    <div class="btn-row end">
+      <button type="button" class="btn ghost" id="linkNo">Cancel</button>
+      <button type="button" class="btn" id="linkYes">Download and open</button>
     </div>
   </div>
 </div>
@@ -866,7 +886,7 @@ function download(blob, name) {
 const slots = { a: null, b: null };
 let cmp = null;
 
-function info(f) { return { id: f.id, name: f.name, path: f.name, size: f.size, mtime: f.mtime, slot: f.slot }; }
+function info(f) { return { id: f.id, name: f.name, path: f.name, size: f.size, mtime: f.mtime, slot: f.slot, origin: f.origin }; }
 function closeSlot(slot) {
   const f = slots[slot];
   if (cmp) { if (cmp.state === 'running') cancel(cmp.wid); cmp = null; }
@@ -875,12 +895,12 @@ function closeSlot(slot) {
   for (const id of f.jobs) cancel(id);
   slots[slot] = null;
 }
-function openBlob(file, slot) {
+function openBlob(file, slot, origin) {
   closeSlot(slot);
   const f = {
     id: rid(6), file, name: file.name || 'untitled.bin', size: file.size,
     mtime: file.lastModified ? new Date(file.lastModified).toISOString() : null,
-    slot, hash: { state: 'running', done: 0 }, entropy: null, searches: new Map(), jobs: new Set(),
+    slot, origin: origin || null, hash: { state: 'running', done: 0 }, entropy: null, searches: new Map(), jobs: new Set(),
   };
   slots[slot] = f;
   const t0 = performance.now();
@@ -888,7 +908,7 @@ function openBlob(file, slot) {
   f.jobs.add(job.id);
   job.promise.then(h => {
     Object.assign(f.hash, { state: 'done', ...h, ms: Math.round(performance.now() - t0) });
-    audit({ action: slot === 'b' ? 'open-compare' : 'open', file: f.name, size: f.size, lastModified: f.mtime, md5: h.md5, sha256: h.sha256 });
+    audit({ action: slot === 'b' ? 'open-compare' : 'open', file: f.name, ...(f.origin ? { source: f.origin } : {}), size: f.size, lastModified: f.mtime, md5: h.md5, sha256: h.sha256 });
   }).catch(e => { if (!e.cancelled) Object.assign(f.hash, { state: 'error', error: e.message }); })
     .finally(() => f.jobs.delete(job.id));
   return info(f);
@@ -915,7 +935,7 @@ async function request(path, opts = {}) {
     let file = body.file;
     if (body.sample) file = slot === 'b' ? sampleB() : sampleA();
     if (!file) throw new Error('Choose a file to open');
-    return openBlob(file, slot);
+    return openBlob(file, slot, body.sample ? null : String(body.origin || '').slice(0, 2048) || null);
   }
   if (route === 'close' && post) { closeSlot(body.slot === 'b' ? 'b' : 'a'); return { ok: true }; }
 
@@ -1281,14 +1301,14 @@ function loadFile(f) {
     file: f, size: f.size, digits: Math.max(8, f.size.toString(16).length),
     top: 0, cur: 0, anchor: null, nib: null, edits: new Map(),
     chunks: new Map(), loading: new Set(), ent: null, magic: null, hash: null,
-    hits: [], hitIdx: -1, match: null, job: null, side: 'a',
+    hits: [], hitIdx: -1, match: null, job: null, side: 'a', expect: null,
   });
   S.digits = Math.max(8, viewSize().toString(16).length);
   setEdit(false);
   $('#welcome').hidden = true;
   $('#evidence').hidden = false;
   $('#evName').textContent = f.name;
-  $('#evName').title = f.name;
+  $('#evName').title = f.origin && f.origin !== 'link' ? `${f.name}\nfrom ${f.origin}` : f.name;
   $('#evMtime').textContent = f.mtime ? 'Modified ' + f.mtime.replace('T', ' ').replace(/\.\d+Z$/, ' UTC') : '';
   $('#evType').textContent = f.size ? 'Identifying…' : 'Empty file';
   $('#evSize').textContent = fmtSize(f.size);
@@ -1305,6 +1325,7 @@ function loadFile(f) {
   pollHash(f.id);
   pollEntropy(f.id);
   if (S.B) runCompare();
+  applyPending();
 }
 
 function detectHeader() {
@@ -1322,7 +1343,7 @@ async function pollHash(id, isB = false) {
     try { h = await api('hash?id=' + id); } catch { return; }
     if (!live()) return;
     if (h.state === 'done') {
-      if (isB) S.B.hash = h; else S.hash = h;
+      if (isB) S.B.hash = h; else { S.hash = h; checkExpected(); }
       $('#evMd5' + sfx).textContent = h.md5;
       $('#evSha' + sfx).textContent = h.sha256;
       if (S.cmp) renderCmpSummary();
@@ -1748,7 +1769,8 @@ function renderSelection() {
   const s = selRange();
   const dl = $('#selInfo');
   const has = !!(S.file && s);
-  ['#carveBtn', '#hashSelBtn', '#copyHexBtn', '#copyTxtBtn', '#decRun'].forEach(id => ($(id).disabled = !has));
+  ['#carveBtn', '#hashSelBtn', '#copyHexBtn', '#copyTxtBtn', '#decRun', '#linkBytesBtn'].forEach(id => ($(id).disabled = !has));
+  $('#linkHereBtn').disabled = !S.file;
   $('#decSrc').textContent = has ? `Selection: ${(s[1] - s[0] + 1).toLocaleString()} bytes at ${h0x(s[0])}` : 'No selection';
   if (!has) { dl.innerHTML = '<dt>Selection</dt><dd>None. Drag across bytes or use Shift+arrows.</dd>'; return; }
   const len = s[1] - s[0] + 1;
@@ -1884,6 +1906,243 @@ async function exportPatched() {
     $('#selOut').innerHTML = outCard(`Patched copy · ${r.changes} change${r.changes === 1 ? '' : 's'}`, r, '<span>The original file was not modified.</span>');
     toast('Exported ' + r.file);
   } catch (e) { toast(e.message); }
+}
+
+
+// ---------------------------------------------------------------- links: data in the URL
+// Formats (all optional, combinable):
+//   #input=<base64url, optionally gzip>&name=…     bytes in the link (Spoke's share-link format); inputB/nameB for file B
+//   #hex=4D5A9000…                                 bytes as hex; hexB for file B
+//   #0x7FFF0   or   #at=0x7FFF0&len=16&sha256=…    jump to an offset in whatever file is opened next; warns if the hash differs
+//   ?src=https://…  (&srcB=…)                      download a file from a site that allows it (CORS); asks first
+//   ?from=<tool>                                   same-origin handoff: localStorage 'hexes.handoff' = {v:1, from, name, data(base64), offset?, length?, at(ms)}
+// Nothing from the URL is ever inserted as HTML, and decoded data is capped so a link can't exhaust memory.
+const LINK_MAX = 8 << 20, REMOTE_MAX = 512 << 20, HANDOFF_KEY = 'hexes.handoff', HANDOFF_MAX_AGE = 10 * 60 * 1000;
+S.pending = null; S.expect = null;
+const shareBase = () => (location.protocol === 'http:' || location.protocol === 'https:') ? location.origin + location.pathname : 'https://jon.glass/hexes/';
+const cleanName = (s, d) => String(s || '').replace(/[\x00-\x1f\x7f\/\\]+/g, '_').trim().slice(0, 120) || d;
+function b64uToBytes(s) {
+  let t = String(s).replace(/ /g, '+').replace(/\s/g, '').replace(/-/g, '+').replace(/_/g, '/');
+  if (/[^A-Za-z0-9+/=]/.test(t)) throw new Error('it is not valid Base64');
+  t += '='.repeat((4 - t.length % 4) % 4);
+  return Uint8Array.from(atob(t), c => c.charCodeAt(0));
+}
+const bytesToB64u = u8 => b64encode(u8).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+async function gunzipCapped(u8, cap) {
+  const reader = new Blob([u8]).stream().pipeThrough(new DecompressionStream('gzip')).getReader();
+  const parts = []; let n = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    n += value.length;
+    if (n > cap) { reader.cancel().catch(() => {}); throw new Error(`it unpacks to more than ${fmtSize(cap)}`); }
+    parts.push(value);
+  }
+  const out = new Uint8Array(n); let o = 0;
+  for (const p of parts) { out.set(p, o); o += p.length; }
+  return out;
+}
+async function maybeGunzip(u8) {
+  if (u8.length > 2 && u8[0] === 0x1f && u8[1] === 0x8b && typeof DecompressionStream !== 'undefined') return gunzipCapped(u8, LINK_MAX);
+  if (u8.length > LINK_MAX) throw new Error(`it is larger than ${fmtSize(LINK_MAX)}`);
+  return u8;
+}
+async function gzipIfSmaller(u8) {
+  if (typeof CompressionStream === 'undefined') return u8;
+  const z = new Uint8Array(await new Response(new Blob([u8]).stream().pipeThrough(new CompressionStream('gzip'))).arrayBuffer());
+  return z.length < u8.length ? z : u8;
+}
+function hexToBytes(s) {
+  const c = String(s).replace(/0x/gi, '').replace(/[\s,:-]+/g, '');
+  if (!c || c.length % 2 || /[^0-9a-f]/i.test(c)) throw new Error('hex= needs whole bytes, like 4D5A9000');
+  if (c.length / 2 > LINK_MAX) throw new Error(`it is larger than ${fmtSize(LINK_MAX)}`);
+  const out = new Uint8Array(c.length / 2);
+  for (let i = 0; i < out.length; i++) out[i] = parseInt(c.substr(i * 2, 2), 16);
+  return out;
+}
+function parseHash(h) {
+  const r = {};
+  h = String(h || '').replace(/^#/, '');
+  if (!h) return r;
+  if (!h.includes('=') && /^(0x)?[0-9a-f]+h?$/i.test(h)) { r.at = h; return r; }
+  const dec = x => { try { return decodeURIComponent(x); } catch { return x; } };
+  for (const part of h.split('&')) {
+    if (!part) continue;
+    const i = part.indexOf('=');
+    r[dec(i < 0 ? part : part.slice(0, i))] = i < 0 ? '' : dec(part.slice(i + 1));
+  }
+  return r;
+}
+function parseAbsOffset(s) {
+  const t = String(s).trim().replace(/[_\s,]/g, '');
+  if (/^0x[0-9a-f]+$/i.test(t)) return parseInt(t.slice(2), 16);
+  if (/^[0-9a-f]+h$/i.test(t)) return parseInt(t.slice(0, -1), 16);
+  if (/^\d+$/.test(t)) return parseInt(t, 10);
+  if (/^[0-9a-f]+$/i.test(t)) return parseInt(t, 16);
+  return null;
+}
+async function linkFile(input, hexStr, name, fallback) {
+  const bytes = input !== undefined ? await maybeGunzip(b64uToBytes(input)) : hexToBytes(hexStr);
+  if (!bytes.length) throw new Error('it is empty');
+  return new File([bytes], cleanName(name, fallback), { type: 'application/octet-stream', lastModified: 0 });
+}
+
+function showPendingNote() {
+  const p = S.pending, el = $('#pendingNote');
+  if (!p || S.file) { el.hidden = true; return; }
+  el.textContent = p.at !== undefined
+    ? `This link points to offset ${h0x(p.at)}${p.len > 1 ? ` (${p.len.toLocaleString()} bytes)` : ''}${p.name ? ` in ${p.name}` : ''}. Open the file and Hexes will jump there${p.sha256 ? ' and check its SHA-256' : ''}.`
+    : `This link expects a file${p.name ? ` named ${p.name}` : ''} with a known SHA-256. Open it and Hexes will check the hash.`;
+  el.hidden = false;
+}
+function applyPending() {
+  const p = S.pending;
+  if (!p || !S.file) return;
+  S.pending = null;
+  showPendingNote();
+  if (p.at !== undefined) {
+    if (p.at >= viewSize()) toast(`The link points to ${h0x(p.at)}, past the end of this file (${h0x(viewSize())}).`, 7000);
+    else {
+      const end = p.len > 1 ? Math.min(viewSize() - 1, p.at + p.len - 1) : p.at;
+      S.anchor = end > p.at ? p.at : null; S.cur = end; S.nib = null; S.match = null;
+      centerOn(p.at); render();
+    }
+  }
+  if (p.sha256) { S.expect = { sha256: p.sha256.toLowerCase(), name: p.name }; checkExpected(); }
+}
+function checkExpected() {
+  const e = S.expect;
+  if (!e || !S.hash) return;
+  S.expect = null;
+  if (S.hash.sha256 === e.sha256) { toast('SHA-256 matches the link. This is the same file.', 5000); status('SHA-256 matches the link'); }
+  else { toast(`SHA-256 does not match the link${e.name ? `, which was made from ${e.name}` : ''}. The offset may point somewhere else in this file.`, 9000); status('SHA-256 differs from the link'); }
+}
+
+function confirmRemote(list) {
+  return new Promise(resolve => {
+    $('#linkList').innerHTML = list.map(u => `<li><b>${u.slot.toUpperCase()}</b><code>${esc(u.url.href)}</code></li>`).join('');
+    $('#linkModal').hidden = false;
+    $('#linkNo').focus();
+    const done = v => { $('#linkModal').hidden = true; $('#linkYes').onclick = $('#linkNo').onclick = null; resolve(v); };
+    $('#linkYes').onclick = () => done(true);
+    $('#linkNo').onclick = () => done(false);
+  });
+}
+async function fetchRemote(u) {
+  const host = u.host || 'this site';
+  status(`Downloading from ${host}…`);
+  let res;
+  try { res = await fetch(u.href, { credentials: 'omit', referrerPolicy: 'no-referrer', cache: 'no-store' }); }
+  catch { throw new Error(`${host} doesn't let other sites read its files (no CORS), or it couldn't be reached. Download the file and open it here instead.`); }
+  if (!res.ok) throw new Error(`${host} answered ${res.status}${res.statusText ? ' ' + res.statusText : ''}`);
+  const len = Number(res.headers.get('content-length')) || 0;
+  if (len > REMOTE_MAX) throw new Error(`the file is ${fmtSize(len)}, and links can load up to ${fmtSize(REMOTE_MAX)}. Download it and open it here instead.`);
+  const reader = res.body.getReader(), parts = [];
+  let n = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    n += value.length;
+    if (n > REMOTE_MAX) { reader.cancel().catch(() => {}); throw new Error(`the file is larger than ${fmtSize(REMOTE_MAX)}. Download it and open it here instead.`); }
+    parts.push(value);
+    status(len ? `Downloading from ${host}… ${Math.floor((n / len) * 100)}%` : `Downloading from ${host}… ${fmtSize(n)}`);
+  }
+  status('');
+  let leaf = u.pathname.split('/').pop() || '';
+  try { leaf = decodeURIComponent(leaf); } catch {}
+  return new File(parts, cleanName(leaf, 'remote.bin'), { type: 'application/octet-stream', lastModified: Date.parse(res.headers.get('last-modified') || '') || 0 });
+}
+function remoteUrl(s) {
+  if (!s) return null;
+  let u;
+  try { u = new URL(s, location.href); } catch { toast(`"${String(s).slice(0, 80)}" is not a valid link`); return null; }
+  if (u.protocol !== 'https:' && u.origin !== location.origin) { toast(`Hexes only downloads from https:// links (got ${u.protocol})`); return null; }
+  return u;
+}
+
+async function readHandoff(from) {
+  const label = cleanName(from, 'another tool');
+  let raw = null;
+  try { raw = localStorage.getItem(HANDOFF_KEY); localStorage.removeItem(HANDOFF_KEY); } catch {}
+  try {
+    if (!raw) throw new Error(`nothing was waiting. Send it from ${label} again.`);
+    const h = JSON.parse(raw);
+    if (h.v !== 1) throw new Error('it uses a handoff format this version does not know');
+    if (h.at && Date.now() - h.at > HANDOFF_MAX_AGE) throw new Error('it is more than 10 minutes old. Send it again.');
+    const bytes = await maybeGunzip(b64uToBytes(h.data || ''));
+    if (!bytes.length) throw new Error('it is empty');
+    if (Number.isFinite(h.offset) && h.offset >= 0 && !S.pending) S.pending = { at: Math.floor(h.offset), len: Math.max(0, Math.floor(h.length || 0)) };
+    toast(`Received ${fmtSize(bytes.length)} from ${cleanName(h.from, label)}`);
+    return new File([bytes], cleanName(h.name, 'handoff.bin'), { type: 'application/octet-stream', lastModified: 0 });
+  } catch (e) { toast(`Could not load from ${label}: ${e.message}`, 7000); return null; }
+}
+
+async function handleLinks(hashOnly) {
+  const q = new URLSearchParams(location.search), h = parseHash(location.hash);
+  if (h.at !== undefined || h.sha256 !== undefined) {
+    const at = h.at !== undefined ? parseAbsOffset(h.at) : null;
+    if (h.at !== undefined && at === null) toast(`"${String(h.at).slice(0, 40)}" is not an offset Hexes understands`);
+    const sha = /^[0-9a-f]{64}$/i.test(h.sha256 || '') ? h.sha256 : null;
+    if (at !== null || sha) S.pending = { at: at !== null ? at : undefined, len: h.len !== undefined ? (parseAbsOffset(h.len) || 0) : 0, sha256: sha, name: h.name ? cleanName(h.name) : null };
+  }
+  let a = null, b = null, aOrigin = null, bOrigin = null;
+  try {
+    if (h.input !== undefined || h.hex !== undefined) { a = await linkFile(h.input, h.hex, h.name, 'linked-bytes.bin'); aOrigin = 'link'; }
+    if (h.inputB !== undefined || h.hexB !== undefined) { b = await linkFile(h.inputB, h.hexB, h.nameB, 'linked-bytes-b.bin'); bOrigin = 'link'; }
+  } catch (e) { toast(`Couldn't read the bytes in that link: ${e.message}`, 7000); }
+  if (a && S.pending && !S.pending.sha256 && h.name) S.pending.name = null; // the name belongs to the inline bytes
+
+  if (!hashOnly) {
+    if (!a && q.get('from')) {
+      a = await readHandoff(q.get('from'));
+      if (a) aOrigin = 'handoff from ' + cleanName(q.get('from'), 'another tool');
+      const rest = new URLSearchParams(q); rest.delete('from');
+      history.replaceState(null, '', location.pathname + (rest.toString() ? '?' + rest : '') + location.hash);
+    }
+    const srcs = q.getAll('src');
+    const want = [];
+    if (!a && srcs[0]) { const u = remoteUrl(srcs[0]); if (u) want.push({ slot: 'a', url: u }); }
+    const bSrc = q.get('srcB') || (a ? srcs[0] : srcs[1]);
+    if (!b && bSrc) { const u = remoteUrl(bSrc); if (u) want.push({ slot: 'b', url: u }); }
+    if (want.length && await confirmRemote(want)) {
+      for (const w of want) {
+        try {
+          const f = await fetchRemote(w.url);
+          if (w.slot === 'a') { a = f; aOrigin = w.url.href; } else { b = f; bOrigin = w.url.href; }
+        } catch (e) { status(''); toast(`Could not load ${w.url.host ? 'from ' + w.url.host : 'that link'}: ${e.message}`, 9000); }
+      }
+    }
+  }
+
+  if (a) await openWith({ file: a, origin: aOrigin });
+  if (b) {
+    if (S.file) await openB({ file: b, origin: bOrigin });
+    else toast('The link included a B file, but there is no A file to compare it with');
+  }
+  if (!a && !hashOnly) {
+    const sp = q.get('sample');
+    if (sp && !S.file) { await openWith({ sample: true }); if (sp === 'compare') await openB({ sample: true }); }
+  }
+  if (S.pending && S.file && !a) applyPending();
+  showPendingNote();
+}
+
+async function copyBytesLink() {
+  let src;
+  try { src = await selectionBytes(); } catch (e) { return toast(e.message); }
+  const z = await gzipIfSmaller(src.buf);
+  const name = `${activeFile().name.replace(/\.[^.]*$/, '')}_${h0x(src.start)}.bin`;
+  const url = `${shareBase()}#name=${encodeURIComponent(name)}&input=${bytesToB64u(z)}`;
+  if (url.length > 2000000) return toast(`That link would be ${fmtSize(url.length)}; browsers stop at about 2 MB. Carve the selection to a file instead.`, 7000);
+  copyText(url, `a link with these ${src.buf.length.toLocaleString()} bytes (${fmtSize(url.length)})`);
+}
+function copyHereLink() {
+  if (!S.file) return;
+  const s = selRange(), f = activeFile(), at = s ? s[0] : S.cur, len = s ? s[1] - s[0] + 1 : 0;
+  const hash = S.side === 'b' && S.B ? S.B.hash : S.hash;
+  let h = `at=${h0x(at)}${len > 1 ? '&len=' + len : ''}&name=${encodeURIComponent(f.name)}`;
+  if (hash && hash.sha256) h += '&sha256=' + hash.sha256;
+  copyText(`${shareBase()}#${h}`, `a link to ${h0x(at)}. It holds the offset and hash, not the file`);
 }
 
 // ---------------------------------------------------------------- compare
@@ -2209,6 +2468,7 @@ document.addEventListener('keydown', e => {
   if (e.key === 'F3') { e.preventDefault(); gotoHit(S.hitIdx + (e.shiftKey ? -1 : 1)); return; }
   if (e.key === 'F7') { e.preventDefault(); gotoDiff(e.shiftKey ? -1 : 1); return; }
   if (e.key === 'Escape' && !$('#modal').hidden) { $('#modal').hidden = true; return; }
+  if (e.key === 'Escape' && !$('#linkModal').hidden) { $('#linkNo').click(); return; }
   const tag = (e.target.tagName || '').toLowerCase();
   if (tag === 'input' || tag === 'select' || tag === 'textarea' || tag === 'button') {
     if (e.key === 'Escape') { e.target.blur(); grid.focus(); }
@@ -2247,10 +2507,10 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', dra
 // ---------------------------------------------------------------- boot
 renderHead();
 render();
-{
-  const p = new URLSearchParams(location.search).get('sample');
-  if (p) openWith({ sample: true }).then(() => { if (p === 'compare') openB({ sample: true }); });
-}
+$('#linkBytesBtn').addEventListener('click', copyBytesLink);
+$('#linkHereBtn').addEventListener('click', copyHereLink);
+window.addEventListener('hashchange', () => handleLinks(true));
+handleLinks(false);
 })();
 
 </script>
