@@ -312,6 +312,7 @@ textarea.token:focus { outline: none; border-color: var(--accent); }
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+<script src="/assets/suite/handoff.js"></script>
 <script>
 /* ===== Shifu engine: a small pandas mirror + pandas code generation ===== */
 
@@ -1671,15 +1672,13 @@ if (typeof module !== 'undefined') module.exports = { BLOCKS: BLOCKS, RECIPES: R
       return h.length > 2000000 ? null : toolBase('spoke') + '#' + h;
     });
   }
-  /* Mill reads a same-origin localStorage handoff at /mill/?from=shifu, then clears it */
+  /* Mill takes the table through the shared suite hand-off (/assets/suite/handoff.js) */
   function sendToMill(o) {
+    if (!window.Suite) { toast('This copy of Shifu cannot hand off to Mill. Download the CSV and drop it into Mill.'); return; }
     var w = window.open('', '_blank');
     var go = function (url) { if (w) { w.opener = null; w.location.href = url; } else location.href = url; };
-    gzB64(toCsv(o.frame)).then(function (b) {
-      try { localStorage.setItem('shifu.handoff', JSON.stringify({ v: 1, name: slug(state.name), gz: b, at: Date.now() })); }
-      catch (e) { if (w) w.close(); toast('This timeline is too big to hand off directly. Download the CSV and drop it into Mill.'); return; }
-      go(toolBase('mill') + '?from=shifu');
-    }, function () { if (w) w.close(); toast('This browser cannot hand off to Mill. Download the CSV instead.'); });
+    Suite.send('shifu', 'mill', { kind: 'table', name: slug(state.name), data: toCsv(o.frame), meta: { timeCols: ['timestamp'], tz: 0 } })
+      .then(go, function (e) { if (w) w.close(); toast(e.message); });
   }
   $('outputs').addEventListener('click', function (e) {
     var a = e.target.closest('[data-spoke]');

@@ -760,6 +760,7 @@ onmessage = async e => {
 };
 
 </script>
+<script src="/assets/suite/handoff.js"></script>
 <script>
 // Magic number table: [offset, hex bytes ("??" = any), label]
 // Longest match at the lowest offset wins.
@@ -1915,9 +1916,9 @@ async function exportPatched() {
 //   #hex=4D5A9000…                                 bytes as hex; hexB for file B
 //   #0x7FFF0   or   #at=0x7FFF0&len=16&sha256=…    jump to an offset in whatever file is opened next; warns if the hash differs
 //   ?src=https://…  (&srcB=…)                      download a file from a site that allows it (CORS); asks first
-//   ?from=<tool>                                   same-origin handoff: localStorage 'hexes.handoff' = {v:1, from, name, data(base64), offset?, length?, at(ms)}
+//   ?from=<tool>                                   same-origin hand-off of kind 'bytes' (meta: offset?, length?), see /assets/suite/handoff.js
 // Nothing from the URL is ever inserted as HTML, and decoded data is capped so a link can't exhaust memory.
-const LINK_MAX = 8 << 20, REMOTE_MAX = 512 << 20, HANDOFF_KEY = 'hexes.handoff', HANDOFF_MAX_AGE = 10 * 60 * 1000;
+const LINK_MAX = 8 << 20, REMOTE_MAX = 512 << 20;
 S.pending = null; S.expect = null;
 const shareBase = () => (location.protocol === 'http:' || location.protocol === 'https:') ? location.origin + location.pathname : 'https://jon.glass/hexes/';
 const cleanName = (s, d) => String(s || '').replace(/[\x00-\x1f\x7f\/\\]+/g, '_').trim().slice(0, 120) || d;
@@ -2062,18 +2063,14 @@ function remoteUrl(s) {
 
 async function readHandoff(from) {
   const label = cleanName(from, 'another tool');
-  let raw = null;
-  try { raw = localStorage.getItem(HANDOFF_KEY); localStorage.removeItem(HANDOFF_KEY); } catch {}
   try {
-    if (!raw) throw new Error(`nothing was waiting. Send it from ${label} again.`);
-    const h = JSON.parse(raw);
-    if (h.v !== 1) throw new Error('it uses a handoff format this version does not know');
-    if (h.at && Date.now() - h.at > HANDOFF_MAX_AGE) throw new Error('it is more than 10 minutes old. Send it again.');
-    const bytes = await maybeGunzip(b64uToBytes(h.data || ''));
-    if (!bytes.length) throw new Error('it is empty');
-    if (Number.isFinite(h.offset) && h.offset >= 0 && !S.pending) S.pending = { at: Math.floor(h.offset), len: Math.max(0, Math.floor(h.length || 0)) };
-    toast(`Received ${fmtSize(bytes.length)} from ${cleanName(h.from, label)}`);
-    return new File([bytes], cleanName(h.name, 'handoff.bin'), { type: 'application/octet-stream', lastModified: 0 });
+    if (!window.Suite) throw new Error('this copy of Hexes cannot read hand-offs');
+    const h = await Suite.receive('hexes', from, { maxBytes: LINK_MAX });
+    if (!h.bytes.length) throw new Error('it is empty');
+    const m = h.meta;
+    if (Number.isFinite(m.offset) && m.offset >= 0 && !S.pending) S.pending = { at: Math.floor(m.offset), len: Math.max(0, Math.floor(m.length || 0)) };
+    toast(`Received ${fmtSize(h.bytes.length)} from ${h.fromName}`);
+    return new File([h.bytes], cleanName(h.name, 'handoff.bin'), { type: 'application/octet-stream', lastModified: 0 });
   } catch (e) { toast(`Could not load from ${label}: ${e.message}`, 7000); return null; }
 }
 
