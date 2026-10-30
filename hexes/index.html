@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Hexes</title>
-<meta name="description" content="A read-only hex viewer for DFIR that runs in your browser: hashing, signatures, a value inspector, search, entropy, carving, XOR/Base64 decoding and two-file compare.">
+<meta name="description" content="A read-only hex viewer for DFIR that runs in your browser: hashing, signatures, a value inspector, strings, search, entropy, carving, XOR/Base64 decoding and two-file compare.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314121a'/%3E%3Cpath d='M9 8v16M9 16h7M16 8v16M20 11l6 10M26 11l-6 10' stroke='%23e3a659' stroke-width='2.6' stroke-linecap='round' fill='none'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -190,8 +190,8 @@ body.comparing .as { padding-left: 8px; }
 .insp td.sig { color: var(--accent); font-family: var(--font-ui); }
 
 .tools { flex: 1; display: flex; flex-direction: column; min-height: 260px; }
-.tabs { display: flex; gap: 4px; margin-bottom: 10px; border-bottom: 1px solid var(--line); }
-.tab { background: none; border: 0; padding: 6px 10px; margin-bottom: -1px; border-bottom: 2px solid transparent; cursor: pointer; color: var(--dim); font-weight: 500; }
+.tabs { display: flex; gap: 2px; margin-bottom: 10px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
+.tab { flex: none; background: none; border: 0; padding: 6px 6px; margin-bottom: -1px; border-bottom: 2px solid transparent; cursor: pointer; color: var(--dim); font-weight: 500; }
 .tab.on { color: var(--fg); border-bottom-color: var(--accent); }
 .tabpane { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
 .stack { display: flex; flex-direction: column; gap: 8px; }
@@ -211,6 +211,10 @@ body.comparing .as { padding-left: 8px; }
 .results li:hover, .results li.on { background: var(--sel); }
 .results .ro { color: var(--accent); }
 .results .rp { color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.results .rk { color: var(--dim); flex: none; width: 1.2em; text-align: center; }
+.results .rs { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.results li.more { justify-content: center; color: var(--accent); font-family: var(--font-ui); }
+.num { width: 4.5em; }
 .dec-out, .sel-out { display: flex; flex-direction: column; gap: 8px; }
 .dec-block { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
 .dec-block header { display: flex; align-items: center; gap: 8px; padding: 5px 8px; background: var(--sunk); font-size: 12px; color: var(--dim); }
@@ -349,6 +353,7 @@ body.comparing .as { padding-left: 8px; }
       <section class="panel tools">
         <div class="tabs" role="tablist">
           <button role="tab" class="tab on" data-tab="search" aria-selected="true">Search</button>
+          <button role="tab" class="tab" data-tab="strings" aria-selected="false">Strings</button>
           <button role="tab" class="tab" data-tab="decode" aria-selected="false">Decode</button>
           <button role="tab" class="tab" data-tab="sel" aria-selected="false">Selection</button>
           <button role="tab" class="tab" data-tab="cmp" aria-selected="false">Compare</button>
@@ -378,6 +383,31 @@ body.comparing .as { padding-left: 8px; }
           <div class="progress" id="searchProg" hidden><span></span></div>
           <div class="result-head" id="searchHead"></div>
           <ol class="results" id="searchResults"></ol>
+        </div>
+
+        <div class="tabpane" data-pane="strings" hidden>
+          <form id="strForm" class="stack">
+            <div class="row2">
+              <label for="strMin" class="check">Min length <input id="strMin" type="number" min="3" max="64" value="6" class="num"></label>
+              <label class="check"><input type="checkbox" id="strA" checked> ASCII</label>
+              <label class="check"><input type="checkbox" id="strU" checked> UTF-16LE</label>
+              <span class="grow"></span>
+              <button type="button" class="btn ghost small" id="strCancel" hidden>Stop</button>
+              <button type="submit" class="btn small" id="strRun">Find strings</button>
+            </div>
+            <div class="row2">
+              <label for="strFilter" class="sr">Filter strings</label>
+              <input id="strFilter" type="text" placeholder="Filter: http, \pipe\, .dll" autocomplete="off" spellcheck="false">
+              <label class="check"><input type="checkbox" id="strRe"> Regex</label>
+            </div>
+          </form>
+          <div class="progress" id="strProg" hidden><span></span></div>
+          <div class="row2">
+            <span class="result-head grow" id="strHead"></span>
+            <button type="button" class="btn ghost small" id="strCsv" hidden>Save as CSV</button>
+          </div>
+          <ol class="results" id="strResults"></ol>
+          <div id="strOut" class="sel-out"></div>
         </div>
 
         <div class="tabpane" data-pane="decode" hidden>
@@ -474,7 +504,7 @@ body.comparing .as { padding-left: 8px; }
 <div class="toast" id="toast" hidden></div>
 <script type="text/js-worker" id="worker-src">
 'use strict';
-// Hexes background worker: hashing, entropy, search, compare. Reads File/Blob slices only.
+// Hexes background worker: hashing, entropy, search, strings, compare. Reads File/Blob slices only.
 
 // ---------------- incremental MD5 ----------------
 function MD5() {
@@ -705,6 +735,41 @@ async function search(id, blob, opts) {
   return { matches: matches.slice(sent), count: matches.length, truncated, state: 'done', done: size - from, total: size - from };
 }
 
+// Printable runs, like `strings -a` (ASCII) and `strings -el` (UTF-16LE: printable byte then 00).
+// Each hit is [offset, byte length, 'A' | 'U', first 200 characters, character count].
+async function strings(id, blob, opts) {
+  const min = Math.max(3, Math.min(64, Math.floor(opts.min) || 6)), wantA = !!opts.ascii, wantU = !!opts.utf16;
+  const MAX = 20000, KEEP = 200, size = blob.size, found = [];
+  let truncated = false, sent = 0;
+  const ok = c => (c >= 0x20 && c < 0x7f) || c === 9;
+  const run = () => ({ start: -1, n: 0, s: '' });
+  const a = run(), u = [run(), run()]; // UTF-16 runs live on even or odd offsets
+  const add = (r, c, off) => { if (r.start < 0) r.start = off; if (r.n < KEEP) r.s += String.fromCharCode(c); r.n++; };
+  const close = (r, enc) => {
+    if (r.start >= 0 && r.n >= min) {
+      if (found.length < MAX) found.push([r.start, enc === 'U' ? r.n * 2 : r.n, enc, r.s, r.n]); else truncated = true;
+    }
+    r.start = -1; r.n = 0; r.s = '';
+  };
+  let prev = -1; // last byte of the previous read, so a UTF-16 pair can straddle two reads
+  for (let off = 0; off < size && !truncated; off += CH) {
+    if (cancelled.has(id)) return { strings: found.slice(sent), count: found.length, truncated, state: 'cancelled' };
+    const b = await readSlice(blob, off, Math.min(size, off + CH));
+    for (let i = 0; i < b.length; i++) {
+      const c = b[i];
+      if (wantA) { if (ok(c)) add(a, c, off + i); else close(a, 'A'); }
+      if (wantU) {
+        const lo = i ? b[i - 1] : prev, at = off + i - 1, r = u[at & 1];
+        if (lo >= 0) { if (c === 0 && ok(lo)) add(r, lo, at); else close(r, 'U'); }
+      }
+    }
+    prev = b.length ? b[b.length - 1] : prev;
+    if (progress(id, { done: Math.min(size, off + CH), total: size, strings: found.slice(sent) })) sent = found.length;
+  }
+  close(a, 'A'); close(u[0], 'U'); close(u[1], 'U');
+  return { strings: found.slice(sent), count: found.length, truncated, state: 'done', done: size, total: size };
+}
+
 async function compare(id, a, b) {
   const size = Math.max(a.size, b.size), common = Math.min(a.size, b.size);
   const buckets = Math.max(1, Math.min(2048, size)), bucketSize = Math.ceil(size / buckets) || 1;
@@ -751,6 +816,7 @@ onmessage = async e => {
     if (op === 'hash') result = await hashBlob(id, args.blob);
     else if (op === 'entropy') result = await entropy(id, args.blob);
     else if (op === 'search') result = await search(id, args.blob, args.opts);
+    else if (op === 'strings') result = await strings(id, args.blob, args.opts);
     else if (op === 'compare') result = await compare(id, args.a, args.b);
     else throw new Error('Unknown operation ' + op);
     postMessage({ id, type: 'done', result });
@@ -901,7 +967,7 @@ function openBlob(file, slot, origin) {
   const f = {
     id: rid(6), file, name: file.name || 'untitled.bin', size: file.size,
     mtime: file.lastModified ? new Date(file.lastModified).toISOString() : null,
-    slot, origin: origin || null, hash: { state: 'running', done: 0 }, entropy: null, searches: new Map(), jobs: new Set(),
+    slot, origin: origin || null, hash: { state: 'running', done: 0 }, entropy: null, searches: new Map(), strings: null, jobs: new Set(),
   };
   slots[slot] = f;
   const t0 = performance.now();
@@ -1001,6 +1067,31 @@ async function request(path, opts = {}) {
     if (q.cancel && j.state === 'running') { cancel(j.wid); }
     const since = Math.max(0, int(q.since, 0));
     return { state: j.state, done: j.done, total: j.total, count: j.matches.length, truncated: j.truncated, error: j.error, matches: j.matches.slice(since) };
+  }
+
+  if (route === 'strings' && post) {
+    const f = need(body.id);
+    if (f.strings && f.strings.state === 'running') { f.strings.state = 'cancelled'; cancel(f.strings.wid); }
+    if (!body.ascii && !body.utf16) throw new Error('Pick ASCII, UTF-16LE or both');
+    const j = f.strings = { id: rid(4), state: 'running', done: 0, total: f.size, strings: [], truncated: false };
+    const job = run('strings', { blob: f.file, opts: { min: int(body.min, 6), ascii: !!body.ascii, utf16: !!body.utf16 } }, m => {
+      if (j.state !== 'running') return;
+      j.done = m.done; j.total = m.total;
+      if (m.strings) j.strings.push(...m.strings);
+    });
+    j.wid = job.id; f.jobs.add(job.id);
+    job.promise.then(r => {
+      if (j.state === 'running' || r.state === 'cancelled') { j.strings.push(...r.strings); j.truncated = r.truncated; j.state = r.state; j.done = j.total; }
+    }).catch(err => { j.state = err.cancelled ? 'cancelled' : 'error'; j.error = err.message; })
+      .finally(() => f.jobs.delete(job.id));
+    return { job: j.id };
+  }
+  if (route === 'strings') {
+    const f = need(q.id), j = f.strings;
+    if (!j || j.id !== q.job) throw new Error('Strings scan not found');
+    if (q.cancel && j.state === 'running') cancel(j.wid);
+    const since = Math.max(0, int(q.since, 0));
+    return { state: j.state, done: j.done, total: j.total, count: j.strings.length, truncated: j.truncated, error: j.error, strings: j.strings.slice(since) };
   }
 
   if (route === 'compare' && post) {
@@ -1161,7 +1252,7 @@ const S = {
   ent: null, magic: null, hash: null,
   hits: [], hitIdx: -1, match: null, job: null,
   wheel: 0, dragFrom: null,
-  side: 'a', B: null, cmp: null, runs: [], diffIdx: -1, jobFile: null,
+  side: 'a', B: null, cmp: null, runs: [], diffIdx: -1, jobFile: null, str: null,
 };
 
 // ---------------------------------------------------------------- utils
@@ -1317,6 +1408,11 @@ function loadFile(f) {
   $('#evSha').textContent = 'hashing…';
   $('#searchResults').innerHTML = '';
   $('#searchHead').textContent = '';
+  S.str = null;
+  renderStrings();
+  $('#strOut').innerHTML = '';
+  $('#strProg').hidden = true;
+  $('#strCancel').hidden = true;
   $('#decOut').innerHTML = '';
   $('#selOut').innerHTML = '';
   document.title = `${f.name} · Hexes`;
@@ -1327,6 +1423,7 @@ function loadFile(f) {
   pollEntropy(f.id);
   if (S.B) runCompare();
   applyPending();
+  autoStrings();
 }
 
 function detectHeader() {
@@ -1753,6 +1850,117 @@ function gotoHit(i) {
     else if (li.offsetTop + li.offsetHeight > ol.scrollTop + ol.clientHeight) ol.scrollTop = li.offsetTop + li.offsetHeight - ol.clientHeight;
   }
   render();
+}
+
+// ---------------------------------------------------------------- strings
+const STR_SHOW = 2000;          // rows drawn at once; "Show more" adds the next batch
+const STR_AUTO = 256 << 20;     // opening the tab scans files up to this size without asking
+
+function strOpts() { return { min: clamp(Math.floor(+$('#strMin').value) || 6, 3, 64), ascii: $('#strA').checked, utf16: $('#strU').checked }; }
+
+async function runStrings(e) {
+  if (e) e.preventDefault();
+  if (!S.file) return toast('Open a file first');
+  const fid = S.file.id, opts = strOpts();
+  $('#strMin').value = opts.min;
+  let job;
+  try { ({ job } = await api('strings', { method: 'POST', body: { id: fid, ...opts } })); }
+  catch (err) { $('#strHead').textContent = err.message; return; }
+  const st = S.str = { job, fid, opts, list: [], view: [], state: 'running', shown: STR_SHOW, on: null };
+  $('#strOut').innerHTML = '';
+  $('#strProg').hidden = false;
+  $('#strCancel').hidden = false;
+  while (S.str === st) {
+    let res;
+    try { res = await api(`strings?id=${fid}&job=${job}&since=${st.list.length}`); }
+    catch (err) { Object.assign(st, { state: 'error', error: err.message }); break; }
+    if (S.str !== st) return;
+    st.list.push(...res.strings);
+    st.list.sort((x, y) => x[0] - y[0]); // ASCII and UTF-16 runs arrive slightly out of order
+    Object.assign(st, { state: res.state, truncated: res.truncated, error: res.error });
+    $('#strProg').firstElementChild.style.width = (res.total ? (res.done / res.total) * 100 : 100) + '%';
+    renderStrings();
+    if (res.state !== 'running') break;
+    await sleep(250);
+  }
+  if (S.str !== st) return;
+  $('#strProg').hidden = true;
+  $('#strCancel').hidden = true;
+  renderStrings();
+}
+
+function strMatcher() {
+  const q = $('#strFilter').value;
+  if (!q) return null;
+  if ($('#strRe').checked) {
+    try { const re = new RegExp(q, 'i'); return x => re.test(x); }
+    catch (e) { return new Error('Regex error: ' + e.message); }
+  }
+  const lq = q.toLowerCase();
+  return x => x.toLowerCase().includes(lq);
+}
+
+function renderStrings() {
+  const st = S.str, ol = $('#strResults');
+  if (!st) { ol.innerHTML = ''; $('#strHead').textContent = ''; $('#strCsv').hidden = true; return; }
+  const m = strMatcher();
+  if (m instanceof Error) { $('#strHead').textContent = m.message; return; }
+  st.view = m ? st.list.filter(x => m(x[3])) : st.list;
+  const n = st.list.length, v = st.view.length;
+  let msg = `${m ? v.toLocaleString() + ' of ' : ''}${n.toLocaleString()} string${n === 1 ? '' : 's'}`;
+  if (st.state === 'running') msg += ' · scanning…';
+  if (st.truncated) msg += ' · stopped at 20,000 (raise the minimum length)';
+  if (st.state === 'cancelled') msg += ' · stopped';
+  if (st.state === 'error') msg = 'Strings failed: ' + st.error;
+  $('#strHead').textContent = msg;
+  $('#strCsv').hidden = !v || st.state === 'running';
+  const show = st.view.slice(0, st.shown), rest = v - show.length;
+  ol.innerHTML = show.map((x, i) =>
+    `<li data-i="${i}"${x[0] === st.on ? ' class="on"' : ''} title="${esc(x[3])}"><span class="ro">${hexOff(x[0])}</span>` +
+    `<span class="rk" title="${x[2] === 'U' ? 'UTF-16LE' : 'ASCII'}">${x[2]}</span>` +
+    `<span class="rs">${esc(x[3])}${x[4] > x[3].length ? '…' : ''}</span></li>`).join('') +
+    (rest > 0 ? `<li class="more" data-more="1">Show ${Math.min(STR_SHOW, rest).toLocaleString()} more (${rest.toLocaleString()} left)</li>` : '');
+}
+
+// Jump to a string and select it, so Decode and Selection work on it straight away
+function gotoString(i) {
+  const x = S.str && S.str.view[i];
+  if (!x) return;
+  const [o, len] = x;
+  S.str.on = o;
+  S.cur = o; S.anchor = len > 1 ? o + len - 1 : null; S.nib = null; S.match = null;
+  const row = Math.floor(o / ROW);
+  if (row < S.top || row >= S.top + S.rows) centerOn(o);
+  document.querySelectorAll('#strResults li.on').forEach(li => li.classList.remove('on'));
+  const li = $(`#strResults li[data-i="${i}"]`);
+  if (li) li.classList.add('on');
+  render();
+}
+
+async function saveStringsCsv() {
+  const st = S.str;
+  if (!st || !st.view.length) return;
+  const q = v => `"${String(v).replace(/"/g, '""')}"`;
+  // evidence strings can start with = + - @, which spreadsheets would run as formulas
+  const cell = v => q(/^[=+\-@\t\r]/.test(v) ? "'" + v : v);
+  const filter = $('#strFilter').value;
+  const lines = [
+    `# ${q(S.file.path)},${S.size},${S.hash ? S.hash.sha256 : ''}`,
+    `# min_length=${st.opts.min}${filter ? ',filter=' + q(filter) : ''}; strings longer than 200 characters are cut; a leading ' stops spreadsheets running formulas`,
+    'offset_hex,offset,encoding,length,string',
+    ...st.view.map(x => `${h0x(x[0])},${x[0]},${x[2] === 'U' ? 'UTF-16LE' : 'ASCII'},${x[4]},${cell(x[3])}`),
+  ];
+  const name = S.file.name.replace(/\.[^.]*$/, '') + (filter ? '_strings_filtered.csv' : '_strings.csv');
+  try {
+    const r = await api('savebytes', { method: 'POST', body: { id: S.file.id, name, data: b64encode(new TextEncoder().encode(lines.join('\n') + '\n')), note: 'strings' } });
+    $('#strOut').innerHTML = outCard('Strings saved', r);
+  } catch (e) { toast(e.message); }
+}
+
+function autoStrings() {
+  if (!S.file || $('[data-pane="strings"]').hidden || (S.str && S.str.fid === S.file.id)) return;
+  if (S.size <= STR_AUTO) runStrings();
+  else $('#strHead').textContent = `This file is ${fmtSize(S.size)}. Press Find strings to scan all of it.`;
 }
 
 // ---------------------------------------------------------------- selection, decode, carve
@@ -2329,6 +2537,7 @@ function openFiles(files, target) {
 function switchTab(name) {
   document.querySelectorAll('.tab').forEach(t => { const on = t.dataset.tab === name; t.classList.toggle('on', on); t.setAttribute('aria-selected', on); });
   document.querySelectorAll('.tabpane').forEach(p => (p.hidden = p.dataset.pane !== name));
+  if (name === 'strings') autoStrings();
 }
 function setEndian(le) {
   S.le = le;
@@ -2385,6 +2594,22 @@ $('#searchType').addEventListener('change', e => { $('#searchQ').placeholder = P
 $('#searchForm').addEventListener('submit', runSearch);
 $('#searchCancel').addEventListener('click', () => { if (S.job && S.jobFile) api(`search?id=${S.jobFile}&job=${S.job}&cancel=1`).catch(() => {}); });
 $('#searchResults').addEventListener('click', e => { const li = e.target.closest('li'); if (li) gotoHit(+li.dataset.i); });
+$('#strForm').addEventListener('submit', runStrings);
+$('#strCancel').addEventListener('click', () => { const st = S.str; if (st) api(`strings?id=${st.fid}&job=${st.job}&cancel=1`).catch(() => {}); });
+// rescan only when a setting really changed: leaving the length box fires 'change' again
+['#strMin', '#strA', '#strU'].forEach(sel => $(sel).addEventListener('change', () => {
+  const o = strOpts(), p = S.str && S.str.opts;
+  if (p && (o.min !== p.min || o.ascii !== p.ascii || o.utf16 !== p.utf16)) runStrings();
+}));
+$('#strFilter').addEventListener('input', () => { if (S.str) { S.str.shown = STR_SHOW; renderStrings(); } });
+$('#strRe').addEventListener('change', () => { if (S.str) { S.str.shown = STR_SHOW; renderStrings(); } });
+$('#strResults').addEventListener('click', e => {
+  const li = e.target.closest('li');
+  if (!li) return;
+  if (li.dataset.more) { S.str.shown += STR_SHOW; renderStrings(); return; }
+  gotoString(+li.dataset.i);
+});
+$('#strCsv').addEventListener('click', saveStringsCsv);
 $('#decRun').addEventListener('click', runDecode);
 $('#decMode').addEventListener('change', e => { $('#decKey').hidden = e.target.value !== 'xor'; });
 $('#decKey').hidden = true;

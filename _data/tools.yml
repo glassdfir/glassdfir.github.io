@@ -58,8 +58,8 @@
   description: >-
     A read-only hex viewer for evidence files. Hexes hashes the file as it
     opens, names it from its magic bytes, and decodes whatever you click as
-    integers, FILETIME, Unix and DOS times, IPs and GUIDs. Search hex with
-    wildcards, text or regex, spot packed or encrypted regions on the entropy
+    integers, FILETIME, Unix and DOS times, IPs and GUIDs. Pull out ASCII and
+    UTF-16 strings, search hex with wildcards, text or regex, spot packed or encrypted regions on the entropy
     map, carve a selection to its own file, peel off Base64 or XOR, and compare
     two files byte for byte.
   good_for: Checking a file is what it claims to be, pulling payloads out of documents, and proving exactly which bytes changed.
