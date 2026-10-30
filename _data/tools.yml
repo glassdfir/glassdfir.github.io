@@ -51,3 +51,16 @@
     slip through. Investigate with malware analysis and forensics, then see
     whether you actually reached containment — or just isolated the first box.
   good_for: Tabletops, training new analysts, and showing why isolating one host isn't containment.
+
+- name: Hexes
+  url: /hexes/
+  tagline: Put a hex on it.
+  description: >-
+    A read-only hex viewer for evidence files. Hexes hashes the file as it
+    opens, names it from its magic bytes, and decodes whatever you click as
+    integers, FILETIME, Unix and DOS times, IPs and GUIDs. Search hex with
+    wildcards, text or regex, spot packed or encrypted regions on the entropy
+    map, carve a selection to its own file, peel off Base64 or XOR, and compare
+    two files byte for byte.
+  good_for: Checking a file is what it claims to be, pulling payloads out of documents, and proving exactly which bytes changed.
+  try: /hexes/?sample=compare
