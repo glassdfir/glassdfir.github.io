@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-labelledby="t">
+  <title id="t">A water glass, half full</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#eef3f8"/>
+      <stop offset="1" stop-color="#c8d6e3"/>
+    </linearGradient>
+    <linearGradient id="water" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#2f7fc1"/>
+      <stop offset=".45" stop-color="#5eaee8"/>
+      <stop offset="1" stop-color="#2a6fa8"/>
+    </linearGradient>
+    <linearGradient id="glass" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#fff" stop-opacity=".55"/>
+      <stop offset=".5" stop-color="#fff" stop-opacity=".15"/>
+      <stop offset="1" stop-color="#fff" stop-opacity=".45"/>
+    </linearGradient>
+  </defs>
+
+  <circle cx="100" cy="100" r="100" fill="url(#bg)"/>
+  <ellipse cx="100" cy="172" rx="40" ry="6" fill="#36526b" opacity=".18"/>
+
+  <!-- glass body: tapered tumbler -->
+  <path d="M56 40 L71 164 A29 6 0 0 0 129 164 L144 40 Z" fill="url(#glass)"/>
+
+  <!-- water, filled to halfway -->
+  <path d="M63.4 101 L69.6 152 A30.4 6 0 0 0 130.4 152 L136.6 101 Z" fill="url(#water)" opacity=".9"/>
+  <ellipse cx="100" cy="101" rx="36.6" ry="6.5" fill="#a9d6f7"/>
+  <ellipse cx="100" cy="101" rx="36.6" ry="6.5" fill="none" stroke="#2a6fa8" stroke-width="1.5" opacity=".6"/>
+
+  <!-- thick glass base -->
+  <path d="M69.6 152 A30.4 6 0 0 0 130.4 152 L129 164 A29 6 0 0 1 71 164 Z" fill="#fff" opacity=".5"/>
+
+  <!-- highlights -->
+  <path d="M65 50 L76 150" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".8"/>
+  <path d="M134 52 L128 120" stroke="#fff" stroke-width="2.5" stroke-linecap="round" opacity=".55"/>
+
+  <!-- outline -->
+  <path d="M56 40 L71 164 A29 6 0 0 0 129 164 L144 40" fill="none" stroke="#36526b" stroke-width="3.5" stroke-linejoin="round"/>
+  <ellipse cx="100" cy="40" rx="44" ry="7.5" fill="#fff" fill-opacity=".35" stroke="#36526b" stroke-width="3.5"/>
+  <path d="M69.6 152 A30.4 6 0 0 0 130.4 152" fill="none" stroke="#36526b" stroke-width="2" opacity=".5"/>
+</svg>
