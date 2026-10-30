@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Hexes</title>
-<meta name="description" content="A read-only hex viewer for DFIR that runs in your browser: hashing, signatures, a value inspector, strings, YARA, search, entropy, carving, XOR/Base64 decoding and two-file compare.">
+<meta name="description" content="A read-only hex viewer for DFIR that runs in your browser: hashing, signatures, a value inspector, strings, YARA, embedded files, bookmarks, search, entropy, carving, XOR/Base64 decoding and two-file compare.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2314121a'/%3E%3Cpath d='M9 8v16M9 16h7M16 8v16M20 11l6 10M26 11l-6 10' stroke='%23e3a659' stroke-width='2.6' stroke-linecap='round' fill='none'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=UnifrakturCook:wght@700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
@@ -130,7 +130,7 @@ body.editing .lock-dot { background: var(--edited); box-shadow: 0 0 0 3px color-
 .seg { display: inline-flex; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
 .seg button { background: transparent; border: 0; padding: 5px 11px; cursor: pointer; font-size: 13px; color: var(--dim); }
 .seg button.on { background: var(--fg); color: var(--bg); }
-.hint { font-size: 12px; color: var(--dim); }
+.hint { font-size: 12px; color: var(--dim); flex: 1 1 0; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 kbd { font-size: 11px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 4px; background: var(--surface); }
 .edit-actions { display: inline-flex; gap: 8px; align-items: center; margin-left: auto; color: var(--edited); font-weight: 500; font-size: 13px; }
 
@@ -167,6 +167,7 @@ body.comparing .as { padding-left: 8px; }
 .n { color: var(--dim); }
 .ld { color: var(--faint); }
 .mt { background: var(--match); }
+.bm { box-shadow: inset 0 -2px var(--good); }
 .sl { background: var(--sel); }
 .ed { color: var(--edited); font-weight: 600; }
 .cu { outline: 1.5px solid var(--cursor); outline-offset: -1.5px; border-radius: 2px; }
@@ -226,6 +227,14 @@ body.resizing { cursor: row-resize; user-select: none; }
 .results .rs { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .results li.more { justify-content: center; color: var(--accent); font-family: var(--font-ui); }
 .num { width: 4.5em; }
+.bm-list li { align-items: center; }
+.bm-list .rk { width: auto; flex: none; }
+.bm-list select { padding: 1px 4px; font-size: 12px; flex: none; }
+.bm-list .bv { flex: none; color: var(--fg); min-width: 0; }
+.bm-list input[type=text] { flex: 1; min-width: 8em; padding: 2px 6px; font-size: 12px; background: transparent; border-color: transparent; font-family: var(--font-ui); }
+.bm-list input[type=text]:hover, .bm-list input[type=text]:focus { border-color: var(--line); background: var(--surface); }
+.bm-list .del { flex: none; border: 0; background: none; color: var(--dim); cursor: pointer; font-size: 15px; line-height: 1; padding: 0 4px; }
+.bm-list .del:hover { color: var(--edited); }
 textarea.code { width: 100%; min-height: 190px; resize: vertical; background: var(--sunk); border: 1px solid var(--line); border-radius: var(--radius); padding: 8px 9px; font-family: var(--font-mono); font-size: 12px; line-height: 1.45; tab-size: 2; color: inherit; white-space: pre; overflow-wrap: normal; overflow-x: auto; }
 .results li.grp { cursor: default; flex-wrap: wrap; background: var(--sunk); color: var(--fg); font-family: var(--font-ui); }
 .results li.grp:hover { background: var(--sunk); }
@@ -335,7 +344,7 @@ textarea.code { width: 100%; min-height: 190px; resize: vertical; background: va
       <button type="button" id="leBtn" class="on" aria-pressed="true">Little-endian</button>
       <button type="button" id="beBtn" aria-pressed="false">Big-endian</button>
     </div>
-    <span class="hint"><kbd>Ctrl</kbd>+<kbd>E</kbd> endian · <kbd>Ctrl</kbd>+<kbd>G</kbd> go to · <kbd>Ctrl</kbd>+<kbd>F</kbd> search · <kbd>F7</kbd> next difference</span>
+    <span class="hint"><kbd>Ctrl</kbd>+<kbd>E</kbd> endian · <kbd>Ctrl</kbd>+<kbd>G</kbd> go to · <kbd>Ctrl</kbd>+<kbd>F</kbd> search · <kbd>F2</kbd> next bookmark · <kbd>F7</kbd> next difference</span>
     <span class="edit-actions" id="editActions" hidden>
       <span id="editCount">0 changes</span>
       <button type="button" class="btn small" id="exportBtn">Export patched copy</button>
@@ -381,6 +390,8 @@ textarea.code { width: 100%; min-height: 190px; resize: vertical; background: va
           <button role="tab" class="tab on" data-tab="search" aria-selected="true">Search</button>
           <button role="tab" class="tab" data-tab="strings" aria-selected="false">Strings</button>
           <button role="tab" class="tab" data-tab="yara" aria-selected="false">YARA</button>
+          <button role="tab" class="tab" data-tab="embed" aria-selected="false">Embedded</button>
+          <button role="tab" class="tab" data-tab="bm" aria-selected="false">Bookmarks</button>
           <button role="tab" class="tab" data-tab="decode" aria-selected="false">Decode</button>
           <button role="tab" class="tab" data-tab="sel" aria-selected="false">Selection</button>
           <button role="tab" class="tab" data-tab="cmp" aria-selected="false">Compare</button>
@@ -473,6 +484,50 @@ textarea.code { width: 100%; min-height: 190px; resize: vertical; background: va
           </div>
         </div>
 
+        <div class="tabpane" data-pane="embed" hidden>
+          <div class="pane-ctl">
+            <p class="note">Finds file signatures anywhere in the file: executables, archives, documents, images, registry hives, event logs and more. Short signatures only count when the structure around them checks out.</p>
+            <div class="row2">
+              <span class="grow"></span>
+              <button type="button" class="btn ghost small" id="embCancel" hidden>Stop</button>
+              <button type="button" class="btn small" id="embRun">Scan for embedded files</button>
+            </div>
+            <div class="progress" id="embProg" hidden><span></span></div>
+            <p class="note">Click a hit to jump to it. An embedded file usually runs up to the next signature, so you can select or carve that far.</p>
+            <div class="btn-row">
+              <button type="button" class="btn ghost small" id="embSelect" disabled>Select to next signature</button>
+              <button type="button" class="btn ghost small" id="embCarve" disabled>Carve to next signature</button>
+            </div>
+          </div>
+          <div class="pane-out">
+            <div class="result-head" id="embHead"></div>
+            <ol class="results" id="embResults"></ol>
+            <div id="embOut" class="sel-out"></div>
+          </div>
+        </div>
+
+        <div class="tabpane" data-pane="bm" hidden>
+          <div class="pane-ctl">
+            <p class="note">Bookmark the selection, or the byte under the cursor. Timestamps are spotted and decoded. Bookmarks stay in this browser and come back when you reopen the same file (matched by SHA-256).</p>
+            <form id="bmForm" class="row2">
+              <label for="bmNote" class="sr">Bookmark note</label>
+              <input id="bmNote" type="text" placeholder="Note, e.g. PE compile time" autocomplete="off" maxlength="300">
+              <button type="submit" class="btn small" id="bmAdd">Add bookmark</button>
+            </form>
+            <div class="btn-row">
+              <button type="button" class="btn ghost small" id="bmMill" title="Sends the bookmarks that hold a timestamp to Mill's timeline">Send timestamps to Mill</button>
+              <button type="button" class="btn ghost small" id="bmCsv">Save as CSV</button>
+              <button type="button" class="btn ghost small" id="bmClear">Clear all</button>
+            </div>
+            <p class="note"><kbd>F2</kbd> jumps to the next bookmark, <kbd>Shift</kbd>+<kbd>F2</kbd> to the previous one.</p>
+          </div>
+          <div class="pane-out">
+            <div class="result-head" id="bmHead"></div>
+            <ol class="results bm-list" id="bmList"></ol>
+            <div id="bmOut" class="sel-out"></div>
+          </div>
+        </div>
+
         <div class="tabpane" data-pane="decode" hidden>
           <div class="pane-ctl">
             <p class="note">Decodes the current selection. Select bytes in the grid first.</p>
@@ -506,6 +561,7 @@ textarea.code { width: 100%; min-height: 190px; resize: vertical; background: va
               <button type="button" class="btn ghost small" id="copyHexBtn">Copy as hex</button>
               <button type="button" class="btn ghost small" id="copyTxtBtn">Copy as text</button>
               <button type="button" class="btn ghost small" id="linkBytesBtn" title="A link that carries these bytes. Anyone who opens it sees them in Hexes.">Copy bytes as link</button>
+              <button type="button" class="btn ghost small" id="bmSelBtn" title="Bookmark this selection with a note">Bookmark</button>
               <button type="button" class="btn ghost small" id="chefBtn" title="Opens CyberChef with exactly these bytes. They travel after the # in the link, which browsers never send to a server.">Send to CyberChef</button>
               <button type="button" class="btn ghost small" id="linkHereBtn" title="A link to this offset and the file's SHA-256. The file itself stays with you.">Copy link to here</button>
             </div>
@@ -579,7 +635,7 @@ textarea.code { width: 100%; min-height: 190px; resize: vertical; background: va
 <div class="toast" id="toast" hidden></div>
 <script type="text/js-worker" id="worker-src">
 'use strict';
-// Hexes background worker: hashing, entropy, search, strings, compare. Reads File/Blob slices only.
+// Hexes background worker: hashing, entropy, search, strings, embedded files, compare. Reads File/Blob slices only.
 
 // ---------------- incremental MD5 ----------------
 function MD5() {
@@ -845,6 +901,81 @@ async function strings(id, blob, opts) {
   return { strings: found.slice(sent), count: found.length, truncated, state: 'done', done: size, total: size };
 }
 
+// File signatures anywhere in the file, not only at offset 0. A signature shorter than 4 bytes only counts
+// when the structure around it checks out, so random bytes and text don't flood the list. A check returns
+// false to reject, true to accept, or a short description of what it found. Checks on longer signatures
+// only reject the ones that are common words in text (FILE, PAGE, RIFF).
+const u16 = (b, i) => b[i] | (b[i + 1] << 8);
+const u32 = (b, i) => (b[i] | (b[i + 1] << 8) | (b[i + 2] << 16) | (b[i + 3] << 24)) >>> 0;
+const be32 = (b, i) => ((b[i] << 24) | (b[i + 1] << 16) | (b[i + 2] << 8) | b[i + 3]) >>> 0;
+const asc = (b, i, n) => { let t = ''; for (let k = 0; k < n && i + k < b.length; k++) { const c = b[i + k]; t += c >= 0x20 && c < 0x7f ? String.fromCharCode(c) : '.'; } return t; };
+const EMBED_CHECK = {
+  '4D 5A': (b, p) => { // MZ counts only when e_lfanew points at "PE\0\0"
+    const e = u32(b, p + 0x3c);
+    if (e < 0x40 || e > 0x1000 || u32(b, p + e) !== 0x00004550) return false;
+    const m = u16(b, p + e + 4), ts = u32(b, p + e + 8);
+    const arch = { 0x14c: 'x86', 0x8664: 'x64', 0xaa64: 'ARM64', 0x1c0: 'ARM' }[m] || 'machine 0x' + m.toString(16);
+    return `${arch}${u16(b, p + e + 22) & 0x2000 ? ' DLL' : ''}, built ${ts ? new Date(ts * 1000).toISOString().slice(0, 19).replace('T', ' ') + ' UTC' : '(no time)'}`;
+  },
+  '50 4B 03 04': (b, p) => { const n = u16(b, p + 26); return (u16(b, p + 4) <= 63 && n > 0 && n <= 512 && asc(b, p + 30, Math.min(n, 120))) || true; }, // the name is a bonus
+  '1F 8B': (b, p) => b[p + 2] === 8 && b[p + 3] < 0x20,
+  'FF D8 FF': (b, p) => (b[p + 3] >= 0xe0 && b[p + 3] <= 0xef) || b[p + 3] === 0xdb || b[p + 3] === 0xfe,
+  '42 5A 68': (b, p) => b[p + 3] >= 0x31 && b[p + 3] <= 0x39 && be32(b, p + 4) === 0x31415926,
+  '49 44 33': (b, p) => b[p + 3] >= 2 && b[p + 3] <= 4 && b[p + 4] < 0xff,
+  '47 49 46 38': (b, p) => (b[p + 4] === 0x37 || b[p + 4] === 0x39) && b[p + 5] === 0x61,
+  '52 49 46 46': (b, p) => { const t = asc(b, p + 8, 4); return /^[A-Z][A-Z0-9 ]{3}$/.test(t) && t; },
+  '46 49 4C 45': (b, p) => u16(b, p + 4) === 0x30 || u16(b, p + 4) === 0x2a,
+  '50 41 47 45': (b, p) => { const t = asc(b, p + 4, 4); return (t === 'DUMP' || t === 'DU64') && t; },
+  '25 50 44 46': (b, p) => b[p + 4] === 0x2d && asc(b, p + 1, 7),
+  '7F 45 4C 46': (b, p) => (b[p + 4] === 1 || b[p + 4] === 2) && (b[p + 4] === 2 ? '64-bit' : '32-bit'),
+  '00 61 73 6D': (b, p) => u32(b, p + 4) === 1,
+  '4D 53 43 46': (b, p) => u32(b, p + 4) === 0,
+  '0A 0D 0D 0A': (b, p) => { const m = u32(b, p + 8); return m === 0x1a2b3c4d || m === 0x4d3c2b1a; },
+  '4C 66 4C 65': (b, p) => u32(b, p) === 0x30,
+  '53 43 43 41': (b, p) => [17, 23, 26, 30, 31].includes(u32(b, p)),
+  '66 74 79 70': (b, p) => { const n = be32(b, p); return n >= 8 && n <= 256 && /^[a-zA-Z0-9 ]{4}$/.test(asc(b, p + 8, 4)) && asc(b, p + 8, 4); },
+  '4E 54 46 53 20 20 20 20': (b, p) => b[p] === 0xeb && b[p + 2] === 0x90,
+};
+const EMBED_SKIP = new Set(['68 62 69 6E']); // registry hbin blocks: hundreds per hive, not separate files
+// Labels that read differently partway through a file than at its start
+const EMBED_LABEL = { '50 4B 05 06': 'ZIP end of central directory' };
+
+async function embedded(id, blob, opts) {
+  const fixed = s => s.bytes.filter(x => x !== -1).length;
+  const sigs = opts.sigs.filter(s => !EMBED_SKIP.has(s.hex) && (EMBED_CHECK[s.hex] || fixed(s) >= 4));
+  const byFirst = Array.from({ length: 256 }, () => []);
+  for (const s of sigs) byFirst[s.bytes[0]].push(s); // every pattern starts with a fixed byte
+  const MAX = 5000, KEEP = 8192, size = blob.size, found = [];
+  let truncated = false, sent = 0, tail = new Uint8Array(0), base = 0; // base: file offset of buf[0]
+  for (let off = 0; off < size && !truncated; off += CH) {
+    if (cancelled.has(id)) return { hits: found.slice(sent), count: found.length, truncated, state: 'cancelled' };
+    const chunk = await readSlice(blob, off, Math.min(size, off + CH));
+    let buf = chunk;
+    if (tail.length) { buf = new Uint8Array(tail.length + chunk.length); buf.set(tail); buf.set(chunk, tail.length); }
+    const final = off + CH >= size;
+    const limit = final ? buf.length : Math.max(0, buf.length - KEEP); // later positions wait, so checks can read ahead
+    for (let j = 0; j < limit && !truncated; j++) {
+      const list = byFirst[buf[j]];
+      if (!list.length) continue;
+      for (const sg of list) {
+        const p = j - sg.off;
+        if (p < 0) continue;
+        let k = 1;
+        while (k < sg.bytes.length && (sg.bytes[k] === -1 || buf[j + k] === sg.bytes[k])) k++;
+        if (k < sg.bytes.length) continue;
+        const check = EMBED_CHECK[sg.hex], v = check ? check(buf, p) : true;
+        if (!v) continue;
+        if (found.length >= MAX) { truncated = true; break; }
+        found.push([base + p, (base + p > 0 && EMBED_LABEL[sg.hex]) || sg.label, typeof v === 'string' ? v : '']);
+      }
+    }
+    tail = final ? new Uint8Array(0) : buf.slice(limit);
+    base += limit;
+    if (progress(id, { done: Math.min(size, off + CH), total: size, hits: found.slice(sent) })) sent = found.length;
+  }
+  return { hits: found.slice(sent), count: found.length, truncated, state: 'done', done: size, total: size };
+}
+
 async function compare(id, a, b) {
   const size = Math.max(a.size, b.size), common = Math.min(a.size, b.size);
   const buckets = Math.max(1, Math.min(2048, size)), bucketSize = Math.ceil(size / buckets) || 1;
@@ -892,6 +1023,7 @@ onmessage = async e => {
     else if (op === 'entropy') result = await entropy(id, args.blob);
     else if (op === 'search') result = await search(id, args.blob, args.opts);
     else if (op === 'strings') result = await strings(id, args.blob, args.opts);
+    else if (op === 'embedded') result = await embedded(id, args.blob, args.opts);
     else if (op === 'compare') result = await compare(id, args.a, args.b);
     else throw new Error('Unknown operation ' + op);
     postMessage({ id, type: 'done', result });
@@ -1052,7 +1184,7 @@ window.MAGIC = [
   [0, 'EF BB BF', 'UTF-8 text with BOM'],
   [0, 'FF FE', 'UTF-16LE text with BOM'],
   [0, 'FE FF', 'UTF-16BE text with BOM'],
-].map(([off, h, label]) => ({ off, label, bytes: h.split(' ').map(t => t === '??' ? -1 : parseInt(t, 16)) }));
+].map(([off, h, label]) => ({ off, label, hex: h, bytes: h.split(' ').map(t => t === '??' ? -1 : parseInt(t, 16)) }));
 
 // bytes: array-like; base: absolute offset of bytes[0] relative to the structure start.
 window.detectMagic = function (bytes) {
@@ -1159,7 +1291,7 @@ function openBlob(file, slot, origin) {
   const f = {
     id: rid(6), file, name: file.name || 'untitled.bin', size: file.size,
     mtime: file.lastModified ? new Date(file.lastModified).toISOString() : null,
-    slot, origin: origin || null, hash: { state: 'running', done: 0 }, entropy: null, searches: new Map(), strings: null, jobs: new Set(),
+    slot, origin: origin || null, hash: { state: 'running', done: 0 }, entropy: null, searches: new Map(), strings: null, embedded: null, jobs: new Set(),
   };
   slots[slot] = f;
   const t0 = performance.now();
@@ -1206,6 +1338,11 @@ async function request(path, opts = {}) {
   }
   if (route === 'hash') { const f = need(q.id); return { ...f.hash, size: f.size }; }
 
+  if (route === 'bookmark' && post) {
+    const f = need(body.id);
+    audit({ action: 'bookmark', op: String(body.op || ''), file: f.name, start: int(body.start, 0), len: int(body.len, 1), note: String(body.note || '').slice(0, 300), as: String(body.as || '') });
+    return { ok: true };
+  }
   // Bytes leaving Hexes for another tool go in the session log with their hashes
   if (route === 'sent' && post) {
     const f = need(body.id);
@@ -1297,6 +1434,29 @@ async function request(path, opts = {}) {
     return { state: j.state, done: j.done, total: j.total, count: j.strings.length, truncated: j.truncated, error: j.error, strings: j.strings.slice(since) };
   }
 
+  if (route === 'embedded' && post) {
+    const f = need(body.id);
+    if (f.embedded && f.embedded.state === 'running') { f.embedded.state = 'cancelled'; cancel(f.embedded.wid); }
+    const j = f.embedded = { id: rid(4), state: 'running', done: 0, total: f.size, hits: [], truncated: false };
+    const job = run('embedded', { blob: f.file, opts: { sigs: window.MAGIC } }, m => {
+      if (j.state !== 'running') return;
+      j.done = m.done; j.total = m.total;
+      if (m.hits) j.hits.push(...m.hits);
+    });
+    j.wid = job.id; f.jobs.add(job.id);
+    job.promise.then(r => {
+      if (j.state === 'running' || r.state === 'cancelled') { j.hits.push(...r.hits); j.truncated = r.truncated; j.state = r.state; j.done = j.total; }
+    }).catch(err => { j.state = err.cancelled ? 'cancelled' : 'error'; j.error = err.message; })
+      .finally(() => f.jobs.delete(job.id));
+    return { job: j.id };
+  }
+  if (route === 'embedded') {
+    const f = need(q.id), j = f.embedded;
+    if (!j || j.id !== q.job) throw new Error('Embedded scan not found');
+    if (q.cancel && j.state === 'running') cancel(j.wid);
+    const since = Math.max(0, int(q.since, 0));
+    return { state: j.state, done: j.done, total: j.total, count: j.hits.length, truncated: j.truncated, error: j.error, hits: j.hits.slice(since) };
+  }
   if (route === 'yara' && post) {
     const f = need(body.id);
     const rules = String(body.rules || '');
@@ -1469,7 +1629,7 @@ const S = {
   ent: null, magic: null, hash: null,
   hits: [], hitIdx: -1, match: null, job: null,
   wheel: 0, dragFrom: null,
-  side: 'a', B: null, cmp: null, runs: [], diffIdx: -1, jobFile: null, str: null, yara: null,
+  side: 'a', B: null, cmp: null, runs: [], diffIdx: -1, jobFile: null, str: null, yara: null, emb: null, bm: { key: null, list: [] },
 };
 
 // ---------------------------------------------------------------- utils
@@ -1628,6 +1788,14 @@ function loadFile(f) {
   S.str = null;
   renderStrings();
   S.yara = null;
+  S.emb = null;
+  renderEmbedded();
+  S.bm = { key: null, list: [] };
+  renderBookmarks();
+  $('#bmOut').innerHTML = '';
+  $('#embOut').innerHTML = '';
+  $('#embProg').hidden = true;
+  $('#embCancel').hidden = true;
   $('#yaraResults').innerHTML = '';
   $('#yaraMsgs').innerHTML = '';
   $('#yaraHead').textContent = '';
@@ -1662,7 +1830,7 @@ async function pollHash(id, isB = false) {
     try { h = await api('hash?id=' + id); } catch { return; }
     if (!live()) return;
     if (h.state === 'done') {
-      if (isB) S.B.hash = h; else { S.hash = h; checkExpected(); }
+      if (isB) S.B.hash = h; else { S.hash = h; checkExpected(); attachBookmarks(); }
       $('#evMd5' + sfx).textContent = h.md5;
       $('#evSha' + sfx).textContent = h.sha256;
       if (S.cmp) renderCmpSummary();
@@ -1720,6 +1888,8 @@ function buildRows(side) {
   const isA = side === 'a', other = isA ? 'b' : 'a', cmp = !!S.B;
   const size = sideSize(side), osize = sideSize(other), vsize = viewSize();
   const sel = selRange(), m = S.match;
+  const v0 = S.top * ROW, v1 = v0 + S.rows * ROW;
+  const bms = isA ? S.bm.list.filter(b => b.start < v1 && b.start + b.len > v0) : [];
   let html = '';
   for (let r = 0; r < S.rows; r++) {
     const base = (S.top + r) * ROW;
@@ -1737,6 +1907,7 @@ function buildRows(side) {
       }
       if (sel && o >= sel[0] && o <= sel[1]) cls += ' sl';
       else if (m && o >= m[0] && o < m[0] + m[1]) cls += ' mt';
+      if (bms.length && bms.some(x => o >= x.start && o < x.start + x.len)) cls += ' bm';
       if (o === S.cur) cls += S.nib !== null && side === S.side ? ' cu nib' : ' cu';
       const ch = b === undefined ? '·' : (b >= 0x20 && b < 0x7f ? esc(String.fromCharCode(b)) : '.');
       hx += `<span class="${cls}" data-o="${o}">${b === undefined ? '··' : HX2[b]}</span>`;
@@ -1922,6 +2093,11 @@ function drawTrack() {
       if (y === last) continue; last = y;
       ctx.fillRect(cmp ? w - 6 : 1, y, 5, 2);
     }
+  }
+  // bookmarks
+  if (S.bm.list.length) {
+    ctx.fillStyle = tok('--good');
+    for (const b of S.bm.list) ctx.fillRect(w - 4, Math.floor((b.start / VS) * h), 3, 3);
   }
   // viewport
   const y0 = (S.top * ROW / VS) * h;
@@ -2313,6 +2489,215 @@ async function addSelectionToRules() {
   const id = addToRules(yaraString(bytes));
   switchTab('yara');
   toast(`Added ${id} to the rule`);
+}
+
+// ---------------------------------------------------------------- embedded files
+async function runEmbedded() {
+  if (!S.file) return toast('Open a file first');
+  const fid = S.file.id;
+  let job;
+  try { ({ job } = await api('embedded', { method: 'POST', body: { id: fid } })); }
+  catch (err) { $('#embHead').textContent = err.message; return; }
+  const st = S.emb = { job, fid, hits: [], state: 'running', on: -1 };
+  $('#embOut').innerHTML = '';
+  $('#embProg').hidden = false;
+  $('#embCancel').hidden = false;
+  embButtons();
+  while (S.emb === st) {
+    let res;
+    try { res = await api(`embedded?id=${fid}&job=${job}&since=${st.hits.length}`); }
+    catch (err) { Object.assign(st, { state: 'error', error: err.message }); break; }
+    if (S.emb !== st) return;
+    st.hits.push(...res.hits);
+    Object.assign(st, { state: res.state, truncated: res.truncated, error: res.error });
+    $('#embProg').firstElementChild.style.width = (res.total ? (res.done / res.total) * 100 : 100) + '%';
+    renderEmbedded();
+    if (res.state !== 'running') break;
+    await sleep(250);
+  }
+  if (S.emb !== st) return;
+  $('#embProg').hidden = true;
+  $('#embCancel').hidden = true;
+  renderEmbedded();
+}
+
+function renderEmbedded() {
+  const st = S.emb, ol = $('#embResults');
+  if (!st) { ol.innerHTML = ''; $('#embHead').textContent = ''; embButtons(); return; }
+  const n = st.hits.length, kinds = {};
+  for (const h of st.hits) kinds[h[1]] = (kinds[h[1]] || 0) + 1;
+  let msg = `${n ? n.toLocaleString() : 'No'} signature${n === 1 ? '' : 's'} found`;
+  if (st.state === 'running') msg += ' · scanning…';
+  if (st.truncated) msg += ' · stopped at 5,000';
+  if (st.state === 'cancelled') msg += ' · stopped';
+  if (st.state === 'error') msg = 'Scan failed: ' + st.error;
+  const top = Object.entries(kinds).sort((a, b) => b[1] - a[1]).slice(0, 4).map(([k, c]) => `${c} × ${k.replace(/ \(.*\)$/, '')}`);
+  $('#embHead').textContent = msg + (top.length && st.state !== 'error' ? ' · ' + top.join(', ') : '');
+  ol.innerHTML = st.hits.map((h, i) =>
+    `<li data-i="${i}"${i === st.on ? ' class="on"' : ''}><span class="ro">${hexOff(h[0])}</span><span class="rid">${esc(h[1])}</span>` +
+    `<span class="rp">${h[0] === 0 ? 'the file itself' + (h[2] ? ' · ' : '') : ''}${esc(h[2])}</span></li>`).join('');
+  embButtons();
+}
+function embButtons() {
+  const on = !!(S.emb && S.emb.hits[S.emb.on]);
+  $('#embSelect').disabled = $('#embCarve').disabled = !on;
+}
+
+function gotoEmbedded(i) {
+  const st = S.emb, h = st && st.hits[i];
+  if (!h || !S.file || st.fid !== S.file.id) return;
+  st.on = i;
+  S.side = 'a'; S.cur = h[0]; S.anchor = null; S.nib = null; S.match = [h[0], 4];
+  const row = Math.floor(h[0] / ROW);
+  if (row < S.top || row >= S.top + S.rows) centerOn(h[0]);
+  document.querySelectorAll('#embResults li.on').forEach(li => li.classList.remove('on'));
+  const li = $(`#embResults li[data-i="${i}"]`);
+  if (li) li.classList.add('on');
+  embButtons();
+  render();
+}
+
+// From the chosen hit up to the next signature that starts later (or the end of the file)
+function selectToNextSignature() {
+  const st = S.emb, h = st && st.hits[st.on];
+  if (!h) return false;
+  const next = st.hits.find(x => x[0] > h[0]);
+  const end = next ? next[0] : S.size;
+  S.side = 'a'; S.anchor = h[0]; S.cur = end - 1; S.nib = null; S.match = null;
+  render();
+  return true;
+}
+
+// ---------------------------------------------------------------- bookmarks
+// Kept per file in this browser, keyed by SHA-256. Until the hash is known they live in memory only.
+const BM_PREFIX = 'hexes.bm.';
+const BM_AS = { '': 'Bytes', filetime: 'FILETIME', unix: 'Unix time', unixms: 'Unix ms', dos: 'DOS time' };
+function saveBookmarks() {
+  if (!S.bm.key) return;
+  try {
+    if (S.bm.list.length) localStorage.setItem(BM_PREFIX + S.bm.key, JSON.stringify(S.bm.list));
+    else localStorage.removeItem(BM_PREFIX + S.bm.key);
+  } catch {}
+}
+function attachBookmarks() {
+  if (!S.hash || !S.hash.sha256) return;
+  S.bm.key = S.hash.sha256;
+  let stored = [];
+  try { stored = JSON.parse(localStorage.getItem(BM_PREFIX + S.bm.key) || '[]'); } catch {}
+  const have = new Set(S.bm.list.map(b => b.id));
+  S.bm.list = S.bm.list.concat(stored.filter(b => b && !have.has(b.id) && Number.isFinite(b.start) && b.start < S.size))
+    .sort((a, b) => a.start - b.start);
+  saveBookmarks();
+  renderBookmarks();
+  render();
+}
+const bmLog = (op, b) => api('bookmark', { method: 'POST', body: { id: S.file.id, op, start: b.start, len: b.len, note: b.note, as: b.as } }).catch(() => {});
+
+// Decode a timestamp from the bookmark's first bytes; iso is what Mill gets
+function bmDecode(bytes, as, le) {
+  const n = bytes.length, dv = new DataView(Uint8Array.from(bytes).buffer);
+  let text = null;
+  if (as === 'filetime' && n >= 8) text = filetime(dv.getBigUint64(0, le));
+  else if (as === 'unix' && n >= 4) text = unixS(dv.getUint32(0, le));
+  else if (as === 'unixms' && n >= 8) text = unixMs(dv.getBigUint64(0, le));
+  else if (as === 'dos' && n >= 4) text = dosTime(dv.getUint16(0, le), dv.getUint16(2, le));
+  if (!text || /not set/.test(text)) return { text: text || (as ? 'not a valid ' + BM_AS[as] : ''), iso: null };
+  const iso = text.replace(' ', 'T').replace(/\.(\d{3})\d*/, '.$1').replace(' UTC', 'Z').replace(' (local)', '');
+  return { text, iso };
+}
+// 8-byte timestamps landing in 1995–2099 are distinctive enough to set automatically. Almost any 4 bytes
+// read as some plausible date (an IPv4 address does), so for those this only suggests.
+const bmPlausible = (bytes, as, le) => { const d = bmDecode(bytes, as, le); return !!d.iso && /^(199[5-9]|20\d\d)-/.test(d.iso); };
+function bmGuess(bytes, len, le) {
+  return len === 8 ? ['filetime', 'unixms'].find(as => bmPlausible(bytes, as, le)) || '' : '';
+}
+function bmSuggest(bytes, len, le) {
+  return len === 4 ? ['unix', 'dos'].find(as => bmPlausible(bytes, as, le)) || '' : '';
+}
+async function bmBytes(b) { return Array.from(await api(`read?id=${S.file.id}&offset=${b.start}&length=${Math.min(8, b.len)}`)); }
+
+async function addBookmark(e) {
+  if (e) e.preventDefault();
+  if (!S.file || !S.size) return toast('Open a file first');
+  if (S.B && S.side === 'b') return toast('Bookmarks are for file A. Click in the A pane first.');
+  const sel = selRange(), start = sel ? sel[0] : S.cur, len = sel ? sel[1] - sel[0] + 1 : 1;
+  const b = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), start, len, note: $('#bmNote').value.trim(), as: '', le: S.le, created: new Date().toISOString() };
+  let hint = '';
+  try {
+    const bytes = await bmBytes(b);
+    b.as = bmGuess(bytes, len, b.le);
+    Object.assign(b, { value: bmDecode(bytes, b.as, b.le).text, iso: bmDecode(bytes, b.as, b.le).iso });
+    const maybe = !b.as && bmSuggest(bytes, len, b.le);
+    if (maybe) hint = `. As a ${BM_AS[maybe]} it would read ${bmDecode(bytes, maybe, b.le).text}; set "Read as" to use that`;
+  } catch {}
+  S.bm.list.push(b);
+  S.bm.list.sort((x, y) => x.start - y.start);
+  $('#bmNote').value = '';
+  saveBookmarks();
+  bmLog('add', b);
+  renderBookmarks();
+  render();
+  toast(`Bookmarked ${h0x(start)}${len > 1 ? ` (${len.toLocaleString()} bytes)` : ''}${b.as ? ' as ' + BM_AS[b.as] + ': ' + b.value : ''}${hint}`, hint ? 7000 : 3200);
+}
+
+function renderBookmarks() {
+  const list = S.bm.list, n = list.length;
+  $('#bmHead').textContent = !S.file ? '' : n ? `${n} bookmark${n === 1 ? '' : 's'}${S.bm.key ? '' : ' · saved once the file is hashed'}` : 'No bookmarks yet';
+  $('#bmList').innerHTML = list.map((b, i) =>
+    `<li data-i="${i}"><span class="ro" title="Jump here">${hexOff(b.start)}</span><span class="rk">${b.len > 1 ? b.len.toLocaleString() + ' B' : ''}</span>` +
+    `<select data-as aria-label="Read as">${Object.entries(BM_AS).map(([k, v]) => `<option value="${k}"${k === b.as ? ' selected' : ''}>${v}</option>`).join('')}</select>` +
+    `${b.as ? `<span class="bv">${esc(b.value || '')}</span>` : ''}` +
+    `<input type="text" data-note value="${esc(b.note || '')}" placeholder="Add a note" aria-label="Note" maxlength="300">` +
+    `<button type="button" class="del" data-del title="Remove bookmark" aria-label="Remove bookmark">×</button></li>`).join('');
+  const timed = list.filter(b => b.iso).length;
+  $('#bmMill').disabled = !timed;
+  $('#bmCsv').disabled = $('#bmClear').disabled = !n;
+}
+
+function gotoBookmark(i) {
+  const b = S.bm.list[i];
+  if (!b) return;
+  S.side = 'a'; S.cur = b.start; S.anchor = b.len > 1 ? b.start + b.len - 1 : null; S.nib = null; S.match = null;
+  const row = Math.floor(b.start / ROW);
+  if (row < S.top || row >= S.top + S.rows) centerOn(b.start);
+  document.querySelectorAll('#bmList li.on').forEach(li => li.classList.remove('on'));
+  const li = $(`#bmList li[data-i="${i}"]`);
+  if (li) li.classList.add('on');
+  render();
+}
+function stepBookmark(dir) {
+  const list = S.bm.list;
+  if (!list.length) return toast('No bookmarks yet');
+  let i = dir > 0 ? list.findIndex(b => b.start > S.cur) : list.map(b => b.start < S.cur).lastIndexOf(true);
+  if (i < 0) i = dir > 0 ? 0 : list.length - 1;
+  gotoBookmark(i);
+}
+
+function bmCsvLines() {
+  const q = v => `"${String(v).replace(/"/g, '""')}"`;
+  const cell = v => q(/^[=+\-@\t\r]/.test(v) ? "'" + v : v);
+  const sha = S.hash ? S.hash.sha256 : '';
+  return ['timestamp,event,offset_hex,offset,length,decoded_as,file,sha256',
+    ...S.bm.list.map(b => [b.iso || '', cell(b.note || '(no note)'), h0x(b.start), b.start, b.len, b.as ? BM_AS[b.as] + (b.as === 'dos' ? ' (local time)' : '') : '', cell(S.file.name), sha].join(','))];
+}
+async function saveBookmarksCsv() {
+  if (!S.bm.list.length) return;
+  try {
+    const r = await api('savebytes', { method: 'POST', body: { id: S.file.id, name: S.file.name.replace(/\.[^.]*$/, '') + '_bookmarks.csv', data: b64encode(new TextEncoder().encode(bmCsvLines().join('\n') + '\n')), note: 'bookmarks' } });
+    $('#bmOut').innerHTML = outCard('Bookmarks saved', r);
+  } catch (e) { toast(e.message); }
+}
+// The timestamped bookmarks become events on Mill's timeline, through the shared suite hand-off
+function sendBookmarksToMill() {
+  const timed = S.bm.list.filter(b => b.iso);
+  if (!timed.length) return toast('None of the bookmarks hold a timestamp yet. Set "Read as" on one first.');
+  if (!window.Suite) return toast('This copy of Hexes cannot hand off to Mill. Save as CSV and drop it into Mill.');
+  const lines = bmCsvLines(), keep = new Set(timed.map(b => b.id));
+  const rows = [lines[0], ...S.bm.list.map((b, i) => keep.has(b.id) ? lines[i + 1] : null).filter(Boolean)];
+  const w = window.open('', '_blank');
+  const go = url => { if (w) { w.opener = null; w.location.href = url; } else location.href = url; };
+  Suite.send('hexes', 'mill', { kind: 'events', name: S.file.name.replace(/\.[^.]*$/, '') + '_bookmarks', data: rows.join('\n') + '\n', meta: { timeCols: ['timestamp'], tz: 0 } })
+    .then(go, e => { if (w) w.close(); toast(e.message); });
 }
 
 // ---------------------------------------------------------------- selection, decode, carve
@@ -2905,6 +3290,7 @@ function switchTab(name) {
   document.querySelectorAll('.tab').forEach(t => { const on = t.dataset.tab === name; t.classList.toggle('on', on); t.setAttribute('aria-selected', on); });
   document.querySelectorAll('.tabpane').forEach(p => (p.hidden = p.dataset.pane !== name));
   if (name === 'strings') autoStrings();
+  if (name === 'embed' && S.file && (!S.emb || S.emb.fid !== S.file.id) && S.size <= STR_AUTO) runEmbedded();
 }
 function setEndian(le) {
   S.le = le;
@@ -2977,8 +3363,47 @@ $('#strResults').addEventListener('click', e => {
   gotoString(+li.dataset.i);
 });
 $('#strCsv').addEventListener('click', saveStringsCsv);
+$('#bmForm').addEventListener('submit', addBookmark);
+$('#bmSelBtn').addEventListener('click', () => { switchTab('bm'); $('#bmNote').focus(); toast('Type a note and press Enter to bookmark the selection'); });
+$('#bmCsv').addEventListener('click', saveBookmarksCsv);
+$('#bmMill').addEventListener('click', sendBookmarksToMill);
+$('#bmClear').addEventListener('click', () => {
+  if (!S.bm.list.length || !confirm(`Remove all ${S.bm.list.length} bookmarks for this file?`)) return;
+  S.bm.list.forEach(b => bmLog('remove', b));
+  S.bm.list = [];
+  saveBookmarks(); renderBookmarks(); render();
+});
+$('#bmList').addEventListener('click', e => {
+  const li = e.target.closest('li[data-i]');
+  if (!li) return;
+  const i = +li.dataset.i, b = S.bm.list[i];
+  if (e.target.closest('[data-del]')) {
+    S.bm.list.splice(i, 1);
+    saveBookmarks(); bmLog('remove', b); renderBookmarks(); render();
+    return;
+  }
+  if (!e.target.closest('input, select')) gotoBookmark(i);
+});
+$('#bmList').addEventListener('change', async e => {
+  const li = e.target.closest('li[data-i]');
+  if (!li) return;
+  const b = S.bm.list[+li.dataset.i];
+  if (e.target.matches('[data-note]')) b.note = e.target.value.trim();
+  if (e.target.matches('[data-as]')) {
+    b.as = e.target.value;
+    try { const d = bmDecode(await bmBytes(b), b.as, b.le); b.value = d.text; b.iso = d.iso; } catch {}
+    renderBookmarks();
+  }
+  saveBookmarks(); bmLog('edit', b);
+});
+$('#embRun').addEventListener('click', runEmbedded);
+$('#embCancel').addEventListener('click', () => { const st = S.emb; if (st) api(`embedded?id=${st.fid}&job=${st.job}&cancel=1`).catch(() => {}); });
+$('#embResults').addEventListener('click', e => { const li = e.target.closest('li[data-i]'); if (li) gotoEmbedded(+li.dataset.i); });
+$('#embSelect').addEventListener('click', () => { if (selectToNextSignature()) toast('Selected to the next signature. The Selection tab can carve, hash or decode it.'); });
+$('#embCarve').addEventListener('click', async () => { if (selectToNextSignature()) { await carve(); const out = $('#selOut').innerHTML; if (out) $('#embOut').innerHTML = out; } });
 $('#strYara').addEventListener('click', addSelectionToRules);
 loadRules();
+renderBookmarks();
 $('#yaraRules').addEventListener('input', () => { clearTimeout(keepRules.t); keepRules.t = setTimeout(keepRules, 400); });
 $('#yaraRun').addEventListener('click', runYara);
 $('#yaraAdd').addEventListener('click', addSelectionToRules);
@@ -3077,6 +3502,7 @@ document.addEventListener('keydown', e => {
   if (mod && e.code === 'KeyG') { e.preventDefault(); $('#gotoInput').focus(); $('#gotoInput').select(); return; }
   if (mod && e.code === 'KeyF') { e.preventDefault(); switchTab('search'); $('#searchQ').focus(); $('#searchQ').select(); return; }
   if (e.key === 'F3') { e.preventDefault(); gotoHit(S.hitIdx + (e.shiftKey ? -1 : 1)); return; }
+  if (e.key === 'F2') { e.preventDefault(); stepBookmark(e.shiftKey ? -1 : 1); return; }
   if (e.key === 'F7') { e.preventDefault(); gotoDiff(e.shiftKey ? -1 : 1); return; }
   if (e.key === 'Escape' && !$('#modal').hidden) { $('#modal').hidden = true; return; }
   if (e.key === 'Escape' && !$('#linkModal').hidden) { $('#linkNo').click(); return; }

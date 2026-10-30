@@ -67,7 +67,8 @@
     opens, names it from its magic bytes, and decodes whatever you click as
     integers, FILETIME, Unix and DOS times, IPs and GUIDs. Pull out ASCII and
     UTF-16 strings, run YARA rules, search hex with wildcards, text or regex, spot packed or encrypted regions on the entropy
-    map, carve a selection to its own file, peel off Base64 or XOR, and compare
+    map, find files hidden inside files and carve them out, bookmark
+    timestamps and send them to Mill, peel off Base64 or XOR, and compare
     two files byte for byte.
   good_for: Checking a file is what it claims to be, pulling payloads out of documents, and proving exactly which bytes changed.
   try: /hexes/?sample=compare
