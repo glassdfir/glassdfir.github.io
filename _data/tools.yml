@@ -43,6 +43,7 @@
 
 - name: Scrimmage
   url: /scrimmage/
+  post: /blogsabout/knowing-when-youve-actually-contained-an-intrusion/
   tagline: Pressure-test red vs. blue on one clock.
   description: >-
     Launch attacker moves and defender responses on a shared timeline, under
