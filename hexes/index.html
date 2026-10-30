@@ -71,7 +71,9 @@ code, kbd { font-family: var(--font-mono); }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 :focus-visible { outline: 2px solid var(--cursor); outline-offset: 1px; }
 
-#app { height: 100%; display: grid; grid-template-rows: auto auto auto 1fr auto; }
+#app { height: 100%; display: flex; flex-direction: column; }
+#app > * { flex: none; }
+#app > .work { flex: 1 1 0; }
 
 /* ---------- header ---------- */
 .top { display: flex; align-items: center; gap: 20px; padding: 10px 18px; border-bottom: 1px solid var(--line); background: var(--surface); flex-wrap: wrap; }
@@ -133,7 +135,7 @@ kbd { font-size: 11px; border: 1px solid var(--line); border-bottom-width: 2px; 
 .edit-actions { display: inline-flex; gap: 8px; align-items: center; margin-left: auto; color: var(--edited); font-weight: 500; font-size: 13px; }
 
 /* ---------- work area ---------- */
-.work { display: grid; grid-template-columns: minmax(0, 1fr) 380px; min-height: 0; }
+.work { display: grid; grid-template-columns: minmax(0, 1fr) 380px; grid-template-rows: minmax(0, 1fr) min(var(--tools-h, clamp(230px, 36vh, 440px)), 70%); min-height: 0; }
 .viewer { display: flex; flex-direction: column; min-width: 0; min-height: 0; border-right: 1px solid var(--line); }
 .view-head, .row { font-family: var(--font-mono); font-size: 13px; white-space: pre; }
 .view-head { padding: 6px 0 4px; color: var(--dim); border-bottom: 1px solid var(--line); overflow: hidden; background: var(--surface); }
@@ -189,11 +191,19 @@ body.comparing .as { padding-left: 8px; }
 .insp td.na { color: var(--faint); }
 .insp td.sig { color: var(--accent); font-family: var(--font-ui); }
 
-.tools { flex: 1; display: flex; flex-direction: column; min-height: 260px; }
+.tools { grid-column: 1 / -1; position: relative; display: flex; flex-direction: column; min-height: 0; padding-top: 4px; border-top: 1px solid var(--line); border-bottom: 0; background: var(--surface); }
+.tools-grip { position: absolute; top: -4px; left: 0; right: 0; height: 9px; cursor: row-resize; z-index: 2; touch-action: none; }
+.tools-grip::after { content: ""; position: absolute; left: 50%; top: 3px; width: 44px; height: 3px; margin-left: -22px; border-radius: 2px; background: var(--line); }
+.tools-grip:hover::after, .tools-grip:focus-visible::after, body.resizing .tools-grip::after { background: var(--accent); }
+body.resizing { cursor: row-resize; user-select: none; }
 .tabs { display: flex; gap: 2px; margin-bottom: 10px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
-.tab { flex: none; background: none; border: 0; padding: 6px 5px; font-size: 13px; margin-bottom: -1px; border-bottom: 2px solid transparent; cursor: pointer; color: var(--dim); font-weight: 500; }
+.tab { flex: none; background: none; border: 0; padding: 6px 10px; margin-bottom: -1px; border-bottom: 2px solid transparent; cursor: pointer; color: var(--dim); font-weight: 500; }
 .tab.on { color: var(--fg); border-bottom-color: var(--accent); }
-.tabpane { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+.tabpane { flex: 1; display: grid; grid-template-columns: minmax(300px, 420px) minmax(0, 1fr); gap: 10px 24px; min-height: 0; }
+.tabpane[data-pane="yara"] { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); }
+.pane-ctl, .pane-out { display: flex; flex-direction: column; gap: 8px; min-width: 0; min-height: 0; overflow: auto; }
+.pane-out .results { max-height: none; flex: 0 1 auto; min-height: 0; }
+.pane-ctl textarea.code { flex: 1; min-height: 110px; resize: none; }
 .stack { display: flex; flex-direction: column; gap: 8px; }
 .row2 { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .row2 select { flex: 1; }
@@ -252,8 +262,13 @@ textarea.code { width: 100%; min-height: 190px; resize: vertical; background: va
 @media (max-width: 900px) {
   body { overflow: auto; }
   #app { height: auto; min-height: 100%; }
-  .work { grid-template-columns: 1fr; }
+  #app > .work { flex: none; }
+  .work { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; }
   .viewer { height: 60vh; border-right: 0; }
+  .tools-grip { display: none; }
+  .tabpane { grid-template-columns: minmax(0, 1fr) !important; }
+  .pane-out .results { max-height: 50vh; }
+  .pane-ctl textarea.code { min-height: 220px; resize: vertical; }
   .hint { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
@@ -358,7 +373,10 @@ textarea.code { width: 100%; min-height: 190px; resize: vertical; background: va
         <table class="insp" id="insp"></table>
       </section>
 
-      <section class="panel tools">
+    </aside>
+
+    <section class="panel tools" aria-label="Tools">
+      <div class="tools-grip" id="toolsGrip" role="separator" aria-orientation="horizontal" aria-label="Drag to resize the tools panel" tabindex="0"></div>
         <div class="tabs" role="tablist">
           <button role="tab" class="tab on" data-tab="search" aria-selected="true">Search</button>
           <button role="tab" class="tab" data-tab="strings" aria-selected="false">Strings</button>
@@ -369,137 +387,160 @@ textarea.code { width: 100%; min-height: 190px; resize: vertical; background: va
         </div>
 
         <div class="tabpane" data-pane="search">
-          <form id="searchForm" class="stack">
-            <div class="row2">
-              <label for="searchType" class="sr">Search type</label>
-              <select id="searchType">
-                <option value="hex">Hex bytes</option>
-                <option value="ascii">Text (ASCII)</option>
-                <option value="utf16">Text (UTF-16LE)</option>
-                <option value="regex">Regex</option>
-              </select>
-              <label class="check"><input type="checkbox" id="searchCi"> Ignore case</label>
-            </div>
-            <label for="searchQ" class="sr">Search for</label>
-            <input id="searchQ" type="text" placeholder="4D 5A ?? 00" autocomplete="off" spellcheck="false">
-            <div class="row2">
-              <label class="check"><input type="checkbox" id="searchFromCursor"> From cursor</label>
-              <span class="grow"></span>
-              <button type="button" class="btn ghost small" id="searchCancel" hidden>Stop</button>
-              <button type="submit" class="btn small">Search</button>
-            </div>
-          </form>
-          <div class="progress" id="searchProg" hidden><span></span></div>
-          <div class="result-head" id="searchHead"></div>
-          <ol class="results" id="searchResults"></ol>
+          <div class="pane-ctl">
+            <form id="searchForm" class="stack">
+              <div class="row2">
+                <label for="searchType" class="sr">Search type</label>
+                <select id="searchType">
+                  <option value="hex">Hex bytes</option>
+                  <option value="ascii">Text (ASCII)</option>
+                  <option value="utf16">Text (UTF-16LE)</option>
+                  <option value="regex">Regex</option>
+                </select>
+                <label class="check"><input type="checkbox" id="searchCi"> Ignore case</label>
+              </div>
+              <label for="searchQ" class="sr">Search for</label>
+              <input id="searchQ" type="text" placeholder="4D 5A ?? 00" autocomplete="off" spellcheck="false">
+              <div class="row2">
+                <label class="check"><input type="checkbox" id="searchFromCursor"> From cursor</label>
+                <span class="grow"></span>
+                <button type="button" class="btn ghost small" id="searchCancel" hidden>Stop</button>
+                <button type="submit" class="btn small">Search</button>
+              </div>
+            </form>
+            <div class="progress" id="searchProg" hidden><span></span></div>
+          </div>
+          <div class="pane-out">
+            <div class="result-head" id="searchHead"></div>
+            <ol class="results" id="searchResults"></ol>
+          </div>
         </div>
 
         <div class="tabpane" data-pane="strings" hidden>
-          <form id="strForm" class="stack">
-            <div class="row2">
-              <label for="strMin" class="check">Min length <input id="strMin" type="number" min="3" max="64" value="6" class="num"></label>
-              <label class="check"><input type="checkbox" id="strA" checked> ASCII</label>
-              <label class="check"><input type="checkbox" id="strU" checked> UTF-16LE</label>
-              <span class="grow"></span>
-              <button type="button" class="btn ghost small" id="strCancel" hidden>Stop</button>
-              <button type="submit" class="btn small" id="strRun">Find strings</button>
-            </div>
-            <div class="row2">
-              <label for="strFilter" class="sr">Filter strings</label>
-              <input id="strFilter" type="text" placeholder="Filter: http, \pipe\, .dll" autocomplete="off" spellcheck="false">
-              <label class="check"><input type="checkbox" id="strRe"> Regex</label>
-            </div>
-          </form>
-          <div class="progress" id="strProg" hidden><span></span></div>
-          <div class="row2">
-            <span class="result-head grow" id="strHead"></span>
-            <button type="button" class="btn ghost small" id="strYara" hidden title="Adds the string you clicked to the YARA rule">Add to YARA</button>
-            <button type="button" class="btn ghost small" id="strCsv" hidden>Save as CSV</button>
+          <div class="pane-ctl">
+            <form id="strForm" class="stack">
+              <div class="row2">
+                <label for="strMin" class="check">Min length <input id="strMin" type="number" min="3" max="64" value="6" class="num"></label>
+                <label class="check"><input type="checkbox" id="strA" checked> ASCII</label>
+                <label class="check"><input type="checkbox" id="strU" checked> UTF-16LE</label>
+                <span class="grow"></span>
+                <button type="button" class="btn ghost small" id="strCancel" hidden>Stop</button>
+                <button type="submit" class="btn small" id="strRun">Find strings</button>
+              </div>
+              <div class="row2">
+                <label for="strFilter" class="sr">Filter strings</label>
+                <input id="strFilter" type="text" placeholder="Filter: http, \pipe\, .dll" autocomplete="off" spellcheck="false">
+                <label class="check"><input type="checkbox" id="strRe"> Regex</label>
+              </div>
+            </form>
+            <div class="progress" id="strProg" hidden><span></span></div>
           </div>
-          <ol class="results" id="strResults"></ol>
-          <div id="strOut" class="sel-out"></div>
+          <div class="pane-out">
+            <div class="row2">
+              <span class="result-head grow" id="strHead"></span>
+              <button type="button" class="btn ghost small" id="strYara" hidden title="Adds the string you clicked to the YARA rule">Add to YARA</button>
+              <button type="button" class="btn ghost small" id="strCsv" hidden>Save as CSV</button>
+            </div>
+            <ol class="results" id="strResults"></ol>
+            <div id="strOut" class="sel-out"></div>
+          </div>
         </div>
 
         <div class="tabpane" data-pane="yara" hidden>
-          <p class="note">Rules run in this browser with <a href="https://virustotal.github.io/yara-x/" target="_blank" rel="noopener">YARA-X</a>. The engine (about 2 MB) downloads once from jsDelivr and is checked against a pinned hash. Your file and rules stay here.</p>
-          <label for="yaraRules" class="sr">YARA rules</label>
-          <textarea id="yaraRules" class="code" rows="11" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
-          <div class="btn-row">
-            <input id="yaraFile" type="file" accept=".yar,.yara,.txt" class="sr" tabindex="-1">
-            <label for="yaraFile" class="btn ghost small" tabindex="0" role="button">Load .yar…</label>
-            <button type="button" class="btn ghost small" id="yaraSave">Save .yar</button>
-            <button type="button" class="btn ghost small" id="yaraAdd" title="Adds the selected bytes as a string in the last rule">Add selection</button>
+          <div class="pane-ctl">
+            <p class="note">Rules run in this browser with <a href="https://virustotal.github.io/yara-x/" target="_blank" rel="noopener">YARA-X</a>. The engine (about 2 MB) downloads once from jsDelivr and is checked against a pinned hash. Your file and rules stay here.</p>
+            <label for="yaraRules" class="sr">YARA rules</label>
+            <textarea id="yaraRules" class="code" rows="11" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea>
+            <div class="btn-row">
+              <input id="yaraFile" type="file" accept=".yar,.yara,.txt" class="sr" tabindex="-1">
+              <label for="yaraFile" class="btn ghost small" tabindex="0" role="button">Load .yar…</label>
+              <button type="button" class="btn ghost small" id="yaraSave">Save .yar</button>
+              <button type="button" class="btn ghost small" id="yaraAdd" title="Adds the selected bytes as a string in the last rule">Add selection</button>
+            </div>
+            <div class="row2">
+              <label for="yaraScope" class="sr">What to scan</label>
+              <select id="yaraScope">
+                <option value="file">Scan the whole file</option>
+                <option value="sel">Scan the selection only</option>
+              </select>
+              <button type="button" class="btn small" id="yaraRun">Scan</button>
+            </div>
           </div>
-          <div class="row2">
-            <label for="yaraScope" class="sr">What to scan</label>
-            <select id="yaraScope">
-              <option value="file">Scan the whole file</option>
-              <option value="sel">Scan the selection only</option>
-            </select>
-            <button type="button" class="btn small" id="yaraRun">Scan</button>
+          <div class="pane-out">
+            <div class="result-head" id="yaraHead"></div>
+            <div id="yaraMsgs" class="dec-out"></div>
+            <ol class="results" id="yaraResults"></ol>
           </div>
-          <div class="result-head" id="yaraHead"></div>
-          <div id="yaraMsgs" class="dec-out"></div>
-          <ol class="results" id="yaraResults"></ol>
         </div>
 
         <div class="tabpane" data-pane="decode" hidden>
-          <p class="note">Decodes the current selection. Select bytes in the grid first.</p>
-          <div class="row2">
-            <label for="decMode" class="sr">Decoder</label>
-            <select id="decMode">
-              <option value="b64">Base64</option>
-              <option value="xor">XOR with key</option>
-              <option value="brute">XOR brute force (1 byte)</option>
-              <option value="hexstr">Hex text → bytes</option>
-            </select>
-            <label for="decKey" class="sr">XOR key</label>
-            <input id="decKey" type="text" placeholder="key: 5A or DE AD" autocomplete="off" spellcheck="false">
+          <div class="pane-ctl">
+            <p class="note">Decodes the current selection. Select bytes in the grid first.</p>
+            <div class="row2">
+              <label for="decMode" class="sr">Decoder</label>
+              <select id="decMode">
+                <option value="b64">Base64</option>
+                <option value="xor">XOR with key</option>
+                <option value="brute">XOR brute force (1 byte)</option>
+                <option value="hexstr">Hex text → bytes</option>
+              </select>
+              <label for="decKey" class="sr">XOR key</label>
+              <input id="decKey" type="text" placeholder="key: 5A or DE AD" autocomplete="off" spellcheck="false">
+            </div>
+            <div class="row2">
+              <span id="decSrc" class="note grow">No selection</span>
+              <button type="button" class="btn small" id="decRun">Decode</button>
+            </div>
           </div>
-          <div class="row2">
-            <span id="decSrc" class="note grow">No selection</span>
-            <button type="button" class="btn small" id="decRun">Decode</button>
+          <div class="pane-out">
+            <div id="decOut" class="dec-out"></div>
           </div>
-          <div id="decOut" class="dec-out"></div>
         </div>
 
         <div class="tabpane" data-pane="sel" hidden>
-          <dl class="kv" id="selInfo"></dl>
-          <div class="btn-row">
-            <button type="button" class="btn small" id="carveBtn">Carve to file</button>
-            <button type="button" class="btn ghost small" id="hashSelBtn">Hash selection</button>
-            <button type="button" class="btn ghost small" id="copyHexBtn">Copy as hex</button>
-            <button type="button" class="btn ghost small" id="copyTxtBtn">Copy as text</button>
-            <button type="button" class="btn ghost small" id="linkBytesBtn" title="A link that carries these bytes. Anyone who opens it sees them in Hexes.">Copy bytes as link</button>
-            <button type="button" class="btn ghost small" id="linkHereBtn" title="A link to this offset and the file's SHA-256. The file itself stays with you.">Copy link to here</button>
+          <div class="pane-ctl">
+            <dl class="kv" id="selInfo"></dl>
+            <div class="btn-row">
+              <button type="button" class="btn small" id="carveBtn">Carve to file</button>
+              <button type="button" class="btn ghost small" id="hashSelBtn">Hash selection</button>
+              <button type="button" class="btn ghost small" id="copyHexBtn">Copy as hex</button>
+              <button type="button" class="btn ghost small" id="copyTxtBtn">Copy as text</button>
+              <button type="button" class="btn ghost small" id="linkBytesBtn" title="A link that carries these bytes. Anyone who opens it sees them in Hexes.">Copy bytes as link</button>
+              <button type="button" class="btn ghost small" id="linkHereBtn" title="A link to this offset and the file's SHA-256. The file itself stays with you.">Copy link to here</button>
+            </div>
           </div>
-          <div id="selOut" class="sel-out"></div>
+          <div class="pane-out">
+            <div id="selOut" class="sel-out"></div>
+          </div>
         </div>
 
         <div class="tabpane" data-pane="cmp" hidden>
-          <form id="cmpForm" class="stack">
-            <p class="note">Open a second file as B. Both scroll together and differing bytes are highlighted. B is always read-only.</p>
-            <input id="fileB" type="file" class="sr" tabindex="-1">
-            <div class="row2">
-              <button type="button" class="btn ghost small" id="sampleB">Tampered sample</button>
+          <div class="pane-ctl">
+            <form id="cmpForm" class="stack">
+              <p class="note">Open a second file as B. Both scroll together and differing bytes are highlighted. B is always read-only.</p>
+              <input id="fileB" type="file" class="sr" tabindex="-1">
+              <div class="row2">
+                <button type="button" class="btn ghost small" id="sampleB">Tampered sample</button>
+                <span class="grow"></span>
+                <label for="fileB" class="btn small" tabindex="0" role="button">Choose file B…</label>
+              </div>
+              <p class="note">Tip: drop two files at once to open them as A and B, or drop one onto the B pane.</p>
+            </form>
+            <div class="progress" id="cmpProg" hidden><span></span></div>
+            <dl class="kv" id="cmpSummary"></dl>
+            <div class="row2" id="cmpNav" hidden>
+              <button type="button" class="btn ghost small" id="diffPrev">◀ Previous</button>
+              <button type="button" class="btn ghost small" id="diffNext">Next ▶</button>
               <span class="grow"></span>
-              <label for="fileB" class="btn small" tabindex="0" role="button">Choose file B…</label>
+              <button type="button" class="btn ghost small" id="cmpCsv">Save runs as CSV</button>
             </div>
-            <p class="note">Tip: drop two files at once to open them as A and B, or drop one onto the B pane.</p>
-          </form>
-          <div class="progress" id="cmpProg" hidden><span></span></div>
-          <dl class="kv" id="cmpSummary"></dl>
-          <div class="row2" id="cmpNav" hidden>
-            <button type="button" class="btn ghost small" id="diffPrev">◀ Previous</button>
-            <button type="button" class="btn ghost small" id="diffNext">Next ▶</button>
-            <span class="grow"></span>
-            <button type="button" class="btn ghost small" id="cmpCsv">Save runs as CSV</button>
           </div>
-          <ol class="results" id="cmpRuns"></ol>
-          <div id="cmpOut" class="sel-out"></div>
+          <div class="pane-out">
+            <ol class="results" id="cmpRuns"></ol>
+            <div id="cmpOut" class="sel-out"></div>
+          </div>
         </div>
       </section>
-    </aside>
   </main>
 
   <footer class="status" id="status">
@@ -3045,6 +3086,43 @@ document.addEventListener('keydown', e => {
 });
 
 window.addEventListener('resize', scheduleRender);
+new ResizeObserver(scheduleRender).observe(grid);
+
+// Tools panel height: drag the grip, or focus it and use the arrow keys; double-click resets. Kept in this browser.
+const TOOLS_KEY = 'hexes.toolsHeight';
+function setToolsHeight(h, keep) {
+  const work = $('.work');
+  h = clamp(Math.round(h), 160, Math.max(160, work.clientHeight - 140));
+  work.style.setProperty('--tools-h', h + 'px');
+  if (keep) { try { localStorage.setItem(TOOLS_KEY, h); } catch {} }
+}
+try { const h = +localStorage.getItem(TOOLS_KEY); if (h > 0) $('.work').style.setProperty('--tools-h', h + 'px'); } catch {}
+$('#toolsGrip').addEventListener('pointerdown', e => {
+  e.preventDefault();
+  const grip = e.currentTarget, y0 = e.clientY, h0 = $('.tools').offsetHeight;
+  grip.setPointerCapture(e.pointerId);
+  document.body.classList.add('resizing');
+  const move = ev => setToolsHeight(h0 + y0 - ev.clientY);
+  const up = () => {
+    grip.removeEventListener('pointermove', move);
+    grip.removeEventListener('pointerup', up);
+    grip.removeEventListener('pointercancel', up);
+    document.body.classList.remove('resizing');
+    setToolsHeight($('.tools').offsetHeight, true);
+  };
+  grip.addEventListener('pointermove', move);
+  grip.addEventListener('pointerup', up);
+  grip.addEventListener('pointercancel', up);
+});
+$('#toolsGrip').addEventListener('keydown', e => {
+  if (e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+  e.preventDefault(); e.stopPropagation(); // keep the arrows from moving the hex cursor
+  setToolsHeight($('.tools').offsetHeight + (e.key === 'ArrowUp' ? 24 : -24), true);
+});
+$('#toolsGrip').addEventListener('dblclick', () => {
+  $('.work').style.removeProperty('--tools-h');
+  try { localStorage.removeItem(TOOLS_KEY); } catch {}
+});
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawTrack);
 
 // ---------------------------------------------------------------- boot
