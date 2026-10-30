@@ -2145,7 +2145,7 @@ rule hexes_sample_beacon : demo
     description = "Hard-coded C2, Base64 PowerShell and an XOR-hidden pipe name"
   strings:
     $c2 = "203.0.113.66"
-    $ps = "powershell" base64wide
+    $ps = "powershell" wide base64
     $pipe = "\\\\\\\\.\\\\pipe\\\\" xor(1-255)
   condition:
     uint16(0) == 0x5A4D and $c2 and any of ($ps, $pipe)
