@@ -98,6 +98,11 @@ html:not(.theme-light) {
     color: $dm-text;
   }
 
+  /* Tools list */
+  .tool { border-top-color: $dm-border; }
+  .tool-good { color: $dm-muted; }
+  .entry-content .tool-links .tool-open:hover { background-color: rgba($dm-link, .12); }
+
   /* Buttons were black on white; invert them */
   .btn {
     background-color: $dm-heading;

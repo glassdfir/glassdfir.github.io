@@ -1,0 +1,87 @@
+/* ==========================================================================
+   Tools page: one row per tool, its icon on the left
+   ========================================================================== */
+
+.tool-list { margin-top: 1.75em; }
+
+.tool {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  padding: 24px 0;
+  border-top: 1px solid $border-color;
+
+  &:first-child { border-top: 0; padding-top: 0; }
+}
+
+.entry-content .tool-icon {
+  flex: none;
+  line-height: 0;
+  border-bottom: 0;
+
+  img {
+    width: 52px;
+    height: 52px;
+    margin: 0;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba($black, .25);
+  }
+}
+
+.tool-body {
+  flex: 1;
+  min-width: 0;
+
+  p { margin: 0 0 8px; }
+}
+
+.entry-content .tool-name {
+  margin: 0;
+  padding: 0;
+  border-bottom: 0;
+  font-size: 1.6em;
+  line-height: 1.2;
+
+  a { border-bottom: 0; text-decoration: none; }
+}
+
+.tool-tagline { font-weight: 600; }
+
+.tool-good {
+  @include font-size(15);
+
+  span {
+    margin-right: 4px;
+    @include font-size(12);
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    opacity: .7;
+  }
+}
+
+.entry-content .tool-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 20px;
+  margin-top: 14px;
+  @include font-size(15);
+
+  a { border-bottom: 0; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+}
+
+.entry-content .tool-links .tool-open {
+  padding: 5px 14px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-weight: 600;
+
+  &:hover { text-decoration: none; background-color: rgba($black, .06); }
+}
+
+@media (max-width: 30em) {
+  .tool { gap: 14px; }
+  .entry-content .tool-icon img { width: 40px; height: 40px; border-radius: 10px; }
+}

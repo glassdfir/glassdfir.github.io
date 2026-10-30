@@ -1,6 +1,8 @@
 # Tools listed on /tools/. Add a new entry here to add a tool to the page.
+# icon is a copy of the tool's favicon on a 32x32 dark tile, kept in tools/icons/.
 - name: Spoke
   url: /spoke/
+  icon: /tools/icons/spoke.svg
   post: /blogsabout/spoke/
   tagline: See the relationships in your CSVs.
   description: >-
@@ -11,6 +13,7 @@
 
 - name: Huddle
   url: /huddle/
+  icon: /tools/icons/huddle.svg
   post: /blogsabout/building-dfir-playbooks-with-huddle/
   tagline: Build and run DFIR playbooks.
   description: >-
@@ -21,6 +24,7 @@
 
 - name: Mill
   url: /mill/
+  icon: /tools/icons/mill.svg
   tagline: Merge your logs into one timeline.
   description: >-
     Drop in CSV, TSV or JSON exports from different tools and Mill finds
@@ -31,6 +35,7 @@
 
 - name: Shifu
   url: /shifu/
+  icon: /tools/icons/shifu.svg
   post: /blogsabout/learning-pandas-one-block-at-a-time/
   tagline: Build pandas scripts by stacking blocks.
   description: >-
@@ -43,6 +48,7 @@
 
 - name: Scrimmage
   url: /scrimmage/
+  icon: /tools/icons/scrimmage.svg
   post: /blogsabout/knowing-when-youve-actually-contained-an-intrusion/
   tagline: Pressure-test red vs. blue on one clock.
   description: >-
@@ -54,6 +60,7 @@
 
 - name: Hexes
   url: /hexes/
+  icon: /tools/icons/hexes.svg
   tagline: Put a hex on it.
   description: >-
     A read-only hex viewer for evidence files. Hexes hashes the file as it
